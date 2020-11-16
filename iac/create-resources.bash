@@ -3,6 +3,7 @@ set -e
 set -u
 
 RESOURCE_GROUP=piipan-resources
+FUNCTIONS_RESOURCE_GROUP=piipan-functions
 LOCATION=westus
 PROJECT_TAG=piipan
 RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
@@ -39,6 +40,8 @@ random_password () {
 
 echo "Creating $RESOURCE_GROUP group"
 az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
+echo "Creating $FUNCTIONS_RESOURCE_GROUP group"
+az group create --name $FUNCTIONS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
 # Create a key vault which will store credentials for use in other templates
 az deployment group create \
