@@ -166,12 +166,17 @@ export PGHOST=`az resource show \
   --resource-type "Microsoft.DbForPostgreSQL/servers" \
   --query properties.fullyQualifiedDomainName -o tsv`
 
+# Multiple PostgreSQL databases cannot be created with an ARM template;
+# detailed database/schema/role configuration can't be done with an ARM
+# template either. Instead, we access the PostgreSQL server from a trusted
+# network (as established by its ARM template firewall variable), and apply
+# various Data Definition (DDL) scripts for each state.
 ./create-databases.bash $RESOURCE_GROUP
 
 if [ "$exists" = "true" ]; then
   echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
 else
-  # Remove current user as a PostgreSQL AD admin
+  # Revoke temporary assignment of current user as a PostgreSQL AD admin
   az ad group member remove \
     --group $PG_AAD_ADMIN \
     --member-id $CURRENT_USER_OBJID

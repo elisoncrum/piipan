@@ -2,6 +2,8 @@
 
 ## Prerequisites
 - [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell, `/dev/urandom`, etc. via macOS, Linux, or the Windows Subsystem for Linux (WSL) 
 - `psql` client for PostgreSQL
 
@@ -20,4 +22,6 @@ To (re)create the Azure resources that `piipan` uses:
 ## Notes
 - `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-leter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
-- Multiple PostgreSQL databases cannot be created with an ARM template. Instead the PostgreSQL server must be accessed from a trusted network (as established by its ARM template firewall variable), and Data Definition Language (DDL) scripts must be applied.
+- If you forget to connect to a trusted network and `create-resources` fails, connect to the network, then re-run the script.
+- Some Azure CLI provisioning commands will return before all of their behind-the-scenes operations complete in the Azure environment. Very occasionally, subsequent provisioning commands in `create-resources` will fail as it won't be able to locate services it expects to be present; e.g., `Can't find app with name` when publishing a Function to a Function App. As a workaround, re-run the script.
+- .NET 5 with Azure Functions v3 is [not (yet) supported by Microsoft](https://github.com/Azure/azure-functions-host/issues/6674).
