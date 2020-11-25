@@ -143,9 +143,20 @@ while IFS=, read -r abbr name ; do
     az identity create -g $RESOURCE_GROUP -n $identity
 done < states.csv
 
-# Temporarily add current user as a PostgreSQL AD admin to allow provisioning of
-# managed identity roles; assumes it is not already a member.
-az ad group member add --group $PG_AAD_ADMIN --member-id $CURRENT_USER_OBJID
+exists=`az ad group member check \
+  --group $PG_AAD_ADMIN \
+  --member-id $CURRENT_USER_OBJID \
+  --query value -o tsv`
+
+if [ "$exists" = "true" ]; then
+  echo "$CURRENT_USER_OBJID is already a member of $PG_AAD_ADMIN"
+else
+  # Temporarily add current user as a PostgreSQL AD admin
+  # to allow provisioning of managed identity roles
+  az ad group member add \
+    --group $PG_AAD_ADMIN \
+    --member-id $CURRENT_USER_OBJID
+fi
 
 export PGPASSWORD=$PG_SECRET
 export PGUSER=${PG_SUPERUSER}@${PG_SERVER_NAME}
@@ -157,8 +168,14 @@ export PGHOST=`az resource show \
 
 ./create-databases.bash $RESOURCE_GROUP
 
-# Remove current user as a PostgreSQL AD admin
-az ad group member remove --group $PG_AAD_ADMIN --member-id $CURRENT_USER_OBJID
+if [ "$exists" = "true" ]; then
+  echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
+else
+  # Remove current user as a PostgreSQL AD admin
+  az ad group member remove \
+    --group $PG_AAD_ADMIN \
+    --member-id $CURRENT_USER_OBJID
+fi
 
 # Create App Service resources for dashboard app
 echo "Creating App Service resources for dashboard app"
