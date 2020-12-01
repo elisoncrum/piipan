@@ -44,6 +44,9 @@ APP_SERVICE_PLAN=piipan-app-plan
 # Base name of dashboard app
 DASHBOARD_APP_NAME=piipan-dashboard
 
+# Display name of service principal account responsible for CI/CD tasks
+SP_NAME_CICD=piipan-cicd
+
 # Create a very long, (mostly) random password. Ensures all Azure character
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
@@ -287,3 +290,6 @@ while IFS=, read -r abbr name ; do
     --included-event-types Microsoft.Storage.BlobCreated \
     --subject-begins-with /blobServices/default/containers/upload/blobs/
 done < states.csv
+
+# Create a service principal for use by CI/CD pipeline.
+./create-service-principal.bash $SP_NAME_CICD none
