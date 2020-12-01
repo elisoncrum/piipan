@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xunit;
 using Dashboard.Pages;
 using Microsoft.Extensions.Logging.Abstractions;
