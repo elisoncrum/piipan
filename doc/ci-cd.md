@@ -30,3 +30,11 @@ Service principal credentials are not stored outside of CircleCI and can not be 
 ```
 
 *Note:* Refreshing credentials will invalidate existing credentials and the `AZURE_SP` and `AZURE_SP_PASSWORD` environment variables will need to be updated.
+
+## Dependency Analysis
+
+Both [Snyk](https://snyk.io) and [Dependabot](https://github.com/features/security) are enabled on this repository to identify known vulnerabilities in software dependencies.
+
+Each repo subdirectory with package references (e.g., a `.csproject` file) should be explicitly configured in both Snyk and Dependabot.
+
+Dependabot is configured via [.github/dependabot.yml](../.github/dependabot.yml). Snyk can be configured by project administrators via its [ web console](https://app.snyk.io/org/18fpiipan/projects).
