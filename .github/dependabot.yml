@@ -1,0 +1,14 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/dashboard/app"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
+- package-ecosystem: nuget
+  directory: "/etl"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
