@@ -53,9 +53,3 @@ In a development environment, the `bin/upload.bash` tool can be used to upload t
 ```
 bin/upload.bash doc/csv/example.csv account-name
 ```
-
-
-
-
-
-
