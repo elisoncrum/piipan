@@ -17,9 +17,11 @@ namespace Dashboard.Pages
             _logger = logger;
         }
 
+        public string Message { get; private set; } = "Hello";
+
         public void OnGet()
         {
-
+            Message += ", world.";
         }
     }
 }
