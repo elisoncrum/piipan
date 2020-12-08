@@ -39,7 +39,7 @@ az functionapp config appsettings set --name function-app-name --resource-group 
 
 Set the database connection string in the `DatabaseConnectionString` environment variable, on a per-state basis, for the Function App. Use the ADO.NET value indicated by the portal for the `participants-records` cluster, modifying the string to reflect the specific state database (e.g, `ea`, `eb`, `ec`, etc.).
 ```
-az functionapp config appsettings set --name function-app-name --resource-group piipan-functions --settings BlobStorageConnectionString="…"
+az functionapp config appsettings set --name function-app-name --resource-group piipan-functions --settings DatabaseConnectionString="…"
 ```
 
 To republish the Azure Function to a specific state:
