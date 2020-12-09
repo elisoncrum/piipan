@@ -7,7 +7,7 @@ updates:
     time: "09:00"
   open-pull-requests-limit: 10
 - package-ecosystem: nuget
-  directory: "/etl"
+  directory: "/etl/src/Piipan.Etl"
   schedule:
     interval: daily
     time: "09:00"

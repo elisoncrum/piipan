@@ -277,7 +277,7 @@ while IFS=, read -r abbr name ; do
     --source ${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}
 
   # Create Function endpoint before setting up event subscription
-  pushd ../etl
+  pushd ../etl/src/Piipan.Etl
   func azure functionapp publish $func_app
   popd
 
