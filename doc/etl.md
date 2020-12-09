@@ -49,7 +49,7 @@ func azure functionapp publish function-app-name
 
 ## Ad-hoc testing
 
-In a development environment, the `bin/upload.bash` tool can be used to upload test CSV files to a storage account.
+In a development environment, the `upload.bash` tool can be used to upload test CSV files to a storage account.
 ```
-bin/upload.bash doc/csv/example.csv account-name
+./etl/tools/upload.bash doc/csv/example.csv account-name
 ```
