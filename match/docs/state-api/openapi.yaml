@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: "State Matching API"
   version: 1.0.0
-  description: "API for detecting a matching PII record within an individual state."
+  description: "API for detecting matching PII records within an individual state."
 tags:
   - name: "Match"
 servers:
@@ -12,8 +12,8 @@ paths:
     post:
       tags:
         - "Match"
-      summary: "Search for a matching PII record"
-      description: "Queries the state database for a PII record that is an exact match to the full name, date of birth, and social security number in the request body's `query` property."
+      summary: "Search for matching PII records"
+      description: "Queries the state database for any PII records that are an exact match to the full name, date of birth, and social security number in the request body's `query` property."
       requestBody:
         required: true
         content:
@@ -25,14 +25,15 @@ paths:
                   $ref: '#/components/requestBodies/matchQuery'
       responses:
         '200':
-          description: "Matching PII record, if one exists"
+          description: "Matching PII records, if any exist"
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  match:
-                    $ref: '#/components/schemas/PIIRecord'
+                  matches:
+                    items:
+                      $ref: '#/components/schemas/PIIRecord'
         '400':
           description: "Bad request. Missing one of the required properties in the request body."
           
