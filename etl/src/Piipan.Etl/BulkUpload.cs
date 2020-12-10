@@ -56,17 +56,8 @@ namespace Piipan.Etl
                     var blobName = GetBlobNameFromUrl(createdEvent.Url);
                     log.LogDebug($"Extracting records from {blobName}");
 
-                    using (var reader = new StreamReader(input))
-                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                    {
-                        csv.Configuration.HasHeaderRecord = true;
-                        csv.Configuration.TrimOptions = TrimOptions.Trim;
-                        csv.Configuration.RegisterClassMap<PiiRecordMap>();
-                        
-                        // Yields records as it is iterated over
-                        var records = csv.GetRecords<PiiRecord>();
-                        Load(records, log);
-                    }
+                    var records = Read(input, log);
+                    Load(records, log);
                 }
                 else
                 {
@@ -78,6 +69,19 @@ namespace Piipan.Etl
                 log.LogError(ex.Message);
                 throw;
             }
+        }
+
+        static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
+        {
+            var reader = new StreamReader(input);
+            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Configuration.HasHeaderRecord = true;
+            csv.Configuration.TrimOptions = TrimOptions.Trim;
+            csv.Configuration.RegisterClassMap<PiiRecordMap>();
+
+            // Yields records as it is iterated over
+            return csv.GetRecords<PiiRecord>();
         }
 
         static void Load(IEnumerable<PiiRecord> records, ILogger log)
