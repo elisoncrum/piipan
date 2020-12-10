@@ -92,18 +92,21 @@ workflows:
       - build
       - deploy-dev:
           requires:
+            - test
             - build
           filters:
             branches:
               only: develop
       - deploy-staging:
           requires:
+            - test
             - build
           filters:
             branches:
               only: staging
       - deploy-prod:
           requires:
+            - test
             - build
           filters:
             branches:
