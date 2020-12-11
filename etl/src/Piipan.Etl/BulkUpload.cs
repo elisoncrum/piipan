@@ -23,7 +23,7 @@ namespace Piipan.Etl
     /// </summary>
     public static class BulkUpload
     {
-        static string GetBlobNameFromUrl(string bloblUrl)
+        internal static string GetBlobNameFromUrl(string bloblUrl)
         {
             var uri = new Uri(bloblUrl);
             var blobClient = new BlobClient(uri);
@@ -71,7 +71,7 @@ namespace Piipan.Etl
             }
         }
 
-        static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
+        internal static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
         {
             var reader = new StreamReader(input);
             var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -84,7 +84,7 @@ namespace Piipan.Etl
             return csv.GetRecords<PiiRecord>();
         }
 
-        static void Load(IEnumerable<PiiRecord> records, ILogger log)
+        internal static void Load(IEnumerable<PiiRecord> records, ILogger log)
         {
             var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
 
