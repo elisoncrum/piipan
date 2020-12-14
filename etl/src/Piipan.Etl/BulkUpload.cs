@@ -25,13 +25,6 @@ namespace Piipan.Etl
     /// </summary>
     public static class BulkUpload
     {
-        internal static string GetBlobNameFromUrl(string bloblUrl)
-        {
-            var uri = new Uri(bloblUrl);
-            var blobClient = new BlobClient(uri);
-            return blobClient.Name;
-        }
-
         /// <summary>
         /// Entry point for the state-specific Azure Function instance
         /// </summary>
@@ -54,15 +47,13 @@ namespace Piipan.Etl
             {
                 if (input != null)
                 {
-                    var createdEvent = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
-                    var blobName = GetBlobNameFromUrl(createdEvent.Url);
-                    log.LogDebug($"Extracting records from {blobName}");
-
                     var records = Read(input, log);
                     Load(records, NpgsqlFactory.Instance, log);
                 }
                 else
                 {
+                    // Can get here if Function does not have
+                    // permission to access blob URL
                     log.LogError("No input stream was provided");
                 }
             }
