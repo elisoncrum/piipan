@@ -2,16 +2,16 @@
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Globalization;
 using System.IO;
-using Azure.Storage.Blobs;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using Npgsql;
 
 namespace Piipan.Etl
@@ -23,13 +23,6 @@ namespace Piipan.Etl
     /// </summary>
     public static class BulkUpload
     {
-        internal static string GetBlobNameFromUrl(string bloblUrl)
-        {
-            var uri = new Uri(bloblUrl);
-            var blobClient = new BlobClient(uri);
-            return blobClient.Name;
-        }
-
         /// <summary>
         /// Entry point for the state-specific Azure Function instance
         /// </summary>
@@ -52,15 +45,13 @@ namespace Piipan.Etl
             {
                 if (input != null)
                 {
-                    var createdEvent = ((JObject)eventGridEvent.Data).ToObject<StorageBlobCreatedEventData>();
-                    var blobName = GetBlobNameFromUrl(createdEvent.Url);
-                    log.LogDebug($"Extracting records from {blobName}");
-
                     var records = Read(input, log);
-                    Load(records, log);
+                    Load(records, NpgsqlFactory.Instance, log);
                 }
                 else
                 {
+                    // Can get here if Function does not have
+                    // permission to access blob URL
                     log.LogError("No input stream was provided");
                 }
             }
@@ -84,49 +75,65 @@ namespace Piipan.Etl
             return csv.GetRecords<PiiRecord>();
         }
 
-        internal static void Load(IEnumerable<PiiRecord> records, ILogger log)
+        internal static void Load(IEnumerable<PiiRecord> records, DbProviderFactory factory, ILogger log)
         {
             var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
 
-            using (var conn = new NpgsqlConnection(connString))
+            using (var conn = factory.CreateConnection())
             {
+                conn.ConnectionString = connString;
                 conn.Open();
 
                 // Assumes we want to process in an all-or-nothing fashion;
                 // i.e., a processing error in one record spoils the whole batch
                 var tx = conn.BeginTransaction();
 
-                using (var cmd = new NpgsqlCommand(
-                    "INSERT INTO uploads (created_at, publisher) VALUES(now(), current_user)", conn))
+                using (var cmd = factory.CreateCommand())
                 {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "INSERT INTO uploads (created_at, publisher) VALUES(now(), current_user)";
                     cmd.ExecuteNonQuery();
                 }
 
                 Int64 lastval = 0;
-                using (var cmd = new NpgsqlCommand("SELECT lastval()", conn))
+                using (var cmd = factory.CreateCommand())
                 {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "SELECT lastval()";
                     lastval = (Int64)cmd.ExecuteScalar();
                 }
 
                 foreach (var record in records)
                 {
-                    using (var cmd = new NpgsqlCommand(
-                        "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id) " +
-                        "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id)", conn))
+                    using (var cmd = factory.CreateCommand())
                     {
-                        cmd.Parameters.AddWithValue("last", record.Last);
-                        cmd.Parameters.AddWithValue("first", (object)record.First ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("middle", (object)record.Middle ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("dob", record.Dob);
-                        cmd.Parameters.AddWithValue("ssn", record.Ssn);
-                        cmd.Parameters.AddWithValue("exception", (object)record.Exception ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("upload_id", lastval);
+                        cmd.Connection = conn;
+                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id) " +
+                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id)";
+
+                        AddWithValue(cmd, DbType.String, "last", record.Last);
+                        AddWithValue(cmd, DbType.String, "first", (object)record.First ?? DBNull.Value);
+                        AddWithValue(cmd, DbType.String, "middle", (object)record.Middle ?? DBNull.Value);
+                        AddWithValue(cmd, DbType.DateTime, "dob", record.Dob);
+                        AddWithValue(cmd, DbType.String, "ssn", record.Ssn);
+                        AddWithValue(cmd, DbType.String, "exception", (object)record.Exception ?? DBNull.Value);
+                        AddWithValue(cmd, DbType.Int64, "upload_id", lastval);
+
                         cmd.ExecuteNonQuery();
                     }
                 }
                 tx.Commit();
                 conn.Close();
             }
+        }
+
+        static void AddWithValue(DbCommand cmd, DbType type, String name, object value)
+        {
+            var p = cmd.CreateParameter();
+            p.DbType = type;
+            p.ParameterName = name;
+            p.Value = value;
+            cmd.Parameters.Add(p);
         }
     }
 }
