@@ -6,14 +6,12 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.IO;
-using Azure.Storage.Blobs;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using Npgsql;
 
 namespace Piipan.Etl
