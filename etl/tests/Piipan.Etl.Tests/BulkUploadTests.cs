@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Npgsql;
 using Xunit;
 
 namespace Piipan.Etl.Tests
@@ -24,6 +28,19 @@ namespace Piipan.Etl.Tests
             stream.Position = 0;
 
             return stream;
+        }
+
+        static PiiRecord RecordFixture()
+        {
+            return new PiiRecord
+            {
+                Last = "Last",
+                First = "First",
+                Middle = "Middle",
+                Dob = new DateTime(1970, 1, 1),
+                Ssn = "000-00-0000",
+                Exception = "Exception"
+            };
         }
 
         [Fact]
@@ -98,6 +115,28 @@ namespace Piipan.Etl.Tests
                     ;
                 }
             });
+        }
+
+        [Fact]
+        public void CountInserts()
+        {
+            var logger = Mock.Of<ILogger>();
+            var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
+            var cmd = new Mock<DbCommand>() { DefaultValue = DefaultValue.Mock };
+            factory.Setup(f => f.CreateCommand()).Returns(cmd.Object);
+
+            // Mocks foreign key used in participants table
+            cmd.Setup(c => c.ExecuteScalar()).Returns((Int64)1);
+
+            // Mock can't test unique constraint on SSN
+            var records = new List<PiiRecord>() {
+                RecordFixture(),
+                RecordFixture(),
+            };
+            BulkUpload.Load(records, factory.Object, logger);
+
+            // Row in uploads table + rows in participants table
+            cmd.Verify(f => f.ExecuteNonQuery(), Times.Exactly(1 + records.Count));
         }
     }
 }
