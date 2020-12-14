@@ -30,7 +30,7 @@ namespace Piipan.Etl.Tests
             return stream;
         }
 
-        static PiiRecord RecordFixture()
+        static PiiRecord AllFields()
         {
             return new PiiRecord
             {
@@ -40,6 +40,19 @@ namespace Piipan.Etl.Tests
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
                 Exception = "Exception"
+            };
+        }
+
+        static PiiRecord OnlyRequiredFields()
+        {
+            return new PiiRecord
+            {
+                Last = "Last",
+                First = null,
+                Middle = null,
+                Dob = new DateTime(1970, 1, 1),
+                Ssn = "000-00-0000",
+                Exception = null
             };
         }
 
@@ -130,8 +143,8 @@ namespace Piipan.Etl.Tests
 
             // Mock can't test unique constraint on SSN
             var records = new List<PiiRecord>() {
-                RecordFixture(),
-                RecordFixture(),
+                AllFields(),
+                OnlyRequiredFields(),
             };
             BulkUpload.Load(records, factory.Object, logger);
 
