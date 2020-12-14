@@ -1,0 +1,43 @@
+#/components/requestBodies/MatchQueryRequest
+MatchQueryRequest:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          query:
+            $ref: '#/MatchQuery'
+MatchQuery:
+  type: object
+  required:
+    - last
+    - dob
+    - ssn
+  properties:
+    first:
+      type: string
+      description: "PII record's first name"
+    middle:
+      type: string
+      description: "PII record's middle name"
+    last:
+      type: string
+      description: "PII record's last name"
+    ssn:
+      type: string
+      description: "PII record's social security number"
+      pattern: '^\d{3}-\d{2}-\d{4}$'
+    dob:
+      type: string
+      format: "date"
+      description: "PII record's date of birth"
+
+#/components/schemas/MatchQueryResponse
+MatchQueryResponse:
+  type: object
+  properties:
+    matches:
+      type: array
+      items:
+        $ref: 'pii-record.yaml#/PiiRecord'

@@ -1,3 +1,4 @@
+# Orchestrator API base spec
 openapi: 3.0.0
 info:
   title: "Active Matching API"
@@ -6,7 +7,7 @@ info:
 tags:
   - name: "Match"
 servers:
-  - url: "/v1/"
+  - url: "/v1"
 paths:
   /query:
     post:
@@ -15,33 +16,23 @@ paths:
       summary: "Search for all matching PII records"
       description: "Queries all state databases for any PII records that are an exact match to the full name, date of birth, and social security number in the request body's `query` property."
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                query:
-                  $ref: '#/components/requestBodies/matchQuery'
+        $ref: '#/components/requestBodies/MatchQueryRequest'
       responses:
         '200':
           description: "Matching PII records, if any exist"
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  matches:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PIIRecord'
+                $ref: '#/components/schemas/MatchQueryResponse'
         '400':
-          description: "Bad request. Missing one of the required properties in the request body."    
-
+          description: "Bad request. Missing one of the required properties in the request body."
 components:
-  schemas:
-    PIIRecord:
-      $ref: '../models/pii-record.yaml'
   requestBodies:
-    matchQuery:
-      $ref: '../models/match-query.yaml'
+    MatchQueryRequest:
+      $ref: '../schemas/match-query.yaml#/MatchQueryRequest'
+  schemas:
+    MatchQueryResponse:
+      $ref: '../schemas/match-query.yaml#/MatchQueryResponse'
+    PiiRecord:
+      $ref: '../schemas/pii-record.yaml#/PiiRecord'
+
