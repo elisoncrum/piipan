@@ -17,13 +17,19 @@ jobs:
             ./cc-test-reporter before-build
       - run:
           working_directory: dashboard/app.Tests
-          name: Test .NET project
+          name: Test Dashboard
+          command: dotnet test --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      - run:
+          working_directory: etl/tests/Piipan.Etl.Tests
+          name: Test Etl
           command: dotnet test --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
           name: Upload Code Climate coverage report
           command: |
-            ./cc-test-reporter -d format-coverage ./dashboard/app.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project
-            ./cc-test-reporter upload-coverage
+            ./cc-test-reporter -d format-coverage ./dashboard/app.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json 
+            ./cc-test-reporter -d format-coverage ./etl/tests/Piipan.Etl.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.etl.json
+            ./cc-test-reporter sum-coverage /tmp/codeclimate.*.json -o /tmp/sum.json
+            ./cc-test-reporter upload-coverage -i /tmp/sum.json
 
   build:
     docker:

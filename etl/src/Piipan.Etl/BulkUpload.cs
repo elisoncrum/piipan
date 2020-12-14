@@ -23,7 +23,7 @@ namespace Piipan.Etl
     /// </summary>
     public static class BulkUpload
     {
-        static string GetBlobNameFromUrl(string bloblUrl)
+        internal static string GetBlobNameFromUrl(string bloblUrl)
         {
             var uri = new Uri(bloblUrl);
             var blobClient = new BlobClient(uri);
@@ -56,17 +56,8 @@ namespace Piipan.Etl
                     var blobName = GetBlobNameFromUrl(createdEvent.Url);
                     log.LogDebug($"Extracting records from {blobName}");
 
-                    using (var reader = new StreamReader(input))
-                    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                    {
-                        csv.Configuration.HasHeaderRecord = true;
-                        csv.Configuration.TrimOptions = TrimOptions.Trim;
-                        csv.Configuration.RegisterClassMap<PiiRecordMap>();
-                        
-                        // Yields records as it is iterated over
-                        var records = csv.GetRecords<PiiRecord>();
-                        Load(records, log);
-                    }
+                    var records = Read(input, log);
+                    Load(records, log);
                 }
                 else
                 {
@@ -80,7 +71,20 @@ namespace Piipan.Etl
             }
         }
 
-        static void Load(IEnumerable<PiiRecord> records, ILogger log)
+        internal static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
+        {
+            var reader = new StreamReader(input);
+            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            csv.Configuration.HasHeaderRecord = true;
+            csv.Configuration.TrimOptions = TrimOptions.Trim;
+            csv.Configuration.RegisterClassMap<PiiRecordMap>();
+
+            // Yields records as it is iterated over
+            return csv.GetRecords<PiiRecord>();
+        }
+
+        internal static void Load(IEnumerable<PiiRecord> records, ILogger log)
         {
             var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
 
