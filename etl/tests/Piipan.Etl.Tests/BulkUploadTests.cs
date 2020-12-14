@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Npgsql;
@@ -24,6 +25,17 @@ namespace Piipan.Etl.Tests
             {
                 writer.WriteLine(record);
             }
+            writer.Flush();
+            stream.Position = 0;
+
+            return stream;
+        }
+
+        static Stream BadBlob()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.WriteLine("foo");
             writer.Flush();
             stream.Position = 0;
 
@@ -54,6 +66,26 @@ namespace Piipan.Etl.Tests
                 Ssn = "000-00-0000",
                 Exception = null
             };
+        }
+
+        static EventGridEvent EventMock()
+        {
+            var e = Mock.Of<EventGridEvent>();
+            // Can't override Data in Setup, just use a real one
+            e.Data = new Object();
+            return e;
+        }
+
+        // Check that the expected message was logged as an error at least once
+        static void VerifyLogError(Mock<ILogger> logger, String expected)
+        {
+            logger.Verify(x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString() == expected),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+            ));
         }
 
         [Fact]
@@ -150,6 +182,29 @@ namespace Piipan.Etl.Tests
 
             // Row in uploads table + rows in participants table
             cmd.Verify(f => f.ExecuteNonQuery(), Times.Exactly(1 + records.Count));
+        }
+
+        [Fact]
+        public void NoInputStream()
+        {
+            var gridEvent = EventMock();
+            var logger = new Mock<ILogger>();
+
+            Stream input = null;
+            BulkUpload.Run(gridEvent, input, logger.Object);
+            VerifyLogError(logger, "No input stream was provided");
+        }
+
+        [Fact]
+        public void BadInputStream()
+        {
+            var gridEvent = EventMock();
+            var logger = new Mock<ILogger>();
+
+            Assert.ThrowsAny<Exception>(() =>
+            {
+                BulkUpload.Run(gridEvent, BadBlob(), logger.Object);
+            });
         }
     }
 }
