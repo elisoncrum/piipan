@@ -1,13 +1,25 @@
 version: 2
 updates:
 - package-ecosystem: nuget
-  directory: "/dashboard/app"
+  directory: "/dashboard/src/Piipan.Dashboard"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
+- package-ecosystem: nuget
+  directory: "/dashboard/tests/Piipan.Dashboard.Tests"
   schedule:
     interval: daily
     time: "09:00"
   open-pull-requests-limit: 10
 - package-ecosystem: nuget
   directory: "/etl/src/Piipan.Etl"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
+- package-ecosystem: nuget
+  directory: "/etl/tests/Piipan.Etl.Tests"
   schedule:
     interval: daily
     time: "09:00"
