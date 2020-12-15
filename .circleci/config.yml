@@ -16,7 +16,7 @@ jobs:
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
       - run:
-          working_directory: dashboard/app.Tests
+          working_directory: dashboard/tests/Piipan.Dashboard.Tests
           name: Test Dashboard
           command: dotnet test --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
@@ -26,7 +26,7 @@ jobs:
       - run:
           name: Upload Code Climate coverage report
           command: |
-            ./cc-test-reporter -d format-coverage ./dashboard/app.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json 
+            ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json 
             ./cc-test-reporter -d format-coverage ./etl/tests/Piipan.Etl.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.etl.json
             ./cc-test-reporter sum-coverage /tmp/codeclimate.*.json -o /tmp/sum.json
             ./cc-test-reporter upload-coverage -i /tmp/sum.json
@@ -43,52 +43,32 @@ jobs:
             apt-get update -y
             apt-get install -y zip
       - run:
-          working_directory: dashboard/app
-          name: Build .NET project
-          command: dotnet publish -o ./build
+          working_directory: dashboard/src/Piipan.Dashboard
+          name: Build Dashboard
+          command: dotnet publish -o ./artifacts
       - run:
-          working_directory: dashboard/app/build
-          name: Zip project build
-          command: zip -r build.zip .
+          working_directory: dashboard/src/Piipan.Dashboard/artifacts
+          name: Zip Dashboard build
+          command: zip -r dashboard.zip .
       - run:
-          name: Move zip to persistent directory
+          name: Move Dashboard zip to persistent directory
           command: |
             mkdir -p workspace
-            mv dashboard/app/build/build.zip workspace/build.zip
+            mv dashboard/src/Piipan.Dashboard/artifacts/dashboard.zip workspace/dashboard.zip
       - persist_to_workspace:
           root: workspace
           paths:
-            - build.zip
+            - dashboard.zip
 
-  deploy-prod:
+  deploy:
     executor: azure-cli/azure-docker
     steps:
       - attach_workspace:
           at: /build/workspace
       - azure-cli/login-with-service-principal
       - run:
-          name: Upload app
-          command: az webapp deployment source config-zip -g $AZURE_RESOURCE_GROUP -n $APP_NAME --src /build/workspace/build.zip
-
-  deploy-staging:
-    executor: azure-cli/azure-docker
-    steps:
-      - attach_workspace:
-          at: /build/workspace
-      - azure-cli/login-with-service-principal
-      - run:
-          name: Upload app
-          command: az webapp deployment source config-zip -g piipan-resources -n piipan-dashboard-xddlt27hoq7hy --slot staging --src /build/workspace/build.zip
-
-  deploy-dev:
-    executor: azure-cli/azure-docker
-    steps:
-      - attach_workspace:
-          at: /build/workspace
-      - azure-cli/login-with-service-principal
-      - run:
-          name: Upload app
-          command: az webapp deployment source config-zip -g piipan-resources -n piipan-dashboard-xddlt27hoq7hy --slot develop --src /build/workspace/build.zip
+          name: Upload Dashboard
+          command: az webapp deployment source config-zip -g $AZURE_RESOURCE_GROUP -n $APP_NAME --src /build/workspace/dashboard.zip
 
 workflows:
   version: 2
@@ -96,21 +76,7 @@ workflows:
     jobs:
       - test
       - build
-      - deploy-dev:
-          requires:
-            - test
-            - build
-          filters:
-            branches:
-              only: develop
-      - deploy-staging:
-          requires:
-            - test
-            - build
-          filters:
-            branches:
-              only: staging
-      - deploy-prod:
+      - deploy:
           requires:
             - test
             - build
