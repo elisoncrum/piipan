@@ -12,12 +12,12 @@ To run the app locally:
 
 2. Run the app using the `dotnet run` CLI command:
 ```
-    cd dashboard/app
+    cd dashboard/src/Piipan.Dashboard
     dotnet run
 ```
 Alternatively, use the `watch` command to update the app upon file changes:
 ```
-    cd dashboard/app
+    cd dashboard/src/Piipan.Dashboard
     dotnet watch run
 ```
 
@@ -25,30 +25,9 @@ Alternatively, use the `watch` command to update the app upon file changes:
 
 ## Deployment
 
-The app is deployed from [CircleCI](https://app.circleci.com/pipelines/github/18F/piipan). The [configuration](../.circleci/config.yml) is set to deploy to different environments within Azure depending on the branch that triggers the CircleCI job. The basic deploy process is:
+The app is deployed from [CircleCI](https://app.circleci.com/pipelines/github/18F/piipan) upon updates to `main`.
 
-1. Build the app
-2. Package app as a zip
-3. If on a branch that is associated with a deployment, deploy the zip file to the relevant deployment slot in Azure
-
-### Azure deployment slots
-
-***Note:** the following deployment approach describes `staging` and `develop` branches and deployment slots that are currently only mocked in for the purpose of configuring CircleCI and App Service. Our git workflow excludes those branches for now and only uses the `main` branch and `production` deployment slot.*
-
-The app is configured with three deployment slots when created from the IaC:
-- production, the default slot created by App Service (`https://<app_name>.azurewebsites.net/`)
-- staging (`https://<app_name>-staging.azurewebsites.net/`)
-- develop (`https://<app_name>-develop.azurewebsites.net/`)
-
-The CircleCI configuration associates the following branches with each deployment slot:
-
-| branch | deployment slot |
-|---|---|
-| `main` | production |
-| `staging` | staging |
-| `develop` | develop |
-
-A push to any of these branches will be automatically deployed to the associated deployment slot upon a successful build.
+Upon deployment, the app can be viewed via a trusted network at `https://<app_name>.azurewebsites.net/`. Currently, only the GSA network block is trusted.
 
 ### Deployment approach
 
@@ -57,5 +36,5 @@ The app is deployed from CircleCI using the [ZIP deployment method](https://docs
 The zip file is then pushed to Azure:
 
 ```
-    az webapp deployment source config-zip -g <resource_group> -n <app_name> --slot <deployment_slot_name> --src <path_to_build>.zip
+    az webapp deployment source config-zip -g <resource_group> -n <app_name> --src <path_to_build>.zip
 ```
