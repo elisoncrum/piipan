@@ -23,4 +23,14 @@ updates:
   schedule:
     interval: daily
     time: "09:00"
+- package-ecosystem: nuget
+  directory: "/match/src/Piipan.Match.State"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/match/tests/Piipan.Match.State.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
   open-pull-requests-limit: 10
