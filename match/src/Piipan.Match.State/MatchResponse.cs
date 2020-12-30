@@ -43,10 +43,17 @@ namespace Piipan.Match.State
         [JsonProperty("exception")]
         public string Exception { get; set; }
 
+        // Read-only
         [JsonProperty("state_name")]
         public string StateName { get; }
 
+        // Read-only
         [JsonProperty("state_abbr")]
         public string StateAbbr { get; }
+
+        public string ToJson()
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,26 @@ namespace Piipan.Match.State.Tests
 {
     public class ApiTests
     {
+        void SetEnvironment()
+        {
+            Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
+            Environment.SetEnvironmentVariable("StateAbbr", "ea");
+            Environment.SetEnvironmentVariable("ServerName", "server-name");
+        }
+
+        static PiiRecord FullRecord()
+        {
+            return new PiiRecord
+            {
+                First = "First",
+                Middle = "Middle",
+                Last = "Last",
+                Dob = new DateTime(1970, 1, 1),
+                Ssn = "000-00-0000",
+                Exception = "Exception"
+            };
+        }
+
         static String JsonBody(string json)
         {
             var data = new
@@ -22,7 +43,7 @@ namespace Piipan.Match.State.Tests
             return JsonConvert.SerializeObject(data);
         }
 
-        static Mock<HttpRequest> CreateMockRequest(string jsonBody)
+        static Mock<HttpRequest> MockRequest(string jsonBody)
         {
             var ms = new MemoryStream();
             var sw = new StreamWriter(ms);
@@ -37,8 +58,6 @@ namespace Piipan.Match.State.Tests
 
             return mockRequest;
         }
-
-        // Valid request returns OkResult
 
         // Non-required and empty/whitespace properties parse to null
         [Theory]
@@ -62,23 +81,42 @@ namespace Piipan.Match.State.Tests
         }
 
         // Malformed data result in null Query
-        [Fact]
-        public void MalformedDateResultsInQuery()
+        [Theory]
+        [InlineData("{{")]
+        [InlineData("<xml>")]
+        public void ExpectMalformedDataResultsInNullQuery(string query)
         {
             // Arrange
-            var malformed = "{{";
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var request = Api.Parse(malformed, logger);
+            var request = Api.Parse(query, logger);
 
             // Assert
             Assert.Null(request.Query);
         }
 
+        // Malformed data results in BadRequest
+        [Theory]
+        [InlineData("{{")]
+        [InlineData("<xml>")]
+        public async void ExpectMalformedDataResultsInBadRequest(string query)
+        {
+            // Arrange
+            Mock<HttpRequest> mockRequest = MockRequest(query);
+            var logger = Mock.Of<ILogger>();
+
+            // Act
+            var response = await Api.Query(mockRequest.Object, logger);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(response);
+            var result = response as BadRequestResult;
+            Assert.Equal(400, result.StatusCode);
+        }
+
         // Incomplete data results in null Query
         [Theory]
-        [InlineData("")]
         [InlineData(@"{}")]
         [InlineData(@"{first: 'First'}")] // Missing Last, Dob, and Ssn
         [InlineData(@"{last: 'Last'}")] // Missing Dob and Ssn
@@ -100,16 +138,16 @@ namespace Piipan.Match.State.Tests
 
         // Incomplete data returns badrequest
         [Theory]
+        [InlineData("")]
         [InlineData(@"{first: 'First'}")] // Missing Last, Dob, and Ssn
         [InlineData(@"{last: 'Last'}")] // Missing Dob and Ssn
         [InlineData(@"{last: 'Last', dob: '2020-01-01'}")] // Missing Ssn
         [InlineData(@"{last: 'Last', dob: '2020-01-1', ssn: '000-00-000'}")] // Invalid Dob DateTime
-        [InlineData(@"{last: 'Last', dob: '', ssn: '000-00-000'}")] // Invalid (empty) Dob DateTime
+        [InlineData(@"{last: 'Last', dob: '', ssn: '000-00-000'}")] // Empty Dob DateTime
         public async void ExpectBadResultFromIncompleteData(string query)
         {
             // Arrange
-            var body = JsonBody(query);
-            Mock<HttpRequest> mockRequest = CreateMockRequest(body);
+            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
             var logger = Mock.Of<ILogger>();
 
             // Act
@@ -122,6 +160,7 @@ namespace Piipan.Match.State.Tests
         }
 
         // Invalid data fails validation
+        // Note: date validation happens in `Api.Parse` not `Api.Validate`
         [Theory]
         [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
         [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
@@ -150,8 +189,7 @@ namespace Piipan.Match.State.Tests
         public async void ExpectBadResultFromInvalidData(string query)
         {
             // Arrange
-            var body = JsonBody(query);
-            Mock<HttpRequest> mockRequest = CreateMockRequest(body);
+            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
             var logger = Mock.Of<ILogger>();
 
             // Act
@@ -222,49 +260,58 @@ namespace Piipan.Match.State.Tests
         public void PiiRecordHasStateData()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
-            Environment.SetEnvironmentVariable("StateAbbr", "ea");
-
-            // Act
-            var record = new PiiRecord
-            {
-                First = "First",
-                Middle = "Middle",
-                Last = "Last",
-                Dob = new DateTime(1970, 1, 1),
-                Ssn = "000-00-0000",
-                Exception = "Exception"
-            };
+            SetEnvironment();
+            var record = FullRecord();
 
             // Assert
             Assert.Equal("ea", record.StateAbbr);
             Assert.Equal("Echo Alpha", record.StateName);
         }
 
-        // SQL contains string
+        [Fact]
+        public void ApiStaticMembers()
+        {
+            // Arrange
+            SetEnvironment();
 
-        // [Fact]
-        // public void ValidRequestResultsInOk()
-        // {
-        //     // Arrange
-        //     var logger = Mock.Of<ILogger>();
-        //     var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
-        //     var cmd = new Mock<DbCommand>() { DefaultValue = DefaultValue.Mock };
-        //     var conn = new Mock<IDbConnection>() { DefaultValue = DefaultValue.Mock };
+            // Assert
+            Assert.Equal("ea", Api.stateAbbr);
+            Assert.Equal("server-name", Api.serverName);
+        }
 
-        //     factory.Setup(f => f.CreateCommand()).Returns(cmd.Object);
+        [Fact]
+        public void PiiRecordJsonMatchesObject()
+        {
+            // Arrange
+            SetEnvironment();
+            var record = FullRecord();
+            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\"\n}";
 
-        //     // Mocks upload_id
-        //     cmd.Setup(c => c.ExecuteScalar()).Returns((Int32)1);
+            // Assert
+            Assert.Equal(expected, record.ToJson());
+        }
 
-        //     // Mocks SELECT results
-        //     conn.Setup(c => c.Query(It.IsAny<String>(), It.IsAny<Object>(), null, true, null, null)).Returns(new List<PiiRecord>());
+        [Fact]
+        public void MatchResponseJsonMatchesObject()
+        {
+            // Arrange
+            SetEnvironment();
+            var record = FullRecord();
+            var response = new MatchQueryResponse
+            {
+                Matches = new List<PiiRecord>()
+            };
+            var expected = "{\n  \"matches\": [\n    {" +
+                    "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state_name\": \"Echo Alpha\",\n      \"state_abbr\": \"ea\"" +
+                    "\n    }\n  ]\n}";
 
-        //     // Act
+            // Act
+            response.Matches.Add(record);
 
+            // Assert
+            Assert.Equal(expected, response.ToJson());
+        }
 
-        //     // Assert
-        //     Assert.False(true);
-        // }
+        // XXX Valid request returns JsonResult
     }
 }
