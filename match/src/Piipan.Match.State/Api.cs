@@ -56,11 +56,12 @@ namespace Piipan.Match.State
             {
                 Matches = Select(request, NpgsqlFactory.Instance, log)
             };
-            return (ActionResult)new OkObjectResult(response.ToJson());
+            return (ActionResult)new JsonResult(response);
         }
 
         internal static MatchQueryRequest Parse(string requestBody, ILogger log)
         {
+            // Assume failure
             MatchQueryRequest request = new MatchQueryRequest { Query = null };
 
             try
@@ -107,17 +108,20 @@ namespace Piipan.Match.State
             return (sql, p);
         }
 
-        internal static List<PiiRecord> Select(MatchQueryRequest request, DbProviderFactory factory, ILogger log)
+        internal static void OpenConnection(DbConnection conn, ILogger log)
         {
             // For now use DatabaseConnectionString method with `postgres` user per `etl/BulkUpload.cs`
             // XXX managed identity
             var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            conn.ConnectionString = connString;
+            conn.Open();
+        }
 
+        internal static List<PiiRecord> Select(MatchQueryRequest request, DbProviderFactory factory, ILogger log)
+        {
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = connString;
-                conn.Open();
-
+                OpenConnection(conn, log);
                 (var sql, var parameters) = Prepare(request, log);
 
                 return conn.Query<PiiRecord>(sql, (object)parameters).AsList();
