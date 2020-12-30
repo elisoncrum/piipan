@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,8 @@ namespace Piipan.Match.State
     /// </summary>
     public static class Api
     {
-        public static IList<string> messages;
+        internal static string stateAbbr = Environment.GetEnvironmentVariable("StateAbbr");
+        internal static string serverName = Environment.GetEnvironmentVariable("ServerName");
 
         /// <summary>
         /// API endpoint for conducting a state-level match
@@ -54,7 +56,7 @@ namespace Piipan.Match.State
 
             var response = new MatchQueryResponse
             {
-                Matches = Select(request, NpgsqlFactory.Instance, log)
+                Matches = await Select(request, NpgsqlFactory.Instance, log)
             };
             return (ActionResult)new JsonResult(response);
         }
@@ -108,24 +110,43 @@ namespace Piipan.Match.State
             return (sql, p);
         }
 
-        internal static void OpenConnection(DbConnection conn, ILogger log)
+        internal async static Task<string> ConnectionString(ILogger log)
         {
-            // For now use DatabaseConnectionString method with `postgres` user per `etl/BulkUpload.cs`
-            // XXX managed identity
-            var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
-            conn.ConnectionString = connString;
-            conn.Open();
+            // If connecting as `postgres` user
+            // var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+
+            // Managed Identity
+            var sqlServerTokenProvider = new AzureServiceTokenProvider();
+            var SqlAccessToken = await sqlServerTokenProvider.GetAccessTokenAsync("https://ossrdbms-aad.database.windows.net");
+            var connString = String.Format(
+                "Server={0}.postgres.database.azure.com; User Id={1}admin@{0}; Database={1}; Port=5432; Password={2}; Ssl Mode=Require",
+                serverName,
+                stateAbbr,
+                SqlAccessToken
+            );
+
+            return connString;
         }
 
-        internal static List<PiiRecord> Select(MatchQueryRequest request, DbProviderFactory factory, ILogger log)
+        internal async static Task<List<PiiRecord>> Select(MatchQueryRequest request, DbProviderFactory factory, ILogger log)
         {
+            List<PiiRecord> records;
+
             using (var conn = factory.CreateConnection())
             {
-                OpenConnection(conn, log);
-                (var sql, var parameters) = Prepare(request, log);
+                conn.ConnectionString = await ConnectionString(log);
+                conn.Open();
 
-                return conn.Query<PiiRecord>(sql, (object)parameters).AsList();
+                // Set role to owner before executing query
+                conn.Execute($"SET ROLE to {stateAbbr}");
+
+                (var sql, var parameters) = Prepare(request, log);
+                records = conn.Query<PiiRecord>(sql, (object)parameters).AsList();
+
+                conn.Close();
             }
+
+            return records;
         }
     }
 }
