@@ -51,7 +51,7 @@ Piipan uses the monorepo strategy; subsystems get their own top-level directory 
 
 ## Documentation
 
-Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), can be found in the top-level [`doc` directory](./doc).
+Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), are organized in [this index](./doc/README.md).
 
 ## Public domain
 
