@@ -47,7 +47,7 @@ Piipan's programming languages and frameworks include: .NET Core, C#, and ASP.NE
 
 Our processes and code are intended to be platform agnostic: the 18F team primarily uses macOS-hosted local development tools and the managed services use a mix of Windows and Linux.
 
-Piipan uses the monorepo strategy; subsystems get their own top-level directory and are independently deployable modulo any shared data stores. A system-wide CircleCI configuration manages continuous integration and deployment.
+Piipan uses the monorepo strategy; subsystems get their own top-level directory and are independently deployable modulo any shared datastores. A system-wide CircleCI configuration manages continuous integration and deployment.
 
 ## Documentation
 

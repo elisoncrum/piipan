@@ -9,6 +9,6 @@ System-wide:
 * [Guidelines for Piipan .NET source trees](./source-guidelines.md)
 
 Subsystems:
-* [Extract-Transform-Load (ETL)](../etl)
-* [Active Match API](../match)
-* [Dashboard](../dashboard)
+* [Extract-Transform-Load (ETL)](../etl/README.md)
+* [Active Match API](../match/README.md)
+* [Dashboard](../dashboard/README.md)
