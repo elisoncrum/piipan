@@ -19,7 +19,7 @@ While all states have separate function apps, managed identities, and databases,
 
 Local development is currently limited as a result of using a managed identity to connect to the state database. The Instance Metadata Service used by managed identities to retrieve authentication tokens is not available locally. There are [potential solutions](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication#local-development-authentication) using the `Microsoft.Azure.Services.AppAuthentication` library. None have been implemented at this time.
 
-The app will still build and run locally. However, any request sent to the local endpoint will result in an exception when the app attempts to retrieve an access token.
+The app will still build and run locally. However, any valid request sent to the local endpoint will result in an exception when the app attempts to retrieve an access token. Invalid requests (e.g., malformed or missing data in the request body) will return proper error responses.
 
 To build and run the app with this limited functionality:
 
@@ -90,6 +90,6 @@ The published app's `query` endpoint currently can be accessed over a trusted ne
 To test the remote app:
 
 1. Connect to a trusted network. Currently, only the GSA network block is trusted.
-1. Send a valid `POST` request to the app's endpoint. The endpoint is in the format `https://{app-name}.azurewebsites.net/api/query`.
+1. Send a valid `POST` request to the app's endpoint. The endpoint is in the format `https://{app-name}.azurewebsites.net/api/v1/query`.
 
 Until the ETL process is updating to insert data into tables in the `piipan` schema, responses will not contain matches unless records have been manually imported into the database.
