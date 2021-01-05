@@ -137,6 +137,7 @@ namespace Piipan.Match.State.Tests
         }
 
         // Incomplete data returns badrequest
+        // Note: date validation happens in `Api.Parse` not `Api.Validate`
         [Theory]
         [InlineData("")]
         [InlineData(@"{first: 'First'}")] // Missing Last, Dob, and Ssn
@@ -203,7 +204,7 @@ namespace Piipan.Match.State.Tests
 
         // Parsed valid data returns object with matching properties
         [Fact]
-        public void RequestObjectPropertiesMatchesRequestJson()
+        public void RequestObjectPropertiesMatchRequestJson()
         {
             // Arrange
             var body = JsonBody(@"{last:'Last', first: 'First', middle: 'Middle', dob: '1970-01-01', ssn: '000-00-0000'}");
@@ -312,6 +313,7 @@ namespace Piipan.Match.State.Tests
             Assert.Equal(expected, response.ToJson());
         }
 
+        // XXX Connection string contains appropriate config
         // XXX Valid request returns JsonResult
     }
 }

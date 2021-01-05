@@ -112,9 +112,6 @@ namespace Piipan.Match.State
 
         internal async static Task<string> ConnectionString(ILogger log)
         {
-            // If connecting as `postgres` user
-            // var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
-
             // Managed Identity
             var sqlServerTokenProvider = new AzureServiceTokenProvider();
             var SqlAccessToken = await sqlServerTokenProvider.GetAccessTokenAsync("https://ossrdbms-aad.database.windows.net");
