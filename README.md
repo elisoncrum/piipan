@@ -3,7 +3,55 @@
 
 # piipan
 
-A system for storing and matching Personal Identifiable Information (PII) records.
+*A system for storing and matching Personal Identifiable Information (PII) records.*
+
+Piipan is a reference model for program integrity initiatives that aim to prevent multiple enrollment in federally-funded, but state-managed benefit programs. Under this model, each state regularly submits their entire list of program participants (i.e., their unique PII) to a federally run instance of Piipan. State-level eligibility workers for the benefit program then query Piipan as part of their (re)certification process; if the applicant is found to be receiving benefits in another state, the eligibility worker deconflicts the multiple enrollment.
+
+Paramount quality attributes of this system include:
+* Only collect PII data elements that are strictly required
+* Confidentiality of program participant information
+* Accuracy of matches
+* Adaptability to policy changes and multiple benefit programs
+
+Further, this reference model is motivated and guided by [Sec. 4011 of the 2018 Farm Bill](https://www.congress.gov/bill/115th-congress/house-bill/2/text), *Interstate data matching to prevent multiple issuances*, which mandates that the information made available by state agencies:
+* shall be used only for the purpose of preventing multiple enrollment;
+* shall not be retained for longer than is necessary.
+
+## High-level architecture
+
+Piipan is designed to be a cloud-native system. It is under active development and is not complete. Several subsystems are anticipated and partially implemented:
+
+* [Extract-Transform-Load (ETL)](./etl)
+* [Active Match Orchestrator API](./match)
+* Query Tool & Collaboration app
+* [Dashboard app](./dashboard)
+* Batch-driven Passive Match
+ 
+A diagram depicting these anticipated subsystems is below:
+
+<p align="center">
+  <a href="./doc/piipan-architecture.png"><img src="./doc/piipan-architecture.png" alt="High-level architecture"></a>
+</p>
+
+A guiding architectural principle is to treat state agencies and their data as tenants of a platform (i.e., Piipan), and accordingly apply isolation best practices and the principle of least privilege throughout the system.
+
+Finally, this reference model is designed to be extended to support a fully federated system, whereby PII records never leave state-run enclaves in bulk. Under this hypothetical extension, the federally-run API orchestrator would reach back to each state, rather than its own isolated copies of state participant records. And the passive match API would incorporate a Privacy Set Intersection (PSI) protocol, with the federal system acting as a semi-trusted 3rd party. 
+
+## Implementation
+
+Piipan targets Microsoft Azure as its cloud computing platform, but generally selects for commoditized features that are available on other cloud platforms.
+
+To expedite development and compliance processes, Piipan maximizes the use of managed services, including Function-as-a-Service (FaaS). No virtual machines or containers are directly employed in the production system.
+
+Piipan's programming languages and frameworks include: .NET Core, C#, and ASP.NET using Razor Pages. Bash and ARM templates are used for Infrastructure-as-Code.
+
+Our processes and code are intended to be platform agnostic: the 18F team primarily uses macOS-hosted local development tools and the managed services use a mix of Windows and Linux.
+
+Piipan uses the monorepo strategy; subsystems get their own top-level directory and are independently deployable modulo any shared data stores. A system-wide CircleCI configuration manages continuous integration and deployment.
+
+## Documentation
+
+Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), can be found in the top-level [`doc` directory](./doc).
 
 ## Public domain
 
