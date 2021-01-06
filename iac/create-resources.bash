@@ -12,6 +12,10 @@ RESOURCE_GROUP=piipan-resources
 # To avoid this issue, put Function Apps in a isolated resource group.
 FUNCTIONS_RESOURCE_GROUP=piipan-functions
 
+# Use seperate resource group for matching API resources to allow use of
+# incremental deployments
+MATCH_RESOURCE_GROUP=piipan-match
+
 LOCATION=westus
 
 PROJECT_TAG=piipan
@@ -57,6 +61,8 @@ echo "Creating $RESOURCE_GROUP group"
 az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 echo "Creating $FUNCTIONS_RESOURCE_GROUP group"
 az group create --name $FUNCTIONS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
+echo "Creating match APIs resource group"
+az group create --name $MATCH_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
 # uniqueString is used pervasively in our ARM templates to create globally
 # identifiers from the resource group id, but it is not available in the CLI.
@@ -289,6 +295,47 @@ while IFS=, read -r abbr name ; do
     --endpoint-type azurefunction \
     --included-event-types Microsoft.Storage.BlobCreated \
     --subject-begins-with /blobServices/default/containers/upload/blobs/
+done < states.csv
+
+# Create per-state Function apps for state-level matching API using
+# ARM template and deploy project code to each function using functions
+# core tools. ARM template assigns a corresponding storage account,
+# managed identity, hosting plan, and application insights instance.
+#
+# Assumes existence of a managed identity with name `{abbr}admin`.
+while IFS=, read -r abbr name ; do
+  echo "Creating match API function app for $name ($abbr)"
+  abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
+
+  identity=${abbr}admin
+  client_id=$(\
+    az identity show \
+      --resource-group $RESOURCE_GROUP \
+      --name $identity \
+      --query clientId \
+      --output tsv)
+
+  echo "Deploying ${name} function resources"
+  func_name=$(\
+    az deployment group create \
+      --name match-api \
+      --resource-group $MATCH_RESOURCE_GROUP \
+      --template-file  ../iac/arm-templates/function-state-match.json \
+      --query properties.outputs.functionAppName.value \
+      --output tsv \
+      --parameters \
+        resourceTags="$RESOURCE_TAGS" \
+        identityGroup=$RESOURCE_GROUP \
+        location=$LOCATION \
+        identityClientId=$client_id \
+        serverName=$PG_SERVER_NAME \
+        stateName="$name" \
+        stateAbbr="$abbr")
+  
+  echo "Publishing ${name} function app"
+  pushd ../match/src/Piipan.Match.State
+  func azure functionapp publish $func_name
+  popd
 done < states.csv
 
 # Create a service principal for use by CI/CD pipeline.
