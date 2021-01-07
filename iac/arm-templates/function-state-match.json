@@ -93,10 +93,33 @@
                     ],
                     "ftpsState": "Disabled",
                     "appSettings": [
+                        /*
+                            The following settings are required for Function apps per the MS documentation:
+                            - AzureWebJobsStorage
+                            - FUNCTIONS_WORKER_RUNTIME
+                            - FUNCTIONS_EXTENSION_VERSION
+
+                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#function-app)
+                        */
                         {
                             "name": "AzureWebJobsStorage",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
                         },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "[variables('functionWorkerRuntime')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        /*
+                            The `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` and `WEBSITE_CONTENTSHARE`
+                            settings are required for Windows function apps using a consumption plan,
+                            per the MS documentation.
+
+                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#windows)
+                        */
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
@@ -105,14 +128,18 @@
                             "name": "WEBSITE_CONTENTSHARE",
                             "value": "[toLower(variables('functionAppName'))]"
                         },
-                        {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~3"
-                        },
+                        // Required when using the zip deployment method (i.e., the method
+                        // used by `func azure functionapp publish`)
                         {
                             "name": "WEBSITE_RUN_FROM_PACKAGE",
                             "value": "1"
                         },
+                        // Connect app to Application Insights instance
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        // Custom environment variables:
                         {
                             "name": "StateName",
                             "value": "[parameters('stateName')]"
@@ -128,14 +155,6 @@
                         {
                             "name": "AzureServicesAuthConnectionString",
                             "value": "[concat('RunAs=App;AppId=',parameters('identityClientId'))]"
-                        },
-                        {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
-                        },
-                        {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "[variables('functionWorkerRuntime')]"
                         }
                     ]
                 }

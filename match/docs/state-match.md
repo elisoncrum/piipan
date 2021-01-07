@@ -36,20 +36,13 @@ See the [ETL database setup instructions](../../etl/docs/etl.md#database-setup).
 
 ### App deployment
 
-Before deploying the app for the first time, switch to the project directory and fetch settings from Azure:
+Deploy the app using the Functions Core Tools, making sure to pass the `--dotnet` flag:
 
 ```
-cd match/src/Piipan.Match.State
-func azure functionapp fetch-app-settings {app-name}
+func azure functionapp publish <app_name> --dotnet
 ```
 
-This will create a file named `local.settings.json` containing app settings. Some settings are required by the deployment process (e.g., `FUNCTIONS_WORKER_RUNTIME`).
-
-With settings stored, the app can be manually deployed:
-
-```
-func azure functionapp publish {app-name}
-```
+`<app_name>` is the name of the Azure Function App resource created by the IaC process.
 
 ## Remote testing
 
