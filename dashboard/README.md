@@ -4,4 +4,4 @@
 
 ## Documentation
 
-* [Dashboard application](../doc/dashboard.md)
+* [Dashboard application](./docs/dashboard.md)

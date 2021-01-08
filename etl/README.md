@@ -4,5 +4,5 @@
 
 ## Documentation
 
-* [Extract-Transform-Load process for PII bulk import](../doc/etl.md)
-* [Bulk import format for participant records](../doc/bulk-import.md)
+* [Extract-Transform-Load process for PII bulk import](./docs/etl.md)
+* [Bulk import format for participant records](./docs/bulk-import.md)

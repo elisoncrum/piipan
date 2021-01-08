@@ -4,5 +4,5 @@
 
 ## Documentation
 
-* [Per-state PII matching API](../doc/state-match.md)
+* [Per-state PII matching API](./docs/state-match.md)
 * [OpenAPI specifications](./docs/openapi.md)

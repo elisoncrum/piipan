@@ -4,4 +4,4 @@
 
 ## Documentation
 
-* [Infrastructure-as-Code](../doc/iac.md)
+* [Infrastructure-as-Code](../docs/iac.md)
