@@ -8,7 +8,7 @@
 ## Summary
 
 An initial API for matching PII on a per-state basis:
-1. JSON `POST` request that conforms to the [OpenApi spec](../match/docs/openapi.md) is sent to the state-specific API endpoint.
+1. JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the state-specific API endpoint.
 1. The `POST` event triggers a function named `Query` in a per-state Function App.
     - If the request is not valid (malformed, missing required data, etc), the function returns a 400 response. Currently no error messaging is included in the response.
     - If the request is valid, the function uses a per-state managed identity to connect to the state-specific database in the `participant-records` cluster and queries for matching records. A 200 response is returned containing any matching record(s).
@@ -28,13 +28,13 @@ To build and run the app with this limited functionality:
 
 ## Manual deployment
 
-These instructions assume that the [piipan infrastructure](iac.md) has been established in the Azure subscription. Running the IaC will set up a Function app for each participating state. Each app is associated with a storage account, an application insights instance, a state-specific managed identity, and a state-specific database. All settings necessary for connecting the app to the state database are automatically stored in the app's configuration.
+These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription. Running the IaC will set up a Function app for each participating state. Each app is associated with a storage account, an application insights instance, a state-specific managed identity, and a state-specific database. All settings necessary for connecting the app to the state database are automatically stored in the app's configuration.
 
 ### Database setup
 
-Before the managed identity can execute commands against the state database the `per-state.sql` DDL must be run while using the state-specific database owner role. The [bulk upload](etl.md) process currently uses the `postgres` user to run the DDL, creating tables in the `public` schema that are not accessible to the state-specific admin roles (e.g., `eaadmin`). Running the DDL as the state-specific database owner is a temporary step until the ETL process is updated to use a managed identity.
+Before the managed identity can execute commands against the state database the `per-state.sql` DDL must be run while using the state-specific database owner role. The [bulk upload](../../etl/docs/etl.md) process currently uses the `postgres` user to run the DDL, creating tables in the `public` schema that are not accessible to the state-specific admin roles (e.g., `eaadmin`). Running the DDL as the state-specific database owner is a temporary step until the ETL process is updated to use a managed identity.
 
-To run the DDL, follow the [ETL manual deployment instructions](etl.md#manual-deployment) but stop short of the final `psql` command:
+To run the DDL, follow the [ETL manual deployment instructions](../../etl/docs/etl.md#manual-deployment) but stop short of the final `psql` command:
 
 ```
 cd ddl

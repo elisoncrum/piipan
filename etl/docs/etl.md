@@ -21,7 +21,7 @@ To Be Determined
 
 ## Manual deployment
 
-These instructions assume that the [piipan infrastructure](iac.md) has been established in the Azure subscription and an administrator has signed in with the Azure CLI. A future iteration will incorporate managed identities and automate these steps, either in the Infrastructure-as-Code and/or in our CI/CD pipeline. 
+These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription and an administrator has signed in with the Azure CLI. A future iteration will incorporate managed identities and automate these steps, either in the Infrastructure-as-Code and/or in our CI/CD pipeline. 
 
 First, establish the tables in the per-state database, in the `participants-records` cluster, using the `postgres` account. The Azure portal can be used to reset the cluster password as necessary. Use the connection string provided by the portal to extract values for `PGHOST` and `PGUSER`.
 ```
