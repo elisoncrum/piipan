@@ -9,7 +9,7 @@ We use CircleCI to automate the build and deployment of our subsystems.
 CircleCI is configured with several environment variables that provide information and credentials necessary to automate deployment to Azure.
 
 | Environment variable | Value |
-|---|---|---|
+|---|---|
 | `AZURE_RESOURCE_GROUP` | Name of resource group where services will be deployed (e.g., "piipan-resources") |
 | `APP_NAME` | Name of [dashboard app](../dashboard/docs/dashboard.md) |
 | `AZURE_SP` | Service principal `appId` (aka `clientId`) |
