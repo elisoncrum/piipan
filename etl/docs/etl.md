@@ -51,5 +51,5 @@ func azure functionapp publish function-app-name
 
 In a development environment, the `upload.bash` tool can be used to upload test CSV files to a storage account.
 ```
-./etl/tools/upload.bash doc/csv/example.csv account-name
+./etl/tools/upload.bash docs/csv/example.csv account-name
 ```
