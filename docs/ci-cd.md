@@ -11,7 +11,7 @@ CircleCI is configured with several environment variables that provide informati
 | Environment variable | Value |
 |---|---|---|
 | `AZURE_RESOURCE_GROUP` | Name of resource group where services will be deployed (e.g., "piipan-resources") |
-| `APP_NAME` | Name of [dashboard app](dashboard.md) |
+| `APP_NAME` | Name of [dashboard app](../dashboard/docs/dashboard.md) |
 | `AZURE_SP` | Service principal `appId` (aka `clientId`) |
 | `AZURE_SP_PASSWORD` | Service principal `password` (aka `clientSecret`)|
 | `AZURE_SP_TENANT` | Service principal `appOwnerTenantId` |

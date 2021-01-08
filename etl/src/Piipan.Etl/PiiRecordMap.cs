@@ -5,7 +5,7 @@ namespace Piipan.Etl
 {
     /// <summary>
     /// Maps and validates a record from a CSV file formatted in accordance with
-    /// <c>/doc/csv/import-schema.json</c> to a <c>PiiRecord</c>.
+    /// <c>/etl/docs/csv/import-schema.json</c> to a <c>PiiRecord</c>.
     /// </summary>
     public class PiiRecordMap : ClassMap<PiiRecord>
     {

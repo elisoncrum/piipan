@@ -30,7 +30,7 @@ Piipan is designed to be a cloud-native system. It is under active development a
 A diagram depicting these anticipated subsystems is below:
 
 <p align="center">
-  <a href="./doc/piipan-architecture.png"><img src="./doc/piipan-architecture.png" alt="High-level architecture"></a>
+  <a href="./docs/piipan-architecture.png"><img src="./docs/piipan-architecture.png" alt="High-level architecture"></a>
 </p>
 
 A guiding architectural principle is to treat state agencies and their data as tenants of a platform (i.e., Piipan), and accordingly apply isolation best practices and the principle of least privilege throughout the system.
@@ -51,7 +51,7 @@ Piipan uses the monorepo strategy; subsystems get their own top-level directory 
 
 ## Documentation
 
-Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), are organized in [this index](./doc/README.md).
+Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), are organized in [this index](./docs/README.md).
 
 ## Public domain
 

@@ -11,7 +11,7 @@ There are Table Schema libraries available for [multiple programming languages](
 ```
 brew install python
 pip3 install tableschema
-cd piipan/doc/csv
+cd piipan/etl/docs/csv
 python3 validate.py example.csv
 ```
 Any errors present in the supplied CSV file will be printed to `stdout`.

@@ -6,7 +6,7 @@ namespace Piipan.Etl
 {
     /// <summary>
     /// A single record extracted from a CSV file formatted in accordance with
-    /// <c>/doc/csv/import-schema.json</c>.
+    /// <c>/etl/docs/csv/import-schema.json</c>.
     /// </summary>
     /// <remarks>
     /// PiiRecordMap ensures required fields are non-null and optional fields are
