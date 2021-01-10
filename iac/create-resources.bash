@@ -182,6 +182,14 @@ export PGHOST=`az resource show \
 # various Data Definition (DDL) scripts for each state.
 ./create-databases.bash $RESOURCE_GROUP
 
+# Apply DDL shared between the ETL and match API subsystems.
+# XXX This should be moved out of IaC, which is not run in CI/CD,
+#     to a continuously deployable workflow that accomodates schema
+#     changes over time.
+pushd ../ddl
+./apply-ddl.bash
+popd
+
 if [ "$exists" = "true" ]; then
   echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
 else
