@@ -110,19 +110,29 @@ namespace Piipan.Match.State
             return (sql, p);
         }
 
-        internal async static Task<string> ConnectionString(ILogger log)
+        internal async static Task<string> ConnectionString()
         {
-            // Managed Identity
-            var sqlServerTokenProvider = new AzureServiceTokenProvider();
-            var SqlAccessToken = await sqlServerTokenProvider.GetAccessTokenAsync("https://ossrdbms-aad.database.windows.net");
-            var connString = String.Format(
-                "Server={0}.postgres.database.azure.com; User Id={1}admin@{0}; Database={1}; Port=5432; Password={2}; Ssl Mode=Require",
-                serverName,
-                stateAbbr,
-                SqlAccessToken
-            );
+            // Environment variable (and placeholder) established
+            // during initial function app provisioning in IaC
+            const string DatabaseConnectionString = "DatabaseConnectionString";
+            const string PasswordPlaceholder = "{password}";
 
-            return connString;
+            // Resource Id for open source software databases in the public Azure cloud;
+            // in other clouds, see result of:
+            // `az cloud show --query endpoints.ossrdbmsResourceId`
+            const string ResourceId = "https://ossrdbms-aad.database.windows.net";
+
+            var builder = new NpgsqlConnectionStringBuilder(
+                Environment.GetEnvironmentVariable(DatabaseConnectionString));
+
+            if (builder.Password == PasswordPlaceholder)
+            {
+                var provider = new AzureServiceTokenProvider();
+                var token = await provider.GetAccessTokenAsync(ResourceId);
+                builder.Password = token;
+            }
+
+            return builder.ConnectionString;
         }
 
         internal async static Task<List<PiiRecord>> Select(MatchQueryRequest request, DbProviderFactory factory, ILogger log)
@@ -131,7 +141,7 @@ namespace Piipan.Match.State
 
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = await ConnectionString(log);
+                conn.ConnectionString = await ConnectionString();
                 conn.Open();
 
                 (var sql, var parameters) = Prepare(request, log);

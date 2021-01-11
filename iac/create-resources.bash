@@ -378,12 +378,15 @@ while IFS=, read -r abbr name ; do
   abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
 
   identity=${abbr}admin
+  db_name=${abbr}
   client_id=$(\
     az identity show \
       --resource-group $RESOURCE_GROUP \
       --name $identity \
       --query clientId \
       --output tsv)
+  db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
+  az_serv_str=`az_connection_string $identity`
 
   echo "Deploying ${name} function resources"
   func_name=$(\
@@ -397,10 +400,11 @@ while IFS=, read -r abbr name ; do
         resourceTags="$RESOURCE_TAGS" \
         identityGroup=$RESOURCE_GROUP \
         location=$LOCATION \
-        identityClientId=$client_id \
-        serverName=$PG_SERVER_NAME \
+        azAuthConnectionString=$az_serv_str \
         stateName="$name" \
-        stateAbbr="$abbr")
+        stateAbbr="$abbr" \
+        dbConnectionString="$db_conn_str" \
+        dbConnectionStringKey="$DB_CONN_STR_KEY")
   
   echo "Publishing ${name} function app"
   pushd ../match/src/Piipan.Match.State

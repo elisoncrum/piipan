@@ -17,11 +17,13 @@
         "identityGroup": {
             "type": "string"
         },
-        "identityClientId": {
-            "type": "string",
-            "defaultValue": ""
+        "azAuthConnectionString": {
+            "type": "string"
         },
-        "serverName": {
+        "dbConnectionString": {
+            "type": "string"
+        },
+        "dbConnectionStringKey": {
             "type": "string"
         }
     },
@@ -149,12 +151,12 @@
                             "value": "[parameters('stateAbbr')]"
                         },
                         {
-                            "name": "ServerName",
-                            "value": "[parameters('serverName')]"
+                            "name": "AzureServicesAuthConnectionString",
+                            "value": "[parameters('azAuthConnectionString')]"
                         },
                         {
-                            "name": "AzureServicesAuthConnectionString",
-                            "value": "[concat('RunAs=App;AppId=',parameters('identityClientId'))]"
+                            "name": "[parameters('dbConnectionStringKey')]",
+                            "value": "[parameters('dbConnectionString')]"
                         }
                     ]
                 }
