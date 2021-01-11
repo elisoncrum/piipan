@@ -334,7 +334,7 @@ while IFS=, read -r abbr name ; do
 
   # Create Function endpoint before setting up event subscription
   pushd ../etl/src/Piipan.Etl
-  func azure functionapp publish $func_app
+  func azure functionapp publish $func_app --dotnet
   popd
 
   az eventgrid system-topic event-subscription create \
@@ -384,7 +384,7 @@ while IFS=, read -r abbr name ; do
   
   echo "Publishing ${name} function app"
   pushd ../match/src/Piipan.Match.State
-  func azure functionapp publish $func_name
+  func azure functionapp publish $func_name --dotnet
   popd
 done < states.csv
 
