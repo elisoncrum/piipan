@@ -1,6 +1,6 @@
 # Bulk import format for participant records
 
-CSV files are used as a data exchange format for the bulk import of program participant records. A description of the required CSV fields can be found in [import-schema.json](csv/import-schema.json), using the [Table Schema specification](https://frictionlessdata.io/table-schema/).
+CSV files are used as a data exchange format for the bulk import of program participant records. A description of the required CSV fields can be found in [import-schema.json](csv/import-schema.json), using the [Table Schema specification](https://specs.frictionlessdata.io/table-schema).
 
 UTF-8 encoding is required for all fields.
 
