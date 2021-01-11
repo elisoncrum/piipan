@@ -134,9 +134,6 @@ namespace Piipan.Match.State
                 conn.ConnectionString = await ConnectionString(log);
                 conn.Open();
 
-                // Set role to owner before executing query
-                conn.Execute($"SET ROLE to {stateAbbr}");
-
                 (var sql, var parameters) = Prepare(request, log);
                 records = conn.Query<PiiRecord>(sql, (object)parameters).AsList();
 
