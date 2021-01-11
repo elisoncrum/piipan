@@ -19,8 +19,17 @@ To (re)create the Azure resources that `piipan` uses:
     cd iac
     ./create-resources.bash
 ```
+
+### Environment variables
+
+The following variables are pre-configured by the Infrastructure-as-Code. Most often they are used to [bind backing services to application code](https://12factor.net/backing-services) via connection strings.
+
+| Environment variable | Value |
+|---|---|
+| `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  |
+
 ## Notes
-- `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-leter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
+- `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
 - If you forget to connect to a trusted network and `create-resources` fails, connect to the network, then re-run the script.
 - If you have recently deleted all the Piipan resource groups and are re-creating the infrastructure from scratch and get an `Exist soft deleted vault with the same name` error, try `az keyvault purge --name <vault-name>`. See output of `az keyvault list-deleted` for the name of the vault, which should correspond to `VAULT_NAME` in `create-resources.bash`.

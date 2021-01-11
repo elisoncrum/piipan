@@ -1,4 +1,11 @@
 #!/bin/bash
+# 
+# Provisions and configures the infrastructure components for all Piipan
+# subsystems. Assumes an Azure user with the Global Administrator role
+# has signed in with the Azure CLI. Must be run from a trusted network.
+#
+# usage: create-resources.bash
+
 set -e
 set -u
 
@@ -51,10 +58,35 @@ DASHBOARD_APP_NAME=piipan-dashboard
 # Display name of service principal account responsible for CI/CD tasks
 SP_NAME_CICD=piipan-cicd
 
+# Name of environment variable used to pass database connection strings
+# to app or function code
+DB_CONN_STR_KEY=DatabaseConnectionString
+
+# For connection strings, our established placeholder value
+PASSWORD_PLACEHOLDER='{password}'
+
 # Create a very long, (mostly) random password. Ensures all Azure character
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
   head /dev/urandom | LC_ALL=C tr -dc "A-Za-z0-9" | head -c 64 ; echo -n 'aA1!'
+}
+
+# Generate the ADO.NET connection string for corresponding database. Password
+# will be set to PASSWORD_PLACEHOLDER.
+pg_connection_string () {
+  server=$1
+  db=$2
+  user=$3
+
+  base=`az postgres show-connection-string \
+    --server-name $server \
+    --database-name $db \
+    --admin-user $user \
+    --admin-password "$PASSWORD_PLACEHOLDER" \
+    --query connectionStrings.\"ado.net\" \
+    -o tsv`
+
+  echo "${base}Ssl Mode=Require;"
 }
 
 echo "Creating $RESOURCE_GROUP group"
@@ -231,6 +263,9 @@ while IFS=, read -r abbr name ; do
   # Managed identity to access database
   identity=${abbr}admin
 
+  # Per-state database
+  db_name=${abbr}
+
   # Actual Function, under the Function App, that receives an event
   # and does the work, name derived from classname in `etl` directory
   func_name=BulkUpload
@@ -282,6 +317,13 @@ while IFS=, read -r abbr name ; do
       --name $func_app \
       --identities ${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}
   fi
+
+  db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
+  az functionapp config appsettings set \
+    --resource-group $FUNCTIONS_RESOURCE_GROUP \
+    --name $func_app \
+    --settings $DB_CONN_STR_KEY="$db_conn_str" \
+    --output none
 
   az eventgrid system-topic create \
     --location $LOCATION \
