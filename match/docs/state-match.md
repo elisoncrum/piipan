@@ -32,39 +32,7 @@ These instructions assume that the [piipan infrastructure](../../docs/iac.md) ha
 
 ### Database setup
 
-Before the managed identity can execute commands against the state database the `per-state.sql` DDL must be run while using the state-specific database owner role. The [bulk upload](../../etl/docs/etl.md) process currently uses the `postgres` user to run the DDL, creating tables in the `public` schema that are not accessible to the state-specific admin roles (e.g., `eaadmin`). Running the DDL as the state-specific database owner is a temporary step until the ETL process is updated to use a managed identity.
-
-To run the DDL, follow the [ETL manual deployment instructions](../../etl/docs/etl.md#manual-deployment) but stop short of the final `psql` command:
-
-```
-cd ddl
-export PGUSER=…
-export PGHOST=…
-export PGPASSWORD=…
-```
-
-Instead, connect to the database and run the following commands to assume the proper role. For example, if running the DDL for Echo Alpha (ea):
-
-```
-GRANT ea to postgres;
-SET ROLE to ea;
-SET search_path=piipan,public;
-```
-
-Now import the DDL:
-
-```
-\i per-state.sql
-```
-
-Finally, revoke access to the database owner from the `postgres` account:
-
-```
-SET ROLE to postgres;
-REVOKE ea FROM postgres;
-```
-
-To verify the tables have been created and have proper ownership run `\dt piipan.`. You should see a list of tables, all owned by the state-specific database owner account (e.g., `ea`).
+See the [ETL database setup instructions](../../etl/docs/etl.md#database-setup).
 
 ### App deployment
 
