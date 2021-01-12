@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.IO;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Npgsql;
 using Xunit;
 
 namespace Piipan.Etl.Tests
@@ -163,7 +161,7 @@ namespace Piipan.Etl.Tests
         }
 
         [Fact]
-        public void CountInserts()
+        public async void CountInserts()
         {
             var logger = Mock.Of<ILogger>();
             var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
@@ -178,32 +176,32 @@ namespace Piipan.Etl.Tests
                 AllFields(),
                 OnlyRequiredFields(),
             };
-            BulkUpload.Load(records, factory.Object, logger);
+            await BulkUpload.Load(records, factory.Object, logger);
 
             // Row in uploads table + rows in participants table
             cmd.Verify(f => f.ExecuteNonQuery(), Times.Exactly(1 + records.Count));
         }
 
         [Fact]
-        public void NoInputStream()
+        public async void NoInputStream()
         {
             var gridEvent = EventMock();
             var logger = new Mock<ILogger>();
 
             Stream input = null;
-            BulkUpload.Run(gridEvent, input, logger.Object);
+            await BulkUpload.Run(gridEvent, input, logger.Object);
             VerifyLogError(logger, "No input stream was provided");
         }
 
         [Fact]
-        public void BadInputStream()
+        public async void BadInputStream()
         {
             var gridEvent = EventMock();
             var logger = new Mock<ILogger>();
 
-            Assert.ThrowsAny<Exception>(() =>
+            await Assert.ThrowsAnyAsync<Exception>(async () =>
             {
-                BulkUpload.Run(gridEvent, BadBlob(), logger.Object);
+                await BulkUpload.Run(gridEvent, BadBlob(), logger.Object);
             });
         }
     }
