@@ -6,9 +6,11 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
@@ -34,7 +36,7 @@ namespace Piipan.Etl
         /// to the per-state storage account and write access to the per-state database.
         /// </remarks>
         [FunctionName("BulkUpload")]
-        public static void Run(
+        public async static Task Run(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] Stream input,
             ILogger log)
@@ -46,7 +48,7 @@ namespace Piipan.Etl
                 if (input != null)
                 {
                     var records = Read(input, log);
-                    Load(records, NpgsqlFactory.Instance, log);
+                    await Load(records, NpgsqlFactory.Instance, log);
                 }
                 else
                 {
@@ -75,9 +77,34 @@ namespace Piipan.Etl
             return csv.GetRecords<PiiRecord>();
         }
 
-        internal static void Load(IEnumerable<PiiRecord> records, DbProviderFactory factory, ILogger log)
+        internal async static Task<string> ConnectionString()
         {
-            var connString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            // Environment variable (and placeholder) established
+            // during initial function app provisioning in IaC
+            const string DatabaseConnectionString = "DatabaseConnectionString";
+            const string PasswordPlaceholder = "{password}";
+
+            // Resource Id for open source software databases in the public Azure cloud;
+            // in other clouds, see result of:
+            // `az cloud show --query endpoints.ossrdbmsResourceId`
+            const string ResourceId = "https://ossrdbms-aad.database.windows.net";
+
+            var builder = new NpgsqlConnectionStringBuilder(
+                Environment.GetEnvironmentVariable(DatabaseConnectionString));
+
+            if (builder.Password == PasswordPlaceholder)
+            {
+                var provider = new AzureServiceTokenProvider();
+                var token = await provider.GetAccessTokenAsync(ResourceId);
+                builder.Password = token;
+            }
+
+            return builder.ConnectionString;
+        }
+
+        internal async static Task Load(IEnumerable<PiiRecord> records, DbProviderFactory factory, ILogger log)
+        {
+            var connString = await ConnectionString();
 
             using (var conn = factory.CreateConnection())
             {
