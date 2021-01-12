@@ -62,6 +62,10 @@ SP_NAME_CICD=piipan-cicd
 # to app or function code
 DB_CONN_STR_KEY=DatabaseConnectionString
 
+# Name of environment variable used to pass Azure Services connection strings
+# to app or function code (required to fetch managed identity tokens)
+AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
+
 # For connection strings, our established placeholder value
 PASSWORD_PLACEHOLDER='{password}'
 
@@ -87,6 +91,21 @@ pg_connection_string () {
     -o tsv`
 
   echo "${base}Ssl Mode=Require;"
+}
+
+# From a managed identity name, generate the value for
+# AzureServicesAuthConnectionString
+az_connection_string () {
+  identity=$1
+
+  client_id=$(\
+    az identity show \
+      --resource-group $RESOURCE_GROUP \
+      --name $identity \
+      --query clientId \
+      --output tsv)
+
+    echo "RunAs=App;AppId=${client_id}"
 }
 
 echo "Creating $RESOURCE_GROUP group"
@@ -319,10 +338,11 @@ while IFS=, read -r abbr name ; do
   fi
 
   db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
+  az_serv_str=`az_connection_string $identity`
   az functionapp config appsettings set \
     --resource-group $FUNCTIONS_RESOURCE_GROUP \
     --name $func_app \
-    --settings $DB_CONN_STR_KEY="$db_conn_str" \
+    --settings $DB_CONN_STR_KEY="$db_conn_str" $AZ_SERV_STR_KEY="$az_serv_str" \
     --output none
 
   az eventgrid system-topic create \
