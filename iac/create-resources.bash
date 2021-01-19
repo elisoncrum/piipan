@@ -403,6 +403,8 @@ done < states.csv
 # managed identity, hosting plan, and application insights instance.
 #
 # Assumes existence of a managed identity with name `{abbr}admin`.
+match_api_endpoints=""
+MATCH_API_PATH="query"
 while IFS=, read -r abbr name ; do
   echo "Creating match API function app for $name ($abbr)"
   abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
@@ -440,6 +442,38 @@ while IFS=, read -r abbr name ; do
   pushd ../match/src/Piipan.Match.State
   func azure functionapp publish $func_name --dotnet
   popd
+
+  func_endpoint=$(\
+    az functionapp function show \
+      --resource-group piipan-match \
+      --name $func_name \
+      --function-name $MATCH_API_PATH \
+      --query invokeUrlTemplate \
+      --output tsv)
+
+  # Build JSON array string of endpoints for binding to orchestrator
+  match_api_endpoints=${match_api_endpoints}",\"$func_endpoint\""
 done < states.csv
+
+match_api_endpoints="[${match_api_endpoints:1}]"
+
+# Create orchestrator-level Function app for querying all state-level
+# APIs. Arm template.
+orch_name=$(\
+  az deployment group create \
+    --name orch-api \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --template-file  ../../../iac/arm-templates/function-orch-match.json \
+    --query properties.outputs.functionAppName.value \
+    --output tsv \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location=$LOCATION \
+      stateApiEndpoints=$match_api_endpoints)
+
+echo "Publishing ${orch_name} function app"
+pushd ../match/src/Piipan.Match.Orchestrator
+func azure functionapp publish $orch_name --dotnet
+popd
 
 script_completed
