@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>query_tool</RootNamespace>
+    <RootNamespace>Piipan.QueryTool</RootNamespace>
   </PropertyGroup>
 
 </Project>

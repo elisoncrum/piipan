@@ -1,5 +1,5 @@
 using Xunit;
-using query_tool.Pages;
+using Piipan.QueryTool.Pages;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Piipan.QueryTool.Tests

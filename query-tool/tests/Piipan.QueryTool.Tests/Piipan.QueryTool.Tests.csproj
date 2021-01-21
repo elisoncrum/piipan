@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.QueryTool\query-tool.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.QueryTool\Piipan.QueryTool.csproj" />
   </ItemGroup>
 
 </Project>

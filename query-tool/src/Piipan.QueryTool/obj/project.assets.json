@@ -13,9 +13,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj",
-      "projectName": "query-tool",
-      "projectPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj",
+      "projectUniqueName": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj",
+      "projectName": "Piipan.QueryTool",
+      "projectPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj",
       "packagesPath": "/Users/matthewwhenry/.nuget/packages/",
       "outputPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/obj/",
       "projectStyle": "PackageReference",

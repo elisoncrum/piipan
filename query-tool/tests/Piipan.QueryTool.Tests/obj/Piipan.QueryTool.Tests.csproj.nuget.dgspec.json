@@ -4,12 +4,12 @@
     "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/tests/Piipan.QueryTool.Tests/Piipan.QueryTool.Tests.csproj": {}
   },
   "projects": {
-    "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj": {
+    "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj",
-        "projectName": "query-tool",
-        "projectPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj",
+        "projectUniqueName": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj",
+        "projectName": "Piipan.QueryTool",
+        "projectPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj",
         "packagesPath": "/Users/matthewwhenry/.nuget/packages/",
         "outputPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/obj/",
         "projectStyle": "PackageReference",
@@ -78,8 +78,8 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj": {
-                "projectPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/query-tool.csproj"
+              "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj": {
+                "projectPath": "/Users/matthewwhenry/Code/18F/USDA/piipan/query-tool/src/Piipan.QueryTool/Piipan.QueryTool.csproj"
               }
             }
           }
