@@ -6,8 +6,7 @@
 #
 # usage: create-resources.bash
 
-set -e
-set -u
+source $(dirname "$0")/../tools/common.bash || exit
 
 # Default resource group for our system
 RESOURCE_GROUP=piipan-resources
@@ -414,3 +413,5 @@ done < states.csv
 
 # Create a service principal for use by CI/CD pipeline.
 ./create-service-principal.bash $SP_NAME_CICD none
+
+script_completed
