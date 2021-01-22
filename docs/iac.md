@@ -9,12 +9,16 @@
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:
-1. Connect to a trusted network. Currently, only the GSA network block is trusted.
-2. Sign in with the Azure CLI `login` command :
+1. Run `install-extensions` to install Azure CLI extensions required by the `az` commands used by our IaC:
+```
+    ./iac/install-extensions.bash
+```
+2. Connect to a trusted network. Currently, only the GSA network block is trusted.
+3. Sign in with the Azure CLI `login` command:
 ```
     az login
 ```
-3. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts:
+4. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts:
 ```
     cd iac
     ./create-resources.bash
@@ -35,3 +39,4 @@ The following variables are pre-configured by the Infrastructure-as-Code. Most o
 - If you have recently deleted all the Piipan resource groups and are re-creating the infrastructure from scratch and get an `Exist soft deleted vault with the same name` error, try `az keyvault purge --name <vault-name>`. See output of `az keyvault list-deleted` for the name of the vault, which should correspond to `VAULT_NAME` in `create-resources.bash`.
 - Some Azure CLI provisioning commands will return before all of their behind-the-scenes operations complete in the Azure environment. Very occasionally, subsequent provisioning commands in `create-resources` will fail as it won't be able to locate services it expects to be present; e.g., `Can't find app with name` when publishing a Function to a Function App. As a workaround, re-run the script.
 - .NET 5 with Azure Functions v3 is [not (yet) supported by Microsoft](https://github.com/Azure/azure-functions-host/issues/6674).
+- `iac/.azure` contains local Azure CLI configuration that is used by `create-resources`
