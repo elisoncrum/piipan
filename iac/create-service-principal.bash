@@ -1,6 +1,6 @@
 #!/bin/bash
-set -e
-set -u
+
+source $(dirname "$0")/../tools/common.bash || exit
 
 main () {
     # Required name parameter
@@ -33,6 +33,8 @@ main () {
         --scopes $SCOPES \
         --only-show-errors \
         --output $OUTPUT
+
+    script_completed
 }
 
 main "$@"

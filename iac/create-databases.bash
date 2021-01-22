@@ -1,10 +1,10 @@
 #!/bin/bash
-set -e
+
+source $(dirname "$0")/../tools/common.bash || exit
 
 # Require PGHOST, PGUSER, PGPASSWORD be set by the caller;
 # PGUSER and PGPASSWORD should correspond to the out-of-the-box,
 # non-AD "superuser" administrtor login
-set -u
 : "$PGHOST"
 : "$PGUSER"
 : "$PGPASSWORD"
@@ -196,6 +196,8 @@ main () {
     create_managed_role $db $role $client_id
     config_managed_role $db $role
   done < states.csv
+
+  script_completed
 }
 
 main "$@"
