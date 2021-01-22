@@ -18,7 +18,7 @@ In some environments, `/bin/sh` will be a soft-link to `/bin/bash`. Other times 
 
 ## Decision
 
-For now, use bash (explicitly as `/bin/bash`, not `/bin/sh`), as our primary scripting language. Bash scripts should be written to support bash 3.2, which is the latest version of bash on macOS and 
+For now, use bash (explicitly as `/bin/bash`, not `/bin/sh`), as our primary scripting language. Bash scripts should be written to support bash 3.2, which is the latest version of bash on macOS.
 
 ## Consequences
 
