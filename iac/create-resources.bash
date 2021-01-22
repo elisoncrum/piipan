@@ -3,6 +3,7 @@
 # Provisions and configures the infrastructure components for all Piipan
 # subsystems. Assumes an Azure user with the Global Administrator role
 # has signed in with the Azure CLI. Must be run from a trusted network.
+# See install-extensions.bash for prerequisite Azure CLI extensions.
 #
 # usage: create-resources.bash
 
