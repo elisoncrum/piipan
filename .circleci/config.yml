@@ -30,11 +30,16 @@ jobs:
           name: Test State Match
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
+          working_directory: query-tool/tests/Piipan.QueryTool.Tests
+          name: Test Query Tool
+          command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      - run:
           name: Upload Code Climate coverage report
           command: |
-            ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json 
+            ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json
             ./cc-test-reporter -d format-coverage ./etl/tests/Piipan.Etl.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.etl.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.State.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.state.json
+            ./cc-test-reporter -d format-coverage ./query-tool/tests/Piipan.QueryTool.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.query-tool.json
             ./cc-test-reporter sum-coverage /tmp/codeclimate.*.json -o /tmp/sum.json
             ./cc-test-reporter upload-coverage -i /tmp/sum.json
 
@@ -64,10 +69,22 @@ jobs:
           command: |
             mkdir -p workspace
             mv dashboard/src/Piipan.Dashboard/artifacts/dashboard.zip workspace/dashboard.zip
+      - run:
+          working_directory: query-tool/src/Piipan.QueryTool
+          name: Build Query Tool
+          command: dotnet publish $MSBUILD_PROPS -o ./artifacts
+      - run:
+          working_directory: query-tool/src/Piipan.QueryTool/artifacts
+          name: Zip Query Tool build
+          command: zip -r query-tool.zip .
+      - run:
+          name: Move Query Tool zip to persistent directory
+          command: mv query-tool/src/Piipan.QueryTool/artifacts/query-tool.zip workspace/query-tool.zip
       - persist_to_workspace:
           root: workspace
           paths:
             - dashboard.zip
+            - query-tool.zip
 
   deploy:
     executor: azure-cli/azure-docker
@@ -78,6 +95,9 @@ jobs:
       - run:
           name: Upload Dashboard
           command: az webapp deployment source config-zip -g $AZURE_RESOURCE_GROUP -n $APP_NAME --src /build/workspace/dashboard.zip
+      - run:
+          name: Upload Query Tool
+          command: az webapp deployment source config-zip -g $AZURE_RESOURCE_GROUP -n $APP_NAME --src /build/workspace/query-tool.zip
 
 workflows:
   version: 2
