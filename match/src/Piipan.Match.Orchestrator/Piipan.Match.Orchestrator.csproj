@@ -22,4 +22,9 @@
   <Target Name="RunFunctions">
     <Exec Command="func start" />
   </Target>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Piipan.Match.Orchestrator.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
