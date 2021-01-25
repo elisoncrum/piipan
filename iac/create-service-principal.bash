@@ -14,7 +14,7 @@ main () {
     OUTPUT=${2:-json}
 
     # Array of groups to which the service principal will be scoped
-    RESOURCE_GROUPS=(piipan-functions piipan-resources)
+    RESOURCE_GROUPS=(piipan-functions piipan-resources piipan-match)
 
     # Create space-separated list of resource group IDs
     for g in "${RESOURCE_GROUPS[@]}"
