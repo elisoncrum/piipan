@@ -270,7 +270,7 @@ az deployment group create \
     appName=$DASHBOARD_APP_NAME \
     servicePlan=$APP_SERVICE_PLAN
 
-# Create App Service resources for dashboard app
+# Create App Service resources for query tool app
 echo "Creating App Service resources for query tool app"
 az deployment group create \
   --name $QUERY_TOOL_APP_NAME \
