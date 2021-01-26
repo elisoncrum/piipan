@@ -62,6 +62,10 @@ SP_NAME_CICD=piipan-cicd
 # to app or function code
 DB_CONN_STR_KEY=DatabaseConnectionString
 
+# Name of environment variable used to pass blob storage account connection
+# strings to app or function code
+BLOB_CONN_STR_KEY=BlobStorageConnectionString
+
 # Name of environment variable used to pass Azure Services connection strings
 # to app or function code (required to fetch managed identity tokens)
 AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
@@ -91,6 +95,23 @@ pg_connection_string () {
     -o tsv`
 
   echo "${base}Ssl Mode=Require;"
+}
+
+# Generate the storage account connection string for the corresponding
+# blob storage account.
+# XXX Uses the secondary access key (aka `key2`) for internal access, reserving
+#     the primary access key (aka `key1`) for state access. Improve by replacing
+#     with share access signatures (SAS URLs) via managed identities at runtime.
+blob_connection_string () {
+  group=$1
+  name=$2
+
+  az storage account show-connection-string \
+    --key secondary \
+    --resource-group $group \
+    --name $name \
+    --query connectionString \
+    -o tsv
 }
 
 # From a managed identity name, generate the value for
@@ -343,11 +364,15 @@ while IFS=, read -r abbr name ; do
   fi
 
   db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
+  blob_conn_str=`blob_connection_string $RESOURCE_GROUP $stor_name`
   az_serv_str=`az_connection_string $identity`
   az functionapp config appsettings set \
     --resource-group $FUNCTIONS_RESOURCE_GROUP \
     --name $func_app \
-    --settings $DB_CONN_STR_KEY="$db_conn_str" $AZ_SERV_STR_KEY="$az_serv_str" \
+    --settings \
+      $DB_CONN_STR_KEY="$db_conn_str" \
+      $AZ_SERV_STR_KEY="$az_serv_str" \
+      $BLOB_CONN_STR_KEY="$blob_conn_str" \
     --output none
 
   az eventgrid system-topic create \

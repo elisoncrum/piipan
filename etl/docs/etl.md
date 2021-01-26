@@ -21,34 +21,13 @@ To Be Determined
 
 ## Manual deployment
 
-These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription and an administrator has signed in with the Azure CLI. A future iteration will incorporate managed identities and automate these steps, either in the Infrastructure-as-Code and/or in our CI/CD pipeline.
+These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription and an administrator has signed in with the Azure CLI. 
 
-### Database setup
-
-First, establish the tables in the per-state database, in the `participants-records` cluster, using the `postgres` account. The Azure portal can be used to reset the cluster password as necessary. Use the connection string provided by the portal to extract values for `PGHOST` and `PGUSER`.
-```
-cd ../ddl
-export PGUSER=…
-export PGHOST=…
-export PGPASSWORD=…
-./apply-ddl.bash
-```
-
-### Environment variables
-
-Set the blob storage connection string in the `BlobStorageConnectionString` environment variable, on a per-state basis, for the Function App. Use an access key indicated by the portal for the state storage account (e.g., specific-storage-account → Settings → Access keys → key1)
-```
-az functionapp config appsettings set --name function-app-name --resource-group piipan-functions --settings BlobStorageConnectionString="…"
-```
-
-Set the database connection string in the `DatabaseConnectionString` environment variable, on a per-state basis, for the Function App. Use the ADO.NET value indicated by the portal for the `participants-records` cluster, modifying the string to reflect the specific state database (e.g, `ea`, `eb`, `ec`, etc.).
-```
-az functionapp config appsettings set --name function-app-name --resource-group piipan-functions --settings DatabaseConnectionString="…"
-```
+All of the underlying databases and service bindings to the Function App via environment variables (i.e., `DatabaseConnectionString` and `BlobStorageConnectionString`) are handled by the Intrastructure-as-Code.
 
 ### App deployment
 
-To republish the Azure Function to a specific state:
+To republish the `BulkUpload` Azure Function for a specific state:
 ```
 func azure functionapp publish function-app-name
 ```
@@ -57,5 +36,12 @@ func azure functionapp publish function-app-name
 
 In a development environment, the `upload.bash` tool can be used to upload test CSV files to a storage account.
 ```
-./etl/tools/upload.bash docs/csv/example.csv account-name
+./etl/tools/upload.bash docs/csv/example.csv storage-account-name
 ```
+
+`upload.bash` uses the credentials of the signed in Azure administrator to access the storage accounts. Privileges to perform that operation have to be explicitly granted:
+```
+./etl/tools/grant-blob.bash storage-account-name
+``` 
+
+While `grant-blob.bash` may return within a few seconds, it take can up to several minutes for Azure to replicate the privileges across its internal infrastructure; e.g., if `upload.bash` fails right after `grant-blob.bash` has been run, try it again in a couple of minutes.
