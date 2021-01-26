@@ -1,7 +1,7 @@
 # Dashboard application
 
 ## Prerequisites
-- [.NET Core SDK](https://dotnet.microsoft.com/download)
+- [.NET Core SDK 3.1](https://dotnet.microsoft.com/download)
 
 ## Local development
 To run the app locally:
