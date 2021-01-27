@@ -5,38 +5,22 @@
         "resourceTags": {
             "type": "object"
         },
-        "stateName": {
-            "type": "string"
-        },
-        "stateAbbr": {
-            "type": "string"
-        },
         "location": {
             "type": "string"
         },
-        "identityGroup": {
-            "type": "string"
-        },
-        "azAuthConnectionString": {
-            "type": "string"
-        },
-        "dbConnectionString": {
-            "type": "string"
-        },
-        "dbConnectionStringKey": {
+        "stateApiEndpoints": {
             "type": "string"
         }
     },
     "variables": {
-        "functionAppName": "[concat(parameters('stateAbbr'), 'func', uniqueString(resourceGroup().id))]",
+        "functionAppName": "[concat('ofunc', uniqueString(resourceGroup().id))]",
         "hostingPlanName": "matchapi",
-        "storageAccountName": "[concat(parameters('stateAbbr'), 'fstor', uniquestring(resourceGroup().id))]",
+        "storageAccountName": "[concat('ofstor', uniquestring(resourceGroup().id))]",
         "functionWorkerRuntime": "dotnet",
         "storageAccountType": "Standard_LRS",
         "applicationInsightsTag": {
             "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('functionAppName')))]": "Resource"
-        },
-        "identityName": "[concat(parameters('stateAbbr'), 'admin')]"
+        }
     },
     "resources": [
         {
@@ -73,10 +57,7 @@
             "location": "[parameters('location')]",
             "kind": "functionapp",
             "identity": {
-                "type": "UserAssigned",
-                "userAssignedIdentities": {
-                    "[resourceId(parameters('identityGroup'),'Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]": {}
-                }
+                "type": "SystemAssigned"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
@@ -142,22 +123,10 @@
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
                         },
-                        // Custom environment variables:
+                        // Bind state-level API endpoints
                         {
-                            "name": "StateName",
-                            "value": "[parameters('stateName')]"
-                        },
-                        {
-                            "name": "StateAbbr",
-                            "value": "[parameters('stateAbbr')]"
-                        },
-                        {
-                            "name": "AzureServicesAuthConnectionString",
-                            "value": "[parameters('azAuthConnectionString')]"
-                        },
-                        {
-                            "name": "[parameters('dbConnectionStringKey')]",
-                            "value": "[parameters('dbConnectionString')]"
+                            "name": "StateApiEndpointStrings",
+                            "value": "[parameters('stateApiEndpoints')]"
                         }
                     ]
                 }

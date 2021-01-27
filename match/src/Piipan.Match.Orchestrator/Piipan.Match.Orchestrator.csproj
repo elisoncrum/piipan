@@ -6,12 +6,9 @@
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.78" />
     <PackageReference Include="FluentValidation" Version="9.4.0" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.13" />
-    <PackageReference Include="Npgsql" Version="5.0.3" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -27,7 +24,7 @@
   </Target>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Piipan.Match.State.Tests</_Parameter1>
+      <_Parameter1>Piipan.Match.Orchestrator.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 </Project>

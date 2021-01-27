@@ -26,11 +26,13 @@ To (re)create the Azure resources that `piipan` uses:
 
 ### Environment variables
 
-The following variables are pre-configured by the Infrastructure-as-Code. Most often they are used to [bind backing services to application code](https://12factor.net/backing-services) via connection strings.
+The following variables are pre-configured by the Infrastructure-as-Code for Functions or Apps that require them. Most often they are used to [bind backing services to application code](https://12factor.net/backing-services) via connection strings.
 
-| Environment variable | Value |
-|---|---|
-| `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  |
+| Environment variable | Value | Used by |
+|---|---|---|
+| `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.State |
+| `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
+| `StateApiEndpointStrings` | Serialized JSON array of endpoints strings for accessing each per-state matching API. | Piipan.Match.Orchestrator |
 
 ## Notes
 - `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
