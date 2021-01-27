@@ -18,12 +18,6 @@ namespace Piipan.Match.Orchestrator
 
     public class PiiRecord
     {
-        public PiiRecord()
-        {
-            StateName = Environment.GetEnvironmentVariable("StateName");
-            StateAbbr = Environment.GetEnvironmentVariable("StateAbbr");
-        }
-
         [JsonProperty("last")]
         public string Last { get; set; }
 

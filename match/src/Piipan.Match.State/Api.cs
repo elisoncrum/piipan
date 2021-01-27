@@ -21,9 +21,6 @@ namespace Piipan.Match.State
     /// </summary>
     public static class Api
     {
-        internal static string stateAbbr = Environment.GetEnvironmentVariable("StateAbbr");
-        internal static string serverName = Environment.GetEnvironmentVariable("ServerName");
-
         /// <summary>
         /// API endpoint for conducting a state-level match
         /// </summary>
