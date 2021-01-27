@@ -40,6 +40,15 @@
         "resolved": "12.0.3",
         "contentHash": "6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg=="
       },
+      "Npgsql": {
+        "type": "Direct",
+        "requested": "[5.0.3, )",
+        "resolved": "5.0.3",
+        "contentHash": "IDx2tijhyXGz7tVXQH0iGnCnW0ReSUy3UC99ytSklJKscob5WV8eLZWuT/jqYBq0l07RmZOSrdjUEDEetsgDIA==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
+        }
+      },
       "xunit": {
         "type": "Direct",
         "requested": "[2.4.1, )",
@@ -743,14 +752,6 @@
         "contentHash": "pzMg9rlInZIyQQvHnmVgO2QfNsivd8fuuBKv7Yw1eV4EmqXLtG76sZBzjRbNqbYbsYnekIo++RSvkP1s7e8N4Q==",
         "dependencies": {
           "Newtonsoft.Json": "12.0.2"
-        }
-      },
-      "Npgsql": {
-        "type": "Transitive",
-        "resolved": "5.0.2",
-        "contentHash": "bqsG+0t6+c7nfpunu08HkjeRZCI2g8EbXNtWUHsnFlDzjx0zsLkvzfByiHuYo9a74CMKR9RmxRu7HiPGCE/EvQ==",
-        "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
       },
       "NuGet.Frameworks": {
@@ -1930,7 +1931,7 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.0",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
           "Newtonsoft.Json.Schema": "3.0.13",
-          "Npgsql": "5.0.2"
+          "Npgsql": "5.0.3"
         }
       }
     }
