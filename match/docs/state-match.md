@@ -15,6 +15,16 @@ An initial API for matching PII on a per-state basis:
 
 While all states have separate function apps, managed identities, and databases, the function code is identical across each state.
 
+## Environment variables
+
+The following environment variables are required by `Query` and are set by the [IaC](../../docs/iac.md):
+
+| Name | |
+|---|---|
+| `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
+| `StateName` | [details](../../docs/iac.md#\:\~\:text=StateName) |
+| `StateAbbr` | [details](../../docs/iac.md#\:\~\:text=StateAbbr) |
+
 ## Local development
 
 Local development is currently limited as a result of using a managed identity to connect to the state database. The Instance Metadata Service used by managed identities to retrieve authentication tokens is not available locally. There are [potential solutions](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication#local-development-authentication) using the `Microsoft.Azure.Services.AppAuthentication` library. None have been implemented at this time.

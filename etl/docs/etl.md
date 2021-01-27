@@ -15,21 +15,29 @@ An initial approach for the bulk import of PII records into piipan has been impl
 
 While all states have separate storage accounts, function apps, and databases, the function code is identical across each state.
 
+## Environment variables
+
+The following environment variables are required by `BulkUpload` and are set by the [IaC](../../docs/iac.md):
+
+| Name | |
+|---|---|
+| `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
+| `BlobStorageConnectionString` | [details](../../docs/iac.md#\:\~\:text=BlobStorageConnectionString) |
+
 ## Local development
 
 To Be Determined
 
 ## Manual deployment
 
-These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription and an administrator has signed in with the Azure CLI. 
-
-All of the underlying databases and service bindings to the Function App via environment variables (i.e., `DatabaseConnectionString` and `BlobStorageConnectionString`) are handled by the Intrastructure-as-Code.
+### Prerequisites
+1. The [Piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription.
+1. An administrator has signed in with the Azure CLI.
 
 ### App deployment
-
-To republish the `BulkUpload` Azure Function for a specific state:
+To republish the `BulkUpload` Azure Function for one specific state:
 ```
-func azure functionapp publish function-app-name
+func azure functionapp publish <function-app-name> --dotnet
 ```
 
 ## Ad-hoc testing
