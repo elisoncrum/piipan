@@ -9,18 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Piipan.QueryTool.Pages
 {
-  public class IndexModel : PageModel
-  {
-    private readonly ILogger<IndexModel> _logger;
+    public class IndexModel : PageModel
+    {
+        private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(ILogger<IndexModel> logger)
-    {
-      _logger = logger;
+        public IndexModel(ILogger<IndexModel> logger)
+        {
+            _logger = logger;
+        }
+        public string Title { get; private set; } = "";
+        public void OnGet()
+        {
+            Title += "NAC Query Tool";
+        }
     }
-    public string Title { get; private set; } = "";
-    public void OnGet()
-    {
-      Title += "NAC Query Tool";
-    }
-  }
 }
