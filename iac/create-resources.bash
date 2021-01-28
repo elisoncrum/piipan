@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # Provisions and configures the infrastructure components for all Piipan
 # subsystems. Assumes an Azure user with the Global Administrator role
 # has signed in with the Azure CLI. Must be run from a trusted network.
@@ -54,6 +54,9 @@ APP_SERVICE_PLAN=piipan-app-plan
 
 # Base name of dashboard app
 DASHBOARD_APP_NAME=piipan-dashboard
+
+# Base name of query tool app
+QUERY_TOOL_APP_NAME=piipan-query-tool
 
 # Display name of service principal account responsible for CI/CD tasks
 SP_NAME_CICD=piipan-cicd
@@ -176,7 +179,7 @@ az deployment group create \
 
 # For each participating state, create a separate storage account.
 # Each account has a blob storage container named `upload`.
-while IFS=, read -r abbr name ; do 
+while IFS=, read -r abbr name ; do
     echo "Creating storage for $name ($abbr)"
     az deployment group create \
     --name "${abbr}-blob-storage" \
@@ -286,6 +289,18 @@ az deployment group create \
     location=$LOCATION \
     resourceTags="$RESOURCE_TAGS" \
     appName=$DASHBOARD_APP_NAME \
+    servicePlan=$APP_SERVICE_PLAN
+
+# Create App Service resources for query tool app
+echo "Creating App Service resources for query tool app"
+az deployment group create \
+  --name $QUERY_TOOL_APP_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./arm-templates/query-tool-app.json \
+  --parameters \
+    location=$LOCATION \
+    resourceTags="$RESOURCE_TAGS" \
+    appName=$QUERY_TOOL_APP_NAME \
     servicePlan=$APP_SERVICE_PLAN
 
 # This is a subscription-level resource provider
