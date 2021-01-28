@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,10 +14,12 @@ namespace Piipan.Match.State.Tests
 {
     public class ApiTests
     {
+
         void SetEnvironment()
         {
             Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
             Environment.SetEnvironmentVariable("StateAbbr", "ea");
+            Environment.SetEnvironmentVariable("AuthorizedRoleName", "AuthorizedRole");
         }
 
         static PiiRecord FullRecord()
@@ -42,10 +45,12 @@ namespace Piipan.Match.State.Tests
             return JsonConvert.SerializeObject(data);
         }
 
-        static Mock<HttpRequest> MockRequest(string jsonBody)
+        static Mock<HttpRequest> MockRequest(string jsonBody, ClaimsPrincipal user)
         {
             var ms = new MemoryStream();
             var sw = new StreamWriter(ms);
+            var ctx = new DefaultHttpContext();
+            ctx.User = user;
 
             sw.Write(jsonBody);
             sw.Flush();
@@ -54,8 +59,44 @@ namespace Piipan.Match.State.Tests
 
             var mockRequest = new Mock<HttpRequest>();
             mockRequest.Setup(x => x.Body).Returns(ms);
+            mockRequest.Setup(x => x.HttpContext).Returns(ctx);
 
             return mockRequest;
+        }
+
+        static ClaimsPrincipal AuthorizedUser()
+        {
+            var identity = new ClaimsIdentity(
+                new Claim[] {
+                    new Claim("roles", "AuthorizedRole"),
+                    new Claim("oid", "123"),
+                    new Claim("sub", "123")
+                }
+            );
+            var principal = new ClaimsPrincipal(identity);
+
+            return principal;
+        }
+
+        static ClaimsPrincipal NonApplicationAuthorizedUser()
+        {
+            var identity = new ClaimsIdentity(
+                new Claim[] {
+                    new Claim("roles", "AuthorizedRole"),
+                    new Claim("oid", "123"),
+                    new Claim("sub", "456")
+                }
+            );
+            var principal = new ClaimsPrincipal(identity);
+
+            return principal;
+        }
+
+        static ClaimsPrincipal AnonymousUser()
+        {
+            var principal = new ClaimsPrincipal(new ClaimsIdentity());
+
+            return principal;
         }
 
         // Non-required and empty/whitespace properties parse to null
@@ -102,7 +143,7 @@ namespace Piipan.Match.State.Tests
         public async void ExpectMalformedDataResultsInBadRequest(string query)
         {
             // Arrange
-            Mock<HttpRequest> mockRequest = MockRequest(query);
+            Mock<HttpRequest> mockRequest = MockRequest(query, AuthorizedUser());
             var logger = Mock.Of<ILogger>();
 
             // Act
@@ -147,7 +188,7 @@ namespace Piipan.Match.State.Tests
         public async void ExpectBadResultFromIncompleteData(string query)
         {
             // Arrange
-            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
+            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query), AuthorizedUser());
             var logger = Mock.Of<ILogger>();
 
             // Act
@@ -189,7 +230,7 @@ namespace Piipan.Match.State.Tests
         public async void ExpectBadResultFromInvalidData(string query)
         {
             // Arrange
-            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
+            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query), AuthorizedUser());
             var logger = Mock.Of<ILogger>();
 
             // Act
@@ -299,6 +340,67 @@ namespace Piipan.Match.State.Tests
 
             // Assert
             Assert.Equal(expected, response.ToJson());
+        }
+
+        [Fact]
+        public void AuthorizedUserIsAuthorized()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger>();
+            var identity = AuthorizedUser();
+
+            // Act
+            SetEnvironment();
+            var authorized = Api.Authorize(identity, logger);
+
+            // Assert
+            Assert.True(authorized);
+        }
+
+        [Fact]
+        public void NonApplicationUserIsNotAuthorized()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger>();
+            var identity = NonApplicationAuthorizedUser();
+
+            // Act
+            SetEnvironment();
+            var authorized = Api.Authorize(identity, logger);
+
+            // Assert
+            Assert.False(authorized);
+        }
+
+        [Fact]
+        public void UnAuthorizedUserIsNotAuthorized()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger>();
+            var identity = AnonymousUser();
+
+            // Act
+            SetEnvironment();
+            var authorized = Api.Authorize(identity, logger);
+
+            // Assert
+            Assert.False(authorized);
+        }
+
+        [Fact]
+        public async void UnAuthorizedUserReturnsUnauthorized()
+        {
+            var query = @"{last:'Last', first: 'First', middle: 'Middle', dob: '1970-01-01', ssn: '000-00-0000'}";
+            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query), AnonymousUser());
+            var logger = Mock.Of<ILogger>();
+
+            // Act
+            var response = await Api.Query(mockRequest.Object, logger);
+
+            // Assert
+            Assert.IsType<UnauthorizedResult>(response);
+            var result = response as UnauthorizedResult;
+            Assert.Equal(401, result.StatusCode);
         }
 
         // XXX Connection string contains appropriate config

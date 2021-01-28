@@ -22,7 +22,7 @@ namespace Piipan.Match.Orchestrator.Tests
     {
         void SetEnvironment()
         {
-            Environment.SetEnvironmentVariable("StateApiEndpointStrings", "[\"https://localhost/api/v1/query\"]");
+            Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https://localhost/api/v1/query\"]");
         }
 
         static PiiRecord FullRecord()
@@ -276,15 +276,29 @@ namespace Piipan.Match.Orchestrator.Tests
             var logger = Mock.Of<ILogger>();
             var mockHttpMessageHandler = MockMessageHandler(HttpStatusCode.OK, FullResponse().ToJson());
             var client = new HttpClient(mockHttpMessageHandler.Object);
-            var endpoints = Api.ApiEndpoints().ToList();
+            var endpoints = Api.StateApiBaseUris();
 
             // Act
             var response = new MatchQueryResponse();
             response.Matches = await Api.Match(FullRequest(), client, logger);
 
             // Assert
-            Assert.Equal(endpoints.Count, response.Matches.Count);
+            Assert.Equal(1, response.Matches.Count);
         }
+
+        // [Fact]
+        // public void ValidUris()
+        // {
+        //     Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https:;example.gov/\"]");
+        //     IEnumerable<Uri> uris = Api.StateApiBaseUris();
+
+        //     foreach (var uri in uris)
+        //     {
+        //         Console.WriteLine(uri.AbsoluteUri);
+        //         Console.WriteLine(uri.Scheme);
+        //         Console.WriteLine(uri.Host);
+        //     }
+        // }
 
         [Fact]
         public async void BadResponseFromStateThrowsException()
