@@ -18,10 +18,9 @@ PROJECT_TAG=piipan
 RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
 DB_SERVER_NAME=piipan-metrics-db
 DB_ADMIN_NAME=piipanadmin
-DB_PASSWORD="<secure password>" # This is a dummy; TODO: rework how we access the DB
+DB_PASSWORD=<dummy> # This is a dummy; TODO: rework how we access the DB
 DB_PRICE_TIER=GP_Gen5_2 # TODO: finalize pricing tier for DB
 DB_NAME=metrics
-DB_TABLE_NAME=user_uploads
 # Identity object ID for the Azure environment account
 CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
 # The default Azure subscription
@@ -36,35 +35,47 @@ az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
 # Create Metrics database server if we don't have one yet
 # server_exists=`az postgres server list --resource-group $RESOURCE_GROUP | grep $DB_SERVER_NAME`
-# if [ "$server_exists" = "" ]; then
-#     # create database server
-#     az postgres server create --resource-group $RESOURCE_GROUP --name $DB_SERVER_NAME  --location $LOCATION -u $DB_ADMIN_NAME -p $DB_PASSWORD --sku-name $DB_PRICE_TIER
-#     # set firewall rule so local ip can have access to db server
-#     az postgres server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER_NAME --name AllowMyIP --start-ip-address $LOCAL_IPV4 --end-ip-address $LOCAL_IPV4
-# fi
+server_exists=`az postgres server list --resource-group $RESOURCE_GROUP`
+if [ "$server_exists" = "[]" ]; then
+    echo "Creating Metrics database server"
+    az postgres server create --resource-group $RESOURCE_GROUP --name $DB_SERVER_NAME  --location $LOCATION -u $DB_ADMIN_NAME -p $DB_PASSWORD --sku-name $DB_PRICE_TIER
+    # set firewall rule so local ip can have access to db server
+    echo "Set firewall rules for db server"
+    # for local IP for in order to complete this script
+    az postgres server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER_NAME --name AllowLocalIP --start-ip-address $LOCAL_IPV4 --end-ip-address $LOCAL_IPV4
+    # for all Azure connections
+    # https://docs.microsoft.com/en-us/azure/postgresql/howto-manage-firewall-using-cli#create-firewall-rule
+    # TODO: lock this down to only our Azure resources
+    az postgres server firewall-rule create --resource-group $RESOURCE_GROUP --server-name $DB_SERVER_NAME --name AllowAllAzureIps --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+fi
+
+### Database stuff
+# Create database within db server (command is idempotent)
+az postgres db create --name $DB_NAME --resource-group $RESOURCE_GROUP --server-name $DB_SERVER_NAME
 
 ## Connect to the db server
-# USERNAME="${DB_ADMIN_NAME}@${DB_SERVER_NAME}"
-# HOST="${DB_SERVER_NAME}.postgres.database.azure.com"
-# CREATE_TABLE_SQL=<<EOF
-#     CREATE TABLE IF NOT EXISTS user_uploads (
-#         id serial PRIMARY KEY,
-#         state_abbrev VARCHAR(50) NOT NULL,
-#         uploaded_at timestamp NOT NULL
-#     );
-# EOF
-## psql --host=$HOST --port=5432 --username=$USERNAME --dbname=postgres --password
-# PGPASSWORD="$DB_PASSWORD" psql -t -A \
-# -h "$HOST" \
-# -p "5432" \
-# -d "postgres" \
-# -U "$USERNAME" \
-# -c "$CREATE_TABLE_SQL"
+# For some reason PG threw an Invalid Username error when trying to set PGUSER here, so it's specified in the prompt instead.
+# export PGUSER=${DB_ADMIN_NAME}@${DB_SERVER_NAME}
+export PGHOST=`az resource show \
+  --resource-group $RESOURCE_GROUP \
+  --name $DB_SERVER_NAME \
+  --resource-type "Microsoft.DbForPostgreSQL/servers" \
+  --query properties.fullyQualifiedDomainName -o tsv`
+export PGPASSWORD=$DB_PASSWORD
 
-# Commenting out Metrics DB creation for now so I can move on to function app and subscriptions
-# LEFT OFF: need to verify I'm actually getting into psql prompt, sql commands seem to be silently failing
+# echo "PGUSER: ${PGUSER}"
+echo "PGHOST: ${PGHOST}"
 
-# Function App stuff
+echo "Insert db table"
+psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1 -X -q - <<EOF
+    CREATE TABLE IF NOT EXISTS user_uploads (
+        id serial PRIMARY KEY,
+        actor VARCHAR(50) NOT NULL,
+        uploaded_at timestamp NOT NULL
+    );
+EOF
+
+### Function App stuff
 FUNC_APP_NAME=PiipanMetricsFunctions
 FUNC_NAME=BulkUploadMetrics
 
@@ -76,6 +87,13 @@ az storage account create --name $FUNC_STORAGE_NAME --location $LOCATION --resou
 # Create the function app in Azure
 echo "Creating function app $FUNC_APP_NAME in Azure"
 az functionapp create --resource-group $RESOURCE_GROUP --consumption-plan-location $LOCATION --runtime dotnet --functions-version 3 --name $FUNC_APP_NAME --storage-account $FUNC_STORAGE_NAME
+
+# Waiting before publishing the app, since publishing immediately after creation returns an App Not Found error
+# Waiting was the best solution I could find. More info in these GH issues:
+# https://github.com/Azure/azure-functions-core-tools/issues/1616
+# https://github.com/Azure/azure-functions-core-tools/issues/1766
+echo "Waiting to publish function app"
+sleep 60s
 
 # publish the function app
 echo "Publishing function app $FUNC_APP_NAME"
