@@ -14,6 +14,14 @@ An initial API for matching PII data across all participating states.
     - If the request is valid, the function queries the per-state APIs for matches. A 200 response is returned containing any matching records.
     - If there is an issue connecting to or querying any of the per-state APIs, the orchestrator returns a 500 response.
 
+## Environment variables
+
+The following environment variables are required by `Query` and are set by the [IaC](../../docs/iac.md):
+
+| Name | |
+|---|---|
+| `StateApiEndpointStrings` | [details](../../docs/iac.md#\:\~\:text=StateApiEndpointStrings) |
+
 ## Binding to state APIs
 
 The orchestrator treats per-state APIs as backing services. When running the [IaC](../../docs/iac.md), per-state endpoints are compiled into a JSON list and saved as an environment variable for the orchestrator Function App.
