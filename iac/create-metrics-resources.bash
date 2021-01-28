@@ -34,8 +34,8 @@ echo "Creating $RESOURCE_GROUP group"
 az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
 # Create Metrics database server if we don't have one yet
-# server_exists=`az postgres server list --resource-group $RESOURCE_GROUP | grep $DB_SERVER_NAME`
 server_exists=`az postgres server list --resource-group $RESOURCE_GROUP`
+# TODO: a better way to check this?
 if [ "$server_exists" = "[]" ]; then
     echo "Creating Metrics database server"
     az postgres server create --resource-group $RESOURCE_GROUP --name $DB_SERVER_NAME  --location $LOCATION -u $DB_ADMIN_NAME -p $DB_PASSWORD --sku-name $DB_PRICE_TIER
@@ -78,9 +78,9 @@ EOF
 ### Function App stuff
 FUNC_APP_NAME=PiipanMetricsFunctions
 FUNC_NAME=BulkUploadMetrics
+FUNC_STORAGE_NAME=piipanmetricsstorage
 
 # Need a storage account to publish function app to:
-FUNC_STORAGE_NAME=piipanmetricsstorage
 echo "Creating storage account $FUNC_STORAGE_NAME"
 az storage account create --name $FUNC_STORAGE_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --sku Standard_LRS
 

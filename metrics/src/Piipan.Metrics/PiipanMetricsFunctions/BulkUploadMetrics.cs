@@ -32,7 +32,6 @@ namespace PiipanMetricsFunctions
         {
             log.LogInformation(eventGridEvent.Data.ToString());
             log.LogInformation(eventGridEvent.EventTime.ToString());
-            // Since eventGridEvent.EventTime is a DateTime object, I can just pass this to Npgsql as-is: https://www.npgsql.org/doc/types/datetime.html#detailed-behavior-sending-values-to-the-database
             var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
             var tmp = new { url = "" };
             var data = JsonConvert.DeserializeAnonymousType(jsondata, tmp);
