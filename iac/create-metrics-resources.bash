@@ -21,6 +21,7 @@ DB_ADMIN_NAME=piipanadmin
 DB_PASSWORD=<dummy> # This is a dummy; TODO: rework how we access the DB
 DB_PRICE_TIER=GP_Gen5_2 # TODO: finalize pricing tier for DB
 DB_NAME=metrics
+DB_TABLE_NAME=participant_uploads
 # Identity object ID for the Azure environment account
 CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
 # The default Azure subscription
@@ -37,16 +38,18 @@ az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 server_exists=`az postgres server list --resource-group $RESOURCE_GROUP`
 # TODO: a better way to check this?
 if [ "$server_exists" = "[]" ]; then
-    echo "Creating Metrics database server"
-    az postgres server create --resource-group $RESOURCE_GROUP --name $DB_SERVER_NAME  --location $LOCATION -u $DB_ADMIN_NAME -p $DB_PASSWORD --sku-name $DB_PRICE_TIER
-    # set firewall rule so local ip can have access to db server
-    echo "Set firewall rules for db server"
-    # for local IP for in order to complete this script
-    az postgres server firewall-rule create --resource-group $RESOURCE_GROUP --server $DB_SERVER_NAME --name AllowLocalIP --start-ip-address $LOCAL_IPV4 --end-ip-address $LOCAL_IPV4
-    # for all Azure connections
-    # https://docs.microsoft.com/en-us/azure/postgresql/howto-manage-firewall-using-cli#create-firewall-rule
-    # TODO: lock this down to only our Azure resources
-    az postgres server firewall-rule create --resource-group $RESOURCE_GROUP --server-name $DB_SERVER_NAME --name AllowAllAzureIps --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+  echo "Creating Metrics database server"
+  az deployment group create \
+    --name metrics \
+    --resource-group $RESOURCE_GROUP \
+    --template-file ./arm-templates/metrics.json \
+    --parameters \
+      administratorLogin=$DB_ADMIN_NAME \
+      administratorLoginPassword=$DB_PASSWORD \
+      serverName=$DB_SERVER_NAME \
+      resourceTags="$RESOURCE_TAGS"
+      # secretName=$PG_SECRET_NAME \
+      # vaultName=$VAULT_NAME \
 fi
 
 ### Database stuff
@@ -63,14 +66,11 @@ export PGHOST=`az resource show \
   --query properties.fullyQualifiedDomainName -o tsv`
 export PGPASSWORD=$DB_PASSWORD
 
-# echo "PGUSER: ${PGUSER}"
-echo "PGHOST: ${PGHOST}"
-
 echo "Insert db table"
 psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1 -X -q - <<EOF
-    CREATE TABLE IF NOT EXISTS user_uploads (
+    CREATE TABLE IF NOT EXISTS $DB_TABLE_NAME (
         id serial PRIMARY KEY,
-        actor VARCHAR(50) NOT NULL,
+        state VARCHAR(50) NOT NULL,
         uploaded_at timestamp NOT NULL
     );
 EOF

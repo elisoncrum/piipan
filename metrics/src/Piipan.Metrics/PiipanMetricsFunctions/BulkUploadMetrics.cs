@@ -65,9 +65,10 @@ namespace PiipanMetricsFunctions
                 conn.Open();
                 var tx = conn.BeginTransaction();
 
-                using (var command = new NpgsqlCommand("INSERT INTO user_uploads (actor, uploaded_at) VALUES (@actor, @uploaded_at)", conn))
+                // Is there a way to get this db table name dynamically? Otherwise We'd have to remember to change the name in both the iac script and here.
+                using (var command = new NpgsqlCommand("INSERT INTO participant_uploads (state, uploaded_at) VALUES (@state, @uploaded_at)", conn))
                 {
-                    command.Parameters.AddWithValue("actor", match.Groups[1].Value);
+                    command.Parameters.AddWithValue("state", match.Groups[1].Value);
                     command.Parameters.AddWithValue("uploaded_at", eventGridEvent.EventTime);
                     int nRows = command.ExecuteNonQuery();
                     log.LogInformation(String.Format("Number of rows inserted={0}", nRows));

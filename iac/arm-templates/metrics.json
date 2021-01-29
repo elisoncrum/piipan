@@ -1,0 +1,192 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "type": "string",
+            "metadata": {
+                "description": "Server Name for Azure database for PostgreSQL"
+            }
+        },
+        "administratorLogin": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "Database administrator login name"
+            }
+        },
+        "administratorLoginPassword": {
+            "type": "securestring",
+            "minLength": 8,
+            "metadata": {
+                "description": "Database administrator password"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "azure_postgresql_vnet",
+            "metadata": {
+                "description": "Virtual Network Name"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "azure_postgresql_subnet",
+            "metadata": {
+                "description": "Subnet Name"
+            }
+        },
+        "virtualNetworkRuleName": {
+            "type": "string",
+            "defaultValue": "AllowSubnet",
+            "metadata": {
+                "description": "Virtual Network RuleName"
+            }
+        },
+        "vnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Virtual Network Address Prefix"
+            }
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Subnet Address Prefix"
+            }
+        },
+        // "vaultName": {
+        //     "type": "string",
+        //     "metadata": {
+        //         "description": "The name of the keyvault that contains the secret."
+        //     }
+        // },
+        // "secretName": {
+        //     "type": "string",
+        //     "metadata": {
+        //         "description": "The name of the secret."
+        //     }
+        // },
+        "resourceTags": {
+            "type": "object",
+            "metadata": {
+                "description": "Resource Tags for project"
+            }
+        }
+    },
+    "variables": {
+        "firewallrules": {
+            "batch": {
+                "rules": [
+                    {
+                        "Name": "rule1",
+                        "StartIpAddress": "0.0.0.0",
+                        "EndIpAddress": "255.255.255.255"
+                    },
+                    {
+                        "Name": "rule2",
+                        "StartIpAddress": "0.0.0.0",
+                        "EndIpAddress": "255.255.255.255"
+                    }
+                ]
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-06-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetAddressPrefix')]"
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "type": "subnets",
+                    "apiVersion": "2020-06-01",
+                    "name": "[parameters('subnetName')]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[parameters('virtualNetworkName')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[parameters('subnetPrefix')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.DBforPostgreSQL/servers",
+            "apiVersion": "2017-12-01",
+            "name": "[parameters('serverName')]",
+            "location": "[parameters('location')]",
+            "tags": "[parameters('resourceTags')]",
+            "sku": {
+                "name": "GP_Gen5_1",
+                "tier": "GeneralPurpose",
+                "capacity": 1,
+                "size": "5120",
+                "family": "Gen5"
+            },
+            "properties": {
+                "createMode": "Default",
+                "version": "11",
+                "administratorLogin": "[parameters('administratorLogin')]",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+                "storageProfile": {
+                    "storageMB": 5120,
+                    "backupRetentionDays": 7,
+                    "geoRedundantBackup": "Disabled",
+                    "storageAutoGrow": "Enabled"
+                }
+            },
+            "resources": [
+                {
+                    "type": "virtualNetworkRules",
+                    "apiVersion": "2017-12-01",
+                    "name": "[parameters('virtualNetworkRuleName')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
+                    ],
+                    "properties": {
+                        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+                        "ignoreMissingVnetServiceEndpoint": true
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.DBforPostgreSQL/servers/firewallRules",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('serverName'),'/',variables('firewallrules').batch.rules[copyIndex()].Name)]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "firewallRulesCopy",
+                "mode": "Serial",
+                "batchSize": 1,
+                "count": "[length(variables('firewallrules').batch.rules)]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
+            ],
+            "properties": {
+                "startIpAddress": "[variables('firewallrules').batch.rules[copyIndex()].StartIpAddress]",
+                "endIpAddress": "[variables('firewallrules').batch.rules[copyIndex()].EndIpAddress]"
+            }
+        }
+    ]
+}
