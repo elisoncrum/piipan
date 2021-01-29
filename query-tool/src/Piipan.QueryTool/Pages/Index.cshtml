@@ -1,17 +1,14 @@
 ﻿@page
 @model IndexModel
 
-@{
-    ViewData["Title"] = "NAC Query Tool";
-}
 <div class="text-center">
     <h1>@Model.Title</h1>
-    <form action="">
-        <div><label for="last">Last Name:</label><input type="text" name="last"></div>
-        <div><label for="middle">Middle Name:</label><input type="text" name="middle"></div>
-        <div><label for="first">First Name</label><input type="text" name="first"></div>
-        <div><label for="ssn">Social Security Number</label><input type="text" name="ssn"></div>
-        <div><label for="dob">Date of Birth</label><input type="text" name="dob"></div>
+    <form asp-page="Index">
+        <div><label asp-for="Query.LastName"></label><input type="text" asp-for="Query.LastName"></div>
+        <div><label asp-for="Query.MiddleName"></label><input type="text" asp-for="Query.MiddleName"></div>
+        <div><label asp-for="Query.FirstName"></label><input type="text" asp-for="Query.FirstName"></div>
+        <div><label asp-for="Query.SocialSecurityNum"></label><input type="text" asp-for="Query.SocialSecurityNum"></div>
+        <div><label asp-for="Query.DateOfBirth"></label><input type="text" asp-for="Query.DateOfBirth"></div>
         <button type="submit">Submit</button>
     </form>
 </div>
