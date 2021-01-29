@@ -26,8 +26,6 @@ DB_TABLE_NAME=participant_uploads
 CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
 # The default Azure subscription
 SUBSCRIPTION_ID=`az account show --query id -o tsv`
-# Get to local IP address
-LOCAL_IPV4=`dig @resolver4.opendns.com myip.opendns.com +short -4`
 ### END VARIABLES
 
 # Create Metrics resource group

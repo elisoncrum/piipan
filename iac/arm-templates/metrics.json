@@ -87,15 +87,16 @@
         "firewallrules": {
             "batch": {
                 "rules": [
+                    // TODO: Remove AllowAllWindowsAzureIps when we define all of our private subnets/network security groups
                     {
-                        "Name": "rule1",
+                        "name": "AllowAllWindowsAzureIps",
                         "StartIpAddress": "0.0.0.0",
-                        "EndIpAddress": "255.255.255.255"
+                        "EndIpAddress": "0.0.0.0"
                     },
                     {
-                        "Name": "rule2",
-                        "StartIpAddress": "0.0.0.0",
-                        "EndIpAddress": "255.255.255.255"
+                        "Name": "GSA-network",
+                        "StartIpAddress": "159.142.146.3",
+                        "EndIpAddress": "159.142.255.255"
                     }
                 ]
             }
@@ -136,9 +137,9 @@
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
             "sku": {
-                "name": "GP_Gen5_1",
+                "name": "GP_Gen5_2",
                 "tier": "GeneralPurpose",
-                "capacity": 1,
+                "capacity": 2,
                 "size": "5120",
                 "family": "Gen5"
             },
