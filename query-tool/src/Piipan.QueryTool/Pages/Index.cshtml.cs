@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-
+using System.Text.Json.Serialization;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -18,27 +18,21 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
         }
-        public string Title { get; private set; }
+
+        private readonly ApiRequest _apiRequest = new ApiRequest();
 
         [BindProperty]
-        public QueryModel Query { get; set; }
-        public class QueryModel
+        public PiiRecord Query { get; set; }
+
+        public string QueryResult { get; private set; }
+        public IActionResult OnPost(PiiRecord query)
         {
-            [Display(Name = "First Name")]
-            public string FirstName { get; set; }
-            [Display(Name = "Middle Name")]
-            public string MiddleName { get; set; }
-            [Display(Name = "Last Name")]
-            public string LastName { get; set; }
-            [Display(Name = "Date of Birth")]
-            public string DateOfBirth { get; set; }
-            [Display(Name = "SSN")]
-            public string SocialSecurityNum { get; set; }
-        }
-        public IActionResult OnPost(QueryModel query)
-        {
+            // QueryResult = _apiRequest.QueryOrchestrator();
             return Page();
         }
+
+        public string Title { get; private set; }
+
         public void OnGet()
         {
             Title = "NAC Query Tool";
