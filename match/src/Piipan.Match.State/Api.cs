@@ -74,6 +74,7 @@ namespace Piipan.Match.State
             var role = Environment.GetEnvironmentVariable(AuthorizedRoleName);
             if (roleClaim == null || !roleClaim.Value.Split(' ').Contains(role))
             {
+                log.LogError("Caller does not have authorized role.");
                 return false;
             }
 
@@ -83,6 +84,7 @@ namespace Piipan.Match.State
             string sub = identity.FindFirst("sub")?.Value;
             if (oid != sub)
             {
+                log.LogError("Caller is not an application.");
                 return false;
             }
 

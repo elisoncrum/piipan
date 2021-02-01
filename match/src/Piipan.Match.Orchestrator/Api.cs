@@ -98,31 +98,31 @@ namespace Piipan.Match.Orchestrator
             return result.IsValid;
         }
 
-        internal static IEnumerable<Uri> StateUris()
+        internal static IEnumerable<Uri> StateApiBaseUris()
         {
-            const string StateApiUriStrings = "StateApiUriStrings";
+            const string StateApiHostStrings = "StateApiHostStrings";
 
             // XXX Validate input
-            IEnumerable<Uri> endpoints = JsonConvert.DeserializeObject<IEnumerable<Uri>>(
-                Environment.GetEnvironmentVariable(StateApiUriStrings));
+            IEnumerable<Uri> uris = JsonConvert.DeserializeObject<IEnumerable<Uri>>(
+                Environment.GetEnvironmentVariable(StateApiHostStrings));
 
-            return endpoints;
+            return uris;
         }
 
-        internal async static Task<HttpRequestMessage> RequestMessage(Uri uri, MatchQueryRequest request)
+        internal async static Task<HttpRequestMessage> RequestMessage(Uri baseUri, Uri apiUri, MatchQueryRequest request, ILogger log)
         {
             // Retrieve authentication token via Azure AD Easy Auth. Passing an empty
-            // string to `AzureServiceTokenProvider` uses the system-assigned identity.
+            // string to `AzureServiceTokenProvider` uses system-assigned identity.
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
 
             // Passed URI must match AAD app URI exactly; AAD app URI does not contain
             // a trailing slash, but `Uri.AbsoluteUri` will add one. 
-            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(uri.AbsoluteUri.TrimEnd('/'));
+            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(baseUri.AbsoluteUri.TrimEnd('/'));
 
             var httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = uri,
+                RequestUri = apiUri,
                 Headers = {
                     { HttpRequestHeader.Authorization.ToString(), $"Bearer {accessToken}" },
                     { HttpRequestHeader.Accept.ToString(), "application/json" }
@@ -137,7 +137,7 @@ namespace Piipan.Match.Orchestrator
         {
             const string StateApiEndpointPath = "StateApiEndpointPath";
             Uri apiUri = new Uri(baseUri, Environment.GetEnvironmentVariable(StateApiEndpointPath));
-            HttpRequestMessage requestMessage = await RequestMessage(apiUri, request);
+            HttpRequestMessage requestMessage = await RequestMessage(baseUri, apiUri, request, log);
 
             var response = client.SendAsync(requestMessage).Result;
 
@@ -152,12 +152,12 @@ namespace Piipan.Match.Orchestrator
         internal async static Task<List<PiiRecord>> Match(MatchQueryRequest request, HttpClient client, ILogger log)
         {
             List<PiiRecord> matches = new List<PiiRecord>();
-            var stateApiUris = StateUris();
+            var stateApiBaseUris = StateApiBaseUris();
 
             // Loop through each state, compile results
-            foreach (var uri in stateApiUris)
+            foreach (var host in stateApiBaseUris)
             {
-                var stateMatches = await MatchState(uri, request, client, log);
+                var stateMatches = await MatchState(host, request, client, log);
                 matches.AddRange(stateMatches.Matches);
             }
 

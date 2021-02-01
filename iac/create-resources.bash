@@ -372,8 +372,16 @@ done < states.csv
 # managed identity, hosting plan, and application insights instance.
 #
 # Assumes existence of a managed identity with name `{abbr}admin`.
-match_api_endpoints=""
-MATCH_API_PATH="query"
+
+# Relative path for per-state Query endpoint
+MATCH_API_PATH='/api/v1/query'
+
+# Name of application role authorized to call per-state APIs
+MATCH_API_APP_ROLE='StateApi.Query'
+
+match_api_hosts=''
+match_func_names=()
+
 while IFS=, read -r abbr name ; do
   echo "Creating match API function app for $name ($abbr)"
   abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
@@ -394,7 +402,7 @@ while IFS=, read -r abbr name ; do
     az deployment group create \
       --name match-api \
       --resource-group $MATCH_RESOURCE_GROUP \
-      --template-file  ../iac/arm-templates/function-state-match.json \
+      --template-file  ./arm-templates/function-state-match.json \
       --query properties.outputs.functionAppName.value \
       --output tsv \
       --parameters \
@@ -405,44 +413,199 @@ while IFS=, read -r abbr name ; do
         stateName="$name" \
         stateAbbr="$abbr" \
         dbConnectionString="$db_conn_str" \
-        dbConnectionStringKey="$DB_CONN_STR_KEY")
+        dbConnectionStringKey="$DB_CONN_STR_KEY" \
+        authorizedRoleName="$MATCH_API_APP_ROLE")
+  
+  # Store function names for future auth configuration
+  match_func_names+=("$func_name")
 
   echo "Publishing ${name} function app"
   pushd ../match/src/Piipan.Match.State
   func azure functionapp publish $func_name --dotnet
   popd
 
-  func_endpoint=$(\
-    az functionapp function show \
-      --resource-group piipan-match \
+  # Store API hosts as a JSON array to be bound to orchestrator API
+  func_host=$(\
+    az functionapp show \
+      --resource-group $MATCH_RESOURCE_GROUP \
       --name $func_name \
-      --function-name $MATCH_API_PATH \
-      --query invokeUrlTemplate \
+      --query defaultHostName \
       --output tsv)
-
-  # Build JSON array string of endpoints for binding to orchestrator
-  match_api_endpoints=${match_api_endpoints}",\"$func_endpoint\""
+  func_host="https://${func_host}"
+  match_api_hosts=${match_api_hosts}",\"$func_host\""
 done < states.csv
 
-match_api_endpoints="[${match_api_endpoints:1}]"
-
-# Create orchestrator-level Function app for querying all state-level
-# APIs. Arm template.
+# Create orchestrator-level Function app using ARM template and
+# deploy project code using functions core tools.
+match_api_hosts="[${match_api_hosts:1}]"
 orch_name=$(\
   az deployment group create \
     --name orch-api \
     --resource-group $MATCH_RESOURCE_GROUP \
-    --template-file  ../../../iac/arm-templates/function-orch-match.json \
+    --template-file  ./arm-templates/function-orch-match.json \
     --query properties.outputs.functionAppName.value \
     --output tsv \
     --parameters \
       resourceTags="$RESOURCE_TAGS" \
       location=$LOCATION \
-      stateApiEndpoints=$match_api_endpoints)
+      StateApiHostStrings=$match_api_hosts \
+      StateApiEndpointPath=$MATCH_API_PATH)
+orch_identity=$(\
+  az webapp identity show \
+    --name $orch_name \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --query principalId \
+    --output tsv)
 
 echo "Publishing ${orch_name} function app"
 pushd ../match/src/Piipan.Match.Orchestrator
 func azure functionapp publish $orch_name --dotnet
 popd
+
+# With per-state and orchestrator APIs created, perform the necessary
+# configurations to enable authentication and authorization of the
+# orchestrator with each state.
+#
+# For each state:
+#   - Register an Azure Active Directory (AAD) app with an application
+#     role named the value of `MATCH_API_APP_ROLE`
+#   - Create a service principal (SP) for the app registation
+#   - Add the application role to the orchestrator API's identity
+#   - Configure and enable App Service Authentiction (i.e., Easy Auth)
+#     for state's Function app.
+#
+# Note: while all incoming requests to the state API will need to
+# contain an authentication token from AAD, authorization/verification
+# of the app role is performed at the application level.
+
+# App Service Authentication is done at the Azure tenant level
+TENANT_ID=$(az account show --query homeTenantId -o tsv)
+
+# Constructs a JSON string for assigning an app role to an identity
+app_role_assignment () {
+  principalId=$1
+  resourceId=$2
+  appRoleId=$3
+
+  echo "\
+  {
+    \"principalId\": \"${principalId}\",
+    \"resourceId\": \"${resourceId}\",
+    \"appRoleId\": \"${appRoleId}\"
+  }"
+}
+
+# Constructs a JSON string for adding an app role to an AAD app
+app_role_manifest () {
+  value=$1
+  json="\
+  [{
+    \"allowedMemberTypes\": [
+    \"Application\"
+    ],
+    \"description\": \"Grants access to per-state API query endpoint\",
+    \"displayName\": \"Authorized state API querying client\",
+    \"isEnabled\": true,
+    \"origin\": \"Application\",
+    \"value\": \"${value}\"
+  }]"
+  echo $json
+}
+
+for func in "${match_func_names[@]}"
+do
+  # Create AAD app registration with app role
+  echo "Creating AAD app registration for ${func}"
+  func_host=$(\
+    az functionapp show \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --name $func \
+    --query defaultHostName \
+    --output tsv)
+  func_host="https://${func_host}"
+  func_api_path=${func_host}${MATCH_API_PATH}
+  app_role=`app_role_manifest $MATCH_API_APP_ROLE`
+
+  # Running `az ad app create` with the `--app-roles` parameter will throw
+  # an error if the app already exists and the app role is enabled
+  exists=$(\
+    az ad app list \
+    --display-name ${func} \
+    --filter "displayName eq '${func}'" \
+    --query "[0].appRoles[?value == '${MATCH_API_APP_ROLE}'].value" \
+    --output tsv)
+  if [ -z "$exists" ]; then
+    func_app_reg_id=$(\
+      az ad app create \
+        --display-name $func \
+        --app-roles "${app_role}" \
+        --available-to-other-tenants false \
+        --homepage $func_host \
+        --identifier-uris $func_host \
+        --reply-urls "${func_host}/.auth/login/aad/callback" \
+        --query objectId \
+        --output tsv)
+  else
+    func_app_reg_id=$(\
+    az ad app list \
+      --display-name ${func} \
+      --filter "displayName eq '${func}'" \
+      --query "[0].objectId" \
+      --output tsv)
+  fi
+
+  # Create an associated SP for the AAD app (throws error if exists)
+  echo "Creating service principal for ${func} AAD app registration"
+  func_app_sp=$(\
+    az ad sp list \
+    --display-name $func \
+    --filter "displayName eq '${func}'" \
+    --query "[0].objectId" \
+    --output tsv)
+  if [ -z "$func_app_sp" ]; then
+    func_app_sp=$(\
+    az ad sp create \
+      --id $func_app_reg_id \
+      --query objectId \
+      --output tsv)
+  fi
+
+  # Assign the orchestrator's system-assigned identity to the app role
+  echo "Assigning orchestrator to app role"
+  app_role_id=$(\
+    az ad app show \
+    --id $func_app_reg_id \
+    --query "appRoles[?value == '${MATCH_API_APP_ROLE}'].id" \
+    --output tsv)
+
+  # Similar to `az ad app create`, `az rest` will throw error when assigning
+  # an app role to an identity that already has the role
+  exists=$(\
+    az rest \
+    --method GET \
+    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${orch_identity}/appRoleAssignments" \
+    --query "value[?appRoleId == '${app_role_id}'].appRoleId" \
+    --output tsv)
+  if [ -z "$exists" ]; then
+    role_json=`app_role_assignment $orch_identity $func_app_sp $app_role_id`
+    az rest \
+    --method POST \
+    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${orch_identity}/appRoleAssignments" \
+    --headers 'Content-Type=application/json' \
+    --body "$role_json"
+  fi
+
+  # Activate App Service Authentication for the function app. Function app's
+  # do not have an az CLI command for `auth`, so we use `az webapp auth`.
+  echo "Configuring Easy Auth settings for ${func}"
+  az webapp auth update \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --name $func \
+    --aad-allowed-token-audiences $func_host $func_api_path \
+    --aad-client-id $func_app_reg_id \
+    --aad-token-issuer-url "https://sts.windows.net/${TENANT_ID}/" \
+    --enabled true \
+    --action LoginWithAzureActiveDirectory
+done
 
 script_completed

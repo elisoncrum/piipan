@@ -25,6 +25,9 @@
         },
         "dbConnectionStringKey": {
             "type": "string"
+        },
+        "authorizedRoleName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -86,14 +89,6 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "httpsOnly": true,
                 "siteConfig": {
-                    "ipSecurityRestrictions": [
-                        {
-                            "ipAddress": "159.142.0.0/16",
-                            "action": "Allow",
-                            "name": "GSA IP range",
-                            "priority": 100
-                        }
-                    ],
                     "ftpsState": "Disabled",
                     "appSettings": [
                         /*
@@ -158,6 +153,10 @@
                         {
                             "name": "[parameters('dbConnectionStringKey')]",
                             "value": "[parameters('dbConnectionString')]"
+                        },
+                        {
+                            "name": "AuthorizedRoleName",
+                            "value": "[parameters('authorizedRoleName')]"
                         }
                     ]
                 }
