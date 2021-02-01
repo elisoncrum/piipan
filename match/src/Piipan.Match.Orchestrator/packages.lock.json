@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "FluentValidation": {
         "type": "Direct",
-        "requested": "[9.4.0, )",
-        "resolved": "9.4.0",
-        "contentHash": "MfOKZJoGX2B7sh0tEB8BU6pRL/ECvSKiNcrK9QsZ3aQYTVQKL9Fw0FR8qh4Wy9+DIQz9didDiMm0HfCOt6S62A=="
+        "requested": "[9.5.0, )",
+        "resolved": "9.5.0",
+        "contentHash": "gsu4SrlTgTCS57nynfUXmuEqOqQdsgZGd69dO4dJg/TRDvNTXKlw5TPKVoY/ieQLsmFBzd9ax/Y1Tx+8Ds3XKw=="
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Direct",
