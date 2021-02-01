@@ -65,22 +65,17 @@ printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
   --file /dev/stdin \
   --query id
 
-# Create Metrics database server if we don't have one yet
-server_exists=`az postgres server list --resource-group $RESOURCE_GROUP`
-# TODO: a better way to check this?
-if [ "$server_exists" = "[]" ]; then
-  echo "Creating Metrics database server"
-  az deployment group create \
-    --name metrics \
-    --resource-group $RESOURCE_GROUP \
-    --template-file ./arm-templates/metrics.json \
-    --parameters \
-      administratorLogin=$DB_ADMIN_NAME \
-      serverName=$DB_SERVER_NAME \
-      secretName=$PG_SECRET_NAME \
-      vaultName=$VAULT_NAME \
-      resourceTags="$RESOURCE_TAGS"
-fi
+echo "Creating Metrics database server"
+az deployment group create \
+  --name metrics \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./arm-templates/metrics.json \
+  --parameters \
+    administratorLogin=$DB_ADMIN_NAME \
+    serverName=$DB_SERVER_NAME \
+    secretName=$PG_SECRET_NAME \
+    vaultName=$VAULT_NAME \
+    resourceTags="$RESOURCE_TAGS"
 
 ### Database stuff
 # Create database within db server (command is idempotent)
