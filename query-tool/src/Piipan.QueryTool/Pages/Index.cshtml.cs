@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using System.Text.Json.Serialization;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -19,15 +15,19 @@ namespace Piipan.QueryTool.Pages
             _logger = logger;
         }
 
-        private readonly ApiRequest _apiRequest = new ApiRequest();
-
         [BindProperty]
         public PiiRecord Query { get; set; }
 
-        public string QueryResult { get; private set; }
-        public IActionResult OnPost(PiiRecord query)
+        private readonly OrchestratorApiRequest _apiRequest = new OrchestratorApiRequest();
+        public string QueryResult { get; private set; } = "";
+
+        public async Task<IActionResult> OnPostAsync(PiiRecord query)
         {
-            // QueryResult = _apiRequest.QueryOrchestrator();
+            QueryResult = await _apiRequest.SendQuery(
+                "https://234ad987-27d2-4ea6-8d7f-7743c7695c5a.mock.pstmn.io/query",
+                query
+            );
+            Title = "NAC Query Results";
             return Page();
         }
 
