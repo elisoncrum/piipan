@@ -1,0 +1,153 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceTags": {
+            "type": "object"
+        },
+        "location": {
+            "type": "string"
+        },
+        "stateApiEndpoints": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "functionAppName": "[concat('ofunc', uniqueString(resourceGroup().id))]",
+        "hostingPlanName": "matchapi",
+        "storageAccountName": "[concat('ofstor', uniquestring(resourceGroup().id))]",
+        "functionWorkerRuntime": "dotnet",
+        "storageAccountType": "Standard_LRS",
+        "applicationInsightsTag": {
+            "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('functionAppName')))]": "Resource"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "tags": "[parameters('resourceTags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[variables('storageAccountType')]"
+            },
+            "kind": "Storage"
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('hostingPlanName')]",
+            "tags": "[parameters('resourceTags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic"
+            },
+            "properties": {
+                "name": "[variables('hostingPlanName')]",
+                "computeMode": "Dynamic"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('functionAppName')]",
+            "tags": "[parameters('resourceTags')]",
+            "location": "[parameters('location')]",
+            "kind": "functionapp",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                    "ipSecurityRestrictions": [
+                        {
+                            "ipAddress": "159.142.0.0/16",
+                            "action": "Allow",
+                            "name": "GSA IP range",
+                            "priority": 100
+                        }
+                    ],
+                    "ftpsState": "Disabled",
+                    "appSettings": [
+                        /*
+                            The following settings are required for Function apps per the MS documentation:
+                            - AzureWebJobsStorage
+                            - FUNCTIONS_WORKER_RUNTIME
+                            - FUNCTIONS_EXTENSION_VERSION
+
+                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#function-app)
+                        */
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "[variables('functionWorkerRuntime')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        /*
+                            The `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` and `WEBSITE_CONTENTSHARE`
+                            settings are required for Windows function apps using a consumption plan,
+                            per the MS documentation.
+
+                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#windows)
+                        */
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(variables('functionAppName'))]"
+                        },
+                        // Required when using the zip deployment method (i.e., the method
+                        // used by `func azure functionapp publish`)
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "1"
+                        },
+                        // Connect app to Application Insights instance
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        // Bind state-level API endpoints
+                        {
+                            "name": "StateApiEndpointStrings",
+                            "value": "[parameters('stateApiEndpoints')]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2020-02-02-preview",
+            "name": "[variables('functionAppName')]",
+            "location": "[parameters('location')]",
+            "tags": "[union(parameters('resourceTags'), variables('applicationInsightsTag'))]",
+            "properties": {
+                "ApplicationId": "[variables('functionAppName')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        }
+    ],
+    "outputs": {
+        "functionAppName": {
+            "type": "string",
+            "value": "[variables('functionAppName')]"
+        }
+    }
+}

@@ -17,7 +17,6 @@ namespace Piipan.Match.State.Tests
         {
             Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
             Environment.SetEnvironmentVariable("StateAbbr", "ea");
-            Environment.SetEnvironmentVariable("ServerName", "server-name");
         }
 
         static PiiRecord FullRecord()
@@ -267,17 +266,6 @@ namespace Piipan.Match.State.Tests
             // Assert
             Assert.Equal("ea", record.StateAbbr);
             Assert.Equal("Echo Alpha", record.StateName);
-        }
-
-        [Fact]
-        public void ApiStaticMembers()
-        {
-            // Arrange
-            SetEnvironment();
-
-            // Assert
-            Assert.Equal("ea", Api.stateAbbr);
-            Assert.Equal("server-name", Api.serverName);
         }
 
         [Fact]
