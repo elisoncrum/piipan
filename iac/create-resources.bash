@@ -170,6 +170,7 @@ az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file ./arm-templates/key-vault.json \
   --parameters \
+    name=$VAULT_NAME \
     location=$LOCATION \
     objectId=$CURRENT_USER_OBJID \
     resourceTags="$RESOURCE_TAGS"
