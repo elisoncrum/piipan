@@ -28,6 +28,8 @@ SUBSCRIPTION_ID=`az account show --query id -o tsv`
 VAULT_NAME=metrics-secret-keeper
 # Name of secret used to store the PostgreSQL metrics server admin password
 PG_SECRET_NAME=metrics-pg-admin
+PASSWORD_PLACEHOLDER='{password}'
+DB_CONN_STR_KEY=DatabaseConnectionString
 ### END CONSTANTS
 
 ### Functions
@@ -35,6 +37,22 @@ PG_SECRET_NAME=metrics-pg-admin
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
   head /dev/urandom | LC_ALL=C tr -dc "A-Za-z0-9" | head -c 64 ; echo -n 'aA1!'
+}
+
+pg_connection_string () {
+  server=$1
+  db=$2
+  user=$3
+
+  base=`az postgres show-connection-string \
+    --server-name $server \
+    --database-name $db \
+    --admin-user $user \
+    --admin-password "$PASSWORD_PLACEHOLDER" \
+    --query connectionStrings.\"ado.net\" \
+    -o tsv`
+
+  echo "${base}Ssl Mode=Require;"
 }
 ### END Functions
 
@@ -89,8 +107,6 @@ export PGHOST=`az resource show \
   --name $DB_SERVER_NAME \
   --resource-type "Microsoft.DbForPostgreSQL/servers" \
   --query properties.fullyQualifiedDomainName -o tsv`
-# export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms \
-#      --query accessToken --output tsv`
 export PGPASSWORD=`az keyvault secret show \
   --id "https://${VAULT_NAME}.vault.azure.net/secrets/${PG_SECRET_NAME}" \
   --query value \
@@ -112,11 +128,21 @@ FUNC_STORAGE_NAME=piipanmetricsstorage
 
 # Need a storage account to publish function app to:
 echo "Creating storage account $FUNC_STORAGE_NAME"
-az storage account create --name $FUNC_STORAGE_NAME --location $LOCATION --resource-group $RESOURCE_GROUP --sku Standard_LRS
+az storage account create \
+  --name $FUNC_STORAGE_NAME \
+  --location $LOCATION \
+  --resource-group $RESOURCE_GROUP \
+  --sku Standard_LRS
 
 # Create the function app in Azure
 echo "Creating function app $FUNC_APP_NAME in Azure"
-az functionapp create --resource-group $RESOURCE_GROUP --consumption-plan-location $LOCATION --runtime dotnet --functions-version 3 --name $FUNC_APP_NAME --storage-account $FUNC_STORAGE_NAME
+az functionapp create \
+  --resource-group $RESOURCE_GROUP \
+  --consumption-plan-location $LOCATION \
+  --runtime dotnet \
+  --functions-version 3 \
+  --name $FUNC_APP_NAME \
+  --storage-account $FUNC_STORAGE_NAME
 
 # Waiting before publishing the app, since publishing immediately after creation returns an App Not Found error
 # Waiting was the best solution I could find. More info in these GH issues:
@@ -124,6 +150,19 @@ az functionapp create --resource-group $RESOURCE_GROUP --consumption-plan-locati
 # https://github.com/Azure/azure-functions-core-tools/issues/1766
 echo "Waiting to publish function app"
 sleep 60s
+
+# Configure settings on function app
+echo "Configure settings on function app"
+DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
+
+echo "DB_CONN_STR: ${DB_CONN_STR}"
+
+az functionapp config appsettings set \
+  --resource-group $RESOURCE_GROUP \
+  --name $FUNC_APP_NAME \
+  --settings \
+    $DB_CONN_STR_KEY="$DB_CONN_STR" \
+  --output none
 
 # publish the function app
 echo "Publishing function app $FUNC_APP_NAME"
