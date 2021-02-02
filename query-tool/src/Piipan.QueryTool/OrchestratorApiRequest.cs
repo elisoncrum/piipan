@@ -44,6 +44,6 @@ namespace Piipan.QueryTool
 
     public class OrchestratorApiResponse
     {
-        public string text { get; set; }
+        public virtual string text { get; set; }
     }
 }
