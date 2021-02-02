@@ -155,14 +155,32 @@ sleep 60s
 echo "Configure settings on function app"
 DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
 
-echo "DB_CONN_STR: ${DB_CONN_STR}"
-
 az functionapp config appsettings set \
   --resource-group $RESOURCE_GROUP \
   --name $FUNC_APP_NAME \
   --settings \
     $DB_CONN_STR_KEY="$DB_CONN_STR" \
   --output none
+
+# Assumes if any identity is set, it is the one we are specifying below
+exists=`az functionapp identity show \
+  --resource-group $RESOURCE_GROUP \
+  --name $FUNC_APP_NAME`
+
+if [ -z "$exists" ]; then
+  # Connect creds from function app to key vault so app can connect to db
+  principalId=`az functionapp identity assign \
+    --resource-group $RESOURCE_GROUP \
+    --name $FUNC_APP_NAME \
+    --query principalId \
+    --output tsv`
+
+  az keyvault set-policy \
+    --name $VAULT_NAME \
+    --object-id $principalId \
+    --secret-permissions get list
+fi
+
 
 # publish the function app
 echo "Publishing function app $FUNC_APP_NAME"

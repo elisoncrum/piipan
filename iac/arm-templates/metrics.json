@@ -137,6 +137,7 @@
                                         "EndIpAddress": "0.0.0.0"
                                     },
                                     // StartIpAddress may change depending on how you're connected to the network
+                                    // TODO: switch this to "StartIpAddress": "159.142.0.0" which represents entire network
                                     {
                                         "Name": "GSA-network",
                                         "StartIpAddress": "159.142.146.3",

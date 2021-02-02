@@ -1,6 +1,7 @@
 // Default URL for triggering event grid function in the local environment.
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
 using System;
+using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -13,6 +14,8 @@ using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Npgsql;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 namespace PiipanMetricsFunctions
 {
@@ -75,20 +78,19 @@ namespace PiipanMetricsFunctions
             // during initial function app provisioning in IaC
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
-
-            // Resource Id for open source software databases in the public Azure cloud;
-            // in other clouds, see result of:
-            // `az cloud show --query endpoints.ossrdbmsResourceId`
-            const string ResourceId = "https://ossrdbms-aad.database.windows.net";
+            const string secretName = "metrics-pg-admin";
+            const string vaultName = "metrics-secret-keeper";
+            var kvUri = $"https://{vaultName}.vault.azure.net";
 
             var builder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable(DatabaseConnectionString));
 
+            var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());
+
             if (builder.Password == PasswordPlaceholder)
             {
-                var provider = new AzureServiceTokenProvider();
-                var token = await provider.GetAccessTokenAsync(ResourceId);
-                builder.Password = token;
+                var password = await client.GetSecretAsync(secretName);
+                builder.Password = password.ToString();
             }
 
             return builder.ConnectionString;
@@ -100,11 +102,11 @@ namespace PiipanMetricsFunctions
             DbProviderFactory factory,
             ILogger log)
         {
-            var connString = await ConnectionString();
+            string connString = await ConnectionString();
             using (var conn = factory.CreateConnection())
             {
                 conn.ConnectionString = connString;
-                log.LogInformation("Opening db connection");
+                log.LogInformation($"Opening db connection to: {connString}");
                 conn.Open();
                 var tx = conn.BeginTransaction();
 
@@ -122,6 +124,14 @@ namespace PiipanMetricsFunctions
                 conn.Close();
                 log.LogInformation("db connection closed");
             }
+        }
+        static void AddWithValue(DbCommand cmd, DbType type, String name, object value)
+        {
+            var p = cmd.CreateParameter();
+            p.DbType = type;
+            p.ParameterName = name;
+            p.Value = value;
+            cmd.Parameters.Add(p);
         }
     }
 }
