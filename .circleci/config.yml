@@ -99,10 +99,10 @@ jobs:
       - azure-cli/login-with-service-principal
       - run:
           name: Upload Dashboard
-          command: az webapp deployment source config-zip -g $AZURE_RESOURCE_GROUP -n $APP_NAME --src /build/workspace/dashboard.zip
+          command: az webapp deployment source config-zip -g piipan-resources -n piipan-dashboard-xddlt27hoq7hy --src /build/workspace/dashboard.zip
       - run:
           name: Upload Query Tool
-          command: az webapp deployment source config-zip -g $AZURE_RESOURCE_GROUP -n $APP_NAME --src /build/workspace/query-tool.zip
+          command: az webapp deployment source config-zip -g piipan-resources -n piipan-query-tool-xddlt27hoq7hy --src /build/workspace/query-tool.zip
 
 workflows:
   version: 2
