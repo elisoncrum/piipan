@@ -1,11 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Piipan.QueryTool
 {
@@ -30,6 +27,8 @@ namespace Piipan.QueryTool
             try
             {
                 var message = new HttpRequestMessage(HttpMethod.Post, RequestUrl);
+                var jsonString = JsonSerializer.Serialize(Query);
+                message.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
                 var resp = await client.SendAsync(message);
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
