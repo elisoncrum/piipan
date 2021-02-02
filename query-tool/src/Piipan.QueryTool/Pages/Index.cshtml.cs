@@ -31,7 +31,7 @@ namespace Piipan.QueryTool.Pages
             return Page();
         }
 
-        public string Title { get; private set; }
+        public string Title { get; private set; } = "";
 
         public void OnGet()
         {
