@@ -15,7 +15,6 @@ namespace Piipan.QueryTool
         {
             RequestUrl = url;
             Query = query;
-            Console.WriteLine(query.LastName);
             return await QueryOrchestrator();
         }
 
