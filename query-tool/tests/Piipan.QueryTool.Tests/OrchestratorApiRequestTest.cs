@@ -40,6 +40,12 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.NotNull(TestQueryResult);
             Assert.Equal("You did a request", TestQueryResult);
+            handlerMock.Protected().Verify(
+              "SendAsync",
+              Times.Exactly(1),
+              ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
+              ItExpr.IsAny<CancellationToken>()
+            );
         }
     }
 }
