@@ -10,15 +10,24 @@ namespace Piipan.QueryTool
     {
         public string RequestUrl;
         public PiiRecord Query;
+        private static HttpClient _client;
 
         public async Task<string> SendQuery(string url, PiiRecord query)
         {
             RequestUrl = url;
             Query = query;
+            _client = new HttpClient();
             return await QueryOrchestrator();
         }
 
-        private static readonly HttpClient client = new HttpClient();
+        public async Task<string> SendQuery(string url, PiiRecord query, HttpClient client)
+        {
+            RequestUrl = url;
+            Query = query;
+            _client = client;
+            return await QueryOrchestrator();
+        }
+
         public string ResponseText { get; private set; }
 
         private async Task<string> QueryOrchestrator()
@@ -28,7 +37,7 @@ namespace Piipan.QueryTool
                 var message = new HttpRequestMessage(HttpMethod.Post, RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
                 message.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var resp = await client.SendAsync(message);
+                var resp = await _client.SendAsync(message);
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
                 ResponseText = json.text;
