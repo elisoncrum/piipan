@@ -96,7 +96,7 @@ namespace PiipanMetricsFunctions
             return builder.ConnectionString;
         }
 
-        internal async static Task Write(
+        public async static Task Write(
             String state,
             DateTime uploadedAt,
             DbProviderFactory factory,
