@@ -72,7 +72,7 @@ namespace PiipanMetricsFunctions
             }
         }
 
-        internal async static Task<string> ConnectionString()
+        internal async static Task<string> ConnectionString(ILogger log)
         {
             // Environment variable (and placeholder) established
             // during initial function app provisioning in IaC
@@ -89,8 +89,8 @@ namespace PiipanMetricsFunctions
 
             if (builder.Password == PasswordPlaceholder)
             {
-                var password = await client.GetSecretAsync(secretName);
-                builder.Password = password.ToString();
+                var secret = await client.GetSecretAsync(secretName);
+                builder.Password = $"{secret.Value.Value}";
             }
 
             return builder.ConnectionString;
@@ -102,11 +102,11 @@ namespace PiipanMetricsFunctions
             DbProviderFactory factory,
             ILogger log)
         {
-            string connString = await ConnectionString();
+            string connString = await ConnectionString(log);
             using (var conn = factory.CreateConnection())
             {
                 conn.ConnectionString = connString;
-                log.LogInformation($"Opening db connection to: {connString}");
+                log.LogInformation("Opening db connection");
                 conn.Open();
                 var tx = conn.BeginTransaction();
 
