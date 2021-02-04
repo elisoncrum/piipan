@@ -38,6 +38,10 @@ jobs:
           name: Test Orchestrator Match
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
+          working_directory: metrics/tests/Piipan.Metrics.Tests
+          name: Test Metrics
+          command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      - run:
           name: Upload Code Climate coverage report
           command: |
             ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json
