@@ -109,20 +109,26 @@ namespace Piipan.Match.Orchestrator
             return uris;
         }
 
-        internal async static Task<HttpRequestMessage> RequestMessage(Uri baseUri, Uri apiUri, MatchQueryRequest request, ILogger log)
+        internal async static Task<string> AccessToken(Uri uri)
         {
             // Retrieve authentication token via Azure AD Easy Auth. Passing an empty
             // string to `AzureServiceTokenProvider` uses system-assigned identity.
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
 
             // Passed URI must match AAD app URI exactly; AAD app URI does not contain
-            // a trailing slash, but `Uri.AbsoluteUri` will add one. 
-            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(baseUri.AbsoluteUri.TrimEnd('/'));
+            // a trailing slash, but `Uri.AbsoluteUri` will add one.
+            var resource = uri.AbsoluteUri.TrimEnd('/');
+            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(resource);
 
+            return accessToken;
+        }
+
+        internal static HttpRequestMessage RequestMessage(Uri uri, string accessToken, MatchQueryRequest request)
+        {
             var httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = apiUri,
+                RequestUri = uri,
                 Headers = {
                     { HttpRequestHeader.Authorization.ToString(), $"Bearer {accessToken}" },
                     { HttpRequestHeader.Accept.ToString(), "application/json" }
@@ -136,12 +142,13 @@ namespace Piipan.Match.Orchestrator
         internal async static Task<MatchQueryResponse> MatchState(Uri baseUri, MatchQueryRequest request, HttpClient client, ILogger log)
         {
             const string StateApiEndpointPath = "StateApiEndpointPath";
-            Uri apiUri = new Uri(baseUri, Environment.GetEnvironmentVariable(StateApiEndpointPath));
-            HttpRequestMessage requestMessage = await RequestMessage(baseUri, apiUri, request, log);
 
-            var response = client.SendAsync(requestMessage).Result;
+            var accessToken = await AccessToken(baseUri);
+            Uri queryUri = new Uri(baseUri, Environment.GetEnvironmentVariable(StateApiEndpointPath));
+            HttpRequestMessage requestMessage = RequestMessage(queryUri, accessToken, request);
 
             // Exception caught by `Query`
+            var response = client.SendAsync(requestMessage).Result;
             response.EnsureSuccessStatusCode();
 
             var matchResponse = await response.Content.ReadAsAsync<MatchQueryResponse>();

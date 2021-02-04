@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,7 +22,7 @@ namespace Piipan.Match.Orchestrator.Tests
     {
         void SetEnvironment()
         {
-            Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https://localhost/api/v1/query\"]");
+            Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https://localhost\"]");
         }
 
         static PiiRecord FullRecord()
@@ -269,38 +269,6 @@ namespace Piipan.Match.Orchestrator.Tests
         }
 
         [Fact]
-        public async void OkResponseFromStateReturnsMatches()
-        {
-            // Arrange
-            SetEnvironment();
-            var logger = Mock.Of<ILogger>();
-            var mockHttpMessageHandler = MockMessageHandler(HttpStatusCode.OK, FullResponse().ToJson());
-            var client = new HttpClient(mockHttpMessageHandler.Object);
-            var endpoints = Api.StateApiBaseUris();
-
-            // Act
-            var response = new MatchQueryResponse();
-            response.Matches = await Api.Match(FullRequest(), client, logger);
-
-            // Assert
-            Assert.Equal(1, response.Matches.Count);
-        }
-
-        // [Fact]
-        // public void ValidUris()
-        // {
-        //     Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https:;example.gov/\"]");
-        //     IEnumerable<Uri> uris = Api.StateApiBaseUris();
-
-        //     foreach (var uri in uris)
-        //     {
-        //         Console.WriteLine(uri.AbsoluteUri);
-        //         Console.WriteLine(uri.Scheme);
-        //         Console.WriteLine(uri.Host);
-        //     }
-        // }
-
-        [Fact]
         public async void BadResponseFromStateThrowsException()
         {
             // Arrange
@@ -314,6 +282,37 @@ namespace Piipan.Match.Orchestrator.Tests
             {
                 await Api.Match(FullRequest(), client, logger);
             });
+        }
+
+        [Fact]
+        public void RequestMessageContainsBearerToken()
+        {
+            // Arrange
+            var uri = new Uri("https://localhost/api/v1/query");
+            var accessToken = "{accessToken}";
+            var request = FullRequest();
+
+            // Act
+            var message = Api.RequestMessage(uri, accessToken, request);
+
+            // Assert
+            Assert.Contains(accessToken, message.Headers.Authorization.ToString());
+        }
+
+        [Fact]
+        public async void FailedStateQueryResultsInServerError()
+        {
+            // Arrange
+            var body = JsonBody(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-0000'}");
+            Mock<HttpRequest> mockRequest = MockRequest(body);
+            var logger = Mock.Of<ILogger>();
+
+            // Act
+            Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https://localhost/foo/bar\"]"); // Unreachable
+            var response = await Api.Query(mockRequest.Object, logger);
+
+            // Assert
+            Assert.IsType<InternalServerErrorResult>(response);
         }
 
         // XXX Test exception handling in `Api.Query` via injected HttpClient
