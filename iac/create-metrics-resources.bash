@@ -9,52 +9,21 @@
 # usage: create-metrics-resources.bash
 
 source $(dirname "$0")/../tools/common.bash || exit
+source $(dirname "$0")/iac-common.bash || exit
 
 ### CONSTANTS
 # Default resource group for metrics system
 RESOURCE_GROUP=piipan-metrics
 LOCATION=westus
-PROJECT_TAG=piipan
-RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
 DB_SERVER_NAME=piipan-metrics-db
 DB_ADMIN_NAME=piipanadmin
 DB_NAME=metrics
 DB_TABLE_NAME=participant_uploads
-# Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
-# The default Azure subscription
-SUBSCRIPTION_ID=`az account show --query id -o tsv`
 # Name of Key Vault
 VAULT_NAME=metrics-secret-keeper
 # Name of secret used to store the PostgreSQL metrics server admin password
 PG_SECRET_NAME=metrics-pg-admin
-PASSWORD_PLACEHOLDER='{password}'
-DB_CONN_STR_KEY=DatabaseConnectionString
 ### END CONSTANTS
-
-### Functions
-# Create a very long, (mostly) random password. Ensures all Azure character
-# class requirements are met by tacking on a non-random, tailored suffix.
-random_password () {
-  head /dev/urandom | LC_ALL=C tr -dc "A-Za-z0-9" | head -c 64 ; echo -n 'aA1!'
-}
-
-pg_connection_string () {
-  server=$1
-  db=$2
-  user=$3
-
-  base=`az postgres show-connection-string \
-    --server-name $server \
-    --database-name $db \
-    --admin-user $user \
-    --admin-password "$PASSWORD_PLACEHOLDER" \
-    --query connectionStrings.\"ado.net\" \
-    -o tsv`
-
-  echo "${base}Ssl Mode=Require;"
-}
-### END Functions
 
 # Create Metrics resource group
 echo "Creating $RESOURCE_GROUP group"
