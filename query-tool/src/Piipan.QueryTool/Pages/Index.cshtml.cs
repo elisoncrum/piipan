@@ -25,7 +25,8 @@ namespace Piipan.QueryTool.Pages
         public async Task<IActionResult> OnPostAsync(PiiRecord query)
         {
             QueryResult = await _apiRequest.SendQuery(
-                "https://234ad987-27d2-4ea6-8d7f-7743c7695c5a.mock.pstmn.io/query",
+                // "https://234ad987-27d2-4ea6-8d7f-7743c7695c5a.mock.pstmn.io/query",
+                "https://ofuncw5wltopux5z7i.azurewebsites.net/api/v1/query",
                 query
             );
             Title = "NAC Query Results";
