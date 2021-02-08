@@ -10,13 +10,13 @@ namespace Piipan.QueryTool
     public class OrchestratorApiRequest
     {
         public string RequestUrl;
-        public PiiRecord Query;
+        public Dictionary<string, PiiRecord> Query = new Dictionary<string, PiiRecord>();
         private static HttpClient _client;
 
         public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query)
         {
             RequestUrl = url;
-            Query = query;
+            Query.Add("query", query);
             _client = new HttpClient();
             return await QueryOrchestrator();
         }
@@ -24,7 +24,7 @@ namespace Piipan.QueryTool
         public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query, HttpClient client)
         {
             RequestUrl = url;
-            Query = query;
+            Query.Add("query", query);
             _client = client;
             return await QueryOrchestrator();
         }
