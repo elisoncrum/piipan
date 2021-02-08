@@ -22,4 +22,27 @@
             <input class="usa-button" type="submit" value="Submit" />
         </fieldset>
     </form>
+    @if (Model.QueryResult.Any())
+    {
+            <table class="usa-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">DOB</th>
+                        <th scope="col">SSN</th>
+                    </tr>
+                </thead>
+                <tbody>
+        @foreach (var record in @Model.QueryResult)
+                {
+                        <tr>
+                            <td>@record.FirstName @record.MiddleName @record.LastName</td>
+                            <td>@record.DateOfBirth</td>
+                            <td>@record.SocialSecurityNum</td>
+                        </tr>
+                }
+                </tbody>
+            </table>
+    }
+
 </div>

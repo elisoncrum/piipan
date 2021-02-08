@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Piipan.QueryTool
 {
@@ -12,7 +13,7 @@ namespace Piipan.QueryTool
         public PiiRecord Query;
         private static HttpClient _client;
 
-        public async Task<string> SendQuery(string url, PiiRecord query)
+        public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query)
         {
             RequestUrl = url;
             Query = query;
@@ -20,7 +21,7 @@ namespace Piipan.QueryTool
             return await QueryOrchestrator();
         }
 
-        public async Task<string> SendQuery(string url, PiiRecord query, HttpClient client)
+        public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query, HttpClient client)
         {
             RequestUrl = url;
             Query = query;
@@ -28,11 +29,10 @@ namespace Piipan.QueryTool
             return await QueryOrchestrator();
         }
 
-        public string ResponseText { get; private set; }
+        public List<PiiRecord> Matches { get; private set; }
 
-        private async Task<string> QueryOrchestrator()
+        private async Task<List<PiiRecord>> QueryOrchestrator()
         {
-            try
             {
                 var message = new HttpRequestMessage(HttpMethod.Post, RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
@@ -40,19 +40,14 @@ namespace Piipan.QueryTool
                 var resp = await _client.SendAsync(message);
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
-                ResponseText = json.text;
-                return ResponseText;
-            }
-            catch (Exception e)
-            {
-                ResponseText = e.Message;
-                return ResponseText;
+                Matches = json.matches;
+                return Matches;
             }
         }
     }
 
     public class OrchestratorApiResponse
     {
-        public virtual string text { get; set; }
+        public virtual List<PiiRecord> matches { get; set; }
     }
 }

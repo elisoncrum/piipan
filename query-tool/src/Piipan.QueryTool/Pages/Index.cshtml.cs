@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,7 +20,7 @@ namespace Piipan.QueryTool.Pages
         public PiiRecord Query { get; set; }
 
         private readonly OrchestratorApiRequest _apiRequest = new OrchestratorApiRequest();
-        public string QueryResult { get; private set; } = "";
+        public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
 
         public async Task<IActionResult> OnPostAsync(PiiRecord query)
         {
