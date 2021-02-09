@@ -70,6 +70,12 @@
                         "firewallrules": {
                             "batch": {
                                 "rules": [
+                                    // TODO: Remove AllowAllWindowsAzureIps when we define all of our private subnets/network security groups
+                                    {
+                                        "name": "AllowAllWindowsAzureIps",
+                                        "StartIpAddress": "0.0.0.0",
+                                        "EndIpAddress": "0.0.0.0"
+                                    },
                                     {
                                         "Name": "GSA-network",
                                         "StartIpAddress": "159.142.0.0",
