@@ -15,6 +15,15 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var handlerMock = new Mock<HttpMessageHandler>();
+            var mockResponse = @"{
+                ""matches"": [
+                    {
+                        ""first"": ""Theodore"",
+                        ""middle"": ""Carri"",
+                        ""last"": ""Farrington""
+                    }
+                ]
+            }";
             handlerMock
               .Protected()
               .Setup<Task<HttpResponseMessage>>(
@@ -25,7 +34,7 @@ namespace Piipan.QueryTool.Tests
               .ReturnsAsync(new HttpResponseMessage()
               {
                   StatusCode = HttpStatusCode.OK,
-                  Content = new StringContent("{\"text\":\"You did a request\"}")
+                  Content = new StringContent(mockResponse)
               });
             var httpClient = new HttpClient(handlerMock.Object);
 
@@ -36,11 +45,12 @@ namespace Piipan.QueryTool.Tests
             var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query, httpClient);
 
             // assert
-            Assert.NotNull(TestQueryResult);
-            Assert.Equal("You did a request", TestQueryResult);
+            Assert.Single(TestQueryResult);
+            Assert.Equal("Theodore", TestQueryResult[0].FirstName);
+            Assert.Equal("Farrington", TestQueryResult[0].LastName);
             handlerMock.Protected().Verify(
               "SendAsync",
-              Times.Exactly(1),
+              Times.AtLeastOnce(),
               ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
               ItExpr.IsAny<CancellationToken>()
             );
