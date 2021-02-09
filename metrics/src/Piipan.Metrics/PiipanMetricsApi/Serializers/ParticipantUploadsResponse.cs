@@ -12,14 +12,10 @@ namespace Piipan.Metrics.Api
             public List<ParticipantUpload> data;
             public ParticipantUploadsResponse(
                 List<ParticipantUpload> responseData,
-                int total,
-                int limit)
+                Meta _meta)
             {
                 data = responseData;
-                meta = new Meta();
-                meta.total = total;
-                meta.limit = limit;
-                meta.offset = 0;
+                meta = _meta;
             }
         }
     }

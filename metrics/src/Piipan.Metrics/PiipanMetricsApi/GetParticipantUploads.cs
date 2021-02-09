@@ -34,15 +34,30 @@ namespace Piipan.Metrics.Api
                     query,
                     log
                 );
-                int limit = 0;
-                int.TryParse(req.Query["limit"], out limit);
-                limit = limit == 0 ? 50 : limit;
+                var meta = new Meta();
+                // TODO: need a more concise way to say:
+                // if param is set, convert to int
+                // if param is not set, then set it as default value
+                int page = 0;
+                int.TryParse(req.Query["page"], out page);
+                meta.page = page == 0 ? 1 : page;
+                int perPage = 0;
+                int.TryParse(req.Query["perPage"], out perPage);
+                perPage = perPage == 0 ? 50 : perPage;
+                meta.perPage = perPage;
+                meta.total = await TotalQuery(
+                    req,
+                    NpgsqlFactory.Instance,
+                    log);
+                meta.nextPage = NextPageParams(
+                    req.Query["state"],
+                    meta.page,
+                    meta.perPage,
+                    meta.total);
                 var response = new ParticipantUploadsResponse(
                     data,
-                    data.Count,
-                    limit
+                    meta
                 );
-
                 return new OkObjectResult(
                     JsonConvert.SerializeObject(response, Formatting.Indented)
                 );
@@ -54,13 +69,66 @@ namespace Piipan.Metrics.Api
             }
         }
 
+        public static String? NextPageParams(
+            string? state,
+            int page,
+            int perPage,
+            Int64 total)
+        {
+            string result = "";
+            int nextPage = page + 1;
+            // if there are next pages to be had
+            if (total >= (nextPage * perPage))
+            {
+                if (!String.IsNullOrEmpty(state))
+                    result += $"&state={state}";
+                result += $"&page={nextPage}&perPage={perPage}";
+            }
+            if (String.IsNullOrEmpty(result))
+            {
+                return null;
+            }
+            else
+            {
+                return "?" + result.TrimStart('&');
+            }
+        }
+
+        public async static Task<Int64> TotalQuery(
+            HttpRequest req,
+            DbProviderFactory factory,
+            ILogger log)
+        {
+            Int64 count = 0;
+            string connString = await ConnectionString(log);
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = connString;
+                log.LogInformation("Opening db connection");
+                conn.Open();
+                using (var cmd = factory.CreateCommand())
+                {
+                    cmd.Connection = conn;
+                    var text = "SELECT COUNT(*) from participant_uploads";
+                    string state = req.Query["state"];
+                    if (!String.IsNullOrEmpty(state))
+                        text += $" WHERE lower(state) LIKE '%{state}%'";
+                    cmd.CommandText = text;
+                    count = (Int64)cmd.ExecuteScalar();
+                }
+                conn.Close();
+                log.LogInformation("Closed db connection");
+            }
+            return count;
+        }
+
         public static String BuildQuery(HttpRequest req)
         {
-            string? limit = String.IsNullOrEmpty(req.Query["limit"]) ? "50" : (string?)req.Query["limit"];
+            string? limit = String.IsNullOrEmpty(req.Query["perPage"]) ? "50" : (string?)req.Query["perPage"];
             var query = "SELECT state, uploaded_at FROM participant_uploads";
             string state = req.Query["state"];
             if (!String.IsNullOrEmpty(state))
-                query += $" WHERE lower(state) LIKE '%{state}%'";
+                query += $" WHERE lower(state) LIKE '%{state.ToLower()}%'";
             query += $" ORDER BY uploaded_at DESC LIMIT {limit}";
             return query;
         }
