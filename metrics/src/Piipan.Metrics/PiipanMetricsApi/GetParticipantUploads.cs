@@ -28,11 +28,20 @@ namespace Piipan.Metrics.Api
 
             try
             {
+                var query = BuildQuery(req);
                 var data = await Read(
                     NpgsqlFactory.Instance,
+                    query,
                     log
                 );
-                var response = new ParticipantUploadsResponse(data, data.Count);
+                int limit = 0;
+                int.TryParse(req.Query["limit"], out limit);
+                limit = limit == 0 ? 50 : limit;
+                var response = new ParticipantUploadsResponse(
+                    data,
+                    data.Count,
+                    limit
+                );
 
                 return new OkObjectResult(
                     JsonConvert.SerializeObject(response, Formatting.Indented)
@@ -45,8 +54,20 @@ namespace Piipan.Metrics.Api
             }
         }
 
+        public static String BuildQuery(HttpRequest req)
+        {
+            string? limit = String.IsNullOrEmpty(req.Query["limit"]) ? "50" : (string?)req.Query["limit"];
+            var query = "SELECT state, uploaded_at FROM participant_uploads";
+            string state = req.Query["state"];
+            if (!String.IsNullOrEmpty(state))
+                query += $" WHERE lower(state) LIKE '%{state}%'";
+            query += $" ORDER BY uploaded_at DESC LIMIT {limit}";
+            return query;
+        }
+
         public async static Task<List<ParticipantUpload>> Read(
             DbProviderFactory factory,
+            String query,
             ILogger log)
         {
             List<ParticipantUpload> results = new List<ParticipantUpload>();
@@ -59,7 +80,7 @@ namespace Piipan.Metrics.Api
                 using (var cmd = factory.CreateCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = "SELECT state, uploaded_at FROM participant_uploads ORDER BY uploaded_at DESC LIMIT 50";
+                    cmd.CommandText = query;
                     var reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
