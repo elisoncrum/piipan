@@ -1,4 +1,6 @@
 using System;
+
+#nullable enable
 namespace Piipan.Metrics.Api
 {
     namespace Serializers

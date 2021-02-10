@@ -19,12 +19,16 @@ namespace Piipan.Metrics.Tests
                 participant_upload.state = "foobar";
                 participant_upload.uploaded_at = new DateTime();
                 List<ParticipantUpload> list = new List<ParticipantUpload>() { participant_upload };
+                var meta = new Meta();
+                meta.page = 1;
+                meta.perPage = 5;
+                meta.total = 6;
                 var result = new ParticipantUploadsResponse(
                     list,
-                    list.Count
+                    meta
                 );
                 Assert.Equal(list, result.data);
-                Assert.Equal(1, result.meta.total);
+                Assert.Equal(6, result.meta.total);
             }
             // Just to want to view the serialized result
             [Fact]
@@ -34,9 +38,13 @@ namespace Piipan.Metrics.Tests
                 participant_upload.state = "foobar";
                 participant_upload.uploaded_at = new DateTime();
                 List<ParticipantUpload> list = new List<ParticipantUpload>() { participant_upload };
+                var meta = new Meta();
+                meta.page = 1;
+                meta.perPage = 5;
+                meta.total = 6;
                 var result = new ParticipantUploadsResponse(
                     list,
-                    list.Count
+                    meta
                 );
                 var serializedResult = JsonConvert.SerializeObject(result, Formatting.Indented);
                 Console.WriteLine(serializedResult);

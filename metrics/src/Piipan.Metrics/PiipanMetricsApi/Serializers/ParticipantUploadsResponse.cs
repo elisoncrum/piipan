@@ -8,7 +8,6 @@ namespace Piipan.Metrics.Api
     {
         public class ParticipantUploadsResponse : Response
         {
-            public Meta meta;
             public List<ParticipantUpload> data;
             public ParticipantUploadsResponse(
                 List<ParticipantUpload> responseData,

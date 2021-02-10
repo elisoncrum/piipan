@@ -15,6 +15,8 @@ using Azure.Security.KeyVault.Secrets;
 using Piipan.Metrics.Models;
 using Piipan.Metrics.Api.Serializers;
 
+#nullable enable
+
 namespace Piipan.Metrics.Api
 {
     public static class GetParticipantUploads
@@ -25,29 +27,21 @@ namespace Piipan.Metrics.Api
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-
             try
             {
-                var query = BuildQuery(req);
-                var data = await Read(
-                    NpgsqlFactory.Instance,
-                    query,
+                var dbfactory = NpgsqlFactory.Instance;
+                var resultsQueryString = ResultsQueryString(req.Query);
+                var data = await ResultsQuery(
+                    dbfactory,
+                    resultsQueryString,
                     log
                 );
                 var meta = new Meta();
-                // TODO: need a more concise way to say:
-                // if param is set, convert to int
-                // if param is not set, then set it as default value
-                int page = 0;
-                int.TryParse(req.Query["page"], out page);
-                meta.page = page == 0 ? 1 : page;
-                int perPage = 0;
-                int.TryParse(req.Query["perPage"], out perPage);
-                perPage = perPage == 0 ? 50 : perPage;
-                meta.perPage = perPage;
+                meta.page = StrToIntWithDefault(req.Query["page"], 1);
+                meta.perPage = StrToIntWithDefault(req.Query["perPage"], 50);
                 meta.total = await TotalQuery(
                     req,
-                    NpgsqlFactory.Instance,
+                    dbfactory,
                     log);
                 meta.nextPage = NextPageParams(
                     req.Query["state"],
@@ -78,7 +72,7 @@ namespace Piipan.Metrics.Api
             string result = "";
             int nextPage = page + 1;
             // if there are next pages to be had
-            if (total >= (nextPage * perPage))
+            if (total >= (page * perPage))
             {
                 if (!String.IsNullOrEmpty(state))
                     result += $"&state={state}";
@@ -110,7 +104,7 @@ namespace Piipan.Metrics.Api
                 {
                     cmd.Connection = conn;
                     var text = "SELECT COUNT(*) from participant_uploads";
-                    string state = req.Query["state"];
+                    string? state = req.Query["state"];
                     if (!String.IsNullOrEmpty(state))
                         text += $" WHERE lower(state) LIKE '%{state}%'";
                     cmd.CommandText = text;
@@ -122,18 +116,31 @@ namespace Piipan.Metrics.Api
             return count;
         }
 
-        public static String BuildQuery(HttpRequest req)
+        public static String ResultsQueryString(IQueryCollection query)
         {
-            string? limit = String.IsNullOrEmpty(req.Query["perPage"]) ? "50" : (string?)req.Query["perPage"];
-            var query = "SELECT state, uploaded_at FROM participant_uploads";
-            string state = req.Query["state"];
+            int limit = StrToIntWithDefault(query["perPage"], 50);
+            int page = StrToIntWithDefault(query["page"], 1);
+            int offset = limit * (page - 1);
+            string? state = query["state"];
+
+            var statement = "SELECT state, uploaded_at FROM participant_uploads";
             if (!String.IsNullOrEmpty(state))
-                query += $" WHERE lower(state) LIKE '%{state.ToLower()}%'";
-            query += $" ORDER BY uploaded_at DESC LIMIT {limit}";
-            return query;
+                statement += $" WHERE lower(state) LIKE '%{state.ToLower()}%'";
+            statement += " ORDER BY uploaded_at DESC";
+            statement += $" LIMIT {limit}";
+            statement += $" OFFSET {offset}";
+            return statement;
         }
 
-        public async static Task<List<ParticipantUpload>> Read(
+        public static int StrToIntWithDefault(string s, int @default)
+        {
+            int number;
+            if (int.TryParse(s, out number))
+                return number;
+            return @default;
+        }
+
+        public async static Task<List<ParticipantUpload>> ResultsQuery(
             DbProviderFactory factory,
             String query,
             ILogger log)
