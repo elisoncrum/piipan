@@ -10,20 +10,9 @@ namespace Piipan.QueryTool.Tests
 {
     public class OrchestratorApiRequestTests
     {
-        [Fact]
-        public async void TestQueryOrchestrator()
-        {
-            // arrange
+        static Mock<HttpMessageHandler> MockHttpMessageHandler(string response) {
             var handlerMock = new Mock<HttpMessageHandler>();
-            var mockResponse = @"{
-                ""matches"": [
-                    {
-                        ""first"": ""Theodore"",
-                        ""middle"": ""Carri"",
-                        ""last"": ""Farrington""
-                    }
-                ]
-            }";
+
             handlerMock
               .Protected()
               .Setup<Task<HttpResponseMessage>>(
@@ -34,8 +23,25 @@ namespace Piipan.QueryTool.Tests
               .ReturnsAsync(new HttpResponseMessage()
               {
                   StatusCode = HttpStatusCode.OK,
-                  Content = new StringContent(mockResponse)
+                  Content = new StringContent(response)
               });
+
+            return handlerMock;
+        }
+        [Fact]
+        public async void TestQueryOrchestrator()
+        {
+            // arrange
+            var mockResponse = @"{
+                ""matches"": [
+                    {
+                        ""first"": ""Theodore"",
+                        ""middle"": ""Carri"",
+                        ""last"": ""Farrington""
+                    }
+                ]
+            }";
+            var handlerMock = MockHttpMessageHandler(mockResponse);
             var httpClient = new HttpClient(handlerMock.Object);
 
             var _apiRequest = new OrchestratorApiRequest();
