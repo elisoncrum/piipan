@@ -13,9 +13,9 @@
       },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Direct",
-        "requested": "[1.6.0, )",
-        "resolved": "1.6.0",
-        "contentHash": "SYHgRdHvtbjSvs7BIBO7JLBm4Y8QXcHDV64AbideJDLoasQXKzqR71AsyyeWwGZTZ0DYSQoUYmCg9i494Ti++A==",
+        "requested": "[1.6.1, )",
+        "resolved": "1.6.1",
+        "contentHash": "78AcjpxnhJDov7HJa4kPpZxpI0coZhS0tdA9ZLUSPExKz5KTgfozayBTLAXDuTuq0gLRzFyf85SvIkrtbB8KpA==",
         "dependencies": {
           "Microsoft.IdentityModel.Clients.ActiveDirectory": "5.2.0",
           "System.Diagnostics.Process": "4.3.0"
