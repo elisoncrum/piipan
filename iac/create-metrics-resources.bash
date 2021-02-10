@@ -91,9 +91,14 @@ psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1
 EOF
 
 ### Function App stuff
-FUNC_APP_NAME=PiipanMetricsFunctions
+FUNCTIONS_UNIQ_STR=`az deployment group create \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./arm-templates/unique-string.json \
+  --query properties.outputs.uniqueString.value \
+  -o tsv`
+FUNC_APP_NAME=PiipanMetricsFunctions${FUNCTIONS_UNIQ_STR}
+FUNC_STORAGE_NAME=piipanmetricsstorage${FUNCTIONS_UNIQ_STR}
 FUNC_NAME=BulkUploadMetrics
-FUNC_STORAGE_NAME=piipanmetricsstorage
 
 # Need a storage account to publish function app to:
 echo "Creating storage account $FUNC_STORAGE_NAME"
@@ -178,7 +183,7 @@ while IFS=, read -r abbr name ; do
 done < states.csv
 
 # Create Metrics API Function App in Azure
-METRICS_FUNC_APP_NAME=PiipanMetricsApi
+METRICS_FUNC_APP_NAME=PiipanMetricsApi${FUNCTIONS_UNIQ_STR}
 
 echo "Creating function app $METRICS_FUNC_APP_NAME in Azure"
 az functionapp create \
