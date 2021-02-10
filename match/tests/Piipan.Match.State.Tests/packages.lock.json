@@ -300,8 +300,8 @@
       },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Transitive",
-        "resolved": "1.6.0",
-        "contentHash": "SYHgRdHvtbjSvs7BIBO7JLBm4Y8QXcHDV64AbideJDLoasQXKzqR71AsyyeWwGZTZ0DYSQoUYmCg9i494Ti++A==",
+        "resolved": "1.6.1",
+        "contentHash": "78AcjpxnhJDov7HJa4kPpZxpI0coZhS0tdA9ZLUSPExKz5KTgfozayBTLAXDuTuq0gLRzFyf85SvIkrtbB8KpA==",
         "dependencies": {
           "Microsoft.IdentityModel.Clients.ActiveDirectory": "5.2.0",
           "System.Diagnostics.Process": "4.3.0"
@@ -1928,7 +1928,7 @@
         "dependencies": {
           "Dapper": "2.0.78",
           "FluentValidation": "9.5.0",
-          "Microsoft.Azure.Services.AppAuthentication": "1.6.0",
+          "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
           "Newtonsoft.Json.Schema": "3.0.13",
           "Npgsql": "5.0.3"
