@@ -32,11 +32,9 @@ The following environment variables are pre-configured by the Infrastructure-as-
 |---|---|---|
 | `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.State |
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
-| `StateApiHostStrings` | Serialized JSON array of valid URI strings for accessing each per-state matching API. | Piipan.Match.Orchestrator |
-| `StateApiEndpointPath` | Relative path for per-state API Query endpoint. | Piipan.Match.Orchestrator |
+| `StateApiUriStrings` | Serialized JSON array of valid URI strings for each per-state matching API's `/query` endpoint. | Piipan.Match.Orchestrator |
 | `StateName` | Name of the state associated with the Function App instance. | Piipan.Match.State |
 | `StateAbbr` | Abbreviation of the state associated with the Function App instance. | Piipan.Match.State |
-| `AuthorizedRoleName` | Name of the [app role](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps) used to authorize requests to the per-state APIs | Piipan.Match.State |
 
 ## Notes
 - `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.

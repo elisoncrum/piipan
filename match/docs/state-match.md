@@ -24,7 +24,6 @@ The following environment variables are required by `Query` and are set by the [
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
 | `StateName` | [details](../../docs/iac.md#\:\~\:text=StateName) |
 | `StateAbbr` | [details](../../docs/iac.md#\:\~\:text=StateAbbr) |
-| `AuthorizedRoleName` | [details](../../docs/iac.md#\:\~\:text=AuthorizedRoleName) |
 
 ## Local development
 
@@ -60,16 +59,16 @@ func azure functionapp publish <app_name> --dotnet
 Each Function App is configured to use Azure App Service Authentication (aka "Easy Auth") to control access and authenticate incoming requests. This authentication is activated by the IaC. Configuration details can also be seen in the Portal at {Function App} > Authentication / Authorization. The details of implementation are:
 
 - An Azure Active Directory App (aka, the app registration) is registered and configured for the Function App (aka, the API)
-- An application role named `StateApi.Query` is added to the app registration and assigned to any consumers of the API (i.e., the orchestrator's system-assigned identity)
+- A generic application role named is added to the app registration and assigned to any consumers of the API (i.e., the orchestrator's system-assigned identity)
 - The API is configured to require all incoming requests to first authenticate with the app registration
-- The API's `Query` method includes an authorization mechanism for ensuring authenticated requests originate from an application that has been assigned the `StateApi.Query` role (by default, Easy Auth will allow access from any application or user within the same tenant as the app)
 
 At a practical level, this implementation enforces the following authentication flow:
 
 1. The client application requests a token from the app registration
-1. The token is included as an authentication header in the request sent to the API's query endpoint
-1. The API verifies that the authorized user has the `StateApi.Query` role (and returns a `401 unauthorized` error if not)
-1. The API performs the requested operation
+1. The app registration grants a token if the client is a member of the AAD tenant and is assigned one of the app registration's application roles
+1. The client includes the token as an authentication header in the request sent to the API's query endpoint
+1. Easy auth validates the token (a `401 unauthorized` is returned if validation fails)
+1. The API executes the request
 
 ## Remote testing
 

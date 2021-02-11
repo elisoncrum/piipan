@@ -98,27 +98,23 @@ namespace Piipan.Match.Orchestrator
             return result.IsValid;
         }
 
-        internal static IEnumerable<Uri> StateApiBaseUris()
+        internal static IEnumerable<Uri> StateApiUris()
         {
-            const string StateApiHostStrings = "StateApiHostStrings";
+            const string StateApiUriStrings = "StateApiUriStrings";
 
             // XXX Validate input
             IEnumerable<Uri> uris = JsonConvert.DeserializeObject<IEnumerable<Uri>>(
-                Environment.GetEnvironmentVariable(StateApiHostStrings));
+                Environment.GetEnvironmentVariable(StateApiUriStrings));
 
             return uris;
         }
 
-        internal async static Task<string> AccessToken(Uri uri)
+        internal async static Task<string> AccessToken(string applicationUri)
         {
             // Retrieve authentication token via Azure AD Easy Auth. Passing an empty
             // string to `AzureServiceTokenProvider` uses system-assigned identity.
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
-
-            // Passed URI must match AAD app URI exactly; AAD app URI does not contain
-            // a trailing slash, but `Uri.AbsoluteUri` will add one.
-            var resource = uri.AbsoluteUri.TrimEnd('/');
-            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(resource);
+            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(applicationUri);
 
             return accessToken;
         }
@@ -139,13 +135,11 @@ namespace Piipan.Match.Orchestrator
             return httpRequestMessage;
         }
 
-        internal async static Task<MatchQueryResponse> MatchState(Uri baseUri, MatchQueryRequest request, HttpClient client, ILogger log)
+        internal async static Task<MatchQueryResponse> MatchState(Uri uri, MatchQueryRequest request, HttpClient client, ILogger log)
         {
-            const string StateApiEndpointPath = "StateApiEndpointPath";
-
-            var accessToken = await AccessToken(baseUri);
-            Uri queryUri = new Uri(baseUri, Environment.GetEnvironmentVariable(StateApiEndpointPath));
-            HttpRequestMessage requestMessage = RequestMessage(queryUri, accessToken, request);
+            // Default Azure AD application URI is in format https://<api_host>
+            var accessToken = await AccessToken($"https://{uri.Host}");
+            HttpRequestMessage requestMessage = RequestMessage(uri, accessToken, request);
 
             // Exception caught by `Query`
             var response = client.SendAsync(requestMessage).Result;
@@ -159,12 +153,12 @@ namespace Piipan.Match.Orchestrator
         internal async static Task<List<PiiRecord>> Match(MatchQueryRequest request, HttpClient client, ILogger log)
         {
             List<PiiRecord> matches = new List<PiiRecord>();
-            var stateApiBaseUris = StateApiBaseUris();
+            var stateApiUris = StateApiUris();
 
             // Loop through each state, compile results
-            foreach (var host in stateApiBaseUris)
+            foreach (var uri in stateApiUris)
             {
-                var stateMatches = await MatchState(host, request, client, log);
+                var stateMatches = await MatchState(uri, request, client, log);
                 matches.AddRange(stateMatches.Matches);
             }
 

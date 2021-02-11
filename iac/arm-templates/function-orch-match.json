@@ -8,10 +8,7 @@
         "location": {
             "type": "string"
         },
-        "StateApiHostStrings": {
-            "type": "string"
-        },
-        "StateApiEndpointPath": {
+        "StateApiUriStrings": {
             "type": "string"
         }
     },
@@ -128,12 +125,8 @@
                         },
                         // Bind state-level APIs
                         {
-                            "name": "StateApiHostStrings",
-                            "value": "[parameters('StateApiHostStrings')]"
-                        },
-                        {
-                            "name": "StateApiEndpointPath",
-                            "value": "[parameters('StateApiEndpointPath')]"
+                            "name": "StateApiUriStrings",
+                            "value": "[parameters('StateApiUriStrings')]"
                         }
                     ]
                 }

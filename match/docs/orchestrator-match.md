@@ -10,9 +10,10 @@
 An initial API for matching PII data across all participating states.
 1. JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
 1. The `POST` event triggers a function named `Query` in the orchestrator Function App.
-    - If the request is not valid (malformed, missing required data, etc), the function returns a 400 response. Currently no error messaging is included in the response.
-    - If the request is valid, the function queries the per-state APIs for matches. A 200 response is returned containing any matching records.
-    - If there is an issue connecting to or querying any of the per-state APIs, the orchestrator returns a 500 response.
+    - If the request is unauthorized (does not include a valid bearer token), the function returns a `401` response.
+    - If the request is not valid (malformed, missing required data, etc), the function returns a `400` response. Currently no error messaging is included in the response.
+    - If the request is valid, the function queries the per-state APIs for matches. A `200` response is returned containing any matching records.
+    - If there is an issue connecting to or querying any of the per-state APIs, the orchestrator returns a `500` response.
 
 ## Environment variables
 
@@ -20,17 +21,15 @@ The following environment variables are required by `Query` and are set by the [
 
 | Name | |
 |---|---|
-| `StateApiHostStrings` | [details](../../docs/iac.md#\:\~\:text=StateApiHostStrings) |
-| `StateApiEndpointPath` | [details](../../docs/iac.md#\:\~\:text=StateApiEndpointPath) |
+| `StateApiUriStrings` | [details](../../docs/iac.md#\:\~\:text=StateApiUriStrings) |
 
 ## Binding to state APIs
 
 The orchestrator treats per-state APIs as backing services. When running the [IaC](../../docs/iac.md):
-- Per-state base URIs are compiled into a JSON list and saved as an environment variable
-- The relative endpoint for the state API query method is saved as an environment variable
+- Per-state URIs are compiled into a JSON list and saved as an environment variable
 - The orchestrator's system-assigned identity is given an authorized application role (which will be checked by the state API upon receiving requests)
 
-At runtime, the app uses the base URI to request an authentication token from the state app's Active Directory app registration. This token, which includes the authorized application role, is included as an authorization header (`Authorization: Bearer {token}`) in the request sent to the state API.
+At runtime, the app requests an authentication token from the state app's Active Directory app registration. The token is then included as an authorization header (`Authorization: Bearer {token}`) in the request sent to the state API.
 
 ## Local development
 

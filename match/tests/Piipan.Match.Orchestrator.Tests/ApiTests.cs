@@ -22,7 +22,7 @@ namespace Piipan.Match.Orchestrator.Tests
     {
         void SetEnvironment()
         {
-            Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https://localhost\"]");
+            Environment.SetEnvironmentVariable("StateApiUriStrings", "[\"https://localhost/\"]");
         }
 
         static PiiRecord FullRecord()
@@ -308,7 +308,7 @@ namespace Piipan.Match.Orchestrator.Tests
             var logger = Mock.Of<ILogger>();
 
             // Act
-            Environment.SetEnvironmentVariable("StateApiHostStrings", "[\"https://localhost/foo/bar\"]"); // Unreachable
+            Environment.SetEnvironmentVariable("StateApiUriStrings", "[\"https://localhost/foo/bar\"]"); // Unreachable
             var response = await Api.Query(mockRequest.Object, logger);
 
             // Assert

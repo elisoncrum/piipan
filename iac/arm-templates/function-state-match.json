@@ -25,9 +25,6 @@
         },
         "dbConnectionStringKey": {
             "type": "string"
-        },
-        "authorizedRoleName": {
-            "type": "string"
         }
     },
     "variables": {
@@ -153,10 +150,6 @@
                         {
                             "name": "[parameters('dbConnectionStringKey')]",
                             "value": "[parameters('dbConnectionString')]"
-                        },
-                        {
-                            "name": "AuthorizedRoleName",
-                            "value": "[parameters('authorizedRoleName')]"
                         }
                     ]
                 }

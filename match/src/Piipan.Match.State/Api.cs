@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Http;
@@ -37,11 +35,6 @@ namespace Piipan.Match.State
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            if (!Authorize(req.HttpContext.User, log))
-            {
-                return (ActionResult)new UnauthorizedResult();
-            }
-
             var incoming = await new StreamReader(req.Body).ReadToEndAsync();
             var request = Parse(incoming, log);
             if (request.Query == null)
@@ -63,32 +56,6 @@ namespace Piipan.Match.State
                 Matches = await Select(request, NpgsqlFactory.Instance, log)
             };
             return (ActionResult)new JsonResult(response);
-        }
-
-        internal static bool Authorize(ClaimsPrincipal identity, ILogger log)
-        {
-            const string AuthorizedRoleName = "AuthorizedRoleName";
-            Claim roleClaim = identity.FindFirst("roles");
-
-            // Authorized user must be in specified app role
-            var role = Environment.GetEnvironmentVariable(AuthorizedRoleName);
-            if (roleClaim == null || !roleClaim.Value.Split(' ').Contains(role))
-            {
-                log.LogError("Caller does not have authorized role.");
-                return false;
-            }
-
-            // Authorized "user" must be an application, in which case
-            // the object ID (`oid`) and subject (`sub`) will match
-            string oid = identity.FindFirst("oid")?.Value;
-            string sub = identity.FindFirst("sub")?.Value;
-            if (oid != sub)
-            {
-                log.LogError("Caller is not an application.");
-                return false;
-            }
-
-            return true;
         }
 
         internal static MatchQueryRequest Parse(string requestBody, ILogger log)
