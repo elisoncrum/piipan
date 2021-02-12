@@ -13,6 +13,7 @@ namespace Piipan.Match.State.Tests
 {
     public class ApiTests
     {
+
         void SetEnvironment()
         {
             Environment.SetEnvironmentVariable("StateName", "Echo Alpha");

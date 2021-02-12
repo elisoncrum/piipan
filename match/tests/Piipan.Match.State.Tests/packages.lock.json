@@ -28,12 +28,6 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
-      "Moq.Dapper": {
-        "type": "Direct",
-        "requested": "[1.0.3, )",
-        "resolved": "1.0.3",
-        "contentHash": "7h8XLeZi2bk+X6cPZqtXbVlxPBmMcwdX7OTqDyE6eDAMhI6b9O35gMJ0ELIC2+mpT+0Z7YPukeCA+soLV2N/zg=="
-      },
       "Newtonsoft.Json": {
         "type": "Direct",
         "requested": "[12.0.3, )",
@@ -93,8 +87,8 @@
       },
       "FluentValidation": {
         "type": "Transitive",
-        "resolved": "9.5.0",
-        "contentHash": "gsu4SrlTgTCS57nynfUXmuEqOqQdsgZGd69dO4dJg/TRDvNTXKlw5TPKVoY/ieQLsmFBzd9ax/Y1Tx+8Ds3XKw=="
+        "resolved": "9.5.1",
+        "contentHash": "By09e2m4N3giD7Giq8NCFgkgN5Hkm8Lv/bk8AadD9Xc6jjj2WDGrD6l9keZbWbkO9aygiHQREIt47iS2sVSU7w=="
       },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Transitive",
@@ -1927,7 +1921,7 @@
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.78",
-          "FluentValidation": "9.5.0",
+          "FluentValidation": "9.5.1",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
           "Newtonsoft.Json.Schema": "3.0.13",
