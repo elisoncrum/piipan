@@ -26,7 +26,7 @@ For now, there's a 1-1 relationship between an API endpoint and a function withi
 
 ## Environment variables
 
-The following environment variables are required by both the Metrics Functions and Metrics API apps and are set by the [IaC](../../docs/iac.md):
+The following environment variables are required by both the Metrics Functions and Metrics API apps and are set by the [IaC](../docs/iac.md):
 
 | Name | |
 |---|---|
