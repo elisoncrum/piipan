@@ -54,13 +54,22 @@ func azure functionapp publish <app_name> --dotnet
 
 `<app_name>` is the name of the Azure Function App resource created by the IaC process.
 
+## Authentication and authorization
+
+Each Function App is configured to use Azure App Service Authentication (aka "Easy Auth") to control access and authenticate incoming requests. This authentication is activated by the IaC. Configuration details can also be seen in the Portal at {Function App} > Authentication / Authorization. The details of implementation are:
+
+- An Azure Active Directory App (aka, the app registration) is registered and configured for the Function App (aka, the API)
+- A generic application role named is added to the app registration and assigned to any consumers of the API (i.e., the orchestrator's system-assigned identity)
+- The API is configured to require all incoming requests to first authenticate with the app registration
+
+At a practical level, this implementation enforces the following authentication flow:
+
+1. The client application requests a token from the app registration
+1. The app registration grants a token if the client is a member of the AAD tenant and is assigned one of the app registration's application roles
+1. The client includes the token as an authentication header in the request sent to the API's query endpoint
+1. Easy auth validates the token (a `401 unauthorized` is returned if validation fails)
+1. The API executes the request
+
 ## Remote testing
 
-The published app's `query` endpoint currently can be accessed over a trusted network. This functionality is only temporary, as the state-level API is intended to be restricted to internal use amongst Piipan's other subsystems.
-
-To test the remote app:
-
-1. Connect to a trusted network. Currently, only the GSA network block is trusted.
-1. Send a valid `POST` request to the app's endpoint. The endpoint is in the format `https://{app-name}.azurewebsites.net/api/v1/query`.
-
-Until the ETL process is updating to insert data into tables in the `piipan` schema, responses will not contain matches unless records have been manually imported into the database.
+With authentication enabled, there is currently no way to access the remote per-state APIs directly. Verify functionality by sending requests through the [orchestrator API](orchestrator-match.md).

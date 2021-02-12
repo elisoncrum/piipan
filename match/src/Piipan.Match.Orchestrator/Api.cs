@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -96,23 +98,54 @@ namespace Piipan.Match.Orchestrator
             return result.IsValid;
         }
 
-        internal static IEnumerable<string> ApiEndpoints()
+        internal static IEnumerable<Uri> StateApiUris()
         {
-            const string StateApiEndpointStrings = "StateApiEndpointStrings";
+            const string StateApiUriStrings = "StateApiUriStrings";
 
-            IEnumerable<string> endpoints = JsonConvert.DeserializeObject<IEnumerable<string>>(
-                Environment.GetEnvironmentVariable(StateApiEndpointStrings));
+            // XXX Validate input
+            IEnumerable<Uri> uris = JsonConvert.DeserializeObject<IEnumerable<Uri>>(
+                Environment.GetEnvironmentVariable(StateApiUriStrings));
 
-            return endpoints;
+            return uris;
         }
 
-        internal async static Task<MatchQueryResponse> MatchState(string uri, MatchQueryRequest request, HttpClient client, ILogger log)
+        internal async static Task<string> AccessToken(string applicationUri)
         {
-            var response = await client.PostAsJsonAsync(uri, request);
-            var matchResponse = await response.Content.ReadAsAsync<MatchQueryResponse>();
+            // Retrieve authentication token via Azure AD Easy Auth. Passing an empty
+            // string to `AzureServiceTokenProvider` uses system-assigned identity.
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            string accessToken = await azureServiceTokenProvider.GetAccessTokenAsync(applicationUri);
+
+            return accessToken;
+        }
+
+        internal static HttpRequestMessage RequestMessage(Uri uri, string accessToken, MatchQueryRequest request)
+        {
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = uri,
+                Headers = {
+                    { HttpRequestHeader.Authorization.ToString(), $"Bearer {accessToken}" },
+                    { HttpRequestHeader.Accept.ToString(), "application/json" }
+                },
+                Content = new StringContent(JsonConvert.SerializeObject(request))
+            };
+
+            return httpRequestMessage;
+        }
+
+        internal async static Task<MatchQueryResponse> MatchState(Uri uri, MatchQueryRequest request, HttpClient client, ILogger log)
+        {
+            // Default Azure AD application URI is in format https://<api_host>
+            var accessToken = await AccessToken($"https://{uri.Host}");
+            HttpRequestMessage requestMessage = RequestMessage(uri, accessToken, request);
 
             // Exception caught by `Query`
+            var response = client.SendAsync(requestMessage).Result;
             response.EnsureSuccessStatusCode();
+
+            var matchResponse = await response.Content.ReadAsAsync<MatchQueryResponse>();
 
             return matchResponse;
         }
@@ -120,10 +153,10 @@ namespace Piipan.Match.Orchestrator
         internal async static Task<List<PiiRecord>> Match(MatchQueryRequest request, HttpClient client, ILogger log)
         {
             List<PiiRecord> matches = new List<PiiRecord>();
-            var endpoints = ApiEndpoints();
+            var stateApiUris = StateApiUris();
 
             // Loop through each state, compile results
-            foreach (var uri in endpoints)
+            foreach (var uri in stateApiUris)
             {
                 var stateMatches = await MatchState(uri, request, client, log);
                 matches.AddRange(stateMatches.Matches);
