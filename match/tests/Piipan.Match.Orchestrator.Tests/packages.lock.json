@@ -28,12 +28,6 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
-      "Moq.Dapper": {
-        "type": "Direct",
-        "requested": "[1.0.3, )",
-        "resolved": "1.0.3",
-        "contentHash": "7h8XLeZi2bk+X6cPZqtXbVlxPBmMcwdX7OTqDyE6eDAMhI6b9O35gMJ0ELIC2+mpT+0Z7YPukeCA+soLV2N/zg=="
-      },
       "Newtonsoft.Json": {
         "type": "Direct",
         "requested": "[12.0.3, )",
