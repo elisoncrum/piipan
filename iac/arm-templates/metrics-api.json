@@ -1,0 +1,99 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appName": {
+            "type": "string",
+            "defaultValue": "[concat('fnapp', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "The name of the function app that you wish to create."
+            }
+        },
+        "resourceTags": {
+            "type": "object"
+        },
+        "location": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "functionAppName": "[parameters('appName')]",
+        "applicationInsightsName": "[concat('metins', uniquestring(resourceGroup().id))]",
+        "functionWorkerRuntime": "dotnet",
+        "storageAccountName": "[concat('metstor', uniquestring(resourceGroup().id))]",
+        "storageAccountType": "Standard_LRS"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "tags": "[parameters('resourceTags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[variables('storageAccountType')]"
+            },
+            "kind": "Storage"
+        },
+        {
+            "apiVersion": "2015-05-01",
+            "name": "[variables('applicationInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "kind": "web",
+            "location": "[resourceGroup().location]",
+            "tags": "[parameters('resourceTags')]",
+            "properties": {
+                "Application_Type": "web",
+                "ApplicationId": "[variables('applicationInsightsName')]"
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "type": "Microsoft.Web/sites",
+            "name": "[variables('functionAppName')]",
+            "tags": "[parameters('resourceTags')]",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
+            ],
+            "properties": {
+                "httpsOnly": true,
+                "siteConfig": {
+                    "ipSecurityRestrictions": [
+                        {
+                            "ipAddress": "159.142.0.0/16",
+                            "action": "Allow",
+                            "name": "GSA IP range",
+                            "priority": 100
+                        }
+                    ],
+                    "ftpsState": "Disabled",
+                    "appSettings": [
+                        /*
+                            The following settings are required for Function apps per the MS documentation:
+                            - AzureWebJobsStorage
+                            - FUNCTIONS_WORKER_RUNTIME
+                            - FUNCTIONS_EXTENSION_VERSION
+
+                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#function-app)
+                        */
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "[variables('functionWorkerRuntime')]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

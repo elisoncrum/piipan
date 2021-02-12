@@ -186,17 +186,16 @@ done < states.csv
 METRICS_FUNC_APP_NAME=PiipanMetricsApi${FUNCTIONS_UNIQ_STR}
 
 echo "Creating function app $METRICS_FUNC_APP_NAME in Azure"
-az functionapp create \
-  --resource-group $RESOURCE_GROUP \
-  --consumption-plan-location $LOCATION \
-  --runtime dotnet \
-  --functions-version 3 \
-  --name $METRICS_FUNC_APP_NAME \
-  --storage-account $FUNC_STORAGE_NAME
-
-# wait for app creation
-echo "Waiting to publish api function app"
-sleep 60s
+az deployment group create \
+    --name $METRICS_FUNC_APP_NAME \
+    --resource-group $RESOURCE_GROUP \
+    --template-file  ./arm-templates/metrics-api.json \
+    --query properties.outputs.functionAppName.value \
+    --output tsv \
+    --parameters \
+      appName=$METRICS_FUNC_APP_NAME \
+      resourceTags="$RESOURCE_TAGS" \
+      location=$LOCATION
 
 echo "Configure settings on $METRICS_FUNC_APP_NAME"
 az functionapp config appsettings set \
@@ -227,6 +226,6 @@ fi
 
 # publish metrics function app
 echo "Publishing function app $METRICS_FUNC_APP_NAME"
-pushd ../metrics/src/Piipan.Metrics/$METRICS_FUNC_APP_NAME
+pushd ../metrics/src/Piipan.Metrics/PiipanMetricsApi
   func azure functionapp publish $METRICS_FUNC_APP_NAME --dotnet
 popd
