@@ -1,0 +1,30 @@
+﻿@page
+@model Piipan.Dashboard.Pages.ParticipantUploadsModel
+@{
+}
+<h1>@Model.Title</h1>
+<ul id="list"></ul>
+<script>
+    var url = 'https://piipanmetricsapiztqzsbh432oyw.azurewebsites.net/api/GetParticipantUploads?';
+    fetch(url)
+        .then(response => response.json())
+        .then((result) => {
+            var items = result.data;
+            var ul = document.getElementById('list');
+            for (var i = 0; i < items.length; i++) {
+                var li = document.createElement("li");
+                var uploadedAt = new Date(items[i].uploaded_at).toLocaleDateString(
+                    'en-us',
+                    {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        timeZone: 'utc'
+                    }
+                );
+                li.appendChild(document.createTextNode(items[i].state + " on " + uploadedAt));
+                ul.appendChild(li);
+            }
+        });
+</script>
