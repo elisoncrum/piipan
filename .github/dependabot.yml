@@ -43,4 +43,19 @@ updates:
   schedule:
     interval: daily
     time: "09:00"
+- package-ecosystem: nuget
+  directory: "/metrics/src/Piipan.Metrics/PiipanMetricsApi"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/metrics/src/Piipan.Metrics/PiipanMetricsFunctions"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/metrics/tests/Piipan.Metrics.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
   open-pull-requests-limit: 10
