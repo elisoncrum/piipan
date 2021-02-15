@@ -7,24 +7,22 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using Piipan.Shared.Authentication;
 using Xunit;
-
 
 namespace Piipan.Match.Orchestrator.Tests
 {
     public class ApiTests
     {
-        void SetEnvironment()
-        {
-            Environment.SetEnvironmentVariable("StateApiUriStrings", "[\"https://localhost/\"]");
-        }
-
         static PiiRecord FullRecord()
         {
             return new PiiRecord
@@ -96,48 +94,63 @@ namespace Piipan.Match.Orchestrator.Tests
                 {
                     StatusCode = status,
                     Content = new StringContent(response, Encoding.UTF8, "application/json")
-                });
+                })
+                .Verifiable();
 
             return mockHttpMessageHandler;
         }
 
-        // HttpStatusCode.BadRequest
-
-        // Non-required and empty/whitespace properties parse to null
-        [Theory]
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-0000'}")] // Missing optionals
-        [InlineData(@"{last: 'Last', middle: '', first: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty optionals
-        [InlineData(@"{last: 'Last', middle: '     ', first: '\n', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace optionals
-        public void ExpectEmptyOptionalPropertiesToBeNull(string query)
+        static Mock<ITokenProvider> MockTokenProvider(string value)
         {
-            // Arrage
-            var body = JsonBody(query);
-            var logger = Mock.Of<ILogger>();
+            var token = new AccessToken(value, DateTimeOffset.Now);
+            var mockTokenProvider = new Mock<ITokenProvider>();
+            mockTokenProvider
+                .Setup(t => t.RetrieveAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult(token));
 
-            // Act
-            var request = Api.Parse(body, logger);
-            var valid = Api.Validate(request, logger);
-
-            // Assert
-            Assert.Null(request.Query.Middle);
-            Assert.Null(request.Query.First);
-            Assert.True(valid);
+            return mockTokenProvider;
         }
 
-        // Malformed data result in null Query
-        [Theory]
-        [InlineData("{{")]
-        [InlineData("<xml>")]
-        public void ExpectMalformedDataResultsInNullQuery(string query)
+        static Api Construct()
         {
-            // Arrange
-            var logger = Mock.Of<ILogger>();
+            var client = new HttpClient();
+            var tokenProvider = new EasyAuthTokenProvider();
+            var apiClient = new AuthorizedJsonApiClient(client, tokenProvider);
+            var api = new Api(apiClient);
 
-            // Act
-            var request = Api.Parse(query, logger);
+            return api;
+        }
 
-            // Assert
-            Assert.Null(request.Query);
+        static Api ConstructMocked(Mock<HttpMessageHandler> handler)
+        {
+            var mockTokenProvider = MockTokenProvider("|token|");
+            var client = new HttpClient(handler.Object);
+            var apiClient = new AuthorizedJsonApiClient(client, mockTokenProvider.Object);
+
+            var api = new Api(apiClient);
+
+            return api;
+        }
+
+        ////
+        // Tests
+        ////
+
+        [Fact]
+        public void PiiRecordJson()
+        {
+            var json = @"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}";
+            var record = JsonConvert.DeserializeObject<PiiRecord>(json);
+
+            Assert.Contains("\"last\": \"Last\"", record.ToJson());
+            Assert.Contains("\"dob\": \"2020-01-01\"", record.ToJson());
+            Assert.Contains("\"ssn\": \"000000000\"", record.ToJson());
+            Assert.Contains("\"first\": null", record.ToJson());
+            Assert.Contains("\"middle\": null", record.ToJson());
+            Assert.Contains("\"exception\": null", record.ToJson());
+            Assert.Contains("\"state_name\": null", record.ToJson());
+            Assert.Contains("\"state_abbr\": null", record.ToJson());
+
         }
 
         // Malformed data results in BadRequest
@@ -147,11 +160,12 @@ namespace Piipan.Match.Orchestrator.Tests
         public async void ExpectMalformedDataResultsInBadRequest(string query)
         {
             // Arrange
+            var api = Construct();
             Mock<HttpRequest> mockRequest = MockRequest(query);
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var response = await Api.Query(mockRequest.Object, logger);
+            var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
             Assert.IsType<BadRequestResult>(response);
@@ -159,29 +173,29 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Equal(400, result.StatusCode);
         }
 
-        // Incomplete data results in null Query
+        // Invalid data results in BadRequest
         [Theory]
-        [InlineData(@"{}")]
-        [InlineData(@"{first: 'First'}")] // Missing Last, Dob, and Ssn
-        [InlineData(@"{last: 'Last'}")] // Missing Dob and Ssn
-        [InlineData(@"{last: 'Last', dob: '2020-01-01'}")] // Missing Ssn
-        [InlineData(@"{last: 'Last', dob: '2020-01-1', ssn: '000-00-000'}")] // Invalid Dob DateTime
-        [InlineData(@"{last: 'Last', dob: '', ssn: '000-00-000'}")] // Invalid (empty) Dob DateTime
-        public void ExpectQueryToBeNull(string query)
+        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
+        [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
+        [InlineData(@"{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
+        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
+        public async void ExpectBadResultFromInvalidData(string query)
         {
             // Arrange
-            var body = JsonBody(query);
+            var api = Construct();
+            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var request = Api.Parse(body, logger);
+            var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            Assert.Null(request.Query);
+            Assert.IsType<BadRequestResult>(response);
+            var result = response as BadRequestResult;
+            Assert.Equal(400, result.StatusCode);
         }
 
-        // Incomplete data returns badrequest
-        // Note: date validation happens in `Api.Parse` not `Api.Validate`
+        // Incomplete data results in BadRequest
         [Theory]
         [InlineData("")]
         [InlineData(@"{first: 'First'}")] // Missing Last, Dob, and Ssn
@@ -192,11 +206,12 @@ namespace Piipan.Match.Orchestrator.Tests
         public async void ExpectBadResultFromIncompleteData(string query)
         {
             // Arrange
+            var api = Construct();
             Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var response = await Api.Query(mockRequest.Object, logger);
+            var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
             Assert.IsType<BadRequestResult>(response);
@@ -204,117 +219,66 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Equal(400, result.StatusCode);
         }
 
-        // Invalid data fails validation
-        // Note: date validation happens in `Api.Parse` not `Api.Validate`
-        [Theory]
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
-        [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
-        [InlineData(@"{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
-        public void ExpectQueryToBeInvalid(string query)
+        // Successful API call
+        [Fact]
+        public async void SuccessfulApiCall()
         {
-            // Arrange
-            var body = JsonBody(query);
+            // Arrange Mocks
             var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(FullRequest().ToJson());
+            var mockHandler = MockMessageHandler(HttpStatusCode.OK, FullResponse().ToJson());
+
+            // Arrage Environment
+            var uriString = "[\"https://localhost/\"]";
+            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
 
             // Act
-            var request = Api.Parse(body, logger);
-            var valid = Api.Validate(request, logger);
+            var api = ConstructMocked(mockHandler);
+            var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            Assert.False(valid);
+            Assert.IsType<JsonResult>(response);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            );
         }
 
-        // Invalid data returns badrequest
-        [Theory]
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
-        [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
-        [InlineData(@"{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
-        public async void ExpectBadResultFromInvalidData(string query)
+        // Failed state API call results in InternalServerError
+        [Fact]
+        public async void FailedStateCall()
         {
-            // Arrange
-            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
+            // Arrange Mocks
             var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(FullRequest().ToJson());
+            var mockHandler = MockMessageHandler(HttpStatusCode.InternalServerError, "");
+
+            // Arrage Environment
+            var uriString = "[\"https://localhost/\"]";
+            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
 
             // Act
-            var response = await Api.Query(mockRequest.Object, logger);
-
-            // Assert
-            Assert.IsType<BadRequestResult>(response);
-            var result = response as BadRequestResult;
-            Assert.Equal(400, result.StatusCode);
-        }
-
-        // Parsed valid data returns object with matching properties
-        [Fact]
-        public void RequestObjectPropertiesMatchRequestJson()
-        {
-            // Arrange
-
-            var body = JsonBody(@"{last:'Last', first: 'First', middle: 'Middle', dob: '1970-01-01', ssn: '000-00-0000'}");
-            var bodyFormatted = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(body), Formatting.Indented);
-            var logger = Mock.Of<ILogger>();
-
-            // Act
-            MatchQueryRequest request = Api.Parse(body, logger);
-
-            // Assert
-            Assert.Equal("Last", request.Query.Last);
-            Assert.Equal("First", request.Query.First);
-            Assert.Equal("Middle", request.Query.Middle);
-            Assert.Equal("000-00-0000", request.Query.Ssn);
-            Assert.Equal(new DateTime(1970, 1, 1), request.Query.Dob);
-            Assert.Equal(bodyFormatted, request.ToJson());
-        }
-
-        [Fact]
-        public async void BadResponseFromStateThrowsException()
-        {
-            // Arrange
-            SetEnvironment();
-            var logger = Mock.Of<ILogger>();
-            var mockHttpMessageHandler = MockMessageHandler(HttpStatusCode.BadRequest, "");
-            var client = new HttpClient(mockHttpMessageHandler.Object);
-
-            // Act/Assert
-            await Assert.ThrowsAnyAsync<Exception>(async () =>
-            {
-                await Api.Match(FullRequest(), client, logger);
-            });
-        }
-
-        [Fact]
-        public void RequestMessageContainsBearerToken()
-        {
-            // Arrange
-            var uri = new Uri("https://localhost/api/v1/query");
-            var accessToken = "{accessToken}";
-            var request = FullRequest();
-
-            // Act
-            var message = Api.RequestMessage(uri, accessToken, request);
-
-            // Assert
-            Assert.Contains(accessToken, message.Headers.Authorization.ToString());
-        }
-
-        [Fact]
-        public async void FailedStateQueryResultsInServerError()
-        {
-            // Arrange
-            var body = JsonBody(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-0000'}");
-            Mock<HttpRequest> mockRequest = MockRequest(body);
-            var logger = Mock.Of<ILogger>();
-
-            // Act
-            Environment.SetEnvironmentVariable("StateApiUriStrings", "[\"https://localhost/foo/bar\"]"); // Unreachable
-            var response = await Api.Query(mockRequest.Object, logger);
+            var api = ConstructMocked(mockHandler);
+            var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
             Assert.IsType<InternalServerErrorResult>(response);
         }
 
-        // XXX Test exception handling in `Api.Query` via injected HttpClient
+        // Required services are passed to Api on startup
+        [Fact]
+        public void DependencyInjection()
+        {
+            var startup = new Startup();
+            var host = new HostBuilder()
+                .ConfigureWebJobs(startup.Configure)
+                .Build();
+
+            Assert.NotNull(host);
+            Assert.NotNull(host.Services.GetRequiredService<IAuthorizedApiClient>());
+        }
     }
 }
