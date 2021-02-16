@@ -1,9 +1,8 @@
-using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Piipan.QueryTool
 {
