@@ -293,6 +293,14 @@ az deployment group create \
 
 # Create App Service resources for query tool app
 echo "Creating App Service resources for query tool app"
+
+orch_api_uri=$(\
+  az functionapp function show \
+    -g piipan-match \
+    -n ofuncw5wltopux5z7i \
+    --function-name Query \
+    --query invokeUrlTemplate)
+
 az deployment group create \
   --name $QUERY_TOOL_APP_NAME \
   --resource-group $RESOURCE_GROUP \
@@ -301,7 +309,8 @@ az deployment group create \
     location=$LOCATION \
     resourceTags="$RESOURCE_TAGS" \
     appName=$QUERY_TOOL_APP_NAME \
-    servicePlan=$APP_SERVICE_PLAN
+    servicePlan=$APP_SERVICE_PLAN \
+    OrchApiUri=$orch_api_uri
 
 # This is a subscription-level resource provider
 az provider register --wait --namespace Microsoft.EventGrid

@@ -25,7 +25,7 @@ namespace Piipan.QueryTool.Pages
         public async Task<IActionResult> OnPostAsync(PiiRecord query)
         {
             QueryResult = await _apiRequest.SendQuery(
-                "https://ofuncw5wltopux5z7i.azurewebsites.net/api/v1/query",
+                Environment.GetEnvironmentVariable("OrchApiUri"),
                 query
             );
 
