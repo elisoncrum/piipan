@@ -8,7 +8,7 @@
         "location": {
             "type": "string"
         },
-        "stateApiEndpoints": {
+        "StateApiUriStrings": {
             "type": "string"
         }
     },
@@ -123,10 +123,10 @@
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
                         },
-                        // Bind state-level API endpoints
+                        // Bind state-level APIs
                         {
-                            "name": "StateApiEndpointStrings",
-                            "value": "[parameters('stateApiEndpoints')]"
+                            "name": "StateApiUriStrings",
+                            "value": "[parameters('StateApiUriStrings')]"
                         }
                     ]
                 }

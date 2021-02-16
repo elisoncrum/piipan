@@ -8,6 +8,7 @@
 # usage: create-resources.bash
 
 source $(dirname "$0")/../tools/common.bash || exit
+source $(dirname "$0")/iac-common.bash || exit
 
 # Default resource group for our system
 RESOURCE_GROUP=piipan-resources
@@ -24,15 +25,6 @@ FUNCTIONS_RESOURCE_GROUP=piipan-functions
 MATCH_RESOURCE_GROUP=piipan-match
 
 LOCATION=westus
-
-PROJECT_TAG=piipan
-RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
-
-# Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
-
-# The default Azure subscription
-SUBSCRIPTION_ID=`az account show --query id -o tsv`
 
 # Name of Key Vault
 VAULT_NAME=secret-keeper
@@ -60,45 +52,6 @@ QUERY_TOOL_APP_NAME=piipan-query-tool
 
 # Display name of service principal account responsible for CI/CD tasks
 SP_NAME_CICD=piipan-cicd
-
-# Name of environment variable used to pass database connection strings
-# to app or function code
-DB_CONN_STR_KEY=DatabaseConnectionString
-
-# Name of environment variable used to pass blob storage account connection
-# strings to app or function code
-BLOB_CONN_STR_KEY=BlobStorageConnectionString
-
-# Name of environment variable used to pass Azure Services connection strings
-# to app or function code (required to fetch managed identity tokens)
-AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
-
-# For connection strings, our established placeholder value
-PASSWORD_PLACEHOLDER='{password}'
-
-# Create a very long, (mostly) random password. Ensures all Azure character
-# class requirements are met by tacking on a non-random, tailored suffix.
-random_password () {
-  head /dev/urandom | LC_ALL=C tr -dc "A-Za-z0-9" | head -c 64 ; echo -n 'aA1!'
-}
-
-# Generate the ADO.NET connection string for corresponding database. Password
-# will be set to PASSWORD_PLACEHOLDER.
-pg_connection_string () {
-  server=$1
-  db=$2
-  user=$3
-
-  base=`az postgres show-connection-string \
-    --server-name $server \
-    --database-name $db \
-    --admin-user $user \
-    --admin-password "$PASSWORD_PLACEHOLDER" \
-    --query connectionStrings.\"ado.net\" \
-    -o tsv`
-
-  echo "${base}Ssl Mode=Require;"
-}
 
 # Generate the storage account connection string for the corresponding
 # blob storage account.
@@ -173,6 +126,7 @@ az deployment group create \
   --resource-group $RESOURCE_GROUP \
   --template-file ./arm-templates/key-vault.json \
   --parameters \
+    name=$VAULT_NAME \
     location=$LOCATION \
     objectId=$CURRENT_USER_OBJID \
     resourceTags="$RESOURCE_TAGS"
@@ -427,8 +381,16 @@ done < states.csv
 # managed identity, hosting plan, and application insights instance.
 #
 # Assumes existence of a managed identity with name `{abbr}admin`.
-match_api_endpoints=""
-MATCH_API_PATH="query"
+
+# Relative path for per-state Query endpoint
+MATCH_API_QUERY_NAME='Query'
+
+# Name of application role authorized to call per-state APIs
+MATCH_API_APP_ROLE='StateApi.Query'
+
+match_api_uris=''
+match_func_names=()
+
 while IFS=, read -r abbr name ; do
   echo "Creating match API function app for $name ($abbr)"
   abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
@@ -449,7 +411,7 @@ while IFS=, read -r abbr name ; do
     az deployment group create \
       --name match-api \
       --resource-group $MATCH_RESOURCE_GROUP \
-      --template-file  ../iac/arm-templates/function-state-match.json \
+      --template-file  ./arm-templates/function-state-match.json \
       --query properties.outputs.functionAppName.value \
       --output tsv \
       --parameters \
@@ -462,42 +424,234 @@ while IFS=, read -r abbr name ; do
         dbConnectionString="$db_conn_str" \
         dbConnectionStringKey="$DB_CONN_STR_KEY")
   
+  # Store function names for future auth configuration
+  match_func_names+=("$func_name")
+
   echo "Publishing ${name} function app"
   pushd ../match/src/Piipan.Match.State
   func azure functionapp publish $func_name --dotnet
   popd
 
-  func_endpoint=$(\
+  # Store API query URIs as a JSON array to be bound to orchestrator API
+  func_uri=$(\
     az functionapp function show \
-      --resource-group piipan-match \
+      --resource-group $MATCH_RESOURCE_GROUP \
       --name $func_name \
-      --function-name $MATCH_API_PATH \
+      --function-name $MATCH_API_QUERY_NAME \
       --query invokeUrlTemplate \
       --output tsv)
-
-  # Build JSON array string of endpoints for binding to orchestrator
-  match_api_endpoints=${match_api_endpoints}",\"$func_endpoint\""
+  match_api_uris=${match_api_uris}",\"$func_uri\""
 done < states.csv
 
-match_api_endpoints="[${match_api_endpoints:1}]"
-
-# Create orchestrator-level Function app for querying all state-level
-# APIs. Arm template.
+# Create orchestrator-level Function app using ARM template and
+# deploy project code using functions core tools.
+match_api_uris="[${match_api_uris:1}]"
 orch_name=$(\
   az deployment group create \
     --name orch-api \
     --resource-group $MATCH_RESOURCE_GROUP \
-    --template-file  ../../../iac/arm-templates/function-orch-match.json \
+    --template-file  ./arm-templates/function-orch-match.json \
     --query properties.outputs.functionAppName.value \
     --output tsv \
     --parameters \
       resourceTags="$RESOURCE_TAGS" \
       location=$LOCATION \
-      stateApiEndpoints=$match_api_endpoints)
+      StateApiUriStrings=$match_api_uris)
+orch_identity=$(\
+  az webapp identity show \
+    --name $orch_name \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --query principalId \
+    --output tsv)
 
 echo "Publishing ${orch_name} function app"
 pushd ../match/src/Piipan.Match.Orchestrator
 func azure functionapp publish $orch_name --dotnet
 popd
+
+# Generate the necessary JSON object for assigning an app role to
+# a service principal or managed identity
+app_role_assignment () {
+  principalId=$1
+  resourceId=$2
+  appRoleId=$3
+
+  echo "\
+  {
+    \"principalId\": \"${principalId}\",
+    \"resourceId\": \"${resourceId}\",
+    \"appRoleId\": \"${appRoleId}\"
+  }"
+}
+
+# Generate the necessary JSON object for adding an app role
+# to an Active Directory app registration
+app_role_manifest () {
+  role=$1
+
+  json="\
+  [{
+    \"allowedMemberTypes\": [
+      \"Application\"
+    ],
+    \"description\": \"Grants application-to-application access\",
+    \"displayName\": \"Authorized client\",
+    \"isEnabled\": true,
+    \"origin\": \"Application\",
+    \"value\": \"${role}\"
+  }]"
+  echo $json
+}
+
+# Create an Active Directory app registration with an application
+# role for a given function app.
+create_aad_app_reg () {
+  func=$1
+  uri=$2
+  role=$3
+
+  # Running `az ad app create` with the `--app-roles` parameter will throw
+  # an error if the app already exists and the app role is enabled
+  exists=$(\
+    az ad app list \
+    --display-name ${func} \
+    --filter "displayName eq '${func}'" \
+    --query "[0].appRoles[?value == '${role}'].value" \
+    --output tsv)
+  if [ -z "$exists" ]; then
+    app_role=$(app_role_manifest $role)
+    app_id=$(\
+      az ad app create \
+        --display-name $func \
+        --app-roles "${app_role}" \
+        --available-to-other-tenants false \
+        --homepage $uri \
+        --identifier-uris $uri \
+        --reply-urls "${uri}/.auth/login/aad/callback" \
+        --query objectId \
+        --output tsv)
+  else
+    app_id=$(\
+      az ad app list \
+        --display-name ${func} \
+        --filter "displayName eq '${func}'" \
+        --query "[0].objectId" \
+        --output tsv)
+  fi
+
+  echo $app_id
+}
+
+# Create a service principal associated with a given AAD
+# application registration
+create_aad_app_sp () {
+  func=$1
+  aad_app_id=$2
+
+  # `az ad sp create` throws error if service principal exits
+  sp=$(\
+    az ad sp list \
+    --display-name $func \
+    --filter "displayName eq '${func}'" \
+    --query "[0].objectId" \
+    --output tsv)
+  if [ -z "$sp" ]; then
+    sp=$(\
+      az ad sp create \
+        --id $aad_app_id \
+        --query objectId \
+        --output tsv)
+  fi
+
+  echo $sp
+}
+
+# Assign an application role to a service principal (generally in
+# the form of a managed identity)
+assign_app_role () {
+  echo "Assigning app role"
+  resource_id=$1
+  principal_id=$2
+  role=$3
+  role_id=$(\
+    az ad sp show \
+    --id $resource_id \
+    --query "appRoles[?value == '${role}'].id" \
+    --output tsv)
+
+  # Similar to `az ad app create`, `az rest` will throw error when assigning
+  # an app role to an identity that already has the role.
+  exists=$(\
+    az rest \
+    --method GET \
+    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --query "value[?principalId == '${principal_id}'].appRoleId" \
+    --output tsv)
+  if [ -z "$exists" ]; then
+    role_json=`app_role_assignment $principal_id $resource_id $role_id`
+    echo $role_json
+    az rest \
+    --method POST \
+    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --headers 'Content-Type=application/json' \
+    --body "$role_json"
+  fi
+}
+
+# With per-state and orchestrator APIs created, perform the necessary
+# configurations to enable authentication and authorization of the
+# orchestrator with each state.
+#
+# For each state:
+#   - Register an Azure Active Directory (AAD) app with an application
+#     role named the value of `MATCH_API_APP_ROLE`
+#   - Create a service principal (SP) for the app registation
+#   - Add the application role to the orchestrator API's identity
+#   - Configure and enable App Service Authentiction (i.e., Easy Auth)
+#     for state's Function app.
+#   - Enable requirement that authentication tokens are only issued to
+#     client applications that are assigned an app role.
+
+# App Service Authentication is done at the Azure tenant level
+TENANT_ID=$(az account show --query homeTenantId -o tsv)
+
+for func in "${match_func_names[@]}"
+do
+  echo "Configuring Easy Auth for ${func}"
+
+  func_host=$(\
+    az functionapp show \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --name $func \
+    --query defaultHostName \
+    --output tsv)
+  func_host="https://${func_host}"
+  func_uri=$(\
+    az functionapp function show \
+      --resource-group $MATCH_RESOURCE_GROUP \
+      --name $func \
+      --function-name $MATCH_API_QUERY_NAME \
+      --query invokeUrlTemplate)
+
+  func_app_reg_id=$(create_aad_app_reg $func $func_uri $MATCH_API_APP_ROLE)
+  func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
+  assign_app_role $func_app_sp $orch_identity $MATCH_API_APP_ROLE
+
+  # Activate App Service Authentication for the function app
+  echo "Configuring Easy Auth settings for ${func}"
+  az webapp auth update \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --name $func \
+    --aad-allowed-token-audiences $func_host $func_uri \
+    --aad-client-id $func_app_reg_id \
+    --aad-token-issuer-url "https://sts.windows.net/${TENANT_ID}/" \
+    --enabled true \
+    --action LoginWithAzureActiveDirectory
+
+  # Any client that attemps authentication must be assigned a role
+  az ad sp update \
+    --id $func_app_sp \
+    --set "appRoleAssignmentRequired=true"
+done
 
 script_completed

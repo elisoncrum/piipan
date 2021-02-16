@@ -34,6 +34,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
 | `StateApiEndpointStrings` | Serialized JSON array of endpoints strings for accessing each per-state matching API. | Piipan.Match.Orchestrator |
+| `StateApiUriStrings` | Serialized JSON array of valid URI strings for each per-state matching API's `/query` endpoint. | Piipan.Match.Orchestrator |
 | `StateName` | Name of the state associated with the Function App instance. | Piipan.Match.State |
 | `StateAbbr` | Abbreviation of the state associated with the Function App instance. | Piipan.Match.State |
 
