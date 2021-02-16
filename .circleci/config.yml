@@ -38,6 +38,10 @@ jobs:
           name: Test Orchestrator Match
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
+          working_directory: metrics/tests/Piipan.Metrics.Tests
+          name: Test Metrics
+          command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      - run:
           name: Upload Code Climate coverage report
           command: |
             ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json
@@ -45,6 +49,7 @@ jobs:
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.State.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.state.json
             ./cc-test-reporter -d format-coverage ./query-tool/tests/Piipan.QueryTool.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.query-tool.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Orchestrator.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.orchestrator.json
+            ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.json
             ./cc-test-reporter sum-coverage /tmp/codeclimate.*.json -o /tmp/sum.json
             ./cc-test-reporter upload-coverage -i /tmp/sum.json
 
