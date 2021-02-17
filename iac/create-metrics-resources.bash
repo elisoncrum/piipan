@@ -183,27 +183,20 @@ while IFS=, read -r abbr name ; do
 done < states.csv
 
 # Create Metrics API Function App in Azure
-METRICS_FUNC_APP_NAME=PiipanMetricsApi${FUNCTIONS_UNIQ_STR}
+METRICS_FUNC_APP_PREFIX=PiipanMetricsApi
 
-echo "Creating function app $METRICS_FUNC_APP_NAME in Azure"
-az deployment group create \
-    --name $METRICS_FUNC_APP_NAME \
+echo "Create $METRICS_FUNC_APP_PREFIX in Azure"
+METRICS_FUNC_APP_NAME=`az deployment group create \
     --resource-group $RESOURCE_GROUP \
     --template-file  ./arm-templates/metrics-api.json \
     --query properties.outputs.functionAppName.value \
     --output tsv \
     --parameters \
-      appName=$METRICS_FUNC_APP_NAME \
+      appPrefix=$METRICS_FUNC_APP_PREFIX \
       resourceTags="$RESOURCE_TAGS" \
-      location=$LOCATION
-
-echo "Configure settings on $METRICS_FUNC_APP_NAME"
-az functionapp config appsettings set \
-  --resource-group $RESOURCE_GROUP \
-  --name $METRICS_FUNC_APP_NAME \
-  --settings \
-    $DB_CONN_STR_KEY="$DB_CONN_STR" \
-  --output none
+      location=$LOCATION \
+      databaseConnectionStringKey="$DB_CONN_STR_KEY" \
+      databaseConnectionStringValue="$DB_CONN_STR"`
 
 # Assumes if any identity is set, it is the one we are specifying below
 exists=`az functionapp identity show \

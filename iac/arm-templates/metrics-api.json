@@ -2,11 +2,11 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "appName": {
+        "appPrefix": {
             "type": "string",
             "defaultValue": "[concat('fnapp', uniqueString(resourceGroup().id))]",
             "metadata": {
-                "description": "The name of the function app that you wish to create."
+                "description": "The prefix of the function app that you wish to create."
             }
         },
         "resourceTags": {
@@ -14,10 +14,18 @@
         },
         "location": {
             "type": "string"
+        },
+        "databaseConnectionStringKey": {
+            "type": "string"
+        },
+        "databaseConnectionStringValue": {
+            "type": "string"
         }
     },
     "variables": {
-        "functionAppName": "[parameters('appName')]",
+        "functionAppName": "[concat(parameters('appPrefix'), uniqueString(resourceGroup().id))]",
+        "databaseConnectionStringKey": "[parameters('databaseConnectionStringKey')]",
+        "databaseConnectionStringValue": "[parameters('databaseConnectionStringValue')]",
         "applicationInsightsName": "[concat('metins', uniquestring(resourceGroup().id))]",
         "functionWorkerRuntime": "dotnet",
         "storageAccountName": "[concat('metstor', uniquestring(resourceGroup().id))]",
@@ -71,6 +79,10 @@
                     ],
                     "ftpsState": "Disabled",
                     "appSettings": [
+                        {
+                          "name": "[variables('databaseConnectionStringKey')]",
+                          "value": "[variables('databaseConnectionStringValue')]"
+                        },
                         /*
                             The following settings are required for Function apps per the MS documentation:
                             - AzureWebJobsStorage
@@ -95,5 +107,12 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "functionAppName": {
+            "condition": "[bool('true')]",
+            "type": "string",
+            "value": "[variables('functionAppName')]"
+        }
+    }
 }
