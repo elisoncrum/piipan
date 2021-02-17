@@ -30,6 +30,13 @@ namespace Piipan.Metrics.Tests
                 meta.total = 5;
                 Assert.Equal(5, meta.total);
             }
+
+            public static void HasANextPage()
+            {
+                var meta = new Meta();
+                meta.nextPage = "foobar";
+                Assert.Equal("foobar", meta.nextPage);
+            }
         }
     }
 }
