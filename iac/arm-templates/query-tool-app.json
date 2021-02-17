@@ -13,6 +13,9 @@
         },
         "servicePlan": {
             "type": "string"
+        },
+        "OrchApiUri": {
+            "type": "string"
         }
     },
     "variables": {
@@ -28,7 +31,14 @@
                     "priority": 100
                 }
             ],
-            "ftpsState": "Disabled"
+            "ftpsState": "Disabled",
+            "appSettings": [
+                // Environment Variables
+                {
+                    "name": "OrchApiUri",
+                    "value": "[parameters('OrchApiUri')]"
+                }
+            ]
         }
     },
     "resources": [

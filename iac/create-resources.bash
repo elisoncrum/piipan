@@ -245,18 +245,6 @@ az deployment group create \
     appName=$DASHBOARD_APP_NAME \
     servicePlan=$APP_SERVICE_PLAN
 
-# Create App Service resources for query tool app
-echo "Creating App Service resources for query tool app"
-az deployment group create \
-  --name $QUERY_TOOL_APP_NAME \
-  --resource-group $RESOURCE_GROUP \
-  --template-file ./arm-templates/query-tool-app.json \
-  --parameters \
-    location=$LOCATION \
-    resourceTags="$RESOURCE_TAGS" \
-    appName=$QUERY_TOOL_APP_NAME \
-    servicePlan=$APP_SERVICE_PLAN
-
 # This is a subscription-level resource provider
 az provider register --wait --namespace Microsoft.EventGrid
 
@@ -588,6 +576,29 @@ assign_app_role () {
     --body "$role_json"
   fi
 }
+
+# Create App Service resources for query tool app.
+# This needs to happen after the orchestrator is created in order for
+# $orch_api to be set.
+echo "Creating App Service resources for query tool app"
+
+orch_api_uri=$(\
+  az functionapp function show \
+    -g piipan-match \
+    -n $orch_name \
+    --function-name Query \
+    --query invokeUrlTemplate)
+
+az deployment group create \
+  --name $QUERY_TOOL_APP_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./arm-templates/query-tool-app.json \
+  --parameters \
+    location=$LOCATION \
+    resourceTags="$RESOURCE_TAGS" \
+    appName=$QUERY_TOOL_APP_NAME \
+    servicePlan=$APP_SERVICE_PLAN \
+    OrchApiUri=$orch_api_uri
 
 # With per-state and orchestrator APIs created, perform the necessary
 # configurations to enable authentication and authorization of the
