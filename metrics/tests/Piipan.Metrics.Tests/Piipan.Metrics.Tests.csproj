@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Metrics\PiipanMetricsFunctions\PiipanMetricsFunctions.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Models\Piipan.Metrics.Models.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Piipan.Metrics\PiipanMetricsApi\Piipan.Metrics.Api.csproj" />
   </ItemGroup>
 
 </Project>

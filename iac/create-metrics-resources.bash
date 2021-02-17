@@ -91,9 +91,14 @@ psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1
 EOF
 
 ### Function App stuff
-FUNC_APP_NAME=PiipanMetricsFunctions
+FUNCTIONS_UNIQ_STR=`az deployment group create \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./arm-templates/unique-string.json \
+  --query properties.outputs.uniqueString.value \
+  -o tsv`
+FUNC_APP_NAME=PiipanMetricsFunctions${FUNCTIONS_UNIQ_STR}
+FUNC_STORAGE_NAME=piipanmetricsstorage${FUNCTIONS_UNIQ_STR}
 FUNC_NAME=BulkUploadMetrics
-FUNC_STORAGE_NAME=piipanmetricsstorage
 
 # Need a storage account to publish function app to:
 echo "Creating storage account $FUNC_STORAGE_NAME"
@@ -176,3 +181,44 @@ while IFS=, read -r abbr name ; do
         --included-event-types Microsoft.Storage.BlobCreated \
         --subject-begins-with /blobServices/default/containers/upload/blobs/
 done < states.csv
+
+# Create Metrics API Function App in Azure
+METRICS_FUNC_APP_PREFIX=PiipanMetricsApi
+
+echo "Create $METRICS_FUNC_APP_PREFIX in Azure"
+METRICS_FUNC_APP_NAME=`az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --template-file  ./arm-templates/metrics-api.json \
+    --query properties.outputs.functionAppName.value \
+    --output tsv \
+    --parameters \
+      appPrefix=$METRICS_FUNC_APP_PREFIX \
+      resourceTags="$RESOURCE_TAGS" \
+      location=$LOCATION \
+      databaseConnectionStringKey="$DB_CONN_STR_KEY" \
+      databaseConnectionStringValue="$DB_CONN_STR"`
+
+# Assumes if any identity is set, it is the one we are specifying below
+exists=`az functionapp identity show \
+  --resource-group $RESOURCE_GROUP \
+  --name $METRICS_FUNC_APP_NAME`
+
+if [ -z "$exists" ]; then
+  # Connect creds from function app to key vault so app can connect to db
+  principalId=`az functionapp identity assign \
+    --resource-group $RESOURCE_GROUP \
+    --name $METRICS_FUNC_APP_NAME \
+    --query principalId \
+    --output tsv`
+
+  az keyvault set-policy \
+    --name $VAULT_NAME \
+    --object-id $principalId \
+    --secret-permissions get list
+fi
+
+# publish metrics function app
+echo "Publishing function app $METRICS_FUNC_APP_NAME"
+pushd ../metrics/src/Piipan.Metrics/PiipanMetricsApi
+  func azure functionapp publish $METRICS_FUNC_APP_NAME --dotnet
+popd
