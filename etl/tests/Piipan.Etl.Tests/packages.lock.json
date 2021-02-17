@@ -433,8 +433,8 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.Storage": {
         "type": "Transitive",
-        "resolved": "4.0.3",
-        "contentHash": "8mzuGWg6tWexvc3YnXI9tddwntGB8O8vQR0KoWOR2j6ivHStEES94HajQ9Il8lRa/ul92RVL7lC8z3cIzNU9BQ==",
+        "resolved": "4.0.4",
+        "contentHash": "sNS63xR2Fx7P2ydvfDnrqEnGH1yWjvwQFDqx8iIk91/E2YXi7wCZjcD8SEu6bQS9n2p9yUxZTQg8CMtIqpfnSw==",
         "dependencies": {
           "Microsoft.Azure.Cosmos.Table": "1.0.7",
           "Microsoft.Azure.Storage.Blob": "11.1.7",
@@ -2153,7 +2153,7 @@
           "CsvHelper": "19.0.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
-          "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.3",
+          "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.4",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
           "Npgsql": "5.0.3"
         }
