@@ -48,6 +48,11 @@ namespace Piipan.Metrics.Api
                     meta.page,
                     meta.perPage,
                     meta.total);
+                meta.prevPage = PrevPageParams(
+                    req.Query["state"],
+                    meta.page,
+                    meta.perPage,
+                    meta.total);
                 var response = new ParticipantUploadsResponse(
                     data,
                     meta
@@ -86,6 +91,22 @@ namespace Piipan.Metrics.Api
             {
                 return "?" + result.TrimStart('&');
             }
+        }
+
+        public static String? PrevPageParams(
+            string? state,
+            int page,
+            int perPage,
+            Int64 total)
+        {
+            var newPage = page - 1;
+            if (newPage <= 0) return null;
+
+            var result = "";
+            if (!String.IsNullOrEmpty(state))
+                result += $"&state={state}";
+            result += $"&page={newPage}&perPage={perPage}";
+            return "?" + result.TrimStart('&');
         }
 
         public async static Task<Int64> TotalQuery(
