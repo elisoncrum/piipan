@@ -170,6 +170,31 @@ namespace Piipan.Metrics.Tests
                 }
 
             }
+
+            public class TotalQueryTests
+            {
+                [Fact]
+                public async void ReturnsInt64()
+                {
+                    var req = EventMock();
+                    var logger = Logger();
+                    var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
+                    var cmd = new Mock<DbCommand>() { DefaultValue = DefaultValue.Mock };
+                    factory.Setup(f => f.CreateCommand()).Returns(cmd.Object);
+
+                    // Mocks foreign key used in participants table
+                    cmd.Setup(c => c.ExecuteScalar()).Returns((Int64)5);
+
+                    var result = await GetParticipantUploads.TotalQuery(
+                        req,
+                        factory.Object,
+                        logger.Object
+                    );
+
+                    Assert.Equal(5, result);
+                    Assert.IsType<Int64>(result);
+                }
+            }
         }
     }
 }

@@ -5,21 +5,47 @@
     ViewData["Title"] = "NAC Query Tool";
 }
 <div class="grid-container">
-    <h1>@Model.Title</h1>
-    <form action="" class="usa-form">
+    <h2>@Model.Title</h2>
+    <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
             <legend class="usa-legend">Search for dual enrollments</legend>
-            <label class="usa-label" for="last">Last Name:</label>
-            <input class="usa-input" type="text" name="last">
-            <label class="usa-label" for="middle">Middle Name:</label>
-            <input class="usa-input" type="text" name="middle">
-            <label class="usa-label" for="first">First Name</label>
-            <input class="usa-input" type="text" name="first">
-            <label class="usa-label" for="ssn">Social Security Number</label>
-            <input class="usa-input" type="text" name="ssn">
-            <label class="usa-label" for="dob">Date of Birth</label>
-            <input class="usa-input" type="text" name="dob">
+            <label class="usa-label" asp-for="Query.LastName"></label>
+            <input class="usa-input" type="text" asp-for="Query.LastName" />
+            <label class="usa-label" asp-for="Query.MiddleName"></label>
+            <input class="usa-input" type="text" asp-for="Query.MiddleName" />
+            <label class="usa-label" asp-for="Query.FirstName"></label>
+            <input class="usa-input" type="text" asp-for="Query.FirstName" />
+            <label class="usa-label" asp-for="Query.SocialSecurityNum"></label>
+            <input class="usa-input" type="text" asp-for="Query.SocialSecurityNum">
+            <label class="usa-label" asp-for="Query.DateOfBirth"></label>
+            <input class="usa-input" type="text" asp-for="Query.DateOfBirth">
             <input class="usa-button" type="submit" value="Submit" />
         </fieldset>
     </form>
+    @if (Model.QueryResult.Any())
+    {
+        <h2>Results</h2>
+        <table class="usa-table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">DOB</th>
+                    <th scope="col">SSN</th>
+                    <th scope="col">State</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var record in @Model.QueryResult)
+            {
+                <tr>
+                    <td>@record.FirstName @record.MiddleName @record.LastName</td>
+                    <td>@record.DateOfBirth</td>
+                    <td>@record.SocialSecurityNum</td>
+                    <td>@record.StateName</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+
 </div>

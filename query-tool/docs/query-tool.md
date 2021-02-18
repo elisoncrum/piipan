@@ -2,6 +2,7 @@
 
 ## Prerequisites
 - [.NET Core SDK](https://dotnet.microsoft.com/download)
+- [npm](https://npmjs.com)
 
 ## Local development
 To run the app locally:
@@ -22,6 +23,21 @@ Alternatively, use the `watch` command to update the app upon file changes:
 ```
 
 3. Visit https://localhost:5001
+
+### Building Assets
+
+The app's UI uses [USWDS](https://designsystem.digital.gov/), which necessitates a dependency on NPM. If you make changes to the app's SCSS, you'll need to install USWDS (and related dependencies), by running:
+```
+    cd query-tool/src/Piipan.QueryTool
+    npm install
+```
+
+After installing the dependencies but before making any changes to the SCSS (in `query-tool/src/Piipan.QueryTool/wwwroot/sass/`), run:
+```
+    npx gulp watch
+```
+
+Gulp will then watch for changes to the SCSS and compile them into the main CSS file.
 
 ## Testing
 
