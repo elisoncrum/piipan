@@ -22,8 +22,6 @@ namespace Piipan.QueryTool
         public string LastName { get; set; }
 
         [Required]
-        // [RegularExpression(@"^\d{4}-\d{2}-\d{2}$",
-        //     ErrorMessage = "Birth date must have the form YYYY-MM-DD")]
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
