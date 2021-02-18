@@ -1,5 +1,6 @@
-using System.Text.Json.Serialization;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Piipan.QueryTool
 {
@@ -21,11 +22,13 @@ namespace Piipan.QueryTool
         public string LastName { get; set; }
 
         [Required]
-        [RegularExpression(@"^\d{4}-\d{2}-\d{2}$",
-            ErrorMessage = "Birth date must have the form YYYY-MM-DD")]
+        // [RegularExpression(@"^\d{4}-\d{2}-\d{2}$",
+        //     ErrorMessage = "Birth date must have the form YYYY-MM-DD")]
         [Display(Name = "Date of Birth")]
+        [DataType(DataType.Date),
+            DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
         [JsonPropertyName("dob")]
-        public string DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         [Required]
         [RegularExpression(@"^\d{3}-\d{2}-\d{4}$",
