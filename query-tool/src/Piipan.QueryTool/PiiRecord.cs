@@ -26,7 +26,7 @@ namespace Piipan.QueryTool
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
         [JsonPropertyName("dob")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [Required]
         [RegularExpression(@"^\d{3}-\d{2}-\d{4}$",
