@@ -58,4 +58,14 @@ updates:
   schedule:
     interval: daily
     time: "09:00"
+- package-ecosystem: nuget
+  directory: "/shared/src/Piipan.Shared"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/shared/tests/Piipan.Shared.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
   open-pull-requests-limit: 10
