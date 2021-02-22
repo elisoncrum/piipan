@@ -8,6 +8,14 @@
     <h2>@Model.Title</h2>
     <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
+            @if (Model.NoResults)
+            {
+                    <div class="usa-alert usa-alert--info usa-alert--slim usa-alert--validation">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">Your search did not return any results.</p>
+                        </div>
+                    </div>
+            }
             <legend class="usa-legend">Search for dual enrollments</legend>
             <label class="usa-label" asp-for="Query.LastName"></label>
             <input class="usa-input" type="text" asp-for="Query.LastName" />

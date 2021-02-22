@@ -21,6 +21,7 @@ namespace Piipan.QueryTool.Pages
 
         private readonly OrchestratorApiRequest _apiRequest = new OrchestratorApiRequest();
         public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
+        public bool NoResults = false;
 
         public async Task<IActionResult> OnPostAsync(PiiRecord query)
         {
@@ -29,6 +30,7 @@ namespace Piipan.QueryTool.Pages
                 query
             );
 
+            NoResults = QueryResult.Count == 0;
             Title = "NAC Query Results";
             return Page();
         }
