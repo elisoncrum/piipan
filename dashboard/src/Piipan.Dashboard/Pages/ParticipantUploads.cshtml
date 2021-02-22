@@ -1,0 +1,41 @@
+﻿@page
+@model Piipan.Dashboard.Pages.ParticipantUploadsModel
+
+<h1>@Model.Title</h1>
+
+<form method="post">
+     <input type="text" name="state">
+    <input type="submit" />
+</form>
+
+@if (!String.IsNullOrEmpty(Model.StateQuery))
+{
+    <span>@Model.StateQuery</span>
+    <a asp-page="/ParticipantUploads">Clear Search</a>
+}
+
+@if (Model.ParticipantUploadResults.Any())
+{
+    <table>
+        <thead>
+            <th>state</th>
+            <th>uploaded at</th>
+        </thead>
+        @foreach (var record in @Model.ParticipantUploadResults)
+        {
+            <tr>
+                <td>@record.State</td>
+                <td>@record.UploadedAt</td>
+            </tr>
+        }
+    </table>
+
+}
+@if (!String.IsNullOrEmpty(Model.PrevPageParams))
+{
+    <a href="@Model.PrevPageParams">Prev</a>
+}
+@if (!String.IsNullOrEmpty(Model.NextPageParams))
+{
+    <a href="@Model.NextPageParams">Next</a>
+}

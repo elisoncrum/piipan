@@ -171,6 +171,54 @@ namespace Piipan.Metrics.Tests
 
             }
 
+
+            public class PrevPageParamsTests
+            {
+                // when there's a previous page to be had
+                [Fact]
+                public void WhenPrevPage()
+                {
+                    var page = 2;
+                    var perPage = 5;
+                    var total = 6;
+                    var result = GetParticipantUploads.PrevPageParams(
+                        null,
+                        page,
+                        perPage,
+                        total);
+                    Assert.Matches(@"\?page=1\&perPage=5", result);
+                }
+                // when there's not a previous page to be had
+                [Fact]
+                public void WhenNotPrevPage()
+                {
+                    var page = 1;
+                    var perPage = 5;
+                    var total = 6;
+                    var result = GetParticipantUploads.PrevPageParams(
+                        null,
+                        page,
+                        perPage,
+                        total);
+                    Assert.Equal(null, result);
+                }
+                // when state is passed, result includes state param
+                [Fact]
+                public void WhenQueryPresent()
+                {
+                    var state = "ea";
+                    var page = 2;
+                    var perPage = 5;
+                    var total = 6;
+                    var result = GetParticipantUploads.PrevPageParams(
+                        state,
+                        page,
+                        perPage,
+                        total);
+                    Assert.Matches("state=ea", result);
+                }
+
+            }
             public class TotalQueryTests
             {
                 [Fact]

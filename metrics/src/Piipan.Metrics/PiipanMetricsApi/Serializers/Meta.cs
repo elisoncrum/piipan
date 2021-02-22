@@ -11,6 +11,7 @@ namespace Piipan.Metrics.Api
             public int perPage { get; set; }
             public Int64 total { get; set; }
             public string? nextPage { get; set; }
+            public string? prevPage { get; set; }
         }
     }
 }
