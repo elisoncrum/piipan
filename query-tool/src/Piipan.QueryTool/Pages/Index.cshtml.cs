@@ -24,12 +24,15 @@ namespace Piipan.QueryTool.Pages
 
         public async Task<IActionResult> OnPostAsync(PiiRecord query)
         {
-            QueryResult = await _apiRequest.SendQuery(
-                Environment.GetEnvironmentVariable("OrchApiUri"),
-                query
-            );
+            if (ModelState.IsValid)
+            {
+                QueryResult = await _apiRequest.SendQuery(
+                    Environment.GetEnvironmentVariable("OrchApiUri"),
+                    query
+                );
 
-            Title = "NAC Query Results";
+                Title = "NAC Query Results";
+            }
             return Page();
         }
 
