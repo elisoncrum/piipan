@@ -13,6 +13,12 @@ namespace Piipan.Dashboard.Pages
 {
     public class ParticipantUploadsModel : PageModel
     {
+        private readonly IParticipantUploadRequest _participantUploadRequest;
+
+        public ParticipantUploadsModel(IParticipantUploadRequest participantUploadRequest)
+        {
+            _participantUploadRequest = participantUploadRequest;
+        }
         public string Title = "Participant Uploads";
         public List<ParticipantUpload> ParticipantUploadResults { get; private set; } = new List<ParticipantUpload>();
         public string? NextPageParams { get; private set; }
@@ -26,8 +32,7 @@ namespace Piipan.Dashboard.Pages
         public async Task OnGetAsync()
         {
             var url = FormatUrl();
-            var api = new ParticipantUploadRequest(httpClient);
-            var response = await api.Get(url);
+            var response = await _participantUploadRequest.Get(url);
             ParticipantUploadResults = response.data;
             SetPageLinks(response.meta);
         }
@@ -39,8 +44,7 @@ namespace Piipan.Dashboard.Pages
             StateQuery = Request.Form["state"];
             var url = QueryHelpers.AddQueryString(BaseUrl, "state", StateQuery);
             url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
-            var api = new ParticipantUploadRequest(httpClient);
-            var response = await api.Get(url);
+            var response = await _participantUploadRequest.Get(url);
             ParticipantUploadResults = response.data;
             SetPageLinks(response.meta);
             return Page();

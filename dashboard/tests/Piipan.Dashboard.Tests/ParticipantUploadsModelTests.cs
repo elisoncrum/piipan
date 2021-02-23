@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Xunit;
 using Piipan.Dashboard.Pages;
+using Piipan.Dashboard.Api;
+using Moq;
+using Xunit;
 
 namespace Piipan.Dashboard.Tests
 {
@@ -10,7 +12,8 @@ namespace Piipan.Dashboard.Tests
         [Fact]
         public void BeforeOnGetAsync_TitleIsCorrect()
         {
-            var pageModel = new ParticipantUploadsModel();
+            var mockApi = new Mock<IParticipantUploadRequest>();
+            var pageModel = new ParticipantUploadsModel(mockApi.Object);
             Assert.Equal("Participant Uploads", pageModel.Title);
         }
 
@@ -24,8 +27,20 @@ namespace Piipan.Dashboard.Tests
         public void BeforeOnGetAsync_BaseUrlIsCorrect()
         {
             Environment.SetEnvironmentVariable("MetricsApiUri", "http://example.com");
-            Assert.Matches("http://example.com", new ParticipantUploadsModel().BaseUrl);
+            var mockApi = new Mock<IParticipantUploadRequest>();
+            var pageModel = new ParticipantUploadsModel(mockApi.Object);
+            Assert.Matches("http://example.com", pageModel.BaseUrl);
             Environment.SetEnvironmentVariable("MetricsApiUri", null);
         }
+
+        [Fact]
+        public void BeforeOnGetAsync_initializesParticipantUploadResults()
+        {
+            var mockApi = new Mock<IParticipantUploadRequest>();
+            var pageModel = new ParticipantUploadsModel(mockApi.Object);
+            Assert.IsType<List<ParticipantUpload>>(pageModel.ParticipantUploadResults);
+        }
+
+        // Add more here
     }
 }

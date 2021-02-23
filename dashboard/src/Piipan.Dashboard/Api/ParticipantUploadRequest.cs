@@ -8,19 +8,23 @@ namespace Piipan.Dashboard
 {
     namespace Api
     {
-        public class ParticipantUploadRequest
+        public interface IParticipantUploadRequest
         {
-            private readonly HttpClient Client;
+            public Task<ParticipantUploadResponse> Get(string url);
+        }
+        public class ParticipantUploadRequest : IParticipantUploadRequest
+        {
+            private readonly HttpClient _httpClient;
 
-            public ParticipantUploadRequest(HttpClient _client)
+            public ParticipantUploadRequest(HttpClient client)
             {
-                Client = _client;
+                _httpClient = client;
             }
             public async Task<ParticipantUploadResponse> Get(string url)
             {
                 try
                 {
-                    var response = await Client.GetAsync(url);
+                    var response = await _httpClient.GetAsync(url);
                     var body = await response.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<ParticipantUploadResponse>(body);
                 }
