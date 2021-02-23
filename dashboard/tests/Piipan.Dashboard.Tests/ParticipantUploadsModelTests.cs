@@ -23,7 +23,9 @@ namespace Piipan.Dashboard.Tests
         [Fact]
         public void BeforeOnGetAsync_BaseUrlIsCorrect()
         {
+            Environment.SetEnvironmentVariable("MetricsApiUri", "http://example.com");
             Assert.Matches("http", ParticipantUploadsModel.BaseUrl);
+            Environment.SetEnvironmentVariable("MetricsApiUri", null);
         }
     }
 }
