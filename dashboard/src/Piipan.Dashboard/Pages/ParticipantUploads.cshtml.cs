@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
 using Piipan.Dashboard.Api;
 
 #nullable enable
@@ -37,7 +37,8 @@ namespace Piipan.Dashboard.Pages
             if (BaseUrl == null)
                 throw new Exception("BaseUrl is null.");
             StateQuery = Request.Form["state"];
-            var url = $"{BaseUrl}?state={StateQuery}&perPage={PerPageDefault}";
+            var url = QueryHelpers.AddQueryString(BaseUrl, "state", StateQuery);
+            url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
             var api = new ParticipantUploadRequest(httpClient);
             var response = await api.Get(url);
             ParticipantUploadResults = response.data;
@@ -53,19 +54,7 @@ namespace Piipan.Dashboard.Pages
             var url = BaseUrl + Request.QueryString;
             StateQuery = Request.Query["state"];
             if (String.IsNullOrEmpty(Request.Query["perPage"]))
-            {
-                string perPageDefault = $"perPage={PerPageDefault}";
-                Regex regex = new Regex(@"\?");
-                Match match = regex.Match(url);
-                if (match.Success)
-                {
-                    url += String.Concat("&", perPageDefault);
-                }
-                else
-                {
-                    url += String.Concat("?", perPageDefault);
-                }
-            }
+                url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
             return url;
         }
 

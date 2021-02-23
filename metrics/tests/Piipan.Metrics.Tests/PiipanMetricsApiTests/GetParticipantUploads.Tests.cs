@@ -166,7 +166,7 @@ namespace Piipan.Metrics.Tests
                         page,
                         perPage,
                         total);
-                    Assert.Matches("state=ea", result);
+                    Assert.Matches(@"\?state=ea", result);
                 }
 
             }
@@ -215,7 +215,7 @@ namespace Piipan.Metrics.Tests
                         page,
                         perPage,
                         total);
-                    Assert.Matches("state=ea", result);
+                    Assert.Matches(@"\?state=ea", result);
                 }
 
             }
