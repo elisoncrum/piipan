@@ -8,7 +8,17 @@
     <h2>@Model.Title</h2>
     <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
-            @if (!ViewData.ModelState.IsValid) {
+            @if (Model.NoResults)
+            {
+                    <div class="usa-alert usa-alert--info usa-alert--slim usa-alert--validation">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">Your search did not return any results.</p>
+                        </div>
+                    </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
                 <div class="usa-alert usa-alert--error usa-alert--validation">
                     <div class="usa-alert__body">
                         <ul>
