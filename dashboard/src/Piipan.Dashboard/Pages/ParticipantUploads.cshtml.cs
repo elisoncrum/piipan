@@ -19,7 +19,7 @@ namespace Piipan.Dashboard.Pages
         public string? PrevPageParams { get; private set; }
         public string? StateQuery { get; private set; }
         public static int PerPageDefault = 10;
-        public static string BaseUrl = "https://piipanmetricsapiztqzsbh432oyw.azurewebsites.net/api/GetParticipantUploads";
+        public static string? BaseUrl = Environment.GetEnvironmentVariable("MetricsApiUri");
 
         private HttpClient httpClient = new HttpClient();
 
@@ -34,6 +34,8 @@ namespace Piipan.Dashboard.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            if (BaseUrl == null)
+                throw new Exception("BaseUrl is null.");
             StateQuery = Request.Form["state"];
             var url = $"{BaseUrl}?state={StateQuery}&perPage={PerPageDefault}";
             var api = new ParticipantUploadRequest(httpClient);
@@ -43,8 +45,11 @@ namespace Piipan.Dashboard.Pages
             return Page();
         }
 
+        // adds default pagination to the api url if none is present from request params
         private string FormatUrl()
         {
+            if (BaseUrl == null)
+                throw new Exception("BaseUrl is null.");
             var url = BaseUrl + Request.QueryString;
             StateQuery = Request.Query["state"];
             if (String.IsNullOrEmpty(Request.Query["perPage"]))

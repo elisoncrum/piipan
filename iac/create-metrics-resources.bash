@@ -13,8 +13,6 @@ source $(dirname "$0")/iac-common.bash || exit
 
 ### CONSTANTS
 # Default resource group for metrics system
-RESOURCE_GROUP=piipan-metrics
-LOCATION=westus
 DB_SERVER_NAME=piipan-metrics-db
 DB_ADMIN_NAME=piipanadmin
 DB_NAME=metrics
@@ -26,14 +24,14 @@ PG_SECRET_NAME=metrics-pg-admin
 ### END CONSTANTS
 
 # Create Metrics resource group
-echo "Creating $RESOURCE_GROUP group"
-az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
+echo "Creating $METRICS_RESOURCE_GROUP group"
+az group create --name $METRICS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
 # Create new Key Vault for this resource group
 echo "Creating Key Vault"
 az deployment group create \
   --name $VAULT_NAME \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --template-file ./arm-templates/key-vault.json \
   --parameters \
     name=$VAULT_NAME \
@@ -55,7 +53,7 @@ printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
 echo "Creating Metrics database server"
 az deployment group create \
   --name metrics \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --template-file ./arm-templates/metrics.json \
   --parameters \
     administratorLogin=$DB_ADMIN_NAME \
@@ -66,13 +64,13 @@ az deployment group create \
 
 ### Database stuff
 # Create database within db server (command is idempotent)
-az postgres db create --name $DB_NAME --resource-group $RESOURCE_GROUP --server-name $DB_SERVER_NAME
+az postgres db create --name $DB_NAME --resource-group $METRICS_RESOURCE_GROUP --server-name $DB_SERVER_NAME
 
 ## Connect to the db server
 # For some reason PG threw an Invalid Username error when trying to set PGUSER here, so it's specified in the prompt instead.
 # export PGUSER=${DB_ADMIN_NAME}@${DB_SERVER_NAME}
 export PGHOST=`az resource show \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --name $DB_SERVER_NAME \
   --resource-type "Microsoft.DbForPostgreSQL/servers" \
   --query properties.fullyQualifiedDomainName -o tsv`
@@ -92,7 +90,7 @@ EOF
 
 ### Function App stuff
 FUNCTIONS_UNIQ_STR=`az deployment group create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --template-file ./arm-templates/unique-string.json \
   --query properties.outputs.uniqueString.value \
   -o tsv`
@@ -105,13 +103,13 @@ echo "Creating storage account $FUNC_STORAGE_NAME"
 az storage account create \
   --name $FUNC_STORAGE_NAME \
   --location $LOCATION \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --sku Standard_LRS
 
 # Create the function app in Azure
 echo "Creating function app $FUNC_APP_NAME in Azure"
 az functionapp create \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --consumption-plan-location $LOCATION \
   --runtime dotnet \
   --functions-version 3 \
@@ -130,7 +128,7 @@ echo "Configure settings on function app"
 DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
 
 az functionapp config appsettings set \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --name $FUNC_APP_NAME \
   --settings \
     $DB_CONN_STR_KEY="$DB_CONN_STR" \
@@ -138,13 +136,13 @@ az functionapp config appsettings set \
 
 # Assumes if any identity is set, it is the one we are specifying below
 exists=`az functionapp identity show \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --name $FUNC_APP_NAME`
 
 if [ -z "$exists" ]; then
   # Connect creds from function app to key vault so app can connect to db
   principalId=`az functionapp identity assign \
-    --resource-group $RESOURCE_GROUP \
+    --resource-group $METRICS_RESOURCE_GROUP \
     --name $FUNC_APP_NAME \
     --query principalId \
     --output tsv`
@@ -187,7 +185,7 @@ METRICS_FUNC_APP_PREFIX=PiipanMetricsApi
 
 echo "Create $METRICS_FUNC_APP_PREFIX in Azure"
 METRICS_FUNC_APP_NAME=`az deployment group create \
-    --resource-group $RESOURCE_GROUP \
+    --resource-group $METRICS_RESOURCE_GROUP \
     --template-file  ./arm-templates/metrics-api.json \
     --query properties.outputs.functionAppName.value \
     --output tsv \
@@ -200,13 +198,13 @@ METRICS_FUNC_APP_NAME=`az deployment group create \
 
 # Assumes if any identity is set, it is the one we are specifying below
 exists=`az functionapp identity show \
-  --resource-group $RESOURCE_GROUP \
+  --resource-group $METRICS_RESOURCE_GROUP \
   --name $METRICS_FUNC_APP_NAME`
 
 if [ -z "$exists" ]; then
   # Connect creds from function app to key vault so app can connect to db
   principalId=`az functionapp identity assign \
-    --resource-group $RESOURCE_GROUP \
+    --resource-group $METRICS_RESOURCE_GROUP \
     --name $METRICS_FUNC_APP_NAME \
     --query principalId \
     --output tsv`
@@ -222,3 +220,27 @@ echo "Publishing function app $METRICS_FUNC_APP_NAME"
 pushd ../metrics/src/Piipan.Metrics/PiipanMetricsApi
   func azure functionapp publish $METRICS_FUNC_APP_NAME --dotnet
 popd
+
+# Deploying Dashboard App here because it now relies on info from metrics api.
+# If we can get the metrics api function app name dynamically without deploying,
+# then this can be moved to its own file.
+metrics_api_uri=$(\
+  az functionapp function show \
+    -g $METRICS_RESOURCE_GROUP \
+    -n  $METRICS_FUNC_APP_NAME \
+    --function-name GetParticipantUploads \
+    --query invokeUrlTemplate \
+    --output tsv)
+
+# Create App Service resources for dashboard app
+echo "Creating App Service resources for dashboard app"
+az deployment group create \
+  --name $DASHBOARD_APP_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --template-file ./arm-templates/dashboard-app.json \
+  --parameters \
+    location=$LOCATION \
+    resourceTags="$RESOURCE_TAGS" \
+    appName=$DASHBOARD_APP_NAME \
+    servicePlan=$APP_SERVICE_PLAN \
+    metricsApiUri=$metrics_api_uri
