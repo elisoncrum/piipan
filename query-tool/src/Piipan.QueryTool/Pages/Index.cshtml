@@ -16,6 +16,23 @@
                         </div>
                     </div>
             }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="usa-alert usa-alert--error usa-alert--validation">
+                    <div class="usa-alert__body">
+                        <ul>
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                @foreach (var error in modelState.Errors)
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
             <legend class="usa-legend">Search for dual enrollments</legend>
             <label class="usa-label" asp-for="Query.LastName"></label>
             <input class="usa-input" type="text" asp-for="Query.LastName" />
@@ -26,7 +43,7 @@
             <label class="usa-label" asp-for="Query.SocialSecurityNum"></label>
             <input class="usa-input" type="text" asp-for="Query.SocialSecurityNum">
             <label class="usa-label" asp-for="Query.DateOfBirth"></label>
-            <input class="usa-input" type="text" asp-for="Query.DateOfBirth">
+            <input class="usa-input" type="date" asp-for="Query.DateOfBirth">
             <input class="usa-button" type="submit" value="Submit" />
         </fieldset>
     </form>

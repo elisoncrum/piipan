@@ -62,6 +62,9 @@
             "name": "[variables('appName')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan'))]"
             ],
@@ -80,5 +83,11 @@
                 ]
             }
         }
-    ]
+    ],
+    "outputs": {
+        "appName": {
+            "type": "string",
+            "value": "[variables('appName')]"
+        }
+    }
 }
