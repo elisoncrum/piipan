@@ -10,9 +10,6 @@
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
 
-# Default resource group for our system
-RESOURCE_GROUP=piipan-resources
-
 # In some cases, when trying to create a Function App, you may receive an
 # error, as Azure has various rules/limitations on how different App Service
 # plans are permitted to co-exist in a single resource group. Details at:
@@ -23,8 +20,6 @@ FUNCTIONS_RESOURCE_GROUP=piipan-functions
 # Use seperate resource group for matching API resources to allow use of
 # incremental deployments
 MATCH_RESOURCE_GROUP=piipan-match
-
-LOCATION=westus
 
 # Name of Key Vault
 VAULT_NAME=secret-keeper
@@ -40,12 +35,6 @@ PG_AAD_ADMIN=piipan-admins
 
 # Name of PostgreSQL server
 PG_SERVER_NAME=participant-records
-
-# Name of App Service Plan
-APP_SERVICE_PLAN=piipan-app-plan
-
-# Base name of dashboard app
-DASHBOARD_APP_NAME=piipan-dashboard
 
 # Base name of query tool app
 QUERY_TOOL_APP_NAME=piipan-query-tool
@@ -233,18 +222,6 @@ else
     --member-id $CURRENT_USER_OBJID
 fi
 
-# Create App Service resources for dashboard app
-echo "Creating App Service resources for dashboard app"
-az deployment group create \
-  --name $DASHBOARD_APP_NAME \
-  --resource-group $RESOURCE_GROUP \
-  --template-file ./arm-templates/dashboard-app.json \
-  --parameters \
-    location=$LOCATION \
-    resourceTags="$RESOURCE_TAGS" \
-    appName=$DASHBOARD_APP_NAME \
-    servicePlan=$APP_SERVICE_PLAN
-
 # This is a subscription-level resource provider
 az provider register --wait --namespace Microsoft.EventGrid
 
@@ -403,7 +380,7 @@ while IFS=, read -r abbr name ; do
         stateAbbr="$abbr" \
         dbConnectionString="$db_conn_str" \
         dbConnectionStringKey="$DB_CONN_STR_KEY")
-  
+
   # Store function names for future auth configuration
   match_func_names+=("$func_name")
 

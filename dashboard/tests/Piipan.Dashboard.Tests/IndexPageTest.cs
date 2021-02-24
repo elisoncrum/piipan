@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 using Piipan.Dashboard.Pages;
 using Microsoft.Extensions.Logging.Abstractions;

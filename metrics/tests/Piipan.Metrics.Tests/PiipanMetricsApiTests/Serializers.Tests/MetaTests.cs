@@ -37,6 +37,13 @@ namespace Piipan.Metrics.Tests
                 meta.nextPage = "foobar";
                 Assert.Equal("foobar", meta.nextPage);
             }
+
+            public static void HasAPrevPage()
+            {
+                var meta = new Meta();
+                meta.prevPage = "foobar";
+                Assert.Equal("foobar", meta.prevPage);
+            }
         }
     }
 }

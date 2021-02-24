@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Npgsql;
@@ -48,6 +48,11 @@ namespace Piipan.Metrics.Api
                     meta.page,
                     meta.perPage,
                     meta.total);
+                meta.prevPage = PrevPageParams(
+                    req.Query["state"],
+                    meta.page,
+                    meta.perPage,
+                    meta.total);
                 var response = new ParticipantUploadsResponse(
                     data,
                     meta
@@ -75,17 +80,30 @@ namespace Piipan.Metrics.Api
             if (total >= (page * perPage))
             {
                 if (!String.IsNullOrEmpty(state))
-                    result += $"&state={state}";
-                result += $"&page={nextPage}&perPage={perPage}";
+                    result = QueryHelpers.AddQueryString(result, "state", state);
+                result = QueryHelpers.AddQueryString(result, "page", nextPage.ToString());
+                result = QueryHelpers.AddQueryString(result, "perPage", perPage.ToString());
             }
             if (String.IsNullOrEmpty(result))
-            {
                 return null;
-            }
-            else
-            {
-                return "?" + result.TrimStart('&');
-            }
+            return result;
+        }
+
+        public static String? PrevPageParams(
+            string? state,
+            int page,
+            int perPage,
+            Int64 total)
+        {
+            var newPage = page - 1;
+            if (newPage <= 0) return null;
+
+            var result = "";
+            if (!String.IsNullOrEmpty(state))
+                result = QueryHelpers.AddQueryString(result, "state", state);
+            result = QueryHelpers.AddQueryString(result, "page", newPage.ToString());
+            result = QueryHelpers.AddQueryString(result, "perPage", perPage.ToString());
+            return result;
         }
 
         public async static Task<Int64> TotalQuery(

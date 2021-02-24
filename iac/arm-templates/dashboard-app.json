@@ -13,6 +13,9 @@
         },
         "servicePlan": {
             "type": "string"
+        },
+        "metricsApiUri": {
+            "type": "string"
         }
     },
     "variables": {
@@ -28,7 +31,14 @@
                     "priority": 100
                 }
             ],
-            "ftpsState": "Disabled"
+            "ftpsState": "Disabled",
+            "appSettings": [
+                // Environment Variables
+                {
+                    "name": "MetricsApiUri",
+                    "value": "[parameters('metricsApiUri')]"
+                }
+            ]
         }
     },
     "resources": [
