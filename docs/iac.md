@@ -37,7 +37,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `StateApiUriStrings` | Serialized JSON array of valid URI strings for each per-state matching API's `/query` endpoint. | Piipan.Match.Orchestrator |
 | `StateName` | Name of the state associated with the Function App instance. | Piipan.Match.State |
 | `StateAbbr` | Abbreviation of the state associated with the Function App instance. | Piipan.Match.State |
-
+| `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 ## Notes
 - `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
