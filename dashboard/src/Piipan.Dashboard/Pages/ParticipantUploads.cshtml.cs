@@ -25,7 +25,8 @@ namespace Piipan.Dashboard.Pages
         public string? PrevPageParams { get; private set; }
         public string? StateQuery { get; private set; }
         public static int PerPageDefault = 10;
-        public string? BaseUrl = Environment.GetEnvironmentVariable("MetricsApiUri");
+        public static string ApiUrlKey = "MetricsApiUri";
+        public string? BaseUrl = Environment.GetEnvironmentVariable(ApiUrlKey);
 
         private HttpClient httpClient = new HttpClient();
 
