@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -34,10 +35,12 @@ namespace Piipan.QueryTool
         private async Task<List<PiiRecord>> QueryOrchestrator()
         {
             {
-                var message = new HttpRequestMessage(HttpMethod.Post, RequestUrl);
+                var requestUri = new Uri(RequestUrl);
+                var tokenProvider = new EasyAuthTokenProvider();
+                var authorizedClient = new AuthorizedJsonApiClient(_client, tokenProvider);
                 var jsonString = JsonSerializer.Serialize(Query);
-                message.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var resp = await _client.SendAsync(message);
+                var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                var resp = await authorizedClient.PostAsync(requestUri, requestBody);
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
                 Matches = json.matches;
