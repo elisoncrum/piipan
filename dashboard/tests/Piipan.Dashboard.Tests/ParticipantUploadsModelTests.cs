@@ -32,13 +32,19 @@ namespace Piipan.Dashboard.Tests
         }
 
         [Fact]
+        public void BeforeOnGetAsync_ApiUrlKeyIsCorrect()
+        {
+            Assert.IsType<String>(ParticipantUploadsModel.ApiUrlKey);
+        }
+
+        [Fact]
         public void BeforeOnGetAsync_BaseUrlIsCorrect()
         {
-            Environment.SetEnvironmentVariable("MetricsApiUri", "http://example.com");
+            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
             var mockApi = new Mock<IParticipantUploadRequest>();
             var pageModel = new ParticipantUploadsModel(mockApi.Object);
             Assert.Matches("http://example.com", pageModel.BaseUrl);
-            Environment.SetEnvironmentVariable("MetricsApiUri", null);
+            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
 
         [Fact]
@@ -54,7 +60,7 @@ namespace Piipan.Dashboard.Tests
         public async void AfterOnGetAsync_setsParticipantUploadResults()
         {
             // setup env
-            Environment.SetEnvironmentVariable("MetricsApiUri", "http://example.com");
+            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
             // setup mocks
             var participantUpload = new ParticipantUpload("eb", new DateTime());
             var data = new List<ParticipantUpload>();
@@ -72,14 +78,14 @@ namespace Piipan.Dashboard.Tests
             // assert
             Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
             // teardown
-            Environment.SetEnvironmentVariable("MetricsApiUri", null);
+            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
         // sets participant uploads after Post request
         [Fact]
         public async void AfterOnPostAsync_setsParticipantUploadResults()
         {
             // setup env
-            Environment.SetEnvironmentVariable("MetricsApiUri", "http://example.com");
+            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
             // setup mock api response
             var participantUpload = new ParticipantUpload("eb", new DateTime());
             var data = new List<ParticipantUpload>();
@@ -105,7 +111,7 @@ namespace Piipan.Dashboard.Tests
             // assert
             Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
             // teardown
-            Environment.SetEnvironmentVariable("MetricsApiUri", null);
+            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
 
         private Mock<IParticipantUploadRequest> mockApiWithResponse(
