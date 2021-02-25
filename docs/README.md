@@ -12,6 +12,7 @@ System-wide:
 Subsystems:
 * [Extract-Transform-Load (ETL)](../etl/README.md)
 * [Active Match API](../match/README.md)
+* [Query Tool & Collaboration app](../query-tool/README.md)
 * [Dashboard](../dashboard/README.md)
 
 Misc:
