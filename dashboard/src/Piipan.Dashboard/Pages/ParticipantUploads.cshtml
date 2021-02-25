@@ -1,41 +1,54 @@
 ﻿@page
 @model Piipan.Dashboard.Pages.ParticipantUploadsModel
 
-<h1>@Model.Title</h1>
+<div class="grid-container">
+    <h1>@Model.Title</h1>
 
-<form method="post">
-     <input type="text" name="state">
-    <input type="submit" />
-</form>
+    <section aria-label="search by state">
+        <form method="post" class="usa-search " role="search">
+            <label class="usa-sr-only" for="state">Search</label>
+            <input class="usa-input" id="search-field" type="search" name="state">
+            <button class="usa-button" type="submit">
+                <span class="usa-search__submit-text">Search</span>
+            </button>
+        </form>
+    </section>
 
-@if (!String.IsNullOrEmpty(Model.StateQuery))
-{
-    <span>@Model.StateQuery</span>
-    <a asp-page="/ParticipantUploads">Clear Search</a>
-}
+    @if (!String.IsNullOrEmpty(Model.StateQuery))
+    {
+        <div class="margin-top-2">
+            <span>Searched for: <strong>@Model.StateQuery</strong></span>
+            <a asp-page="/ParticipantUploads" class="usa-button usa-button--unstyled margin-left-1">Clear Search</a>
+        </div>
+    }
 
-@if (Model.ParticipantUploadResults.Any())
-{
-    <table>
-        <thead>
-            <th>state</th>
-            <th>uploaded at</th>
-        </thead>
-        @foreach (var record in @Model.ParticipantUploadResults)
-        {
-            <tr>
-                <td>@record.State</td>
-                <td>@record.UploadedAt</td>
-            </tr>
-        }
-    </table>
+    @if (Model.ParticipantUploadResults.Any())
+    {
+        <table class="usa-table">
+            <thead>
+                <th>state</th>
+                <th>uploaded at</th>
+            </thead>
+            @foreach (var record in @Model.ParticipantUploadResults)
+            {
+                <tr>
+                    <td>@record.State</td>
+                    <td>@record.UploadedAt</td>
+                </tr>
+            }
+        </table>
 
-}
-@if (!String.IsNullOrEmpty(Model.PrevPageParams))
-{
-    <a href="@Model.PrevPageParams">Prev</a>
-}
-@if (!String.IsNullOrEmpty(Model.NextPageParams))
-{
-    <a href="@Model.NextPageParams">Next</a>
-}
+    }
+    @if (!Model.ParticipantUploadResults.Any())
+    {
+        <h3>There were no results for your search</h3>
+    }
+    @if (!String.IsNullOrEmpty(Model.PrevPageParams))
+    {
+        <a href="@Model.PrevPageParams" class="usa-button usa-button--outline">Prev</a>
+    }
+    @if (!String.IsNullOrEmpty(Model.NextPageParams))
+    {
+        <a href="@Model.NextPageParams" class="usa-button usa-button--outline">Next</a>
+    }
+</div>
