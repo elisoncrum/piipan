@@ -120,7 +120,7 @@ Application objects are accessed via the Azure AD tenant in which they were crea
 - *Azure CLI*: [`az ad app`](https://docs.microsoft.com/en-us/cli/azure/ad/app?view=azure-cli-latest)
 
 **Relevant documentation**
-- ([Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals#application-registration))
+- [Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals#application-registration)
 
 ### Application registration
 
@@ -129,7 +129,7 @@ The *action* that results in an application object. Application registration is 
 As noted below, "Application registrations" is also the name of the navigation item in the Azure Portal under which application objects are found and managed.
 
 **Relevant documentation**
-- ([Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals#application-registration))
+- [Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals#application-registration)
 
 ### Application roles
 
@@ -161,7 +161,7 @@ App roles are different from Azure roles used in role-based access control (Azur
         - To view a service principal's assigned roles: the [`appRoleAssignments` REST endpoint](https://docs.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0&tabs=http) when using `az rest`
 
 **Relevant documentation**
-- ([How to: Add app roles to your application and receive them in the token](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps#declare-roles-for-an-application))
+- [How to: Add app roles to your application and receive them in the token](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps#declare-roles-for-an-application)
 
 ### Service Principal — in the context of an [application object](#application-object)
 
@@ -175,7 +175,7 @@ In the context of an application object, a service principal is the *local* (to 
     - [`az ad sp`](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 **Relevant documentation**
-([Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals#service-principal-object))
+- [Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals#service-principal-object)
 
 ### Service Principal — in the context of a system-assigned identity
 
@@ -199,4 +199,4 @@ If the Azure resource is destroyed, so to is its system-assigned identity's serv
 ## Miscellaneous notes
 
 - Some Azure resources can function as *both* a client *and* a server. Take for example Piipan's Orchestrator API. When it is *called* by the Query Tool, it is operating as the server. When it is *calling* the individual state APIs, it is operating as the client. In this case the Orchestrator API has two service principals: one for its system-assigned identity when operating as a client, and one for its local application object instance when it is operating as a server.
-- App Service Authentication handles all HTTP requests before they reach the application. Any requests that reach the application have already been authorized. Consequently, when an Azure Function is utilizing App Service Authentication, the application itself is configured with an [`AuthLevel` of `Anonymous`](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#configuration).
+- App Service Authentication [handles all HTTP requests](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization#on-windows) before they reach the application. Any requests that reach the application have already been authorized. Consequently, when an Azure Function is utilizing App Service Authentication, the application itself is configured with an [`AuthLevel` of `Anonymous`](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#configuration).
