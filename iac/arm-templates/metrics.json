@@ -89,41 +89,6 @@
                             "metadata": {
                                 "description": "Server Name for Azure database for PostgreSQL"
                             }
-                        },
-                        "subnetName": {
-                            "type": "string",
-                            "defaultValue": "azure_postgresql_subnet",
-                            "metadata": {
-                                "description": "Subnet Name"
-                            }
-                        },
-                        "subnetPrefix": {
-                            "type": "string",
-                            "defaultValue": "10.0.0.0/16",
-                            "metadata": {
-                                "description": "Subnet Address Prefix"
-                            }
-                        },
-                        "virtualNetworkName": {
-                            "type": "string",
-                            "defaultValue": "azure_postgresql_vnet",
-                            "metadata": {
-                                "description": "Virtual Network Name"
-                            }
-                        },
-                        "virtualNetworkRuleName": {
-                            "type": "string",
-                            "defaultValue": "AllowSubnet",
-                            "metadata": {
-                                "description": "Virtual Network RuleName"
-                            }
-                        },
-                        "vnetAddressPrefix": {
-                            "type": "string",
-                            "defaultValue": "10.0.0.0/16",
-                            "metadata": {
-                                "description": "Virtual Network Address Prefix"
-                            }
                         }
                     },
                     "variables": {
@@ -148,42 +113,15 @@
                     },
                     "resources": [
                         {
-                            "type": "Microsoft.Network/virtualNetworks",
-                            "apiVersion": "2020-06-01",
-                            "name": "[parameters('virtualNetworkName')]",
-                            "location": "[parameters('location')]",
-                            "properties": {
-                                "addressSpace": {
-                                    "addressPrefixes": [
-                                        "[parameters('vnetAddressPrefix')]"
-                                    ]
-                                }
-                            },
-                            "resources": [
-                                {
-                                    "type": "subnets",
-                                    "apiVersion": "2020-06-01",
-                                    "name": "[parameters('subnetName')]",
-                                    "location": "[parameters('location')]",
-                                    "dependsOn": [
-                                        "[parameters('virtualNetworkName')]"
-                                    ],
-                                    "properties": {
-                                        "addressPrefix": "[parameters('subnetPrefix')]"
-                                    }
-                                }
-                            ]
-                        },
-                        {
                             "type": "Microsoft.DBforPostgreSQL/servers",
-                            "apiVersion": "2017-12-01",
+                            "apiVersion": "2017-12-01-preview",
                             "name": "[parameters('serverName')]",
                             "location": "[parameters('location')]",
                             "tags": "[parameters('resourceTags')]",
                             "sku": {
-                                "name": "GP_Gen5_2",
-                                "tier": "GeneralPurpose",
-                                "capacity": 2,
+                                "name": "B_Gen5_1",
+                                "tier": "Basic",
+                                "capacity": 1,
                                 "size": "5120",
                                 "family": "Gen5"
                             },
@@ -197,22 +135,10 @@
                                     "backupRetentionDays": 7,
                                     "geoRedundantBackup": "Disabled",
                                     "storageAutoGrow": "Enabled"
-                                }
-                            },
-                            "resources": [
-                                {
-                                    "type": "virtualNetworkRules",
-                                    "apiVersion": "2017-12-01",
-                                    "name": "[parameters('virtualNetworkRuleName')]",
-                                    "dependsOn": [
-                                        "[resourceId('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
-                                    ],
-                                    "properties": {
-                                        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-                                        "ignoreMissingVnetServiceEndpoint": true
-                                    }
-                                }
-                            ]
+                                },
+                                "previewFeature": "",
+                                "infrastructureEncryption": "Disabled"
+                            }
                         },
                         {
                             "type": "Microsoft.DBforPostgreSQL/servers/firewallRules",

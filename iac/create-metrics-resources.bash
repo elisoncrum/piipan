@@ -94,8 +94,9 @@ FUNCTIONS_UNIQ_STR=`az deployment group create \
   --template-file ./arm-templates/unique-string.json \
   --query properties.outputs.uniqueString.value \
   -o tsv`
-FUNC_APP_NAME=PiipanMetricsFunctions${FUNCTIONS_UNIQ_STR}
-FUNC_STORAGE_NAME=piipanmetricsstorage${FUNCTIONS_UNIQ_STR}
+FUNC_APP_PREFIX=PiipanMetricsFunctions
+FUNC_APP_NAME=${FUNC_APP_PREFIX}${FUNCTIONS_UNIQ_STR}
+FUNC_STORAGE_NAME=piipanmet${FUNCTIONS_UNIQ_STR}
 FUNC_NAME=BulkUploadMetrics
 
 # Need a storage account to publish function app to:
@@ -156,12 +157,12 @@ fi
 
 # publish the function app
 echo "Publishing function app $FUNC_APP_NAME"
-pushd ../metrics/src/Piipan.Metrics/$FUNC_APP_NAME
+pushd ../metrics/src/Piipan.Metrics/$FUNC_APP_PREFIX
   func azure functionapp publish $FUNC_APP_NAME --dotnet
 popd
 
 # Subscribe each dynamically created event blob topic to this function
-FUNCTIONS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+FUNCTIONS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
 SUBS_RESOURCE_GROUP=piipan-resources
 
 while IFS=, read -r abbr name ; do
@@ -217,7 +218,7 @@ fi
 
 # publish metrics function app
 echo "Publishing function app $METRICS_FUNC_APP_NAME"
-pushd ../metrics/src/Piipan.Metrics/PiipanMetricsApi
+pushd ../metrics/src/Piipan.Metrics/$METRICS_FUNC_APP_PREFIX
   func azure functionapp publish $METRICS_FUNC_APP_NAME --dotnet
 popd
 
