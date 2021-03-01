@@ -8,6 +8,7 @@ System-wide:
 * [Service principals in Azure](./service-principals.md)
 * [Guidelines for Piipan .NET source trees](./source-guidelines.md)
 * [Updating .NET dependencies](./update-deps.md)
+* [Securing internal APIs](./securing-internal-apis.md)
 
 Subsystems:
 * [Extract-Transform-Load (ETL)](../etl/README.md)

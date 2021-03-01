@@ -27,6 +27,7 @@ We will use App Service authentication to secure our APIs and allow communicatio
 - Our IaC will likely need to make use of [deployment scripts](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template) to handle the necessary Active Directory configuration from within an ARM template.
 
 ## Resources
+- [Securing internal APIs](../securing-internal-apis.md)
 - [Secure an HTTP endpoint in production](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#secure-an-http-endpoint-in-production)
 - [How to: Add app roles to your application and receive them in the token](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps)
 - [Configure an application to require user assignment](https://docs.microsoft.com/en-us/azure/active-directory/manage-apps/assign-user-or-group-access-portal#configure-an-application-to-require-user-assignment)
