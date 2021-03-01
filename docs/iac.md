@@ -14,11 +14,15 @@ To (re)create the Azure resources that `piipan` uses:
     ./iac/install-extensions.bash
 ```
 2. Connect to a trusted network. Currently, only the GSA network block is trusted.
-3. Sign in with the Azure CLI `login` command:
+3. Configure the desired Azure cloud; either `AzureCloud` or `AzureUSGovernment`:
+```
+    az cloud set --name AzureCloud
+```
+4. Sign in with the Azure CLI `login` command:
 ```
     az login
 ```
-4. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts:
+5. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts:
 ```
     cd iac
     ./create-resources.bash

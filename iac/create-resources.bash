@@ -680,4 +680,7 @@ query_tool_identity=$(\
     --output tsv)
 assign_app_role $orch_app_sp $query_tool_identity $ORCH_API_APP_ROLE
 
+# Establish metrics sub-system
+./create-metrics-resources.bash
+
 script_completed

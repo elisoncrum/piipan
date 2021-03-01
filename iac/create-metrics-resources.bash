@@ -245,3 +245,5 @@ az deployment group create \
     appName=$DASHBOARD_APP_NAME \
     servicePlan=$APP_SERVICE_PLAN \
     metricsApiUri=$metrics_api_uri
+
+script_completed
