@@ -29,14 +29,19 @@ The orchestrator treats per-state APIs as backing services. When running the [Ia
 - Per-state URIs are compiled into a JSON list and saved as an environment variable
 - The orchestrator's system-assigned identity is given an authorized application role (which will be checked by the state API upon receiving requests)
 
-At runtime, the app requests an authentication token from the state app's Active Directory app registration. The token is then included as an authorization header (`Authorization: Bearer {token}`) in the request sent to the state API.
+At runtime, the app requests an authentication token from the state app's Active Directory application object. The token is then included as an authorization header (`Authorization: Bearer {token}`) in the request sent to the state API. For more detail on this process see [Securing internal APIs](../../docs/securing-internal-apis.md).
 
 ## Local development
 
+Local development is achieved by connecting a locally running instance of the orchestrator API to remote instances of the state APIs. When running locally, `Startup.cs` conditionally configures the `Piipan.Shared.Autentication.AuthorizedJsonApiClient` dependency to use Azure CLI credentials when obtaining access tokens. To make use of this functionality:
+
+1. Adjust the orchestrator's local configuration by adding `"DEVELOPMENT": "true"` to the `Values` object in `local.settings.json`.
+1. Assign your user account the `StateApi.Query` role for each state the orchestrator queries. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script.
+1. Ensure the Azure CLI has been added as an authorized client application to each state API's application object. This can be done via the Azure Portal at Azure Active Directory > Application registrations > {State API's application object} > Expose an API > Add a client application and adding the client ID `04b07795-8ddb-461a-bbee-02f9e1bf7b46` (the global identifier for the Azure CLI) with the `user_impersonation` scope. A helper script for this action does not yet exist.
+
+With the orchestrator running locally (`func start` or `dotnet watch msbuild /t:RunFunctions`), any requests to the local endpoint will now use the user account authorized with Azure CLI to obtain access tokens from the state APIs.
+
 A true local development approach with locally run instances of the per-state APIs and participant records database does not yet exist.
-
-Until then, local development is limited by the need to authenticate with Active Directory before accessing state APIs. The Instance Metadata Service used to retrieve authentication tokens is not available locally. There are [potential solutions](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication#local-development-authentication) using the `Microsoft.Azure.Services.AppAuthentication` library. None have been implemented at this time.
-
 
 ### App deployment
 
@@ -51,5 +56,7 @@ func azure functionapp publish <app_name> --dotnet
 ## Remote testing
 
 To test the orchestrator remotely:
-1. Connect to a trusted network. Currently, only the GSA network block is trusted.
-1. Submit valid POST requests using a tool like Postman.
+1. Assign your user account the `OrchestratorApi.Query` role for each state the orchestrator queries. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script.
+1. Ensure the Azure CLI has been added as an authorized client application to the orchestrator's application object (see [local development](#local-development)).
+1. Retrieve a token for your user using the Azure CLI: `az account get-access-token --resource <orchestrator application ID URI>`.
+1. Send a request to the remote endpoint—perhaps using a tool like Postman or `curl`—and include the access token in the Authorization header: `Authorization: Bearer {token}`.

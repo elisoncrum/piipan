@@ -449,9 +449,10 @@ app_role_manifest () {
   json="\
   [{
     \"allowedMemberTypes\": [
+      \"User\",
       \"Application\"
     ],
-    \"description\": \"Grants application-to-application access\",
+    \"description\": \"Grants application access\",
     \"displayName\": \"Authorized client\",
     \"isEnabled\": true,
     \"origin\": \"Application\",
