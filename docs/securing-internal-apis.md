@@ -2,11 +2,11 @@
 
 Piipan's micro-service architecture consists of several internal APIs used to expose underlying data (e.g., participant data, metrics, and collaboration records). These APIs are deployed to the Azure environment in the form of Azure Functions. Clients — typically, but not exclusively, in the form of App Service apps or other Azure Functions — call the APIs via endpoints in the form of [HTTP triggers](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp).
 
-Endpoints are publicly accessible by default. Rudimentary security is offered in the form of [access keys](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#authorization-keys) or [IP restrictions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#inbound-access-restrictions), but neither are considered sufficient outside of development environments.
+When you create a Function App in Azure, its endpoint is publicly accessible by default. Rudimentary security can be configured offered in the form of [shared access keys](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#authorization-keys) or [IP restrictions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#inbound-access-restrictions), but neither are considered sufficient outside of development environments.
 
-To secure endpoints in production, the APIs use [App Service Authentication](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization) (sometimes referred to as "Easy Auth") with Azure Active Directory (Azure AD) configured as the authentication service. Azure AD uses OpenID Connect for authentication and OAuth 2.0 for authorization, though App Service Authentication largely abstracts these implementation details away from developers.
+To secure endpoints in production, the APIs use [App Service Authentication](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization) (sometimes referred to as "Easy Auth") with Azure Active Directory (Azure AD) configured as the authentication service. Azure AD uses OpenID Connect for authentication and OAuth 2.0 for authorization, though App Service Authentication largely abstracts these implementation details away from developers. Conveniently, App Service Authentication also alleviates the need to manually manage and rotate internal API credentials.
 
-Once secured, the APIs are protected from unauthorized access both externally and internally.
+Once secured, the APIs are protected from unauthorized access both externally and internally, consistent with the aims of a [Zero Trust Architecture](https://csrc.nist.gov/publications/detail/sp/800-207/final).
 
 This document details how the internal APIs are utilized, how to secure them, how to authorize client applications, and defines the various objects involved in the process.
 
@@ -31,7 +31,10 @@ Piipan's internal APIs follow a traditional client–server model where communic
 
 ## Resources involved
 
-In the Azure environment, the resources involved in authenticated client–server communication are divided between two domains: Azure resources (e.g., Azure Functions, App Service apps, database clusters, etc) and Azure AD resources (e.g., application objects, service principals, user accounts, etc). Azure resources provide the application logic (i.e., sending requests and responses) while their related Azure AD resources handle authentication and authorization.
+In the Azure environment, the resources involved in authenticated client–server communication are divided between two domains:
+- Azure resources (e.g., Azure Functions, App Service apps, database clusters, etc) and 
+- Azure AD resources (e.g., application objects, service principals, user accounts, etc).
+Azure resources provide the application logic (i.e., sending requests and responses), while their related Azure AD resources handle authentication and authorization.
 
 When an Azure resource is created it is effectively unknown to Azure AD. For the resource to make use of Azure AD's authentication and authorization functionality it must first create and configure a resource in Azure AD that will act as its representative. This representative resource is called a service principal. This is true for all Azure resources, both on the client side and server side.
 
