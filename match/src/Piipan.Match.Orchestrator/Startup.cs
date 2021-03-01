@@ -13,7 +13,7 @@ namespace Piipan.Match.Orchestrator
             ITokenProvider tokenProvider;
             var configuration = builder.GetContext().Configuration;
 
-            if (configuration["DEVELOPMENT"] == "true")
+            if (configuration?["DEVELOPMENT"] == "true")
             {
                 tokenProvider = new CliTokenProvider();
             }
