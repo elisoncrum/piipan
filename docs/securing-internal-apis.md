@@ -2,7 +2,7 @@
 
 Piipan's micro-service architecture consists of several internal APIs used to expose underlying data (e.g., participant data, metrics, and collaboration records). These APIs are deployed to the Azure environment in the form of Azure Functions. Clients — typically, but not exclusively, in the form of App Service apps or other Azure Functions — call the APIs via endpoints in the form of [HTTP triggers](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp).
 
-When you create a Function App in Azure, its endpoint is publicly accessible by default. Rudimentary security can be configured offered in the form of [shared access keys](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#authorization-keys) or [IP restrictions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#inbound-access-restrictions), but neither are considered sufficient outside of development environments.
+When you create a Function App in Azure, its endpoint is publicly accessible by default. Rudimentary security can be configured in the form of [shared access keys](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#authorization-keys) or [IP restrictions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#inbound-access-restrictions), but neither are considered sufficient outside of development environments.
 
 To secure endpoints in production, the APIs use [App Service Authentication](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization) (sometimes referred to as "Easy Auth") with Azure Active Directory (Azure AD) configured as the authentication service. Azure AD uses OpenID Connect for authentication and OAuth 2.0 for authorization, though App Service Authentication largely abstracts these implementation details away from developers. Conveniently, App Service Authentication also alleviates the need to manually manage and rotate internal API credentials.
 
@@ -75,6 +75,7 @@ An illustrated version of this flow:
 
 <p align="center">
   <a href="./piipan-internal-authentication.png"><img src="./piipan-internal-authentication.png" alt="Authenticated API diagram"></a>
+  <!-- Google Drawing: https://docs.google.com/drawings/d/1PlAZwHBbf1QkRC4LDkce7FmnUq25veJGj2Vafyj9-FY/edit?usp=sharing -->
 </p>
 
 ## Definitions
@@ -84,10 +85,12 @@ The key components described in this document are defined below, alphabetically.
 ### Access token
 
 A JSON Web Token (JWT) granted to a client from a server. The token represents the server's authorization to use its resources. Client applications retrieve access tokens using the [`Azure.Identity` client library](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/app-auth-migration). Tokens are requested from the server via its application object's [application ID URI](#application-id-uri). Piipan has a shared authentication library (`Piipan.Shared.Authentication`) which abstracts away some of the complexity of requesting/using access tokens when calling internal APIs.
-- **AZ CLI**: Access tokens are usually retrieved at the code-level, but can be retrieved via the CLI for *users* using [`az account get-access-token`](https://docs.microsoft.com/en-us/cli/azure/account?view=azure-cli-latest#az_account_get_access_token)
+
+**Retrieving access tokens**
+- *Azure CLI*: Access tokens are usually retrieved at the code-level, but can be retrieved via the CLI for *users* using [`az account get-access-token`](https://docs.microsoft.com/en-us/cli/azure/account?view=azure-cli-latest#az_account_get_access_token)
 
 **Relevant documentation**
-([Microsoft identity platform developer glossary](https://docs.microsoft.com/en-us/azure/active-directory/develop/developer-glossary#access-token))
+- [Microsoft identity platform developer glossary](https://docs.microsoft.com/en-us/azure/active-directory/develop/developer-glossary#access-token)
 
 ### App Service Authentication
 
@@ -99,7 +102,7 @@ All configuration is done through the associated Azure and Azure AD resources (e
 
 **Managing App Service Authentication**
 - *Portal*: {your application} > Authentication / Authorization
-- *AZ CLI*: [`az webapp auth`](https://docs.microsoft.com/en-us/cli/azure/webapp/auth?view=azure-cli-latest) (despite being under the `webapp` namespace, the same command is used when configuring authentication for Azure Functions)
+- *Azure CLI*: [`az webapp auth`](https://docs.microsoft.com/en-us/cli/azure/webapp/auth?view=azure-cli-latest) (despite being under the `webapp` namespace, the same command is used when configuring authentication for Azure Functions)
 
 **Relevant documentation**
 - [Authentication and authorization in Azure App Service and Azure Functions](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization)
@@ -109,8 +112,8 @@ All configuration is done through the associated Azure and Azure AD resources (e
 A valid URI string defined on an [application object](#application-object). This URI is used for specifying the resource from which the client should request an [access token]() for authenticating with the server. The URI can be set to any value unique to the tenant, but by convention it is set to the base URL of the server *without a trailing slash*. For example, if a server's API can be called from `https://functionfoo.azurewebsites.net/api/endpoint`, the application ID URI is set to `https://functionfoo.azurewebsites.net`.
 
 **Managing the application ID URI**
-- **Portal**: Azure Active Directory > App registration > All applications > {your application object} > Application ID URI
-- **Azure CLI**: The `--identifier-uris` parameter / `identifierUris` property when using `az ad app [create / show / update]`
+- *Portal*: Azure Active Directory > App registration > All applications > {your application object} > Application ID URI
+- *Azure CLI*: The `--identifier-uris` parameter / `identifierUris` property when using `az ad app [create / show / update]`
 
 ### Application Object
 
