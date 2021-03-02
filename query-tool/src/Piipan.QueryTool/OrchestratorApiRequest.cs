@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -32,6 +33,7 @@ namespace Piipan.QueryTool
 
         private async Task<List<PiiRecord>> QueryOrchestrator()
         {
+            try
             {
                 var message = new HttpRequestMessage(HttpMethod.Post, RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
@@ -40,8 +42,12 @@ namespace Piipan.QueryTool
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
                 Matches = json.matches;
-                return Matches;
             }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
+            return Matches;
         }
     }
 
