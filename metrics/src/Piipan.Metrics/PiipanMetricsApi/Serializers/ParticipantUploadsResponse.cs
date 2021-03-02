@@ -8,9 +8,9 @@ namespace Piipan.Metrics.Api
     {
         public class ParticipantUploadsResponse : Response
         {
-            public List<ParticipantUpload> data;
+            public IEnumerable<ParticipantUpload> data;
             public ParticipantUploadsResponse(
-                List<ParticipantUpload> responseData,
+                IEnumerable<ParticipantUpload> responseData,
                 Meta _meta)
             {
                 data = responseData;
