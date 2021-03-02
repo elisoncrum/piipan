@@ -13,17 +13,20 @@ source $(dirname "$0")/iac-common.bash || exit
 
 ### CONSTANTS
 # Default resource group for metrics system
-DB_SERVER_NAME=piipan-metrics-db
+DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}-${LOCATION}
 DB_ADMIN_NAME=piipanadmin
 DB_NAME=metrics
 DB_TABLE_NAME=participant_uploads
+# Needed for both function apps
+DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
 # Name of Key Vault
-VAULT_NAME=metrics-secret-keeper
+VAULT_NAME=${PREFIX}kvmetrics${ENV}${LOCATION} # vault names can't use hyphens even though the docs say they can
 # Name of secret used to store the PostgreSQL metrics server admin password
 PG_SECRET_NAME=metrics-pg-admin
 ### END CONSTANTS
 
 # Create Metrics resource group
+# Eventually resource group will already be created for us by partner
 echo "Creating $METRICS_RESOURCE_GROUP group"
 az group create --name $METRICS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
@@ -54,7 +57,7 @@ echo "Creating Metrics database server"
 az deployment group create \
   --name metrics \
   --resource-group $METRICS_RESOURCE_GROUP \
-  --template-file ./arm-templates/metrics.json \
+  --template-file ./arm-templates/database-metrics.json \
   --parameters \
     administratorLogin=$DB_ADMIN_NAME \
     serverName=$DB_SERVER_NAME \
@@ -88,63 +91,37 @@ psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1
     );
 EOF
 
-### Function App stuff
-FUNCTIONS_UNIQ_STR=`az deployment group create \
-  --resource-group $METRICS_RESOURCE_GROUP \
-  --template-file ./arm-templates/unique-string.json \
-  --query properties.outputs.uniqueString.value \
-  -o tsv`
-FUNC_APP_PREFIX=PiipanMetricsFunctions
-FUNC_APP_NAME=${FUNC_APP_PREFIX}${FUNCTIONS_UNIQ_STR}
-FUNC_STORAGE_NAME=piipanmet${FUNCTIONS_UNIQ_STR}
-FUNC_NAME=BulkUploadMetrics
+# Create Metrics Collect Function App in Azure
+COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
+COLLECT_APP_ID=metricscol
+COLLECT_FUNC=BulkUploadMetrics
 
-# Need a storage account to publish function app to:
-echo "Creating storage account $FUNC_STORAGE_NAME"
-az storage account create \
-  --name $FUNC_STORAGE_NAME \
-  --location $LOCATION \
-  --resource-group $METRICS_RESOURCE_GROUP \
-  --sku Standard_LRS
+echo "Create $COLLECT_APP_FILEPATH in Azure"
+COLLECT_APP_NAME=`az deployment group create \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --template-file  ./arm-templates/function-metrics.json \
+    --query properties.outputs.functionAppName.value \
+    --output tsv \
+    --parameters \
+      functionAppName="${PREFIX}-func-${COLLECT_APP_ID}-${ENV}-${LOCATION}" \
+      resourceTags="$RESOURCE_TAGS" \
+      location=$LOCATION \
+      databaseConnectionStringKey="$DB_CONN_STR_KEY" \
+      databaseConnectionStringValue="$DB_CONN_STR" \
+      applicationInsightsName="${PREFIX}-ins-${COLLECT_APP_ID}-${ENV}-${LOCATION}" \
+      storageAccountName="${PREFIX}st${COLLECT_APP_ID}${ENV}${LOCATION}"`
 
-# Create the function app in Azure
-echo "Creating function app $FUNC_APP_NAME in Azure"
-az functionapp create \
-  --resource-group $METRICS_RESOURCE_GROUP \
-  --consumption-plan-location $LOCATION \
-  --runtime dotnet \
-  --functions-version 3 \
-  --name $FUNC_APP_NAME \
-  --storage-account $FUNC_STORAGE_NAME
-
-# Waiting before publishing the app, since publishing immediately after creation returns an App Not Found error
-# Waiting was the best solution I could find. More info in these GH issues:
-# https://github.com/Azure/azure-functions-core-tools/issues/1616
-# https://github.com/Azure/azure-functions-core-tools/issues/1766
-echo "Waiting to publish function app"
-sleep 60s
-
-# Configure settings on function app
-echo "Configure settings on function app"
-DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
-
-az functionapp config appsettings set \
-  --resource-group $METRICS_RESOURCE_GROUP \
-  --name $FUNC_APP_NAME \
-  --settings \
-    $DB_CONN_STR_KEY="$DB_CONN_STR" \
-  --output none
 
 # Assumes if any identity is set, it is the one we are specifying below
 exists=`az functionapp identity show \
   --resource-group $METRICS_RESOURCE_GROUP \
-  --name $FUNC_APP_NAME`
+  --name $COLLECT_APP_NAME`
 
 if [ -z "$exists" ]; then
   # Connect creds from function app to key vault so app can connect to db
   principalId=`az functionapp identity assign \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --name $FUNC_APP_NAME \
+    --name $COLLECT_APP_NAME \
     --query principalId \
     --output tsv`
 
@@ -154,14 +131,18 @@ if [ -z "$exists" ]; then
     --secret-permissions get list
 fi
 
+# Found that this is still necessary after deploying a function app through an ARM template
+echo "waiting to publish function app"
+sleep 60s
 
 # publish the function app
-echo "Publishing function app $FUNC_APP_NAME"
-pushd ../metrics/src/Piipan.Metrics/$FUNC_APP_PREFIX
-  func azure functionapp publish $FUNC_APP_NAME --dotnet
+echo "Publishing function app $COLLECT_APP_NAME"
+pushd ../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH
+  func azure functionapp publish $COLLECT_APP_NAME --dotnet
 popd
 
 # Subscribe each dynamically created event blob topic to this function
+echo "set FUNCTIONS_PROVIDERS"
 FUNCTIONS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
 SUBS_RESOURCE_GROUP=piipan-resources
 
@@ -175,38 +156,41 @@ while IFS=, read -r abbr name ; do
         --name $sub_name \
         --resource-group $SUBS_RESOURCE_GROUP \
         --system-topic-name $topic_name \
-        --endpoint ${FUNCTIONS_PROVIDERS}/Microsoft.Web/sites/${FUNC_APP_NAME}/functions/${FUNC_NAME} \
+        --endpoint ${FUNCTIONS_PROVIDERS}/Microsoft.Web/sites/${COLLECT_APP_NAME}/functions/${COLLECT_FUNC} \
         --endpoint-type azurefunction \
         --included-event-types Microsoft.Storage.BlobCreated \
         --subject-begins-with /blobServices/default/containers/upload/blobs/
 done < states.csv
 
 # Create Metrics API Function App in Azure
-METRICS_FUNC_APP_PREFIX=PiipanMetricsApi
+API_APP_FILEPATH=Piipan.Metrics.Api
+METRICS_API_APP_ID=metricsapi
 
-echo "Create $METRICS_FUNC_APP_PREFIX in Azure"
-METRICS_FUNC_APP_NAME=`az deployment group create \
+echo "Create $API_APP_FILEPATH in Azure"
+API_APP_NAME=`az deployment group create \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --template-file  ./arm-templates/metrics-api.json \
+    --template-file  ./arm-templates/function-metrics.json \
     --query properties.outputs.functionAppName.value \
     --output tsv \
     --parameters \
-      appPrefix=$METRICS_FUNC_APP_PREFIX \
+      functionAppName="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
       resourceTags="$RESOURCE_TAGS" \
       location=$LOCATION \
       databaseConnectionStringKey="$DB_CONN_STR_KEY" \
-      databaseConnectionStringValue="$DB_CONN_STR"`
+      databaseConnectionStringValue="$DB_CONN_STR" \
+      applicationInsightsName="${PREFIX}-ins-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
+      storageAccountName="${PREFIX}st${METRICS_API_APP_ID}${ENV}${LOCATION}"`
 
 # Assumes if any identity is set, it is the one we are specifying below
 exists=`az functionapp identity show \
   --resource-group $METRICS_RESOURCE_GROUP \
-  --name $METRICS_FUNC_APP_NAME`
+  --name $API_APP_NAME`
 
 if [ -z "$exists" ]; then
   # Connect creds from function app to key vault so app can connect to db
   principalId=`az functionapp identity assign \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --name $METRICS_FUNC_APP_NAME \
+    --name $API_APP_NAME \
     --query principalId \
     --output tsv`
 
@@ -216,10 +200,13 @@ if [ -z "$exists" ]; then
     --secret-permissions get list
 fi
 
+echo "waiting to publish function app"
+sleep 60s
+
 # publish metrics function app
-echo "Publishing function app $METRICS_FUNC_APP_NAME"
-pushd ../metrics/src/Piipan.Metrics/$METRICS_FUNC_APP_PREFIX
-  func azure functionapp publish $METRICS_FUNC_APP_NAME --dotnet
+echo "Publishing function app $API_APP_NAME"
+pushd ../metrics/src/Piipan.Metrics/$API_APP_FILEPATH
+  func azure functionapp publish $API_APP_NAME --dotnet
 popd
 
 # Deploying Dashboard App here because it now relies on info from metrics api.
@@ -228,7 +215,7 @@ popd
 metrics_api_uri=$(\
   az functionapp function show \
     -g $METRICS_RESOURCE_GROUP \
-    -n  $METRICS_FUNC_APP_NAME \
+    -n  $API_APP_NAME \
     --function-name GetParticipantUploads \
     --query invokeUrlTemplate \
     --output tsv)

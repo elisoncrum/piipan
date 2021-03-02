@@ -18,7 +18,10 @@ METRICS_RESOURCE_GROUP=piipan-metrics
 # Name of App Service Plan
 APP_SERVICE_PLAN=piipan-app-plan
 
-# Default location
+# Grouping naming convention configs together
+# Eventually these will be configured per environment
+PREFIX=fns
+ENV=dev
 LOCATION=westus
 
 # Name of environment variable used to pass database connection strings

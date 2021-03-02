@@ -4,7 +4,7 @@ using Xunit;
 using Moq;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
-using PiipanMetricsFunctions;
+using Piipan.Metrics.Collect;
 
 namespace Piipan.Metrics.Tests
 {

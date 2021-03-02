@@ -14,7 +14,7 @@ using Npgsql;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
-namespace PiipanMetricsFunctions
+namespace Piipan.Metrics.Collect
 {
     public static class BulkUploadMetrics
     {
