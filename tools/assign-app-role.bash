@@ -8,7 +8,7 @@
 #
 # usage: assign-app-role.bash function-name role-name
 
-source common.bash || exit
+source $(dirname "$0")/common.bash || exit
 
 main () {
   function=$1
