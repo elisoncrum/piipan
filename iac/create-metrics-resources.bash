@@ -92,14 +92,14 @@ main () {
 EOF
 
   ### Function App stuff
-  FUNCTIONS_UNIQ_STR=`az deployment group create \
+  METRICS_UNIQ_STR=`az deployment group create \
     --resource-group $METRICS_RESOURCE_GROUP \
     --template-file ./arm-templates/unique-string.json \
     --query properties.outputs.uniqueString.value \
     -o tsv`
   FUNC_APP_PREFIX=PiipanMetricsFunctions
-  FUNC_APP_NAME=${FUNC_APP_PREFIX}${FUNCTIONS_UNIQ_STR}
-  FUNC_STORAGE_NAME=piipanmet${FUNCTIONS_UNIQ_STR}
+  FUNC_APP_NAME=${FUNC_APP_PREFIX}${METRICS_UNIQ_STR}
+  FUNC_STORAGE_NAME=piipanmet${METRICS_UNIQ_STR}
   FUNC_NAME=BulkUploadMetrics
 
   # Need a storage account to publish function app to:
@@ -165,7 +165,7 @@ EOF
   popd
 
   # Subscribe each dynamically created event blob topic to this function
-  FUNCTIONS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
+  METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
   SUBS_RESOURCE_GROUP=piipan-resources
 
   while IFS=, read -r abbr name ; do
@@ -178,7 +178,7 @@ EOF
           --name $sub_name \
           --resource-group $SUBS_RESOURCE_GROUP \
           --system-topic-name $topic_name \
-          --endpoint ${FUNCTIONS_PROVIDERS}/Microsoft.Web/sites/${FUNC_APP_NAME}/functions/${FUNC_NAME} \
+          --endpoint ${METRICS_PROVIDERS}/Microsoft.Web/sites/${FUNC_APP_NAME}/functions/${FUNC_NAME} \
           --endpoint-type azurefunction \
           --included-event-types Microsoft.Storage.BlobCreated \
           --subject-begins-with /blobServices/default/containers/upload/blobs/
