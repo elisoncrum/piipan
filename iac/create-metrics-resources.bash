@@ -21,6 +21,8 @@ DB_TABLE_NAME=participant_uploads
 VAULT_NAME=metrics-secret-keeper
 # Name of secret used to store the PostgreSQL metrics server admin password
 PG_SECRET_NAME=metrics-pg-admin
+# Base name of dashboard app
+DASHBOARD_APP_NAME=piipan-dashboard
 ### END CONSTANTS
 
 main () {

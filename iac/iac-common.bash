@@ -35,9 +35,6 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 
 # For connection strings, our established placeholder value
 PASSWORD_PLACEHOLDER='{password}'
-
-# Base name of dashboard app
-DASHBOARD_APP_NAME=piipan-dashboard
 ### END Constants
 
 ### Functions
