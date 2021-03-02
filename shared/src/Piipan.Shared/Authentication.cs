@@ -12,6 +12,18 @@ namespace Piipan.Shared.Authentication
         Task<AccessToken> RetrieveAsync(string resourceUri);
     }
 
+    public class CliTokenProvider : ITokenProvider
+    {
+        public async Task<AccessToken> RetrieveAsync(string resourceUri)
+        {
+            var tokenCredential = new AzureCliCredential();
+            var context = new TokenRequestContext(new[] { resourceUri });
+            var tokenTask = await tokenCredential.GetTokenAsync(context);
+
+            return tokenTask;
+        }
+    }
+
     public class EasyAuthTokenProvider : ITokenProvider
     {
         public async Task<AccessToken> RetrieveAsync(string appUri)
