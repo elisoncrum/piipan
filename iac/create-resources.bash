@@ -42,6 +42,9 @@ QUERY_TOOL_APP_NAME=piipan-query-tool
 # Display name of service principal account responsible for CI/CD tasks
 SP_NAME_CICD=piipan-cicd
 
+# App Service Authentication is done at the Azure tenant level
+TENANT_ID=$(az account show --query homeTenantId -o tsv)
+
 # Generate the storage account connection string for the corresponding
 # blob storage account.
 # XXX Uses the secondary access key (aka `key2`) for internal access, reserving
@@ -72,6 +75,192 @@ az_connection_string () {
       --output tsv)
 
     echo "RunAs=App;AppId=${client_id}"
+}
+
+# Generate the necessary JSON object for assigning an app role to
+# a service principal or managed identity
+app_role_assignment () {
+  principalId=$1
+  resourceId=$2
+  appRoleId=$3
+
+  echo "\
+  {
+    \"principalId\": \"${principalId}\",
+    \"resourceId\": \"${resourceId}\",
+    \"appRoleId\": \"${appRoleId}\"
+  }"
+}
+
+# Generate the necessary JSON object for adding an app role
+# to an Active Directory app registration
+app_role_manifest () {
+  role=$1
+
+  json="\
+  [{
+    \"allowedMemberTypes\": [
+      \"User\",
+      \"Application\"
+    ],
+    \"description\": \"Grants application access\",
+    \"displayName\": \"Authorized client\",
+    \"isEnabled\": true,
+    \"origin\": \"Application\",
+    \"value\": \"${role}\"
+  }]"
+  echo $json
+}
+
+# Create an Active Directory app registration with an application
+# role for a given application.
+create_aad_app_reg () {
+  app=$1
+  role=$2
+  resource_group=$3
+
+  app_uri=$(\
+    az functionapp show \
+    --resource-group $resource_group \
+    --name $app \
+    --query defaultHostName \
+    --output tsv)
+  app_uri="https://${app_uri}"
+
+  # Running `az ad app create` with the `--app-roles` parameter will throw
+  # an error if the app already exists and the app role is enabled
+  exists=$(\
+    az ad app list \
+    --display-name ${app} \
+    --filter "displayName eq '${app}'" \
+    --query "[0].appRoles[?value == '${role}'].value" \
+    --output tsv)
+  if [ -z "$exists" ]; then
+    app_role=$(app_role_manifest $role)
+    app_id=$(\
+      az ad app create \
+        --display-name $app \
+        --app-roles "${app_role}" \
+        --available-to-other-tenants false \
+        --homepage $app_uri \
+        --identifier-uris $app_uri \
+        --reply-urls "${app_uri}/.auth/login/aad/callback" \
+        --query objectId \
+        --output tsv)
+  else
+    app_id=$(\
+      az ad app list \
+        --display-name ${app} \
+        --filter "displayName eq '${app}'" \
+        --query "[0].objectId" \
+        --output tsv)
+  fi
+
+  echo $app_id
+}
+
+# Create a service principal associated with a given AAD
+# application registration
+create_aad_app_sp () {
+  app=$1
+  aad_app_id=$2
+  filter="displayName eq '${app}' and servicePrincipalType eq 'Application'"
+
+  # `az ad sp create` throws error if service principal exits
+  sp=$(\
+    az ad sp list \
+    --display-name $app \
+    --filter "${filter}" \
+    --query "[0].objectId" \
+    --output tsv)
+  if [ -z "$sp" ]; then
+    sp=$(\
+      az ad sp create \
+        --id $aad_app_id \
+        --query objectId \
+        --output tsv)
+  fi
+
+  echo $sp
+}
+
+# Assign an application role to a service principal (generally in
+# the form of a managed identity)
+assign_app_role () {
+  echo "Assigning app role"
+  resource_id=$1
+  principal_id=$2
+  role=$3
+  role_id=$(\
+    az ad sp show \
+    --id $resource_id \
+    --query "appRoles[?value == '${role}'].id" \
+    --output tsv)
+
+  # Similar to `az ad app create`, `az rest` will throw error when assigning
+  # an app role to an identity that already has the role.
+  exists=$(\
+    az rest \
+    --method GET \
+    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --query "value[?principalId == '${principal_id}'].appRoleId" \
+    --output tsv)
+  if [ -z "$exists" ]; then
+    role_json=`app_role_assignment $principal_id $resource_id $role_id`
+    echo $role_json
+    az rest \
+    --method POST \
+    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --headers 'Content-Type=application/json' \
+    --body "$role_json"
+  fi
+}
+
+# Activate App Service authentication (Easy Auth) for an app
+# service or function app, and require app role assignment.
+# Assumes Active Directory application and associated service
+# principal already exist for the app
+enable_easy_auth () {
+  app=$1
+  resource_group=$2
+
+  app_uri=$(\
+    az functionapp show \
+    --resource-group $resource_group \
+    --name $app \
+    --query defaultHostName \
+    --output tsv)
+  app_uri="https://${app_uri}"
+
+  app_aad_client=$(\
+    az ad app list \
+      --display-name ${app} \
+      --filter "displayName eq '${app}'" \
+      --query "[0].objectId" \
+      --output tsv)
+
+  sp_filter="displayName eq '${app}' and servicePrincipalType eq 'Application'"
+  app_aad_sp=$(\
+    az ad sp list \
+      --display-name $app \
+      --filter "${sp_filter}" \
+      --query "[0].objectId" \
+      --output tsv)
+
+  echo "Configuring Easy Auth settings for ${app}"
+  az webapp auth update \
+    --resource-group $resource_group \
+    --name $app \
+    --aad-allowed-token-audiences $app_uri \
+    --aad-client-id $app_aad_client \
+    --aad-token-issuer-url "https://sts.windows.net/${TENANT_ID}/" \
+    --enabled true \
+    --action LoginWithAzureActiveDirectory
+
+  # Any client that attemps authentication must be assigned a role
+  az ad sp update \
+    --id $app_aad_sp \
+    --set "appRoleAssignmentRequired=true"
 }
 
 # Any changes to the set of resource groups below should also
@@ -425,195 +614,6 @@ echo "Publishing ${orch_name} function app"
 pushd ../match/src/Piipan.Match.Orchestrator
 func azure functionapp publish $orch_name --dotnet
 popd
-
-# Generate the necessary JSON object for assigning an app role to
-# a service principal or managed identity
-app_role_assignment () {
-  principalId=$1
-  resourceId=$2
-  appRoleId=$3
-
-  echo "\
-  {
-    \"principalId\": \"${principalId}\",
-    \"resourceId\": \"${resourceId}\",
-    \"appRoleId\": \"${appRoleId}\"
-  }"
-}
-
-# Generate the necessary JSON object for adding an app role
-# to an Active Directory app registration
-app_role_manifest () {
-  role=$1
-
-  json="\
-  [{
-    \"allowedMemberTypes\": [
-      \"User\",
-      \"Application\"
-    ],
-    \"description\": \"Grants application access\",
-    \"displayName\": \"Authorized client\",
-    \"isEnabled\": true,
-    \"origin\": \"Application\",
-    \"value\": \"${role}\"
-  }]"
-  echo $json
-}
-
-# Create an Active Directory app registration with an application
-# role for a given application.
-create_aad_app_reg () {
-  app=$1
-  role=$2
-  resource_group=$3
-
-  app_uri=$(\
-    az functionapp show \
-    --resource-group $resource_group \
-    --name $app \
-    --query defaultHostName \
-    --output tsv)
-  app_uri="https://${app_uri}"
-
-  # Running `az ad app create` with the `--app-roles` parameter will throw
-  # an error if the app already exists and the app role is enabled
-  exists=$(\
-    az ad app list \
-    --display-name ${app} \
-    --filter "displayName eq '${app}'" \
-    --query "[0].appRoles[?value == '${role}'].value" \
-    --output tsv)
-  if [ -z "$exists" ]; then
-    app_role=$(app_role_manifest $role)
-    app_id=$(\
-      az ad app create \
-        --display-name $app \
-        --app-roles "${app_role}" \
-        --available-to-other-tenants false \
-        --homepage $app_uri \
-        --identifier-uris $app_uri \
-        --reply-urls "${app_uri}/.auth/login/aad/callback" \
-        --query objectId \
-        --output tsv)
-  else
-    app_id=$(\
-      az ad app list \
-        --display-name ${app} \
-        --filter "displayName eq '${app}'" \
-        --query "[0].objectId" \
-        --output tsv)
-  fi
-
-  echo $app_id
-}
-
-# Create a service principal associated with a given AAD
-# application registration
-create_aad_app_sp () {
-  app=$1
-  aad_app_id=$2
-  filter="displayName eq '${app}' and servicePrincipalType eq 'Application'"
-
-  # `az ad sp create` throws error if service principal exits
-  sp=$(\
-    az ad sp list \
-    --display-name $app \
-    --filter "${filter}" \
-    --query "[0].objectId" \
-    --output tsv)
-  if [ -z "$sp" ]; then
-    sp=$(\
-      az ad sp create \
-        --id $aad_app_id \
-        --query objectId \
-        --output tsv)
-  fi
-
-  echo $sp
-}
-
-# Assign an application role to a service principal (generally in
-# the form of a managed identity)
-assign_app_role () {
-  echo "Assigning app role"
-  resource_id=$1
-  principal_id=$2
-  role=$3
-  role_id=$(\
-    az ad sp show \
-    --id $resource_id \
-    --query "appRoles[?value == '${role}'].id" \
-    --output tsv)
-
-  # Similar to `az ad app create`, `az rest` will throw error when assigning
-  # an app role to an identity that already has the role.
-  exists=$(\
-    az rest \
-    --method GET \
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
-    --query "value[?principalId == '${principal_id}'].appRoleId" \
-    --output tsv)
-  if [ -z "$exists" ]; then
-    role_json=`app_role_assignment $principal_id $resource_id $role_id`
-    echo $role_json
-    az rest \
-    --method POST \
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
-    --headers 'Content-Type=application/json' \
-    --body "$role_json"
-  fi
-}
-
-# App Service Authentication is done at the Azure tenant level
-TENANT_ID=$(az account show --query homeTenantId -o tsv)
-
-# Activate App Service authentication (Easy Auth) for an app
-# service or function app, and require app role assignment.
-# Assumes Active Directory application and associated service
-# principal already exist for the app
-enable_easy_auth () {
-  app=$1
-  resource_group=$2
-
-  app_uri=$(\
-    az functionapp show \
-    --resource-group $resource_group \
-    --name $app \
-    --query defaultHostName \
-    --output tsv)
-  app_uri="https://${app_uri}"
-
-  app_aad_client=$(\
-    az ad app list \
-      --display-name ${app} \
-      --filter "displayName eq '${app}'" \
-      --query "[0].objectId" \
-      --output tsv)
-
-  sp_filter="displayName eq '${app}' and servicePrincipalType eq 'Application'"
-  app_aad_sp=$(\
-    az ad sp list \
-      --display-name $app \
-      --filter "${sp_filter}" \
-      --query "[0].objectId" \
-      --output tsv)
-
-  echo "Configuring Easy Auth settings for ${app}"
-  az webapp auth update \
-    --resource-group $resource_group \
-    --name $app \
-    --aad-allowed-token-audiences $app_uri \
-    --aad-client-id $app_aad_client \
-    --aad-token-issuer-url "https://sts.windows.net/${TENANT_ID}/" \
-    --enabled true \
-    --action LoginWithAzureActiveDirectory
-
-  # Any client that attemps authentication must be assigned a role
-  az ad sp update \
-    --id $app_aad_sp \
-    --set "appRoleAssignmentRequired=true"
-}
 
 # Create App Service resources for query tool app.
 # This needs to happen after the orchestrator is created in order for
