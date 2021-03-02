@@ -1,16 +1,31 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit;
+using Azure.Core;
 using Moq;
 using Moq.Protected;
+using Piipan.Shared.Authentication;
+using Xunit;
 
 namespace Piipan.QueryTool.Tests
 {
     public class OrchestratorApiRequestTests
     {
-        static Mock<HttpMessageHandler> MockHttpMessageHandler(string response) {
+        static Mock<ITokenProvider> MockTokenProvider(string value)
+        {
+            var token = new AccessToken(value, DateTimeOffset.Now);
+            var mockTokenProvider = new Mock<ITokenProvider>();
+            mockTokenProvider
+                .Setup(t => t.RetrieveAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult(token));
+
+            return mockTokenProvider;
+        }
+
+        static Mock<HttpMessageHandler> MockHttpMessageHandler(string response)
+        {
             var handlerMock = new Mock<HttpMessageHandler>();
 
             handlerMock
@@ -43,12 +58,13 @@ namespace Piipan.QueryTool.Tests
             }";
             var handlerMock = MockHttpMessageHandler(mockResponse);
             var httpClient = new HttpClient(handlerMock.Object);
-
+            var token = "|token|";
+            var tokenProvider = MockTokenProvider(token);
             var _apiRequest = new OrchestratorApiRequest();
             var query = new PiiRecord();
 
             // act
-            var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query, httpClient);
+            var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query, httpClient, tokenProvider.Object);
 
             // assert
             Assert.Single(TestQueryResult);

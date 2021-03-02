@@ -19,24 +19,29 @@ namespace Piipan.QueryTool
             RequestUrl = url;
             Query.Add("query", query);
             _client = new HttpClient();
-            return await QueryOrchestrator();
+            var tokenProvider = new EasyAuthTokenProvider();
+            return await QueryOrchestrator(tokenProvider);
         }
 
-        public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query, HttpClient client)
+        public async Task<List<PiiRecord>> SendQuery(
+            string url,
+            PiiRecord query,
+            HttpClient client,
+            ITokenProvider tokenProvider
+        )
         {
             RequestUrl = url;
             Query.Add("query", query);
             _client = client;
-            return await QueryOrchestrator();
+            return await QueryOrchestrator(tokenProvider);
         }
 
         public List<PiiRecord> Matches { get; private set; }
 
-        private async Task<List<PiiRecord>> QueryOrchestrator()
+        private async Task<List<PiiRecord>> QueryOrchestrator(ITokenProvider tokenProvider)
         {
             {
                 var requestUri = new Uri(RequestUrl);
-                var tokenProvider = new EasyAuthTokenProvider();
                 var authorizedClient = new AuthorizedJsonApiClient(_client, tokenProvider);
                 var jsonString = JsonSerializer.Serialize(Query);
                 var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
