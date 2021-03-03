@@ -20,6 +20,7 @@ DB_TABLE_NAME=participant_uploads
 # Needed for both function apps
 DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
 # Name of Key Vault
+VAULT_NAME_KEY=KeyVaultName
 VAULT_NAME=${PREFIX}kvmetrics${ENV}${LOCATION} # vault names can't use hyphens even though the docs say they can
 # Name of secret used to store the PostgreSQL metrics server admin password
 PG_SECRET_NAME=metrics-pg-admin
@@ -108,6 +109,8 @@ COLLECT_APP_NAME=`az deployment group create \
       location=$LOCATION \
       databaseConnectionStringKey="$DB_CONN_STR_KEY" \
       databaseConnectionStringValue="$DB_CONN_STR" \
+      vaultNameKey="$VAULT_NAME_KEY" \
+      vaultNameValue="$VAULT_NAME" \
       applicationInsightsName="${PREFIX}-ins-${COLLECT_APP_ID}-${ENV}-${LOCATION}" \
       storageAccountName="${PREFIX}st${COLLECT_APP_ID}${ENV}${LOCATION}"`
 
@@ -178,6 +181,8 @@ API_APP_NAME=`az deployment group create \
       location=$LOCATION \
       databaseConnectionStringKey="$DB_CONN_STR_KEY" \
       databaseConnectionStringValue="$DB_CONN_STR" \
+      vaultNameKey="$VAULT_NAME_KEY" \
+      vaultNameValue="$VAULT_NAME" \
       applicationInsightsName="${PREFIX}-ins-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
       storageAccountName="${PREFIX}st${METRICS_API_APP_ID}${ENV}${LOCATION}"`
 

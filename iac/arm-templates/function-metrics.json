@@ -26,6 +26,12 @@
         },
         "storageAccountName": {
             "type": "string"
+        },
+        "vaultNameKey": {
+            "type": "string"
+        },
+        "vaultNameValue": {
+            "type": "string"
         }
     },
     "variables": {
@@ -88,6 +94,10 @@
                         {
                           "name": "[variables('databaseConnectionStringKey')]",
                           "value": "[variables('databaseConnectionStringValue')]"
+                        },
+                        {
+                            "name": "[parameters('vaultNameKey')]",
+                            "value": "[parameters('vaultNameValue')]"
                         },
                         /*
                             The following settings are required for Function apps per the MS documentation:
