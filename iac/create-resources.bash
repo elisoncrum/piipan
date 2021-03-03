@@ -5,14 +5,13 @@
 # has signed in with the Azure CLI. Must be run from a trusted network.
 # See install-extensions.bash for prerequisite Azure CLI extensions.
 #
-# usage: create-resources.bash
+# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# See iac/env for available environments.
+#
+# usage: create-resources.bash <azure-env>
 
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
-
-# Use seperate resource group for matching API resources to allow use of
-# incremental deployments
-MATCH_RESOURCE_GROUP=piipan-match
 
 # Name of Key Vault
 VAULT_NAME=secret-keeper
@@ -44,12 +43,12 @@ TENANT_ID=$(az account show --query homeTenantId -o tsv)
 #     the primary access key (aka `key1`) for state access. Improve by replacing
 #     with share access signatures (SAS URLs) via managed identities at runtime.
 blob_connection_string () {
-  group=$1
+  resource_group=$1
   name=$2
 
   az storage account show-connection-string \
     --key secondary \
-    --resource-group $group \
+    --resource-group $resource_group \
     --name $name \
     --query connectionString \
     -o tsv
@@ -58,11 +57,12 @@ blob_connection_string () {
 # From a managed identity name, generate the value for
 # AzureServicesAuthConnectionString
 az_connection_string () {
-  identity=$1
+  resource_group=$1
+  identity=$2
 
   client_id=$(\
     az identity show \
-      --resource-group $RESOURCE_GROUP \
+      --resource-group $resource_group \
       --name $identity \
       --query clientId \
       --output tsv)
@@ -257,6 +257,10 @@ enable_easy_auth () {
 }
 
 main () {
+  # Load agency/subscription/deployment-specific settings
+  azure_env=$1
+  source $(dirname "$0")/env/${azure_env}.bash
+
   # Any changes to the set of resource groups below should also
   # be made to create-service-principal.bash
   echo "Creating $RESOURCE_GROUP group"
@@ -265,7 +269,7 @@ main () {
   az group create --name $MATCH_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
   # Create a service principal for use by CI/CD pipeline.
-  ./create-service-principal.bash $SP_NAME_CICD none
+  ./create-service-principal.bash $azure_env $SP_NAME_CICD none
 
   # uniqueString is used pervasively in our ARM templates to create globally
   # identifiers from the resource group id, but it is not available in the CLI.
@@ -471,7 +475,7 @@ main () {
 
     db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
     blob_conn_str=`blob_connection_string $RESOURCE_GROUP $stor_name`
-    az_serv_str=`az_connection_string $identity`
+    az_serv_str=`az_connection_string $RESOURCE_GROUP $identity`
     az functionapp config appsettings set \
       --resource-group $RESOURCE_GROUP \
       --name $func_app \
@@ -533,7 +537,7 @@ main () {
         --query clientId \
         --output tsv)
     db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
-    az_serv_str=`az_connection_string $identity`
+    az_serv_str=`az_connection_string $RESOURCE_GROUP $identity`
 
     echo "Deploying ${name} function resources"
     func_name=$(\
@@ -665,7 +669,7 @@ main () {
   assign_app_role $orch_app_sp $query_tool_identity $ORCH_API_APP_ROLE
 
   # Establish metrics sub-system
-  ./create-metrics-resources.bash
+  ./create-metrics-resources.bash $azure_env
 
   script_completed
 }

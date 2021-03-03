@@ -9,17 +9,8 @@ CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
 # The default Azure subscription
 SUBSCRIPTION_ID=`az account show --query id -o tsv`
 
-# Default resource group for our system
-RESOURCE_GROUP=piipan-resources
-
-# resource group for metrics
-METRICS_RESOURCE_GROUP=piipan-metrics
-
-# Name of App Service Plan
+# Name of App Service Plan, used by both query tool and dashboard
 APP_SERVICE_PLAN=piipan-app-plan
-
-# Default location
-LOCATION=westus
 
 # Name of environment variable used to pass database connection strings
 # to app or function code

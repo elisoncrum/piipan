@@ -3,10 +3,13 @@
 # Provisions and configures the infrastructure components for all Piipan Metrics subsystems.
 # Assumes an Azure user with the Global Administrator role has signed in with the Azure CLI.
 # Assumes Piipan base resources have been created in the same environment
-# (for example, state-sepcific blob topics).
+# (for example, state-specific blob topics).
 # Must be run from a trusted network.
 #
-# usage: create-metrics-resources.bash
+# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# See iac/env for available environments.
+#
+# usage: create-metrics-resources.bash <azure-env>
 
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
@@ -26,6 +29,10 @@ DASHBOARD_APP_NAME=piipan-dashboard
 ### END CONSTANTS
 
 main () {
+  # Load agency/subscription/deployment-specific settings
+  azure_env=$1
+  source $(dirname "$0")/env/${azure_env}.bash
+
   # Create Metrics resource group
   echo "Creating $METRICS_RESOURCE_GROUP group"
   az group create --name $METRICS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
