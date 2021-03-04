@@ -12,16 +12,19 @@ namespace Piipan.QueryTool.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IAuthorizedApiClient _apiClient;
-        public IndexModel(ILogger<IndexModel> logger, IAuthorizedApiClient apiClient)
+        private readonly OrchestratorApiRequest _apiRequest;
+
+        public IndexModel(ILogger<IndexModel> logger,
+                          IAuthorizedApiClient apiClient)
         {
             _logger = logger;
             _apiClient = apiClient;
+            _apiRequest = new OrchestratorApiRequest(_apiClient);
         }
 
         [BindProperty]
         public PiiRecord Query { get; set; }
 
-        private readonly OrchestratorApiRequest _apiRequest = new OrchestratorApiRequest(_apiClient);
         public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
         public bool NoResults = false;
 
