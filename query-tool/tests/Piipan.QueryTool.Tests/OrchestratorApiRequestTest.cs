@@ -57,14 +57,11 @@ namespace Piipan.QueryTool.Tests
                 ]
             }";
             var handlerMock = MockHttpMessageHandler(mockResponse);
-            var httpClient = new HttpClient(handlerMock.Object);
-            var token = "|token|";
-            var tokenProvider = MockTokenProvider(token);
             var _apiRequest = new OrchestratorApiRequest();
             var query = new PiiRecord();
 
             // act
-            var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query, httpClient, tokenProvider.Object);
+            var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query);
 
             // assert
             Assert.Single(TestQueryResult);
