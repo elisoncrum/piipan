@@ -3,10 +3,13 @@
 # Provisions and configures the infrastructure components for all Piipan Metrics subsystems.
 # Assumes an Azure user with the Global Administrator role has signed in with the Azure CLI.
 # Assumes Piipan base resources have been created in the same environment
-# (for example, state-sepcific blob topics).
+# (for example, state-specific blob topics).
 # Must be run from a trusted network.
 #
-# usage: create-metrics-resources.bash
+# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# See iac/env for available environments.
+#
+# usage: create-metrics-resources.bash <azure-env>
 
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
@@ -21,9 +24,15 @@ DB_TABLE_NAME=participant_uploads
 VAULT_NAME=metrics-secret-keeper
 # Name of secret used to store the PostgreSQL metrics server admin password
 PG_SECRET_NAME=metrics-pg-admin
+# Base name of dashboard app
+DASHBOARD_APP_NAME=piipan-dashboard
 ### END CONSTANTS
 
 main () {
+  # Load agency/subscription/deployment-specific settings
+  azure_env=$1
+  source $(dirname "$0")/env/${azure_env}.bash
+
   # Create Metrics resource group
   echo "Creating $METRICS_RESOURCE_GROUP group"
   az group create --name $METRICS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
@@ -90,14 +99,14 @@ main () {
 EOF
 
   ### Function App stuff
-  FUNCTIONS_UNIQ_STR=`az deployment group create \
+  METRICS_UNIQ_STR=`az deployment group create \
     --resource-group $METRICS_RESOURCE_GROUP \
     --template-file ./arm-templates/unique-string.json \
     --query properties.outputs.uniqueString.value \
     -o tsv`
   FUNC_APP_PREFIX=PiipanMetricsFunctions
-  FUNC_APP_NAME=${FUNC_APP_PREFIX}${FUNCTIONS_UNIQ_STR}
-  FUNC_STORAGE_NAME=piipanmet${FUNCTIONS_UNIQ_STR}
+  FUNC_APP_NAME=${FUNC_APP_PREFIX}${METRICS_UNIQ_STR}
+  FUNC_STORAGE_NAME=piipanmet${METRICS_UNIQ_STR}
   FUNC_NAME=BulkUploadMetrics
 
   # Need a storage account to publish function app to:
@@ -163,7 +172,7 @@ EOF
   popd
 
   # Subscribe each dynamically created event blob topic to this function
-  FUNCTIONS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
+  METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
   SUBS_RESOURCE_GROUP=piipan-resources
 
   while IFS=, read -r abbr name ; do
@@ -176,7 +185,7 @@ EOF
           --name $sub_name \
           --resource-group $SUBS_RESOURCE_GROUP \
           --system-topic-name $topic_name \
-          --endpoint ${FUNCTIONS_PROVIDERS}/Microsoft.Web/sites/${FUNC_APP_NAME}/functions/${FUNC_NAME} \
+          --endpoint ${METRICS_PROVIDERS}/Microsoft.Web/sites/${FUNC_APP_NAME}/functions/${FUNC_NAME} \
           --endpoint-type azurefunction \
           --included-event-types Microsoft.Storage.BlobCreated \
           --subject-begins-with /blobServices/default/containers/upload/blobs/
