@@ -96,25 +96,44 @@ EOF
   # Create Metrics Collect Function App in Azure
   COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
   COLLECT_APP_ID=metricscol
+  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}-${LOCATION}
+  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}${LOCATION}
   COLLECT_FUNC=BulkUploadMetrics
 
-  echo "Create $COLLECT_APP_FILEPATH in Azure"
-  COLLECT_APP_NAME=`az deployment group create \
-      --resource-group $METRICS_RESOURCE_GROUP \
-      --template-file  ./arm-templates/function-metrics.json \
-      --query properties.outputs.functionAppName.value \
-      --output tsv \
-      --parameters \
-        functionAppName="${PREFIX}-func-${COLLECT_APP_ID}-${ENV}-${LOCATION}" \
-        resourceTags="$RESOURCE_TAGS" \
-        location=$LOCATION \
-        databaseConnectionStringKey="$DB_CONN_STR_KEY" \
-        databaseConnectionStringValue="$DB_CONN_STR" \
-        vaultNameKey="$VAULT_NAME_KEY" \
-        vaultNameValue="$VAULT_NAME" \
-        applicationInsightsName="${PREFIX}-ins-${COLLECT_APP_ID}-${ENV}-${LOCATION}" \
-        storageAccountName="${PREFIX}st${COLLECT_APP_ID}${ENV}${LOCATION}"`
+  # Will need to revisit how to successfully deploy this app through an arm template
+  # Need a storage account to publish function app to:
+  echo "Creating storage account for $COLLECT_APP_NAME"
+  az storage account create \
+    --name $COLLECT_STORAGE_NAME \
+    --location $LOCATION \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --sku Standard_LRS
 
+  # Create the function app in Azure
+  echo "Creating function app $COLLECT_APP_NAME in Azure"
+  az functionapp create \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --consumption-plan-location $LOCATION \
+    --runtime dotnet \
+    --functions-version 3 \
+    --name $COLLECT_APP_NAME \
+    --storage-account $COLLECT_STORAGE_NAME
+
+  # Waiting before publishing the app, since publishing immediately after creation returns an   App Not Found error
+  # Waiting was the best solution I could find. More info in these GH issues:
+  # https://github.com/Azure/azure-functions-core-tools/issues/1616
+  # https://github.com/Azure/azure-functions-core-tools/issues/1766
+  echo "Waiting to publish function app"
+  sleep 60s
+
+  echo "configure settings"
+  az functionapp config appsettings set \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --name $COLLECT_APP_NAME \
+    --settings \
+      $DB_CONN_STR_KEY="$DB_CONN_STR" \
+      $VAULT_NAME_KEY="$VAULT_NAME" \
+    --output none
 
   # Assumes if any identity is set, it is the one we are specifying below
   exists=`az functionapp identity show \
@@ -134,10 +153,6 @@ EOF
       --object-id $principalId \
       --secret-permissions get list
   fi
-
-  # Found that this is still necessary after deploying a function app through an ARM template
-  echo "waiting to publish function app"
-  sleep 60s
 
   # publish the function app
   echo "Publishing function app $COLLECT_APP_NAME"
