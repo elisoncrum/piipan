@@ -1,16 +1,18 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit;
 using Moq;
 using Moq.Protected;
+using Xunit;
 
 namespace Piipan.QueryTool.Tests
 {
     public class OrchestratorApiRequestTests
     {
-        static Mock<HttpMessageHandler> MockHttpMessageHandler(string response) {
+        static Mock<HttpMessageHandler> MockHttpMessageHandler(string statusCode, string response)
+        {
             var handlerMock = new Mock<HttpMessageHandler>();
 
             handlerMock
@@ -22,7 +24,7 @@ namespace Piipan.QueryTool.Tests
               )
               .ReturnsAsync(new HttpResponseMessage()
               {
-                  StatusCode = HttpStatusCode.OK,
+                  StatusCode = (HttpStatusCode)Enum.Parse(typeof(HttpStatusCode), statusCode, true),
                   Content = new StringContent(response)
               });
 
@@ -41,7 +43,7 @@ namespace Piipan.QueryTool.Tests
                     }
                 ]
             }";
-            var handlerMock = MockHttpMessageHandler(mockResponse);
+            var handlerMock = MockHttpMessageHandler("OK", mockResponse);
             var httpClient = new HttpClient(handlerMock.Object);
 
             var _apiRequest = new OrchestratorApiRequest();
@@ -60,6 +62,23 @@ namespace Piipan.QueryTool.Tests
               ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
               ItExpr.IsAny<CancellationToken>()
             );
+        }
+
+        [Fact]
+        public async void TestQueryOrchestratorError()
+        {
+            // arrange
+            var handlerMock = MockHttpMessageHandler("InternalServerError", "");
+            var httpClient = new HttpClient(handlerMock.Object);
+
+            var _apiRequest = new OrchestratorApiRequest();
+            var query = new PiiRecord();
+
+            // act
+            Func<Task> act = () => _apiRequest.SendQuery("http://example.com", query, httpClient);
+
+            // assert
+            await Assert.ThrowsAsync<InvalidOperationException>(act);
         }
     }
 }
