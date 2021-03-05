@@ -4,22 +4,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Piipan.Shared.Authentication;
 
 namespace Piipan.QueryTool.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+        private readonly IAuthorizedApiClient _apiClient;
+        private readonly OrchestratorApiRequest _apiRequest;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger,
+                          IAuthorizedApiClient apiClient)
         {
             _logger = logger;
+            _apiClient = apiClient;
+            _apiRequest = new OrchestratorApiRequest(_apiClient);
         }
 
         [BindProperty]
         public PiiRecord Query { get; set; }
 
-        private readonly OrchestratorApiRequest _apiRequest = new OrchestratorApiRequest();
         public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
         public bool NoResults = false;
 
