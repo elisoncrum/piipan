@@ -4,7 +4,7 @@ using Xunit;
 using Moq;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
-using PiipanMetricsFunctions;
+using Piipan.Metrics.Collect;
 
 namespace Piipan.Metrics.Tests
 {
@@ -37,6 +37,7 @@ namespace Piipan.Metrics.Tests
         [Fact]
         public async void WriteSuccess()
         {
+            Environment.SetEnvironmentVariable("KeyVaultName", "foo");
             string state = "eb";
             var date = new DateTime();
             var logger = Mock.Of<ILogger>();
@@ -47,6 +48,8 @@ namespace Piipan.Metrics.Tests
             await BulkUploadMetrics.Write(state, date, factory.Object, logger);
 
             cmd.Verify(f => f.ExecuteNonQuery(), Times.Exactly(1));
+            // teardown
+            Environment.SetEnvironmentVariable("KeyVaultName", null);
         }
     }
 }
