@@ -2,7 +2,7 @@
 #
 # Provisions and configures the infrastructure components for all Piipan Metrics subsystems.
 # Assumes an Azure user with the Global Administrator role has signed in with the Azure CLI.
-# Assumes Piipan base resources have been created in the same environment
+# Assumes Piipan base resource groups, resources have been created in the same environment
 # (for example, state-specific blob topics).
 # Must be run from a trusted network.
 #
@@ -36,11 +36,6 @@ main () {
   source $(dirname "$0")/env/${azure_env}.bash
 
   set_constants
-
-  # Create Metrics resource group
-  # Eventually resource group will already be created for us by partner
-  echo "Creating $METRICS_RESOURCE_GROUP group"
-  az group create --name $METRICS_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
 
   # Create new Key Vault for this resource group
   echo "Creating Key Vault"

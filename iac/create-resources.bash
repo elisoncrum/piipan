@@ -263,10 +263,7 @@ main () {
 
   # Any changes to the set of resource groups below should also
   # be made to create-service-principal.bash
-  echo "Creating $RESOURCE_GROUP group"
-  az group create --name $RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
-  echo "Creating match APIs resource group"
-  az group create --name $MATCH_RESOURCE_GROUP -l $LOCATION --tags Project=$PROJECT_TAG
+  ./create-resource-groups.bash $azure_env
 
   # Create a service principal for use by CI/CD pipeline.
   ./create-service-principal.bash $azure_env $SP_NAME_CICD none
