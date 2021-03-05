@@ -14,27 +14,28 @@
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
 
-### CONSTANTS
-# Default resource group for metrics system
-DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}-${LOCATION}
-DB_ADMIN_NAME=piipanadmin
-DB_NAME=metrics
-DB_TABLE_NAME=participant_uploads
-# Needed for both function apps
-DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
-# Name of Key Vault
-VAULT_NAME_KEY=KeyVaultName
-VAULT_NAME=${PREFIX}kvmetrics${ENV}${LOCATION} # vault names can't use hyphens even though the docs say they can
-# Name of secret used to store the PostgreSQL metrics server admin password
-PG_SECRET_NAME=metrics-pg-admin
-# Base name of dashboard app
-DASHBOARD_APP_NAME=piipan-dashboard
-### END CONSTANTS
+set_constants () {
+  DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}-${LOCATION}
+  DB_ADMIN_NAME=piipanadmin
+  DB_NAME=metrics
+  DB_TABLE_NAME=participant_uploads
+  # Needed for both function apps
+  DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
+  # Name of Key Vault
+  VAULT_NAME_KEY=KeyVaultName
+  VAULT_NAME=${PREFIX}kvmetrics${ENV}${LOCATION} # vault names can't use hyphens even though the docs say they can
+  # Name of secret used to store the PostgreSQL metrics server admin password
+  PG_SECRET_NAME=metrics-pg-admin
+  # Base name of dashboard app
+  DASHBOARD_APP_NAME=piipan-dashboard
+}
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+
+  set_constants
 
   # Create Metrics resource group
   # Eventually resource group will already be created for us by partner
