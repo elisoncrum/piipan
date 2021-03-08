@@ -15,6 +15,17 @@ namespace Piipan.QueryTool.Tests
 {
     public class OrchestratorApiRequestTests
     {
+        static Mock<ITokenProvider> MockTokenProvider(string value)
+        {
+            var token = new AccessToken(value, DateTimeOffset.Now);
+            var mockTokenProvider = new Mock<ITokenProvider>();
+            mockTokenProvider
+                .Setup(t => t.RetrieveAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult(token));
+
+            return mockTokenProvider;
+        }
+
         static Mock<HttpMessageHandler> MockHttpMessageHandler(string statusCode, string response)
         {
             var handlerMock = new Mock<HttpMessageHandler>();
@@ -79,23 +90,6 @@ namespace Piipan.QueryTool.Tests
               ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
               ItExpr.IsAny<CancellationToken>()
             );
-        }
-
-        [Fact]
-        public async void TestQueryOrchestratorError()
-        {
-            // arrange
-            var handlerMock = MockHttpMessageHandler("InternalServerError", "");
-            var httpClient = new HttpClient(handlerMock.Object);
-
-            var _apiRequest = new OrchestratorApiRequest();
-            var query = new PiiRecord();
-
-            // act
-            Func<Task> act = () => _apiRequest.SendQuery("http://example.com", query, httpClient);
-
-            // assert
-            await Assert.ThrowsAsync<InvalidOperationException>(act);
         }
     }
 }
