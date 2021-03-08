@@ -10,12 +10,21 @@ namespace Piipan.Match.Orchestrator
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            ITokenProvider tokenProvider;
+            var configuration = builder.GetContext().Configuration;
+
+            if (configuration?["DEVELOPMENT"] == "true")
+            {
+                tokenProvider = new CliTokenProvider();
+            }
+            else
+            {
+                tokenProvider = new EasyAuthTokenProvider();
+            }
+
             builder.Services.AddSingleton<IAuthorizedApiClient>((s) =>
             {
-                var client = new HttpClient();
-                var tokenProvider = new EasyAuthTokenProvider();
-
-                return new AuthorizedJsonApiClient(client, tokenProvider);
+                return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
             });
         }
     }

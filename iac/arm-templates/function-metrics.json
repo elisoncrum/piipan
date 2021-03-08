@@ -2,7 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "appPrefix": {
+        "applicationInsightsName": {
+            "type": "string"
+        },
+        "functionAppName": {
             "type": "string",
             "defaultValue": "[concat('fnapp', uniqueString(resourceGroup().id))]",
             "metadata": {
@@ -20,15 +23,24 @@
         },
         "databaseConnectionStringValue": {
             "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "vaultNameKey": {
+            "type": "string"
+        },
+        "vaultNameValue": {
+            "type": "string"
         }
     },
     "variables": {
-        "functionAppName": "[concat(parameters('appPrefix'), uniqueString(resourceGroup().id))]",
+        "functionAppName": "[parameters('functionAppName')]",
         "databaseConnectionStringKey": "[parameters('databaseConnectionStringKey')]",
         "databaseConnectionStringValue": "[parameters('databaseConnectionStringValue')]",
-        "applicationInsightsName": "[concat('metins', uniquestring(resourceGroup().id))]",
+        "applicationInsightsName": "[parameters('applicationInsightsName')]",
         "functionWorkerRuntime": "dotnet",
-        "storageAccountName": "[concat('metstor', uniquestring(resourceGroup().id))]",
+        "storageAccountName": "[parameters('storageAccountName')]",
         "storageAccountType": "Standard_LRS"
     },
     "resources": [
@@ -83,6 +95,10 @@
                           "name": "[variables('databaseConnectionStringKey')]",
                           "value": "[variables('databaseConnectionStringValue')]"
                         },
+                        {
+                            "name": "[parameters('vaultNameKey')]",
+                            "value": "[parameters('vaultNameValue')]"
+                        },
                         /*
                             The following settings are required for Function apps per the MS documentation:
                             - AzureWebJobsStorage
@@ -102,6 +118,26 @@
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~3"
+                        },
+                        // Connect app to Application Insights instance
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(concat('microsoft.insights/components/', variables('applicationInsightsName'))).InstrumentationKey]"
+                        },
+                        /*
+                            The `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` and `WEBSITE_CONTENTSHARE`
+                            settings are required for Windows function apps using a consumption plan,
+                            per the MS documentation.
+
+                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#windows)
+                        */
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(variables('functionAppName'))]"
                         }
                     ]
                 }

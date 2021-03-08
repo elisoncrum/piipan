@@ -33,6 +33,7 @@ namespace Piipan.Metrics.Tests
             {
                 [Fact]
                 public async void ResultsQuerySuccess() {
+                    Environment.SetEnvironmentVariable("KeyVaultName", "foo");
                     var logger = Logger();
                     var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
                     var cmd = new Mock<DbCommand>() { DefaultValue = DefaultValue.Mock };
@@ -46,6 +47,9 @@ namespace Piipan.Metrics.Tests
                     );
 
                     Assert.Equal(new List<ParticipantUpload>(), results);
+
+                    //teardown
+                    Environment.SetEnvironmentVariable("KeyVaultName", null);
                 }
 
             }
@@ -224,6 +228,7 @@ namespace Piipan.Metrics.Tests
                 [Fact]
                 public async void ReturnsInt64()
                 {
+                    Environment.SetEnvironmentVariable("KeyVaultName", "foo");
                     var req = EventMock();
                     var logger = Logger();
                     var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
@@ -241,6 +246,8 @@ namespace Piipan.Metrics.Tests
 
                     Assert.Equal(5, result);
                     Assert.IsType<Int64>(result);
+                    // teardown
+                    Environment.SetEnvironmentVariable("KeyVaultName", null);
                 }
             }
         }
