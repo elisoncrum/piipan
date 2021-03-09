@@ -30,6 +30,7 @@ namespace Piipan.QueryTool
 
         private async Task<List<PiiRecord>> QueryOrchestrator()
         {
+            try
             {
                 var requestUri = new Uri(RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
@@ -38,8 +39,12 @@ namespace Piipan.QueryTool
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
                 Matches = json.matches;
-                return Matches;
             }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
+            return Matches;
         }
     }
 

@@ -26,7 +26,7 @@ namespace Piipan.QueryTool.Tests
             return mockTokenProvider;
         }
 
-        static Mock<HttpMessageHandler> MockHttpMessageHandler(string response)
+        static Mock<HttpMessageHandler> MockHttpMessageHandler(string statusCode, string response)
         {
             var handlerMock = new Mock<HttpMessageHandler>();
 
@@ -39,7 +39,7 @@ namespace Piipan.QueryTool.Tests
               )
               .ReturnsAsync(new HttpResponseMessage()
               {
-                  StatusCode = HttpStatusCode.OK,
+                  StatusCode = (HttpStatusCode)Enum.Parse(typeof(HttpStatusCode), statusCode, true),
                   Content = new StringContent(response)
               });
 
@@ -67,7 +67,9 @@ namespace Piipan.QueryTool.Tests
                     }
                 ]
             }";
-            var handlerMock = MockHttpMessageHandler(mockResponse);
+
+            var handlerMock = MockHttpMessageHandler("OK", mockResponse);
+            var httpClient = new HttpClient(handlerMock.Object);
             var mockApiClient = ConstructMocked(handlerMock);
             var query = new PiiRecord();
             var jsonString = JsonSerializer.Serialize(query);

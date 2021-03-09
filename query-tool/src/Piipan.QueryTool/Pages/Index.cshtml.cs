@@ -26,6 +26,7 @@ namespace Piipan.QueryTool.Pages
         public PiiRecord Query { get; set; }
 
         public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
+        public String RequestError { get; private set; }
         public bool NoResults = false;
 
         public async Task<IActionResult> OnPostAsync(PiiRecord query)
@@ -37,8 +38,16 @@ namespace Piipan.QueryTool.Pages
                     query
                 );
 
-                NoResults = QueryResult.Count == 0;
-                Title = "NAC Query Results";
+                try
+                {
+                    NoResults = QueryResult.Count == 0;
+                    Title = "NAC Query Results";
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    RequestError = "There was an error running your search";
+                }
             }
             return Page();
         }
