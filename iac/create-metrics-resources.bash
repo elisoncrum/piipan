@@ -167,7 +167,7 @@ EOF
 
   # Subscribe each dynamically created event blob topic to this function
   METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
-  SUBS_RESOURCE_GROUP=piipan-resources
+  SUBS_RESOURCE_GROUP=$RESOURCE_GROUP
 
   while IFS=, read -r abbr name ; do
       echo "Subscribing to ${name} blob events"
