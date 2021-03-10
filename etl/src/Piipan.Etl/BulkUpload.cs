@@ -67,11 +67,13 @@ namespace Piipan.Etl
         internal static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
         {
             var reader = new StreamReader(input);
-            var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-            csv.Configuration.HasHeaderRecord = true;
-            csv.Configuration.TrimOptions = TrimOptions.Trim;
-            csv.Configuration.RegisterClassMap<PiiRecordMap>();
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                TrimOptions = TrimOptions.Trim,
+            };
+            var csv = new CsvReader(reader, config);
+            csv.Context.RegisterClassMap<PiiRecordMap>();
 
             // Yields records as it is iterated over
             return csv.GetRecords<PiiRecord>();
