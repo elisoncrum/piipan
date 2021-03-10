@@ -189,22 +189,32 @@ EOF
   API_APP_FILEPATH=Piipan.Metrics.Api
   METRICS_API_APP_ID=metricsapi
 
-  echo "Create $API_APP_FILEPATH in Azure"
-  API_APP_NAME=`az deployment group create \
+  # Will need to revisit how to successfully deploy this app through an arm template
+  # Need a storage account to publish function app to:
+  echo "Creating storage account for metrics api"
+  az storage account create \
+    --name "${PREFIX}st${METRICS_API_APP_ID}${ENV}" \
+    --location $LOCATION \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --sku Standard_LRS
+
+  # Create the function app in Azure
+  echo "Creating function app metrics api"
+  az functionapp create \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --consumption-plan-location $LOCATION \
+    --runtime dotnet \
+    --functions-version 3 \
+    --name "${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
+    --storage-account "${PREFIX}st${METRICS_API_APP_ID}${ENV}"
+
+  az functionapp config appsettings set \
       --resource-group $METRICS_RESOURCE_GROUP \
-      --template-file  ./arm-templates/function-metrics.json \
-      --query properties.outputs.functionAppName.value \
-      --output tsv \
-      --parameters \
-        functionAppName="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
-        resourceTags="$RESOURCE_TAGS" \
-        location=$LOCATION \
-        databaseConnectionStringKey="$DB_CONN_STR_KEY" \
-        databaseConnectionStringValue="$DB_CONN_STR" \
-        vaultNameKey="$VAULT_NAME_KEY" \
-        vaultNameValue="$VAULT_NAME" \
-        applicationInsightsName="${PREFIX}-ins-${METRICS_API_APP_ID}-${ENV}" \
-        storageAccountName="${PREFIX}st${METRICS_API_APP_ID}${ENV}"`
+      --name "${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
+      --settings \
+        $DB_CONN_STR_KEY="$DB_CONN_STR" \
+        $VAULT_NAME_KEY="$VAULT_NAME" \
+      --output none
 
   # Assumes if any identity is set, it is the one we are specifying below
   exists=`az functionapp identity show \
