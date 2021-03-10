@@ -129,7 +129,7 @@ EOF
   # https://github.com/Azure/azure-functions-core-tools/issues/1616
   # https://github.com/Azure/azure-functions-core-tools/issues/1766
   echo "Waiting to publish function app"
-  sleep 60s
+  sleep 60
 
   echo "configure settings"
   az functionapp config appsettings set \
@@ -225,8 +225,8 @@ EOF
       --secret-permissions get list
   fi
 
-  echo "waiting to publish function app"
-  sleep 60s
+  echo "Waiting to publish function app"
+  sleep 60
 
   # publish metrics function app
   echo "Publishing function app $API_APP_NAME"

@@ -559,6 +559,9 @@ main () {
     # Store function names for future auth configuration
     match_func_names+=("$func_name")
 
+    echo "Waiting to publish function app"
+    sleep 60
+
     echo "Publishing ${name} function app"
     pushd ../match/src/Piipan.Match.State
     func azure functionapp publish $func_name --dotnet
@@ -595,6 +598,10 @@ main () {
       --resource-group $MATCH_RESOURCE_GROUP \
       --query principalId \
       --output tsv)
+
+
+  echo "Waiting to publish function app"
+  sleep 60
 
   echo "Publishing ${orch_name} function app"
   pushd ../match/src/Piipan.Match.Orchestrator
