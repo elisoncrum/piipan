@@ -15,7 +15,7 @@ source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
 
 set_constants () {
-  DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}-${LOCATION}
+  DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}
   DB_ADMIN_NAME=piipanadmin
   DB_NAME=metrics
   DB_TABLE_NAME=participant_uploads
@@ -23,7 +23,7 @@ set_constants () {
   DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
   # Name of Key Vault
   VAULT_NAME_KEY=KeyVaultName
-  VAULT_NAME=${PREFIX}kvmetrics${ENV}${LOCATION} # vault names can't use hyphens even though the docs say they can
+  VAULT_NAME=${PREFIX}-kv-metrics-${ENV}
   # Name of secret used to store the PostgreSQL metrics server admin password
   PG_SECRET_NAME=metrics-pg-admin
   # Base name of dashboard app
@@ -101,8 +101,8 @@ EOF
   # Create Metrics Collect Function App in Azure
   COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
   COLLECT_APP_ID=metricscol
-  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}-${LOCATION}
-  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}${LOCATION}
+  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}
+  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}
   COLLECT_FUNC=BulkUploadMetrics
 
   # Will need to revisit how to successfully deploy this app through an arm template
@@ -196,15 +196,15 @@ EOF
       --query properties.outputs.functionAppName.value \
       --output tsv \
       --parameters \
-        functionAppName="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
+        functionAppName="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
         resourceTags="$RESOURCE_TAGS" \
         location=$LOCATION \
         databaseConnectionStringKey="$DB_CONN_STR_KEY" \
         databaseConnectionStringValue="$DB_CONN_STR" \
         vaultNameKey="$VAULT_NAME_KEY" \
         vaultNameValue="$VAULT_NAME" \
-        applicationInsightsName="${PREFIX}-ins-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
-        storageAccountName="${PREFIX}st${METRICS_API_APP_ID}${ENV}${LOCATION}"`
+        applicationInsightsName="${PREFIX}-ins-${METRICS_API_APP_ID}-${ENV}" \
+        storageAccountName="${PREFIX}st${METRICS_API_APP_ID}${ENV}"`
 
   # Assumes if any identity is set, it is the one we are specifying below
   exists=`az functionapp identity show \
