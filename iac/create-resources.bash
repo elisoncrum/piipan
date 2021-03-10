@@ -303,7 +303,8 @@ main () {
       --template-file ./arm-templates/blob-storage.json \
       --parameters \
         stateAbbreviation=$abbr \
-        resourceTags="$RESOURCE_TAGS"
+        resourceTags="$RESOURCE_TAGS" \
+        location=$LOCATION
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -441,7 +442,8 @@ main () {
       --template-file ./arm-templates/function-storage.json \
       --parameters \
         stateAbbreviation=$abbr \
-        resourceTags="$RESOURCE_TAGS"
+        resourceTags="$RESOURCE_TAGS" \
+        location=$LOCATION
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
