@@ -34,6 +34,7 @@ main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  verify_cloud
 
   set_constants
 

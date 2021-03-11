@@ -260,6 +260,7 @@ main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  verify_cloud
 
   # Any changes to the set of resource groups below should also
   # be made to create-service-principal.bash
