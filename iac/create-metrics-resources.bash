@@ -85,10 +85,7 @@ main () {
     --name $DB_SERVER_NAME \
     --resource-type "Microsoft.DbForPostgreSQL/servers" \
     --query properties.fullyQualifiedDomainName -o tsv`
-  export PGPASSWORD=`az keyvault secret show \
-    --id "https://${VAULT_NAME}.vault.azure.net/secrets/${PG_SECRET_NAME}" \
-    --query value \
-    --output tsv`
+  export PGPASSWORD=$PG_SECRET
 
   echo "Insert db table"
   psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1 -X -q - <<EOF
