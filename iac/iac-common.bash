@@ -50,6 +50,24 @@ pg_connection_string () {
     --query connectionStrings.\"ado.net\" \
     -o tsv`
 
+  # See:
+  # https://github.com/Azure/azure-cli-extensions/issues/3143
+  # https://docs.microsoft.com/en-us/azure/azure-government/compare-azure-government-global-azure
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    base=${base/.postgres.database.azure.com/.postgres.database.usgovcloudapi.net}
+  fi
+
   echo "${base}Ssl Mode=Require;"
+}
+
+# Verify that the expected Azure environment is the active cloud
+verify_cloud () {
+  local cn=$(az cloud show --query name -o tsv)
+
+  if [ "$CLOUD_NAME" != "$cn" ]; then
+    echo "error: '$cn' is the active cloud, expecting '$CLOUD_NAME'"
+    return 1
+  fi
+  return 0
 }
 ### END Functions
