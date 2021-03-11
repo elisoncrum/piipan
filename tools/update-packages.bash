@@ -6,8 +6,7 @@
 #
 # usage: update-packages.bash <path> [--highest-major]
 
-#source $(dirname "$0")/../tools/common.bash || exit
-source /Users/ryanmhofschneider/projects/scratch/piipan/tools/common.bash || exit
+source $(dirname "$0")/common.bash || exit
 
 main () {
   start_path="$1"
