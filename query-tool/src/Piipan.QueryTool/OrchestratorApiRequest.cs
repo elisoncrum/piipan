@@ -1,30 +1,28 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Piipan.Shared.Authentication;
 
 namespace Piipan.QueryTool
 {
     public class OrchestratorApiRequest
     {
+        public OrchestratorApiRequest(IAuthorizedApiClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
+
         public string RequestUrl;
         public Dictionary<string, PiiRecord> Query = new Dictionary<string, PiiRecord>();
-        private static HttpClient _client;
+        private readonly IAuthorizedApiClient _apiClient;
 
         public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query)
         {
             RequestUrl = url;
             Query.Add("query", query);
-            _client = new HttpClient();
-            return await QueryOrchestrator();
-        }
-
-        public async Task<List<PiiRecord>> SendQuery(string url, PiiRecord query, HttpClient client)
-        {
-            RequestUrl = url;
-            Query.Add("query", query);
-            _client = client;
             return await QueryOrchestrator();
         }
 
@@ -32,16 +30,21 @@ namespace Piipan.QueryTool
 
         private async Task<List<PiiRecord>> QueryOrchestrator()
         {
+            try
             {
-                var message = new HttpRequestMessage(HttpMethod.Post, RequestUrl);
+                var requestUri = new Uri(RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
-                message.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var resp = await _client.SendAsync(message);
+                var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                var resp = await _apiClient.PostAsync(requestUri, requestBody);
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
                 Matches = json.matches;
-                return Matches;
             }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
+            return Matches;
         }
     }
 

@@ -198,7 +198,8 @@ namespace Piipan.Metrics.Api
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
             const string secretName = "metrics-pg-admin";
-            const string vaultName = "metrics-secret-keeper";
+            const string vaultNameKey = "KeyVaultName";
+            string? vaultName = Environment.GetEnvironmentVariable(vaultNameKey);
             var kvUri = $"https://{vaultName}.vault.azure.net";
 
             var builder = new NpgsqlConnectionStringBuilder(

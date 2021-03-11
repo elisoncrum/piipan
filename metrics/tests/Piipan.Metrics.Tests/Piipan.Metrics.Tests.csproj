@@ -23,13 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.Metrics\PiipanMetricsFunctions\PiipanMetricsFunctions.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Collect\Piipan.Metrics.Collect.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Models\Piipan.Metrics.Models.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.Metrics\PiipanMetricsApi\Piipan.Metrics.Api.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
   </ItemGroup>
 
 </Project>

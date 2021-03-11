@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Piipan.Shared.Authentication;
 
 namespace Piipan.QueryTool
 {
@@ -24,6 +26,12 @@ namespace Piipan.QueryTool
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            ITokenProvider tokenProvider = new EasyAuthTokenProvider();
+            services.AddSingleton<IAuthorizedApiClient>((s) =>
+            {
+                return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

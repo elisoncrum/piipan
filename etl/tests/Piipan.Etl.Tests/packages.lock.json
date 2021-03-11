@@ -8,6 +8,15 @@
         "resolved": "3.0.3",
         "contentHash": "PdyhdzG2LK7YUEtccObPql+3OuFODaFNeYayxdPoK1eHb2StZoeQf1WMb16QrKiIdi4fs5Kog8jxXtlZOgAEuA=="
       },
+      "CsvHelper": {
+        "type": "Direct",
+        "requested": "[26.0.1, )",
+        "resolved": "26.0.1",
+        "contentHash": "8osOmXbxzY8S1w21t5ilmWPIlo0DrfYNUklJvLiBWcb33Sm6v5jATN0DmCsBS5KVLYdwX+vnx+FIGoGF+rJwkw==",
+        "dependencies": {
+          "Microsoft.CSharp": "4.5.0"
+        }
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[16.9.1, )",
@@ -69,14 +78,6 @@
           "System.Reflection.Emit": "4.3.0",
           "System.Reflection.TypeExtensions": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
-        }
-      },
-      "CsvHelper": {
-        "type": "Transitive",
-        "resolved": "19.0.0",
-        "contentHash": "vUHF8wPOVvdtUQ4sXQI62jEIGcz5p7MG3Qf4Hazg+3EZQFh+UoTASEG0a1tsGmhNsHZ/Y+qRO+SgLMZO8jNcSg==",
-        "dependencies": {
-          "Microsoft.CSharp": "4.5.0"
         }
       },
       "Microsoft.AspNet.WebApi.Client": {
@@ -2149,7 +2150,7 @@
       "piipan.etl": {
         "type": "Project",
         "dependencies": {
-          "CsvHelper": "19.0.0",
+          "CsvHelper": "26.0.1",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.4",
