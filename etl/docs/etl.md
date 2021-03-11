@@ -23,6 +23,7 @@ The following environment variables are required by `BulkUpload` and are set by 
 |---|---|
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
 | `BlobStorageConnectionString` | [details](../../docs/iac.md#\:\~\:text=BlobStorageConnectionString) |
+| `CloudName` | [details](../../docs/iac.md#\:\~\:text=CloudName) |
 
 ## Local development
 

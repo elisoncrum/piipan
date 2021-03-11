@@ -24,6 +24,10 @@ BLOB_CONN_STR_KEY=BlobStorageConnectionString
 # to app or function code (required to fetch managed identity tokens)
 AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 
+# Name of the environment variable used to indicate the active Azure cloud
+# so that application code can use the appropriate, cloud-specific domain
+CLOUD_NAME_STR_KEY=CloudName
+
 # For connection strings, our established placeholder value
 PASSWORD_PLACEHOLDER='{password}'
 ### END Constants
