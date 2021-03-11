@@ -53,8 +53,8 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.9.0",
-        "contentHash": "Jr5JP47RPM5i2kqgc1oNaRq29sm6/AOog/XRkis3gwuwyTblT+PR7PLhOeab3UPtYLwnppQRfY16pgnTJk5HOw==",
+        "resolved": "1.10.0",
+        "contentHash": "iyliCDiwhYNJ5XOoyxzVl896+jvbIolYnk9SMn2JkjeXOBZItudgzdZ7lFIN4wkNl2JQBkUFE3jPYHhsmakhnw==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.0.0",
           "System.Buffers": "4.5.0",
@@ -1293,7 +1293,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.9.0",
+          "Azure.Core": "1.10.0",
           "Azure.Identity": "1.3.0"
         }
       }
