@@ -15,3 +15,6 @@ PREFIX=fns
 
 # Deployment environment for resource identifiers
 ENV=$(basename "${BASH_SOURCE%.*}")
+
+# Either AzureCloud or AzureUSGovernment
+CLOUD_NAME=AzureCloud
