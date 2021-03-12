@@ -138,24 +138,17 @@ EOF
       $VAULT_NAME_KEY="$VAULT_NAME" \
     --output none
 
-  # Assumes if any identity is set, it is the one we are specifying below
-  exists=`az functionapp identity show \
+  # Connect creds from function app to key vault so app can connect to db
+  principalId=`az functionapp identity assign \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --name $COLLECT_APP_NAME`
+    --name $COLLECT_APP_NAME \
+    --query principalId \
+    --output tsv`
 
-  if [ -z "$exists" ]; then
-    # Connect creds from function app to key vault so app can connect to db
-    principalId=`az functionapp identity assign \
-      --resource-group $METRICS_RESOURCE_GROUP \
-      --name $COLLECT_APP_NAME \
-      --query principalId \
-      --output tsv`
-
-    az keyvault set-policy \
-      --name $VAULT_NAME \
-      --object-id $principalId \
-      --secret-permissions get list
-  fi
+  az keyvault set-policy \
+    --name $VAULT_NAME \
+    --object-id $principalId \
+    --secret-permissions get list
 
   # publish the function app
   echo "Publishing function app $COLLECT_APP_NAME"
@@ -215,24 +208,17 @@ EOF
         $VAULT_NAME_KEY="$VAULT_NAME" \
       --output none
 
-  # Assumes if any identity is set, it is the one we are specifying below
-  exists=`az functionapp identity show \
+  # Connect creds from function app to key vault so app can connect to db
+  principalId=`az functionapp identity assign \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --name $API_APP_NAME`
+    --name $API_APP_NAME \
+    --query principalId \
+    --output tsv`
 
-  if [ -z "$exists" ]; then
-    # Connect creds from function app to key vault so app can connect to db
-    principalId=`az functionapp identity assign \
-      --resource-group $METRICS_RESOURCE_GROUP \
-      --name $API_APP_NAME \
-      --query principalId \
-      --output tsv`
-
-    az keyvault set-policy \
-      --name $VAULT_NAME \
-      --object-id $principalId \
-      --secret-permissions get list
-  fi
+  az keyvault set-policy \
+    --name $VAULT_NAME \
+    --object-id $principalId \
+    --secret-permissions get list
 
   echo "Waiting to publish function app"
   sleep 60
