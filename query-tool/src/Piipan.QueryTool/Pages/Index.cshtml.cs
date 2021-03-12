@@ -19,7 +19,7 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _apiClient = apiClient;
-            _apiRequest = new OrchestratorApiRequest(_apiClient);
+            _apiRequest = new OrchestratorApiRequest(_apiClient, _logger);
         }
 
         [BindProperty]
@@ -40,12 +40,13 @@ namespace Piipan.QueryTool.Pages
 
                 try
                 {
+                    _logger.LogInformation("Query form submitted");
                     NoResults = QueryResult.Count == 0;
                     Title = "NAC Query Results";
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception);
+                    _logger.LogError(exception, exception.Message);
                     RequestError = "There was an error running your search";
                 }
             }
