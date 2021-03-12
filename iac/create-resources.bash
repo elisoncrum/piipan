@@ -262,12 +262,7 @@ main () {
   source $(dirname "$0")/env/${azure_env}.bash
   verify_cloud
 
-  # Any changes to the set of resource groups below should also
-  # be made to create-service-principal.bash
   ./create-resource-groups.bash $azure_env
-
-  # Create a service principal for use by CI/CD pipeline.
-  ./create-service-principal.bash $azure_env $SP_NAME_CICD none
 
   # uniqueString is used pervasively in our ARM templates to create globally
   # identifiers from the resource group id, but it is not available in the CLI.
