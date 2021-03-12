@@ -616,7 +616,7 @@ main () {
 
   orch_api_uri=$(\
     az functionapp function show \
-      -g piipan-match \
+      -g $MATCH_RESOURCE_GROUP \
       -n $orch_name \
       --function-name Query \
       --query invokeUrlTemplate)

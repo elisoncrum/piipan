@@ -198,12 +198,13 @@ EOF
 
   # Create the function app in Azure
   echo "Creating function app metrics api"
+  API_APP_NAME="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}"
   az functionapp create \
     --resource-group $METRICS_RESOURCE_GROUP \
     --consumption-plan-location $LOCATION \
     --runtime dotnet \
     --functions-version 3 \
-    --name "${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
+    --name $API_APP_NAME \
     --storage-account "${PREFIX}st${METRICS_API_APP_ID}${ENV}"
 
   az functionapp config appsettings set \
