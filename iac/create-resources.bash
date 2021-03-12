@@ -619,7 +619,8 @@ main () {
       -g $MATCH_RESOURCE_GROUP \
       -n $orch_name \
       --function-name Query \
-      --query invokeUrlTemplate)
+      --query invokeUrlTemplate \
+      -o tsv)
 
   query_tool_name=$(\
     az deployment group create \
