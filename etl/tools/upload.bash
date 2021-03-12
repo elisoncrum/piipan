@@ -5,14 +5,22 @@
 # database. Requires that the user has write privileges on the account; use
 # grant-blob.bash to establish those privs.
 #
-# usage: upload.bash path-to-file account-name
+# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# See iac/env for available environments.
+#
+# usage: upload.bash <azure-env> <path-to-file> <storage-account>
 
-set -e
-set -u
+source $(dirname "$0")/../../tools/common.bash || exit
+source $(dirname "$0")/../../iac/iac-common.bash || exit
 
 main () {
-  file_path=$1
-  storage_account=$2
+  # Load agency/subscription/deployment-specific settings
+  azure_env=$1
+  source $(dirname "$0")/../../iac/env/${azure_env}.bash
+  verify_cloud
+
+  file_path=$2
+  storage_account=$3
 
   az storage blob upload \
     --account-name $storage_account \
