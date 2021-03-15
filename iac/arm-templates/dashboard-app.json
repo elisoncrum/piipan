@@ -80,5 +80,11 @@
                 ]
             }
         }
-    ]
+    ],
+    "outputs": {
+        "appName": {
+            "type": "string",
+            "value": "[variables('appName')]"
+        }
+    }
 }

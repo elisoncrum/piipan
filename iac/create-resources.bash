@@ -636,6 +636,13 @@ main () {
         servicePlan=$APP_SERVICE_PLAN \
         OrchApiUri=$orch_api_uri)
 
+  echo "Create Front Door and WAF policy for query tool app"
+  ./add-front-door-to-app.bash \
+    $azure_env \
+    $RESOURCE_GROUP \
+    querytool \
+    $query_tool_name.azurewebsites.net
+
   # With per-state and orchestrator APIs created, perform the necessary
   # configurations to enable authentication and authorization of the
   # orchestrator with each state.

@@ -8,7 +8,7 @@
                 "description": "url address of the app that will use the front door. Do not include http/s prefix."
             }
         },
-        "appHostName": {
+        "frontDoorHostName": {
             "type": "string",
             "metadata": {
                 "description": "Host name of the app that will use the front door"
@@ -17,7 +17,7 @@
         "frontDoorName": {
             "type": "string",
             "metadata": {
-                "description": "The desired name of the frontdoor resource. appHostName subdomain must be same as frontdoor name."
+                "description": "The desired name of the frontdoor resource. frontDoorHostName subdomain must be same as frontdoor name."
             }
         },
         "resourceGroupName": {
@@ -112,9 +112,9 @@
                 ],
                 "frontendEndpoints": [
                     {
-                        "name": "[concat('azurefd-net-', uniqueString(parameters('frontDoorName')))]",
+                        "name": "[concat('azurefd-net-', uniqueString(parameters('frontDoorName')))]", /* eg: my-frontend */
                         "properties": {
-                            "hostName": "[parameters('appHostName')]", /* eg: app-eoc-dashboard-frontend.azurefd.net */
+                            "hostName": "[parameters('frontDoorHostName')]", /* eg: my-frontend.azurefd.net */
                             "sessionAffinityEnabledState": "Disabled",
                             "sessionAffinityTtlSeconds": 0,
                             "webApplicationFirewallPolicyLink": {

@@ -256,16 +256,26 @@ EOF
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
-  az deployment group create \
-    --name $DASHBOARD_APP_NAME \
-    --resource-group $RESOURCE_GROUP \
-    --template-file ./arm-templates/dashboard-app.json \
-    --parameters \
-      location=$LOCATION \
-      resourceTags="$RESOURCE_TAGS" \
-      appName=$DASHBOARD_APP_NAME \
-      servicePlan=$APP_SERVICE_PLAN \
-      metricsApiUri=$metrics_api_uri
+  DASHBOARD_HOST_PREFIX=$(\
+    az deployment group create \
+      --name $DASHBOARD_APP_NAME \
+      --resource-group $RESOURCE_GROUP \
+      --template-file ./arm-templates/dashboard-app.json \
+      --query properties.outputs.appName.value \ # LEFT OFF HERE
+      --output tsv \
+      --parameters \
+        location=$LOCATION \
+        resourceTags="$RESOURCE_TAGS" \
+        appName=$DASHBOARD_APP_NAME \
+        servicePlan=$APP_SERVICE_PLAN \
+        metricsApiUri=$metrics_api_uri)
+
+  echo "Create Front Door and WAF policy for dashboard app"
+  ./add-front-door-to-app.bash \
+    $azure_env \
+    $RESOURCE_GROUP \
+    dashboard \
+    $DASHBOARD_HOST_PREFIX.azurewebsites.net
 
   script_completed
 }
