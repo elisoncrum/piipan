@@ -28,6 +28,7 @@ set_constants () {
   PG_SECRET_NAME=metrics-pg-admin
   # Base name of dashboard app
   DASHBOARD_APP_NAME=piipan-dashboard
+  DASHBOARD_FRONTDOOR_NAME=dashboard
 }
 
 main () {
@@ -256,7 +257,7 @@ EOF
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
-  DASHBOARD_HOST_PREFIX=$(\
+  dashboard_host_prefix=$(\
     az deployment group create \
       --name $DASHBOARD_APP_NAME \
       --resource-group $RESOURCE_GROUP \
@@ -271,11 +272,12 @@ EOF
         metricsApiUri=$metrics_api_uri)
 
   echo "Create Front Door and WAF policy for dashboard app"
+  dashboard_host="${dashboard_host_prefix}${web_app_host_suffix}"
   ./add-front-door-to-app.bash \
     $azure_env \
     $RESOURCE_GROUP \
-    dashboard \
-    $DASHBOARD_HOST_PREFIX.azurewebsites.net
+    $DASHBOARD_FRONTDOOR_NAME \
+    $dashboard_host
 
   script_completed
 }

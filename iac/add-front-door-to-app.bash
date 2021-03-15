@@ -1,21 +1,15 @@
-### This script creates an Azure Front Door with a WAF policy
-### and applies it to a single web app.
-###
-### Run:
-### ./iac/add-front-door-to-app.bash \
-###   <env> \
-###   <resource_group> \
-###   <front_door_name> \
-###   <app_host_name>
-###
-### Arguments must be ordered:
-###   env (eg: tts/dev)
-###   resource_group (eg: rg-core-dev)
-###   front_door_name (eg: dashboard) Hyphens not allowed
-###   app_host_name (eg: my-dashboard.azurewebsites.net)
-###
-### Example script:
-### ./iac/add-front-door-to-app.bash tts/dev rg-core-dev piipandashboard piipan-dashboard-5or4l3nqzevf4.azurewebsites.net
+#!/bin/bash
+# This script creates an Azure Front Door with a WAF policy
+# and applies it to a single web app.
+#
+# Arguments:
+#   env (eg: tts/dev)
+#   resource_group (eg: rg-core-dev)
+#   front_door_name (eg: dashboard) Hyphens not allowed
+#   app_host_name (eg: my-dashboard.azurewebsites.net)
+#
+# Usage:
+# ./iac/add-front-door-to-app.bash tts/dev rg-core-dev dashboard my-dashboard-123.azurewebsites.net
 
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
@@ -23,6 +17,7 @@ source $(dirname "$0")/iac-common.bash || exit
 main () {
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  verify_cloud
 
   resource_group=$2
   front_door_name=$3 # no hyphens
@@ -39,7 +34,7 @@ main () {
     --template-file ./arm-templates/front-door-app-service.json \
     --parameters \
       appAddress=$app_address \
-      frontDoorHostName="${front_door_full_name}.azurefd.net" \
+      frontDoorHostName="${front_door_full_name}${front_door_host_suffix}" \
       frontDoorName=$front_door_full_name \
       resourceGroupName=$resource_group \
       resourceTags="$RESOURCE_TAGS" \

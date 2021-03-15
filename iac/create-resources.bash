@@ -30,6 +30,7 @@ PG_SERVER_NAME=participant-records
 
 # Base name of query tool app
 QUERY_TOOL_APP_NAME=piipan-query-tool
+QUERY_TOOL_FRONTDOOR_NAME=querytool
 
 # Display name of service principal account responsible for CI/CD tasks
 SP_NAME_CICD=piipan-cicd
@@ -637,11 +638,12 @@ main () {
         OrchApiUri=$orch_api_uri)
 
   echo "Create Front Door and WAF policy for query tool app"
+  query_tool_host="${query_tool_name}${web_app_host_suffix}"
   ./add-front-door-to-app.bash \
     $azure_env \
     $RESOURCE_GROUP \
-    querytool \
-    $query_tool_name.azurewebsites.net
+    $QUERY_TOOL_FRONTDOOR_NAME \
+    $query_tool_host
 
   # With per-state and orchestrator APIs created, perform the necessary
   # configurations to enable authentication and authorization of the

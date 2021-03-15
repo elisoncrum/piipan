@@ -86,7 +86,7 @@
                 "[concat(subscription().id, '/resourceGroups/', parameters('resourceGroupName'), '/providers/Microsoft.Network/frontdoorwebapplicationfirewallpolicies/', parameters('wafPolicyName'))]"
             ],
             "properties": {
-                "friendlyName": "app-eoc-dashboard-frontend",
+                "friendlyName": "[parameters('frontDoorName')]",
                 "enabledState": "Enabled",
                 "healthProbeSettings": [
                     {
@@ -131,7 +131,7 @@
                         "properties": {
                             "backends": [
                                 {
-                                    "address": "[parameters('appAddress')]", // "app-eoc-dashboard-ijvxuzy7tgrdc.azurewebsites.net"
+                                    "address": "[parameters('appAddress')]",
                                     "privateLinkResourceId": null,
                                     "privateLinkLocation": null,
                                     "privateEndpointStatus": null,
@@ -141,7 +141,7 @@
                                     "httpsPort": 443,
                                     "priority": 1,
                                     "weight": 50,
-                                    "backendHostHeader": "[parameters('appAddress')]" // "app-eoc-dashboard-ijvxuzy7tgrdc.azurewebsites.net"
+                                    "backendHostHeader": "[parameters('appAddress')]"
                                 }
                             ],
                             "loadBalancingSettings": {
