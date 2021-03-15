@@ -478,6 +478,7 @@ main () {
         $DB_CONN_STR_KEY="$db_conn_str" \
         $AZ_SERV_STR_KEY="$az_serv_str" \
         $BLOB_CONN_STR_KEY="$blob_conn_str" \
+        $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
 
     az eventgrid system-topic create \

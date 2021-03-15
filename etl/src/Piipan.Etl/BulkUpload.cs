@@ -81,15 +81,24 @@ namespace Piipan.Etl
 
         internal async static Task<string> ConnectionString()
         {
-            // Environment variable (and placeholder) established
+            // Environment variables (and placeholder) established
             // during initial function app provisioning in IaC
+            const string CloudName = "CloudName";
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
+            const string GovernmentCloud = "AzureUSGovernment";
 
-            // Resource Id for open source software databases in the public Azure cloud;
-            // in other clouds, see result of:
+            // Resource ids for open source software databases in the public and
+            // US government clouds. Set the desired active cloud, then see:
             // `az cloud show --query endpoints.ossrdbmsResourceId`
-            const string ResourceId = "https://ossrdbms-aad.database.windows.net";
+            const string CommercialId = "https://ossrdbms-aad.database.windows.net";
+            const string GovermentId = "https://ossrdbms-aad.database.usgovcloudapi.net";
+
+            var resourceId = CommercialId;
+            var cn = Environment.GetEnvironmentVariable(CloudName);
+            if (cn == GovernmentCloud) {
+                resourceId = GovermentId;
+            }
 
             var builder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable(DatabaseConnectionString));
@@ -97,7 +106,7 @@ namespace Piipan.Etl
             if (builder.Password == PasswordPlaceholder)
             {
                 var provider = new AzureServiceTokenProvider();
-                var token = await provider.GetAccessTokenAsync(ResourceId);
+                var token = await provider.GetAccessTokenAsync(resourceId);
                 builder.Password = token;
             }
 
