@@ -260,13 +260,9 @@ main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  verify_cloud
 
-  # Any changes to the set of resource groups below should also
-  # be made to create-service-principal.bash
   ./create-resource-groups.bash $azure_env
-
-  # Create a service principal for use by CI/CD pipeline.
-  ./create-service-principal.bash $azure_env $SP_NAME_CICD none
 
   # uniqueString is used pervasively in our ARM templates to create globally
   # identifiers from the resource group id, but it is not available in the CLI.
@@ -303,7 +299,8 @@ main () {
       --template-file ./arm-templates/blob-storage.json \
       --parameters \
         stateAbbreviation=$abbr \
-        resourceTags="$RESOURCE_TAGS"
+        resourceTags="$RESOURCE_TAGS" \
+        location=$LOCATION
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -441,7 +438,8 @@ main () {
       --template-file ./arm-templates/function-storage.json \
       --parameters \
         stateAbbreviation=$abbr \
-        resourceTags="$RESOURCE_TAGS"
+        resourceTags="$RESOURCE_TAGS" \
+        location=$LOCATION
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
@@ -480,6 +478,7 @@ main () {
         $DB_CONN_STR_KEY="$db_conn_str" \
         $AZ_SERV_STR_KEY="$az_serv_str" \
         $BLOB_CONN_STR_KEY="$blob_conn_str" \
+        $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
 
     az eventgrid system-topic create \
@@ -557,6 +556,9 @@ main () {
     # Store function names for future auth configuration
     match_func_names+=("$func_name")
 
+    echo "Waiting to publish function app"
+    sleep 60
+
     echo "Publishing ${name} function app"
     pushd ../match/src/Piipan.Match.State
     func azure functionapp publish $func_name --dotnet
@@ -594,6 +596,10 @@ main () {
       --query principalId \
       --output tsv)
 
+
+  echo "Waiting to publish function app"
+  sleep 60
+
   echo "Publishing ${orch_name} function app"
   pushd ../match/src/Piipan.Match.Orchestrator
   func azure functionapp publish $orch_name --dotnet
@@ -606,10 +612,11 @@ main () {
 
   orch_api_uri=$(\
     az functionapp function show \
-      -g piipan-match \
+      -g $MATCH_RESOURCE_GROUP \
       -n $orch_name \
       --function-name Query \
-      --query invokeUrlTemplate)
+      --query invokeUrlTemplate \
+      -o tsv)
 
   query_tool_name=$(\
     az deployment group create \

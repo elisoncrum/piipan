@@ -24,6 +24,10 @@ BLOB_CONN_STR_KEY=BlobStorageConnectionString
 # to app or function code (required to fetch managed identity tokens)
 AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 
+# Name of the environment variable used to indicate the active Azure cloud
+# so that application code can use the appropriate, cloud-specific domain
+CLOUD_NAME_STR_KEY=CloudName
+
 # For connection strings, our established placeholder value
 PASSWORD_PLACEHOLDER='{password}'
 ### END Constants
@@ -50,6 +54,24 @@ pg_connection_string () {
     --query connectionStrings.\"ado.net\" \
     -o tsv`
 
+  # See:
+  # https://github.com/Azure/azure-cli-extensions/issues/3143
+  # https://docs.microsoft.com/en-us/azure/azure-government/compare-azure-government-global-azure
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    base=${base/.postgres.database.azure.com/.postgres.database.usgovcloudapi.net}
+  fi
+
   echo "${base}Ssl Mode=Require;"
+}
+
+# Verify that the expected Azure environment is the active cloud
+verify_cloud () {
+  local cn=$(az cloud show --query name -o tsv)
+
+  if [ "$CLOUD_NAME" != "$cn" ]; then
+    echo "error: '$cn' is the active cloud, expecting '$CLOUD_NAME'"
+    return 1
+  fi
+  return 0
 }
 ### END Functions

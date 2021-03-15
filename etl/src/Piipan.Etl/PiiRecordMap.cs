@@ -13,7 +13,7 @@ namespace Piipan.Etl
         {
             Map(m => m.Last).Name("last").Validate(field =>
             {
-                return !string.IsNullOrEmpty(field);
+                return !string.IsNullOrEmpty(field.Field);
             });
 
             Map(m => m.First).Name("first")
@@ -26,7 +26,7 @@ namespace Piipan.Etl
 
             Map(m => m.Ssn).Name("ssn").Validate(field =>
             {
-                Match match = Regex.Match(field, "^[0-9]{3}-[0-9]{2}-[0-9]{4}$");
+                Match match = Regex.Match(field.Field, "^[0-9]{3}-[0-9]{2}-[0-9]{4}$");
                 return match.Success;
             });
 

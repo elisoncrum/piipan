@@ -15,7 +15,7 @@ source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
 
 set_constants () {
-  DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}-${LOCATION}
+  DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}
   DB_ADMIN_NAME=piipanadmin
   DB_NAME=metrics
   DB_TABLE_NAME=participant_uploads
@@ -23,7 +23,7 @@ set_constants () {
   DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
   # Name of Key Vault
   VAULT_NAME_KEY=KeyVaultName
-  VAULT_NAME=${PREFIX}kvmetrics${ENV}${LOCATION} # vault names can't use hyphens even though the docs say they can
+  VAULT_NAME=${PREFIX}-kv-metrics-${ENV}
   # Name of secret used to store the PostgreSQL metrics server admin password
   PG_SECRET_NAME=metrics-pg-admin
   # Base name of dashboard app
@@ -34,6 +34,7 @@ main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  verify_cloud
 
   set_constants
 
@@ -84,10 +85,7 @@ main () {
     --name $DB_SERVER_NAME \
     --resource-type "Microsoft.DbForPostgreSQL/servers" \
     --query properties.fullyQualifiedDomainName -o tsv`
-  export PGPASSWORD=`az keyvault secret show \
-    --id "https://${VAULT_NAME}.vault.azure.net/secrets/${PG_SECRET_NAME}" \
-    --query value \
-    --output tsv`
+  export PGPASSWORD=$PG_SECRET
 
   echo "Insert db table"
   psql -U $DB_ADMIN_NAME@$DB_SERVER_NAME -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1 -X -q - <<EOF
@@ -101,8 +99,8 @@ EOF
   # Create Metrics Collect Function App in Azure
   COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
   COLLECT_APP_ID=metricscol
-  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}-${LOCATION}
-  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}${LOCATION}
+  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}
+  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}
   COLLECT_FUNC=BulkUploadMetrics
 
   # Will need to revisit how to successfully deploy this app through an arm template
@@ -129,7 +127,7 @@ EOF
   # https://github.com/Azure/azure-functions-core-tools/issues/1616
   # https://github.com/Azure/azure-functions-core-tools/issues/1766
   echo "Waiting to publish function app"
-  sleep 60s
+  sleep 60
 
   echo "configure settings"
   az functionapp config appsettings set \
@@ -167,7 +165,7 @@ EOF
 
   # Subscribe each dynamically created event blob topic to this function
   METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${METRICS_RESOURCE_GROUP}/providers
-  SUBS_RESOURCE_GROUP=piipan-resources
+  SUBS_RESOURCE_GROUP=$RESOURCE_GROUP
 
   while IFS=, read -r abbr name ; do
       echo "Subscribing to ${name} blob events"
@@ -189,22 +187,33 @@ EOF
   API_APP_FILEPATH=Piipan.Metrics.Api
   METRICS_API_APP_ID=metricsapi
 
-  echo "Create $API_APP_FILEPATH in Azure"
-  API_APP_NAME=`az deployment group create \
+  # Will need to revisit how to successfully deploy this app through an arm template
+  # Need a storage account to publish function app to:
+  echo "Creating storage account for metrics api"
+  az storage account create \
+    --name "${PREFIX}st${METRICS_API_APP_ID}${ENV}" \
+    --location $LOCATION \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --sku Standard_LRS
+
+  # Create the function app in Azure
+  echo "Creating function app metrics api"
+  API_APP_NAME="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}"
+  az functionapp create \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --consumption-plan-location $LOCATION \
+    --runtime dotnet \
+    --functions-version 3 \
+    --name $API_APP_NAME \
+    --storage-account "${PREFIX}st${METRICS_API_APP_ID}${ENV}"
+
+  az functionapp config appsettings set \
       --resource-group $METRICS_RESOURCE_GROUP \
-      --template-file  ./arm-templates/function-metrics.json \
-      --query properties.outputs.functionAppName.value \
-      --output tsv \
-      --parameters \
-        functionAppName="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
-        resourceTags="$RESOURCE_TAGS" \
-        location=$LOCATION \
-        databaseConnectionStringKey="$DB_CONN_STR_KEY" \
-        databaseConnectionStringValue="$DB_CONN_STR" \
-        vaultNameKey="$VAULT_NAME_KEY" \
-        vaultNameValue="$VAULT_NAME" \
-        applicationInsightsName="${PREFIX}-ins-${METRICS_API_APP_ID}-${ENV}-${LOCATION}" \
-        storageAccountName="${PREFIX}st${METRICS_API_APP_ID}${ENV}${LOCATION}"`
+      --name "${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
+      --settings \
+        $DB_CONN_STR_KEY="$DB_CONN_STR" \
+        $VAULT_NAME_KEY="$VAULT_NAME" \
+      --output none
 
   # Assumes if any identity is set, it is the one we are specifying below
   exists=`az functionapp identity show \
@@ -225,8 +234,8 @@ EOF
       --secret-permissions get list
   fi
 
-  echo "waiting to publish function app"
-  sleep 60s
+  echo "Waiting to publish function app"
+  sleep 60
 
   # publish metrics function app
   echo "Publishing function app $API_APP_NAME"

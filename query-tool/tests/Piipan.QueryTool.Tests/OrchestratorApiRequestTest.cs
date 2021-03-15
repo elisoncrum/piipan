@@ -6,8 +6,10 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.Protected;
+using Piipan.QueryTool.Pages;
 using Piipan.Shared.Authentication;
 using Xunit;
 
@@ -75,7 +77,7 @@ namespace Piipan.QueryTool.Tests
             var jsonString = JsonSerializer.Serialize(query);
             var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-            var _apiRequest = new OrchestratorApiRequest(mockApiClient);
+            var _apiRequest = new OrchestratorApiRequest(mockApiClient, new NullLogger<IndexModel>());
 
             // act
             var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query);

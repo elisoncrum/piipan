@@ -4,15 +4,19 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Piipan.Shared.Authentication;
 
 namespace Piipan.QueryTool
 {
     public class OrchestratorApiRequest
     {
-        public OrchestratorApiRequest(IAuthorizedApiClient apiClient)
+        private readonly ILogger _logger;
+
+        public OrchestratorApiRequest(IAuthorizedApiClient apiClient, ILogger logger)
         {
             _apiClient = apiClient;
+            _logger = logger;
         }
 
         public string RequestUrl;
@@ -32,6 +36,7 @@ namespace Piipan.QueryTool
         {
             try
             {
+                _logger.LogInformation("Querying Orchestrator API");
                 var requestUri = new Uri(RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
                 var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
@@ -42,7 +47,7 @@ namespace Piipan.QueryTool
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                _logger.LogError(exception, exception.Message);
             }
             return Matches;
         }
