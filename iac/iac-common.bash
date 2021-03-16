@@ -78,19 +78,17 @@ verify_cloud () {
 # hard-coded switches between commerical and government Azure environments
 web_app_host_suffix () {
   if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
-    return ".azurewebsites.us"
+    echo ".azurewebsites.us"
   else
-    return ".azurewebsites.net"
+    echo ".azurewebsites.net"
   fi
 }
 
 front_door_host_suffix () {
   if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
-    # can't find this in the list of azure gov domains so I'm guessing here
-    # https://docs.microsoft.com/en-us/azure/azure-government/compare-azure-government-global-azure
-    return ".azurefd.us"
+    echo ".azurefd.us"
   else
-    return ".azurefd.net"
+    echo ".azurefd.net"
   fi
 }
 ### END Functions
