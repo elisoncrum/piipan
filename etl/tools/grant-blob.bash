@@ -4,18 +4,21 @@
 # storage account. Used in conjunction with upload.bash for ad-hoc testing.
 # Only intended for development environments.
 #
-# usage: grant-blob.bash account-name
+# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# See iac/env for available environments.
+#
+# usage: grant-blob.bash <azure-env> <storage-account>
 
-set -e
-set -u
+source $(dirname "$0")/../../tools/common.bash || exit
+source $(dirname "$0")/../../iac/iac-common.bash || exit
 
 main () {
-  storage_account=$1
+  # Load agency/subscription/deployment-specific settings
+  azure_env=$1
+  source $(dirname "$0")/../../iac/env/${azure_env}.bash
+  verify_cloud
 
-  # XXX Constants duplicated from iac/create-resources.bash
-
-  # Default resource group for our system
-  RESOURCE_GROUP=piipan-resources
+  storage_account=$2
 
   # The default Azure subscription
   SUBSCRIPTION_ID=`az account show --query id -o tsv`
