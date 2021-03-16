@@ -248,7 +248,7 @@ EOF
       --name $DASHBOARD_APP_NAME \
       --resource-group $RESOURCE_GROUP \
       --template-file ./arm-templates/dashboard-app.json \
-      --query properties.outputs.appName.value \ # LEFT OFF HERE
+      --query properties.outputs.appName.value \
       --output tsv \
       --parameters \
         location=$LOCATION \
