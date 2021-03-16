@@ -634,7 +634,8 @@ main () {
         OrchApiUri=$orch_api_uri)
 
   echo "Create Front Door and WAF policy for query tool app"
-  query_tool_host="${query_tool_name}${web_app_host_suffix}"
+  suffix=$(web_app_host_suffix)
+  query_tool_host=${query_tool_name}${suffix}
   ./add-front-door-to-app.bash \
     $azure_env \
     $RESOURCE_GROUP \

@@ -28,13 +28,14 @@ main () {
 
   echo "WAF name: ${waf_full_name}"
 
+  suffix=$(front_door_host_suffix)
   az deployment group create \
     --name $front_door_full_name \
     --resource-group $resource_group \
     --template-file ./arm-templates/front-door-app-service.json \
     --parameters \
       appAddress=$app_address \
-      frontDoorHostName="${front_door_full_name}${front_door_host_suffix}" \
+      frontDoorHostName=${front_door_full_name}${suffix} \
       frontDoorName=$front_door_full_name \
       resourceGroupName=$resource_group \
       resourceTags="$RESOURCE_TAGS" \

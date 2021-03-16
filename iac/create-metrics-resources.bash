@@ -258,7 +258,8 @@ EOF
         metricsApiUri=$metrics_api_uri)
 
   echo "Create Front Door and WAF policy for dashboard app"
-  dashboard_host="${dashboard_host_prefix}${web_app_host_suffix}"
+  suffix=$(web_app_host_suffix)
+  dashboard_host=${dashboard_host_prefix}${suffix}
   ./add-front-door-to-app.bash \
     $azure_env \
     $RESOURCE_GROUP \
