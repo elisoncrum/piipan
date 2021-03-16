@@ -32,3 +32,6 @@ PiiRecord:
     exception:
       type: string
       description: "Placeholder for value indicating special processing instructions"
+    match_id:
+      type: string
+      description: "the identifier of the match"
