@@ -88,13 +88,14 @@ get_resources () {
   local sys_type=$1
   local group=$2
 
+  local res
   res=$(\
     az resource list \
       --tag $sys_type \
       --query "[? resourceGroup == '${group}' ].name" \
       -o tsv)
 
-  as_array=($res)
+  local as_array=($res)
   if [[ ${#as_array[@]} -eq 0 ]]; then
     echo "error: no resources found with $sys_type in $group" 1>&2
     return 1
