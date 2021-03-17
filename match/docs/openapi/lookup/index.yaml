@@ -1,0 +1,30 @@
+# Lookup API base spec
+openapi: 3.0.0
+info:
+  title: "Match ID Lookup API"
+  version: 1.0.0
+  description: "API for providing a previous Match ID and receiving the corresponding PII"
+tags:
+  - name: "Match"
+servers:
+  - url: "/v1"
+paths:
+  /match_ids/{match_id}:
+    get:
+      summary: "get the PII related to a Match ID"
+      description: "User can provide a Match ID and receive the PII associated with it"
+      responses:
+        '200':
+          description: "PII record, if it exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchIdResponse'
+        '400':
+          description: "Bad request"
+        '404':
+          description: "Not Found"
+components:
+  schemas:
+    MatchIdResponse:
+      $ref: '../schemas/lookup.yaml#/MatchIdResponse'

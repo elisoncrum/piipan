@@ -1,0 +1,8 @@
+#/components/requestBodies/MatchIdResponse
+MatchIdResponse:
+  type: "object"
+  required:
+    - data
+  properties:
+    data:
+      $ref: 'pii-record.yaml#/PiiRecord'
