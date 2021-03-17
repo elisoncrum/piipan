@@ -27,10 +27,14 @@ To (re)create the Azure resources that `piipan` uses:
     cd iac
     ./create-resources.bash tts/dev
 ```
+6. Run `create-apim`, which deploys ARM template and runs associated CLI commands to create an Azure API Management (APIM) instance, specifying the [name of the deployment environment](#deployment-environments) and an administrator email (a required property which can be subsequently changed). If the APIM instance does not already exist this script can take ~45 minutes to complete.
+```
+    ./create-apim.bash tts/dev your-email
+```
 
 ## Deployment environments
 
-Configuration for each enviroment is in `iac/env` in a corresponding, `source`-able bash script.
+Configuration for each environment is in `iac/env` in a corresponding, `source`-able bash script.
 
 | Name | Description |
 |---|---|
@@ -65,6 +69,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | OrchestratorApi | the single Function App for the Orchestrator API |
 | DashboardApp | the single Dashboard App Service |
 | QueryApp | the single Query tool App Service |
+| NacApi | the single API Management instance for the external-facing NAC API |
 
 In the Azure Portal, tags can be added to resource lists using the "Manage view" and/or "Edit columns" menu item that appears at the top left of the view. Specific tag values can also be filtered via "Add filter".
 
