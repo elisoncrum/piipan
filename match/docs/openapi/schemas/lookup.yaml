@@ -1,5 +1,5 @@
-#/components/requestBodies/MatchIdResponse
-MatchIdResponse:
+#/components/requestBodies/LookupIdResponse
+LookupIdResponse:
   type: "object"
   required:
     - data
