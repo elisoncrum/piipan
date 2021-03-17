@@ -33,6 +33,9 @@
         "storageAccountName": "[concat(parameters('stateAbbr'), 'fstor', uniquestring(resourceGroup().id))]",
         "functionWorkerRuntime": "dotnet",
         "storageAccountType": "Standard_LRS",
+        "systemTypeTag": {
+            "SysType": "PerStateMatchApi"
+        },
         "applicationInsightsTag": {
             "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('functionAppName')))]": "Resource"
         },
@@ -69,7 +72,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2020-06-01",
             "name": "[variables('functionAppName')]",
-            "tags": "[parameters('resourceTags')]",
+            "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "location": "[parameters('location')]",
             "kind": "functionapp",
             "identity": {

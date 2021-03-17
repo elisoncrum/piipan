@@ -53,6 +53,26 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Api, Piipan.Metrics.Collect |
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl |
+
+
+## `SysType` resource tag
+
+ The below resource tagging scheme is used for key Piipan components, using the `SysType` ("System Type") tag. This tag is used to ease enumeration of resource instances in IaC and to make a resource's system-level purpose more obvious in the Azure Portal. While a resource's name can make obvious its system type, often Azure naming restrictions and cloud-level uniqueness requirements can make those names inscrutable.
+
+| Value | Description |
+|---|---|
+| PerStateMatchApi | one of _N_ API Function Apps for Per-state matching |
+| OrchestratorApi | the single Function App for the Orchestrator API |
+| DashboardApp | the single Dashboard App Service |
+| QueryApp | the single Query tool App Service |
+
+In the Azure Portal, tags can be added to resource lists using the "Manage view" and/or "Edit columns" menu item that appears at the top left of the view. Specific tag values can also be filtered via "Add filter".
+
+In the Azure CLI, `az resource list` can be used. Be sure to query for only the resources in the environment-specific resource group (e.g., `-dev`, `-test`, etc.):
+```
+az resource list  --tag SysType=PerStateMatchApi --query "[? resourceGroup == 'rg-match-dev' ].name"
+```
+
 ## Notes
 - `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
