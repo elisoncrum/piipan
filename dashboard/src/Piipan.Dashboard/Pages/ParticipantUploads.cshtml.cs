@@ -35,25 +35,30 @@ namespace Piipan.Dashboard.Pages
 
         public async Task OnGetAsync()
         {
-            _logger.LogInformation("Loading initial results");
-            var url = FormatUrl();
-            var response = await _participantUploadRequest.Get(url);
-            ParticipantUploadResults = response.data;
-            SetPageLinks(response.meta);
+            try
+            {
+                _logger.LogInformation("Loading initial results");
+                var url = FormatUrl();
+                var response = await _participantUploadRequest.Get(url);
+                ParticipantUploadResults = response.data;
+                SetPageLinks(response.meta);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, exception.Message);
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            _logger.LogInformation("Querying uploads via search form");
-
-            if (BaseUrl == null)
-            {
-                _logger.LogError("BaseUrl is null");
-                throw new Exception("BaseUrl is null.");
-            }
-
             try
             {
+                _logger.LogInformation("Querying uploads via search form");
+
+                if (BaseUrl == null)
+                {
+                    throw new Exception("BaseUrl is null.");
+                }
 
                 StateQuery = Request.Form["state"];
                 var url = QueryHelpers.AddQueryString(BaseUrl, "state", StateQuery);
@@ -74,20 +79,12 @@ namespace Piipan.Dashboard.Pages
         {
             if (BaseUrl == null)
             {
-                _logger.LogError("BaseUrl is null");
                 throw new Exception("BaseUrl is null.");
             }
             var url = BaseUrl + Request.QueryString;
-            try
-            {
-                StateQuery = Request.Query["state"];
-                if (String.IsNullOrEmpty(Request.Query["perPage"]))
-                    url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, exception.Message);
-            }
+            StateQuery = Request.Query["state"];
+            if (String.IsNullOrEmpty(Request.Query["perPage"]))
+                url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
             return url;
         }
 
