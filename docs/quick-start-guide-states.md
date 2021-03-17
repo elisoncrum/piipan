@@ -18,7 +18,7 @@ These three elements translate to three main areas of the API that states will i
 
 1. States will upload participant data through a scheduled [CSV upload](../etl/README.md)
 2. Eligibility workers will conduct matches through [Active Matching](../match/README.md)
-3. Eligibility workers will be able to reference previous matches through [a Match ID Lookup](../match/docs/openapi/orchestrator/index.yaml)
+3. Eligibility workers will be able to take action by referncing PII through [a Lookup ID](../match/docs/openapi/orchestrator/index.yaml)
 
 ### Urls
 
@@ -33,9 +33,9 @@ These three elements translate to three main areas of the API that states will i
 | endpoint | description | Type | Parameters | Response | Authentication |
 |---|---|---|---|---|---|
 | `/BulkUpload` | uploads bulk participant data to the system | POST | a CSV file [in this format](../etl/docs/bulk-import.md) | [coming soon] | Key-based, contact a developer for access |
-| [coming soon] | query the system for status on data processing from a bulk upload | POST | [coming soon] | [coming soon] | Key-based, contact a developer for access |
-| `/query` | query for matches | POST | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | Key-based, contact a developer for access |
-| `matchi_ids/:id` | Match ID Lookup | GET | match ID | [coming soon] | Key-based, contact a developer for access |
+| [coming soon] | query for status on data processing from a bulk upload | POST | [coming soon] | [coming soon] | Key-based, contact a developer for access |
+| `/query` | query for active matches | POST | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | Key-based, contact a developer for access |
+| `lookup_ids/:id` | Returns PII for a Lookup ID | GET | Lookup ID | [coming soon] | Key-based, contact a developer for access |
 
 ## Authentication
 
