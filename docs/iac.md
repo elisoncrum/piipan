@@ -18,7 +18,7 @@ To (re)create the Azure resources that `piipan` uses:
 ```
     az cloud set --name AzureCloud
 ```
-4. Sign in with the Azure CLI `login` command:
+4. Sign in with the Azure CLI `login` command. Step 5 can be run with an account having the Contributor role on the subscription. Step 6 appears to require yet-to-be-understood privileges on Azure Active Directory; use a Global Administrator account.
 ```
     az login
 ```
@@ -26,6 +26,10 @@ To (re)create the Azure resources that `piipan` uses:
 ```
     cd iac
     ./create-resources.bash tts/dev
+```
+6. Run `configure-easy-auth`, which runs app registrations, creates local service principals, and enables [App Service Authentication for internal APIs](./securing-internal-apis.md).
+```
+    ./configure-easy-auth.bash tts/dev
 ```
 
 ## Deployment environments
