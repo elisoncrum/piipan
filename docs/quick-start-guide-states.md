@@ -1,6 +1,6 @@
 # Quick-Start Guide for States
 
-For a high-level view of system architecure, go [here](../README.md).
+For a high-level view of system architecture, go [here](../README.md).
 
 ## System Status
 
