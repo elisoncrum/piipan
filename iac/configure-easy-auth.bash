@@ -204,6 +204,44 @@ enable_easy_auth () {
     --set "appRoleAssignmentRequired=true"
 }
 
+# Configures App Service Authentication (aka Easy Auth) for an API provider
+# (a Function App) and an API client (either a Function App or App Service):
+#    - Registers an Azure Active Directory (AAD) app with an application role
+#      for the API provider.
+#    - Create a service principal (SP) for the app registation.
+#    - Add the application role to the client identity.
+#    - Configure and enable App Service Authentiction (i.e., Easy Auth)
+#      for the API provider.
+#    - Enable requirement that authentication tokens are only issued to client
+#      applications that are assigned an app role.
+#
+# <func> is the name of the API provider Function App
+# <group> is the resource group <func> belongs to
+# <role> is the Piipan role name
+# <client_identity> is the principal id of the client Function App/App service
+configure_easy_auth_pair () {
+  local func=$1
+  local group=$2
+  local role=$3
+  local client_identity=$4
+
+  local func_app_reg_id
+  func_app_reg_id=$(create_aad_app_reg $func $role $group)
+
+  # Wait a bit to prevent "service principal being created must in the local tenant" error
+  sleep 60
+  local func_app_sp
+  func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
+
+  # Activate App Service Authentication for the Function App API
+  enable_easy_auth $func $group
+
+  # Give the client component access to the Function App API
+  # Wait a bit to prevent ResourceNotFoundError
+  sleep 60
+  assign_app_role $func_app_sp $client_identity $role
+}
+
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
@@ -235,54 +273,20 @@ main () {
       --query principalId \
       --output tsv)
 
-  # With per-state and orchestrator APIs created, perform the necessary
-  # configurations to enable authentication and authorization of the
-  # orchestrator with each state.
-  #
-  # For each state:
-  #   - Register an Azure Active Directory (AAD) app with an application
-  #     role named the value of `STATE_API_APP_ROLE`
-  #   - Create a service principal (SP) for the app registation
-  #   - Add the application role to the orchestrator API's identity
-  #   - Configure and enable App Service Authentiction (i.e., Easy Auth)
-  #     for state's Function app.
-  #   - Enable requirement that authentication tokens are only issued to
-  #     client applications that are assigned an app role.
-
   for func in "${match_func_names[@]}"
   do
-    echo "Configuring Easy Auth for ${func}"
-
-    func_app_reg_id=$(create_aad_app_reg $func $STATE_API_APP_ROLE $MATCH_RESOURCE_GROUP)
-
-    # Wait a bit to prevent "service principal being created must in the local tenant" error
-    sleep 60
-    func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
-
-    # Activate App Service Authentication for the per-state match API
-    enable_easy_auth $func $MATCH_RESOURCE_GROUP
-
-    # Give orchestrator API access to the per-state match API
-    # Wait a bit to prevent ResourceNotFoundError
-    sleep 60
-    assign_app_role $func_app_sp $orch_identity $STATE_API_APP_ROLE
+    echo "Configure Easy Auth for PerStateMatchApi:${func} and OrchestratorApi"
+    configure_easy_auth_pair \
+      $func $MATCH_RESOURCE_GROUP \
+      $STATE_API_APP_ROLE \
+      $orch_identity
   done
 
-  echo "Configuring Easy Auth for orchestrator API"
-
-  orch_app_reg_id=$(create_aad_app_reg $orch_name $ORCH_API_APP_ROLE $MATCH_RESOURCE_GROUP)
-
-  # Wait a bit to prevent "service principal being created must in the local tenant" error
-  sleep 60
-  orch_app_sp=$(create_aad_app_sp $orch_name $orch_app_reg_id)
-
-  # Activate App Service Authentication for the orchestrator API
-  enable_easy_auth $orch_name $MATCH_RESOURCE_GROUP
-
-  # Give query tool access to orchestrator
-  # Wait a bit to prevent ResourceNotFoundError
-  sleep 60
-  assign_app_role $orch_app_sp $query_tool_identity $ORCH_API_APP_ROLE
+  echo "Configure Easy Auth for OrchestratorApi and QueryApp"
+  configure_easy_auth_pair \
+    $orch_name $MATCH_RESOURCE_GROUP \
+    $ORCH_API_APP_ROLE \
+    $query_tool_identity
 
   script_completed
 }
