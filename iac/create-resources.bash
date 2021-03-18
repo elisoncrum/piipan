@@ -400,13 +400,6 @@ main () {
         resourceTags="$RESOURCE_TAGS" \
         location=$LOCATION \
         StateApiUriStrings=$match_api_uris)
-  orch_identity=$(\
-    az webapp identity show \
-      --name $orch_name \
-      --resource-group $MATCH_RESOURCE_GROUP \
-      --query principalId \
-      --output tsv)
-
 
   echo "Waiting to publish function app"
   sleep 60
