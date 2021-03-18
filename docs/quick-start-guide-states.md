@@ -4,7 +4,7 @@ For a high-level view of system architecure, go [here](../README.md).
 
 ## System Status
 
-All three API's are in Alpha stage and under active development. We plan on having API's ready for states testing in a sandbox environment by the end of April 2021.
+All three API's are in Alpha stage and under active development. We plan on having API's ready for state testing in a sandbox environment by end of April 2021.
 
 ## API Overview
 
@@ -18,28 +18,28 @@ These three elements translate to three main areas of the API that states will i
 
 1. States will upload participant data through a scheduled [CSV upload](../etl/README.md)
 2. Eligibility workers will conduct matches through [Active Matching](../match/README.md)
-3. Eligibility workers will be able to take action by referncing PII through [a Lookup ID](../match/docs/openapi/orchestrator/index.yaml)
+3. Eligibility workers will be able to take action by referencing previous matches through [a Lookup ID](../match/docs/openapi/orchestrator/index.yaml)
 
 ### Urls
 
-| environment | description | url |
+| url | environment | description |
 |---|---|---|
-| sandbox | for initial testing of the integration; fake data only | [coming soon] |
-| pre-production | for testing with actual data at scale; data is not used in production | [coming soon] |
-| production | actual data used in the production system | [coming soon] |
+| [coming soon] | sandbox | for initial testing of the integration; fake data only |
+|  [coming soon] | pre-production | for testing with actual data at scale; data is not used in production |
+| [coming soon] | production | actual data used in the production system |
 
 ### Endpoints Overview
 
 | endpoint | description | Type | Parameters | Response | Authentication |
 |---|---|---|---|---|---|
-| `/BulkUpload` | uploads bulk participant data to the system | POST | a CSV file [in this format](../etl/docs/bulk-import.md) | [coming soon] | Key-based, contact a developer for access |
-| [coming soon] | query for status on data processing from a bulk upload | POST | [coming soon] | [coming soon] | Key-based, contact a developer for access |
-| `/query` | query for active matches | POST | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | Key-based, contact a developer for access |
-| `lookup_ids/:id` | Returns PII for a Lookup ID | GET | Lookup ID | [coming soon] | Key-based, contact a developer for access |
+| `/BulkUpload` | uploads bulk participant data to the system | POST | a CSV file [in this format](../etl/docs/bulk-import.md) | [coming soon] | contact a developer for access token |
+| [coming soon] | query for status on data processing from a bulk upload | POST | [coming soon] | [coming soon] | contact a developer for access token |
+| `/query` | query for active matches | POST | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | contact a developer for access token |
+| `lookup_ids/:id` | Returns PII for a Lookup ID | GET | Lookup ID | [coming soon] | contact a developer for access token |
 
 ## Authentication
 
-To use all endpoints, states will need two API keys: one for bulk uploading and another for the rest of the endpoints. Contact us for access to these keys.
+To use all endpoints, states will need two API tokens: one for bulk uploading and another for the rest of the endpoints. Contact us for token access.
 
 ## Feedback
 
