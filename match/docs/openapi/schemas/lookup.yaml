@@ -5,4 +5,4 @@ LookupIdResponse:
     - data
   properties:
     data:
-      $ref: 'pii-record.yaml#/PiiRecord'
+      $ref: 'match-query.yaml#/MatchQuery'

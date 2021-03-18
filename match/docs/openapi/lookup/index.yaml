@@ -3,7 +3,7 @@ openapi: 3.0.0
 info:
   title: "Lookup ID Endpoint"
   version: 1.0.0
-  description: "API for providing a previous Lookup ID and receiving the corresponding PII"
+  description: "API for providing a Lookup ID and receiving the original match data"
 tags:
   - name: "Match"
 servers:
@@ -11,11 +11,11 @@ servers:
 paths:
   /lookup_ids/{id}:
     get:
-      summary: "get the PII related to a Lookup ID"
-      description: "User can provide a Lookup ID and receive the PII associated with it"
+      summary: "get the original match data related to a Lookup ID"
+      description: "User can provide a Lookup ID and receive the match data associated with it"
       responses:
         '200':
-          description: "PII record, if it exists"
+          description: "original active match data"
           content:
             application/json:
               schema:
