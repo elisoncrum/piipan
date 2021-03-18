@@ -37,6 +37,9 @@ MatchQuery:
 MatchQueryResponse:
   type: object
   properties:
+    lookup_id:
+      type: string
+      description: "the identifier of the match request"
     matches:
       type: array
       items:
