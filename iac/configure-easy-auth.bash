@@ -135,20 +135,23 @@ assign_app_role () {
     --query "appRoles[?value == '${role}'].id" \
     --output tsv)
 
+  domain=$(graph_host_suffix)
+
   # Similar to `az ad app create`, `az rest` will throw error when assigning
   # an app role to an identity that already has the role.
   exists=$(\
     az rest \
     --method GET \
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --uri "https://graph${domain}/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
     --query "value[?principalId == '${principal_id}'].appRoleId" \
     --output tsv)
+
   if [ -z "$exists" ]; then
     role_json=`app_role_assignment $principal_id $resource_id $role_id`
     echo $role_json
     az rest \
     --method POST \
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --uri "https://graph${domain}/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
     --headers 'Content-Type=application/json' \
     --body "$role_json"
   fi
@@ -225,6 +228,13 @@ main () {
       --query principalId \
       --output tsv)
 
+  query_tool_identity=$(\
+    az webapp identity show \
+      --name $query_tool_name \
+      --resource-group $RESOURCE_GROUP \
+      --query principalId \
+      --output tsv)
+
   # With per-state and orchestrator APIs created, perform the necessary
   # configurations to enable authentication and authorization of the
   # orchestrator with each state.
@@ -244,25 +254,34 @@ main () {
     echo "Configuring Easy Auth for ${func}"
 
     func_app_reg_id=$(create_aad_app_reg $func $STATE_API_APP_ROLE $MATCH_RESOURCE_GROUP)
-    func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
-    assign_app_role $func_app_sp $orch_identity $STATE_API_APP_ROLE
 
-    # Activate App Service Authentication for the function app
+    # Wait a bit to prevent "service principal being created must in the local tenant" error
+    sleep 60
+    func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
+
+    # Activate App Service Authentication for the per-state match API
     enable_easy_auth $func $MATCH_RESOURCE_GROUP
+
+    # Give orchestrator API access to the per-state match API
+    # Wait a bit to prevent ResourceNotFoundError
+    sleep 60
+    assign_app_role $func_app_sp $orch_identity $STATE_API_APP_ROLE
   done
 
-  # Configure orchestrator with app service authentication
+  echo "Configuring Easy Auth for orchestrator API"
+
   orch_app_reg_id=$(create_aad_app_reg $orch_name $ORCH_API_APP_ROLE $MATCH_RESOURCE_GROUP)
+
+  # Wait a bit to prevent "service principal being created must in the local tenant" error
+  sleep 60
   orch_app_sp=$(create_aad_app_sp $orch_name $orch_app_reg_id)
+
+  # Activate App Service Authentication for the orchestrator API
   enable_easy_auth $orch_name $MATCH_RESOURCE_GROUP
 
   # Give query tool access to orchestrator
-  query_tool_identity=$(\
-    az webapp identity show \
-      --name $query_tool_name \
-      --resource-group $RESOURCE_GROUP \
-      --query principalId \
-      --output tsv)
+  # Wait a bit to prevent ResourceNotFoundError
+  sleep 60
   assign_app_role $orch_app_sp $query_tool_identity $ORCH_API_APP_ROLE
 
   script_completed
