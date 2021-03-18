@@ -1,6 +1,10 @@
 ﻿@page
 @model IndexModel
 
-<p>@Model.Message</p>
+<div class="grid-container">
+    <p>@Model.Message</p>
 
-<a asp-page="/ParticipantUploads">Participant Uploads</a>
+    <ul class="usa-list">
+      <li><a asp-page="/ParticipantUploads">Participant Uploads</a></li>
+    </ul>
+</div>
