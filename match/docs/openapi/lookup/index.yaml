@@ -1,0 +1,30 @@
+# Lookup API base spec
+openapi: 3.0.0
+info:
+  title: "Lookup ID Endpoint"
+  version: 1.0.0
+  description: "API for providing a Lookup ID and receiving the original match data"
+tags:
+  - name: "Match"
+servers:
+  - url: "/v1"
+paths:
+  /lookup_ids/{id}:
+    get:
+      summary: "get the original match data related to a Lookup ID"
+      description: "User can provide a Lookup ID and receive the match data associated with it"
+      responses:
+        '200':
+          description: "original active match data"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookupIdResponse'
+        '400':
+          description: "Bad request"
+        '404':
+          description: "Not Found"
+components:
+  schemas:
+    LookupIdResponse:
+      $ref: '../schemas/lookup.yaml#/LookupIdResponse'
