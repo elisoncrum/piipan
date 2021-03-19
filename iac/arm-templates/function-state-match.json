@@ -23,7 +23,7 @@
         "dbConnectionString": {
             "type": "string"
         },
-        "dbConnectionStringKey": {
+        "cloudName": {
             "type": "string"
         }
     },
@@ -151,8 +151,12 @@
                             "value": "[parameters('azAuthConnectionString')]"
                         },
                         {
-                            "name": "[parameters('dbConnectionStringKey')]",
+                            "name": "DatabaseConnectionString",
                             "value": "[parameters('dbConnectionString')]"
+                        },
+                        {
+                            "name": "CloudName",
+                            "value": "[parameters('cloudName')]"
                         }
                     ]
                 }

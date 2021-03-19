@@ -362,7 +362,7 @@ main () {
           stateName="$name" \
           stateAbbr="$abbr" \
           dbConnectionString="$db_conn_str" \
-          dbConnectionStringKey="$DB_CONN_STR_KEY")
+          cloudName="$CLOUD_NAME")
 
     # Store function names for future auth configuration
     match_func_names+=("$func_name")
