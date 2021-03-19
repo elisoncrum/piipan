@@ -16,16 +16,14 @@
         },
         "publisherName": {
             "type": "String"
-        },
-        "functionAppName": {
-            "type": "String"
         }
     },
     "variables": {
         "systemTypeTag": {
             "SysType": "PublicApi"
         },
-        "displayName": "Public API"
+        "displayName": "Public API",
+        "matchSetName": "match"
     },
     "resources": [
         {
@@ -65,11 +63,24 @@
             }
         },
         {
-            "type": "Microsoft.ApiManagement/service/apis",
+            "type": "Microsoft.ApiManagement/service/apiVersionSets",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(parameters('apiName'), '/', parameters('functionAppName'))]",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "displayName": "[variables('displayName')]",
+                "versioningScheme": "Segment"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]"
             ],
             "properties": {
                 "displayName": "[variables('displayName')]",
@@ -77,7 +88,9 @@
                 "protocols": [
                     "https"
                 ],
-                "path": "/api"
+                "path": "",
+                "apiVersion": "v1",
+                "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]"
             }
         }
     ],
