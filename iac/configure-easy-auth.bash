@@ -135,20 +135,23 @@ assign_app_role () {
     --query "appRoles[?value == '${role}'].id" \
     --output tsv)
 
+  domain=$(graph_host_suffix)
+
   # Similar to `az ad app create`, `az rest` will throw error when assigning
   # an app role to an identity that already has the role.
   exists=$(\
     az rest \
     --method GET \
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --uri "https://graph${domain}/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
     --query "value[?principalId == '${principal_id}'].appRoleId" \
     --output tsv)
+
   if [ -z "$exists" ]; then
     role_json=`app_role_assignment $principal_id $resource_id $role_id`
     echo $role_json
     az rest \
     --method POST \
-    --uri "https://graph.microsoft.com/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
+    --uri "https://graph${domain}/v1.0/servicePrincipals/${resource_id}/appRoleAssignedTo" \
     --headers 'Content-Type=application/json' \
     --body "$role_json"
   fi
@@ -201,6 +204,44 @@ enable_easy_auth () {
     --set "appRoleAssignmentRequired=true"
 }
 
+# Configures App Service Authentication (aka Easy Auth) for an API provider
+# (a Function App) and an API client (either a Function App or App Service):
+#    - Registers an Azure Active Directory (AAD) app with an application role
+#      for the API provider.
+#    - Create a service principal (SP) for the app registation.
+#    - Add the application role to the client identity.
+#    - Configure and enable App Service Authentiction (i.e., Easy Auth)
+#      for the API provider.
+#    - Enable requirement that authentication tokens are only issued to client
+#      applications that are assigned an app role.
+#
+# <func> is the name of the API provider Function App
+# <group> is the resource group <func> belongs to
+# <role> is the Piipan role name
+# <client_identity> is the principal id of the client Function App/App service
+configure_easy_auth_pair () {
+  local func=$1
+  local group=$2
+  local role=$3
+  local client_identity=$4
+
+  local func_app_reg_id
+  func_app_reg_id=$(create_aad_app_reg $func $role $group)
+
+  # Wait a bit to prevent "service principal being created must in the local tenant" error
+  sleep 60
+  local func_app_sp
+  func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
+
+  # Activate App Service Authentication for the Function App API
+  enable_easy_auth $func $group
+
+  # Give the client component access to the Function App API
+  # Wait a bit to prevent ResourceNotFoundError
+  sleep 60
+  assign_app_role $func_app_sp $client_identity $role
+}
+
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
@@ -225,45 +266,27 @@ main () {
       --query principalId \
       --output tsv)
 
-  # With per-state and orchestrator APIs created, perform the necessary
-  # configurations to enable authentication and authorization of the
-  # orchestrator with each state.
-  #
-  # For each state:
-  #   - Register an Azure Active Directory (AAD) app with an application
-  #     role named the value of `STATE_API_APP_ROLE`
-  #   - Create a service principal (SP) for the app registation
-  #   - Add the application role to the orchestrator API's identity
-  #   - Configure and enable App Service Authentiction (i.e., Easy Auth)
-  #     for state's Function app.
-  #   - Enable requirement that authentication tokens are only issued to
-  #     client applications that are assigned an app role.
-
-  for func in "${match_func_names[@]}"
-  do
-    echo "Configuring Easy Auth for ${func}"
-
-    func_app_reg_id=$(create_aad_app_reg $func $STATE_API_APP_ROLE $MATCH_RESOURCE_GROUP)
-    func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
-    assign_app_role $func_app_sp $orch_identity $STATE_API_APP_ROLE
-
-    # Activate App Service Authentication for the function app
-    enable_easy_auth $func $MATCH_RESOURCE_GROUP
-  done
-
-  # Configure orchestrator with app service authentication
-  orch_app_reg_id=$(create_aad_app_reg $orch_name $ORCH_API_APP_ROLE $MATCH_RESOURCE_GROUP)
-  orch_app_sp=$(create_aad_app_sp $orch_name $orch_app_reg_id)
-  enable_easy_auth $orch_name $MATCH_RESOURCE_GROUP
-
-  # Give query tool access to orchestrator
   query_tool_identity=$(\
     az webapp identity show \
       --name $query_tool_name \
       --resource-group $RESOURCE_GROUP \
       --query principalId \
       --output tsv)
-  assign_app_role $orch_app_sp $query_tool_identity $ORCH_API_APP_ROLE
+
+  for func in "${match_func_names[@]}"
+  do
+    echo "Configure Easy Auth for PerStateMatchApi:${func} and OrchestratorApi"
+    configure_easy_auth_pair \
+      $func $MATCH_RESOURCE_GROUP \
+      $STATE_API_APP_ROLE \
+      $orch_identity
+  done
+
+  echo "Configure Easy Auth for OrchestratorApi and QueryApp"
+  configure_easy_auth_pair \
+    $orch_name $MATCH_RESOURCE_GROUP \
+    $ORCH_API_APP_ROLE \
+    $query_tool_identity
 
   script_completed
 }

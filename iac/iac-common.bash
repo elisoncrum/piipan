@@ -120,4 +120,12 @@ front_door_host_suffix () {
     echo ".azurefd.net"
   fi
 }
+
+graph_host_suffix () {
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    echo ".microsoft.us"
+  else
+    echo ".microsoft.com"
+  fi
+}
 ### END Functions
