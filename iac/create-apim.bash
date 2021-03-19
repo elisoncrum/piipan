@@ -55,8 +55,7 @@ main () {
   APIM_NAME='nac-api'
   PUBLISHER_NAME='NAC Administrator'
   publisher_email=$2
-  #orch_name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
-  orch_name='ofunchaaz7alkqwuvo'
+  orch_name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
 
   apim_name=$(\
     az deployment group create \
