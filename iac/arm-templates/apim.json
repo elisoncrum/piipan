@@ -1,0 +1,90 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiName": {
+            "type": "String"
+        },
+        "resourceTags": {
+            "type": "object"
+        },
+        "location": {
+            "type": "String"
+        },
+        "publisherEmail": {
+            "type": "String"
+        },
+        "publisherName": {
+            "type": "String"
+        },
+        "functionAppName": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "systemTypeTag": {
+            "SysType": "PublicApi"
+        },
+        "displayName": "Public API"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[parameters('apiName')]",
+            "location": "[parameters('location')]",
+            "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "publisherEmail": "[parameters('publisherEmail')]",
+                "publisherName": "[parameters('publisherName')]",
+                "hostnameConfigurations": [
+                    {
+                        "type": "Proxy",
+                        "hostName": "[concat(parameters('apiName'), '.azure-api.net')]",
+                        "defaultSslBinding": true
+                    }
+                ],
+                /* Explicity asserting security settings rather than relying on defaults. */
+                "customProperties": {
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "false"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', parameters('functionAppName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "displayName": "[variables('displayName')]",
+                "subscriptionRequired": true,
+                "protocols": [
+                    "https"
+                ],
+                "path": "/api"
+            }
+        }
+    ],
+    "outputs": {
+        "apimName": {
+            "type": "string",
+            "value": "[parameters('apiName')]"
+        }
+    }
+}
