@@ -22,16 +22,16 @@
         }
     },
     "variables": {
-        "uniqueApiName": "[concat(toLower(parameters('apiName')), '-', uniqueString(resourceGroup().id))]",
         "systemTypeTag": {
-            "SysType": "NacApi"
-        }
+            "SysType": "PublicApi"
+        },
+        "displayName": "Public API"
     },
     "resources": [
         {
             "type": "Microsoft.ApiManagement/service",
             "apiVersion": "2020-06-01-preview",
-            "name": "[variables('uniqueApiName')]",
+            "name": "[parameters('apiName')]",
             "location": "[parameters('location')]",
             "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "sku": {
@@ -47,7 +47,7 @@
                 "hostnameConfigurations": [
                     {
                         "type": "Proxy",
-                        "hostName": "[concat(variables('uniqueApiName'), '.azure-api.net')]",
+                        "hostName": "[concat(parameters('apiName'), '.azure-api.net')]",
                         "defaultSslBinding": true
                     }
                 ],
@@ -67,12 +67,12 @@
         {
             "type": "Microsoft.ApiManagement/service/apis",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(variables('uniqueApiName'), '/', parameters('functionAppName'))]",
+            "name": "[concat(parameters('apiName'), '/', parameters('functionAppName'))]",
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service', variables('uniqueApiName'))]"
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
             "properties": {
-                "displayName": "Orchestrator API",
+                "displayName": "[variables('displayName')]",
                 "subscriptionRequired": true,
                 "protocols": [
                     "https"
@@ -84,7 +84,7 @@
     "outputs": {
         "apimName": {
             "type": "string",
-            "value": "[variables('uniqueApiName')]"
+            "value": "[parameters('apiName')]"
         }
     }
 }
