@@ -17,7 +17,8 @@ main () {
     fi
   fi
 
-  projects=$(find "$start_path" -name "*.csproj")
+  # Sort so `src` projects are updated before `tests` projects
+  projects=$(find "$start_path" -name "*.csproj" | sort)
 
   while IFS=, read csproj; do
     dn=$(dirname $csproj)
