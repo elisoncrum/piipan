@@ -448,6 +448,11 @@ main () {
   # Establish metrics sub-system
   ./create-metrics-resources.bash $azure_env
 
+  # Configures App Service Authentication between:
+  #   - PerStateMatchApi and OrchestratorApi
+  #   - OrchestratorApi and QueryApp
+  ./configure-easy-auth.bash $azure_env
+
   script_completed
 }
 
