@@ -24,6 +24,7 @@ The following environment variables are required by `Query` and are set by the [
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
 | `StateName` | [details](../../docs/iac.md#\:\~\:text=StateName) |
 | `StateAbbr` | [details](../../docs/iac.md#\:\~\:text=StateAbbr) |
+| `CloudName` | [details](../../docs/iac.md#\:\~\:text=CloudName) |
 
 ## Local development
 

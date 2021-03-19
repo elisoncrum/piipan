@@ -25,6 +25,8 @@ Piipan is designed to be a cloud-native system. It is under active development a
 * [Active Match Orchestrator API](./match)
 * [Query Tool & Collaboration app](./query-tool)
 * [Dashboard app](./dashboard)
+* [Metrics](./metrics)
+* Collaboration
 * Batch-driven Passive Match
  
 A diagram depicting these anticipated subsystems is below:
