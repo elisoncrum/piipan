@@ -61,9 +61,10 @@ namespace Piipan.Match.State.Tests
 
         // Non-required and empty/whitespace properties parse to null
         [Theory]
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-0000'}")] // Missing optionals
-        [InlineData(@"{last: 'Last', middle: '', first: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty optionals
-        [InlineData(@"{last: 'Last', middle: '     ', first: '\n', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace optionals
+        [InlineData(@"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}")] // Missing optionals
+        [InlineData(@"{last: 'Last', middle: '', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty optionals
+        [InlineData(@"{last: 'Last', middle: '     ', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace optionals
+        [InlineData(@"{last: 'Last', middle: '\n', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace optionals
         public void ExpectEmptyOptionalPropertiesToBeNull(string query)
         {
             // Arrage
@@ -76,7 +77,6 @@ namespace Piipan.Match.State.Tests
 
             // Assert
             Assert.Null(request.Query.Middle);
-            Assert.Null(request.Query.First);
             Assert.True(valid);
         }
 
@@ -163,10 +163,12 @@ namespace Piipan.Match.State.Tests
         // Invalid data fails validation
         // Note: date validation happens in `Api.Parse` not `Api.Validate`
         [Theory]
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
-        [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
-        [InlineData(@"{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
+        [InlineData(@"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
+        [InlineData(@"{last: '', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
+        [InlineData(@"{last: 'Last', first: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty first
+        [InlineData(@"{last: '        ', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
+        [InlineData(@"{last: 'Last', first: '       ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace first
+        [InlineData(@"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
         public void ExpectQueryToBeInvalid(string query)
         {
             // Arrange
@@ -228,7 +230,7 @@ namespace Piipan.Match.State.Tests
         public void SqlHasIsNullCondition()
         {
             // Arrange
-            var body = JsonBody(@"{last:'Last', dob: '1970-01-01', ssn: '000-00-0000'}");
+            var body = JsonBody(@"{last:'Last', first: 'First', dob: '1970-01-01', ssn: '000-00-0000'}");
             var logger = Mock.Of<ILogger>();
 
             // Act
@@ -237,7 +239,6 @@ namespace Piipan.Match.State.Tests
 
             // Assert
             Assert.Contains("middle IS NULL", sql);
-            Assert.Contains("first IS NULL", sql);
         }
 
         // SQL contains strings

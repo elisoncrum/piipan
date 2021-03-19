@@ -19,7 +19,7 @@ namespace Piipan.Match.State
         [JsonProperty("last", Required = Required.Always)]
         public string Last { get; set; }
 
-        [JsonProperty("first", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("first", Required = Required.Always)]
         [JsonConverter(typeof(NullConverter))]
         public string First { get; set; }
 

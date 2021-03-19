@@ -139,13 +139,13 @@ namespace Piipan.Match.Orchestrator.Tests
         [Fact]
         public void PiiRecordJson()
         {
-            var json = @"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}";
+            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000'}";
             var record = JsonConvert.DeserializeObject<PiiRecord>(json);
 
             Assert.Contains("\"last\": \"Last\"", record.ToJson());
             Assert.Contains("\"dob\": \"2020-01-01\"", record.ToJson());
             Assert.Contains("\"ssn\": \"000000000\"", record.ToJson());
-            Assert.Contains("\"first\": null", record.ToJson());
+            Assert.Contains("\"first\": \"First\"", record.ToJson());
             Assert.Contains("\"middle\": null", record.ToJson());
             Assert.Contains("\"exception\": null", record.ToJson());
             Assert.Contains("\"state_name\": null", record.ToJson());
@@ -178,6 +178,8 @@ namespace Piipan.Match.Orchestrator.Tests
         [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
         [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
         [InlineData(@"{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
+        [InlineData(@"{last: 'Last', first: '', dob: '2020-01-01', ssn: '000-00-000'}")] // Empty first
+        [InlineData(@"{last: 'Last', first: '       ', dob: '2020-01-01', ssn: '000-00-000'}")] // Whitespace first
         [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
         public async void ExpectBadResultFromInvalidData(string query)
         {
@@ -203,6 +205,7 @@ namespace Piipan.Match.Orchestrator.Tests
         [InlineData(@"{last: 'Last', dob: '2020-01-01'}")] // Missing Ssn
         [InlineData(@"{last: 'Last', dob: '2020-01-1', ssn: '000-00-000'}")] // Invalid Dob DateTime
         [InlineData(@"{last: 'Last', dob: '', ssn: '000-00-000'}")] // Empty Dob DateTime
+        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Missing First
         public async void ExpectBadResultFromIncompleteData(string query)
         {
             // Arrange
