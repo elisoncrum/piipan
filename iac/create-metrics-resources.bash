@@ -137,6 +137,7 @@ EOF
     --settings \
       $DB_CONN_STR_KEY="$DB_CONN_STR" \
       $VAULT_NAME_KEY="$VAULT_NAME" \
+      $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
     --output none
 
   # Connect creds from function app to key vault so app can connect to db
@@ -207,6 +208,7 @@ EOF
       --settings \
         $DB_CONN_STR_KEY="$DB_CONN_STR" \
         $VAULT_NAME_KEY="$VAULT_NAME" \
+        $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
 
   # Connect creds from function app to key vault so app can connect to db

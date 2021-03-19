@@ -56,7 +56,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `StateAbbr` | Abbreviation of the state associated with the Function App instance. | Piipan.Match.State |
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Api, Piipan.Metrics.Collect |
-| `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.State |
+| `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.State, Piipan.Metrics.Api, Piipan.Metrics.Collect |
 
 
 ## `SysType` resource tag
