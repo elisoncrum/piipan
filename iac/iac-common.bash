@@ -73,13 +73,13 @@ pg_connection_string () {
 
 # Verify that the expected Azure environment is the active cloud
 verify_cloud () {
-  local cn=$(az cloud show --query name -o tsv)
+  local cn
+  cn=$(az cloud show --query name -o tsv)
 
   if [ "$CLOUD_NAME" != "$cn" ]; then
-    echo "error: '$cn' is the active cloud, expecting '$CLOUD_NAME'"
+    echo "error: '$cn' is the active cloud, expecting '$CLOUD_NAME'" 1>&2
     return 1
   fi
-  return 0
 }
 
 # Return a space-delimited string of resource names for the resources
