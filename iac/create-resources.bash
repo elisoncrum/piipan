@@ -13,30 +13,32 @@
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
 
-# Name of Key Vault
-VAULT_NAME=secret-keeper
+set_constants () {
+  # Name of Key Vault
+  VAULT_NAME=secret-keeper
 
-# Name of secret used to store the PostgreSQL server admin password
-PG_SECRET_NAME=particpants-records-admin
+  # Name of secret used to store the PostgreSQL server admin password
+  PG_SECRET_NAME=particpants-records-admin
 
-# Name of administrator login for PostgreSQL server
-PG_SUPERUSER=postgres
+  # Name of administrator login for PostgreSQL server
+  PG_SUPERUSER=postgres
 
-# Name of Azure Active Directory admin for PostgreSQL server
-PG_AAD_ADMIN=piipan-admins
+  # Name of Azure Active Directory admin for PostgreSQL server
+  PG_AAD_ADMIN=piipan-admins
 
-# Name of PostgreSQL server
-PG_SERVER_NAME=participant-records
+  # Name of PostgreSQL server
+  PG_SERVER_NAME=participant-records
 
-# Base name of query tool app
-QUERY_TOOL_APP_NAME=${PREFIX}-app-query-tool-${ENV}
-QUERY_TOOL_FRONTDOOR_NAME=querytool
+  # Base name of query tool app
+  QUERY_TOOL_APP_NAME=${PREFIX}-app-query-tool-${ENV}
+  QUERY_TOOL_FRONTDOOR_NAME=querytool
 
-# Display name of service principal account responsible for CI/CD tasks
-SP_NAME_CICD=piipan-cicd
+  # Display name of service principal account responsible for CI/CD tasks
+  SP_NAME_CICD=piipan-cicd
 
-# App Service Authentication is done at the Azure tenant level
-TENANT_ID=$(az account show --query homeTenantId -o tsv)
+  # App Service Authentication is done at the Azure tenant level
+  TENANT_ID=$(az account show --query homeTenantId -o tsv)
+}
 
 # Generate the storage account connection string for the corresponding
 # blob storage account.
@@ -76,6 +78,8 @@ main () {
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
   verify_cloud
+
+  set_constants
 
   ./create-resource-groups.bash $azure_env
 
@@ -425,7 +429,7 @@ main () {
 
   front_door_id=$(\
   az network front-door show \
-    --name $QUERY_TOOL_FRONTDOOR_NAME \
+    --name ${PREFIX}-fd-${QUERY_TOOL_FRONTDOOR_NAME}-${ENV} \
     --resource-group $RESOURCE_GROUP \
     --query frontdoorId \
     --output tsv)

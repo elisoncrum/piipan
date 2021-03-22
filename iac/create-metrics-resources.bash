@@ -245,7 +245,7 @@ EOF
 
   front_door_id=$(\
   az network front-door show \
-    --name $DASHBOARD_FRONTDOOR_NAME \
+    --name ${PREFIX}-fd-${DASHBOARD_FRONTDOOR_NAME}-${ENV} \
     --resource-group $RESOURCE_GROUP \
     --query frontdoorId \
     --output tsv)
