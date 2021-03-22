@@ -99,7 +99,7 @@ namespace Piipan.Match.State
                 middle = request.Query.Middle
             };
             var sql = "SELECT upload_id, first, last, middle, dob, ssn, exception FROM participants " +
-                        "WHERE ssn=@ssn AND dob=@dob AND last=@last AND first=@first" +
+                        "WHERE ssn=@ssn AND dob=@dob AND last=@last AND first=@first " +
                         "AND " + (p.middle == null ? "middle IS NULL" : "middle=@middle") + " " +
                         "AND upload_id=(SELECT id FROM uploads WHERE created_at = (SELECT MAX(created_at) FROM uploads))";
 
@@ -123,7 +123,8 @@ namespace Piipan.Match.State
 
             var resourceId = CommercialId;
             var cn = Environment.GetEnvironmentVariable(CloudName);
-            if (cn == GovernmentCloud) {
+            if (cn == GovernmentCloud)
+            {
                 resourceId = GovermentId;
             }
 
