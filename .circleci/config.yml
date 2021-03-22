@@ -143,7 +143,7 @@ jobs:
       - azure-cli/login-with-service-principal
       - run:
           name: Upload Dashboard
-          command: az webapp deployment source config-zip -g rg-core-dev -n fns-fd-dashboard-dev --src /build/workspace/dashboard.zip
+          command: az webapp deployment source config-zip -g rg-core-dev -n fns-app-dashboard-dev --src /build/workspace/dashboard.zip
       - run:
           name: Upload Query Tool
           command: az webapp deployment source config-zip -g rg-core-dev -n fns-app-query-tool-dev --src /build/workspace/query-tool.zip
