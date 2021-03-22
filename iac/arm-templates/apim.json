@@ -16,6 +16,9 @@
         },
         "publisherName": {
             "type": "String"
+        },
+        "orchestratorUrl": {
+            "type": "String"
         }
     },
     "variables": {
@@ -90,7 +93,8 @@
                 ],
                 "path": "",
                 "apiVersion": "v1",
-                "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]"
+                "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]",
+                "serviceUrl": "[parameters('orchestratorUrl')]"
             }
         },
         /* XXX generate via OpenAPI spec rather than hardcode */

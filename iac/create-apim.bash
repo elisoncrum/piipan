@@ -57,6 +57,16 @@ main () {
   PUBLISHER_NAME='API Administrator'
   publisher_email=$2
 
+  orch_name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
+  orch_base_url=$(\
+    az functionapp show \
+      -g $MATCH_RESOURCE_GROUP \
+      -n $orch_name \
+      --query defaultHostName \
+      --output tsv)
+  orch_base_url="https://${orch_base_url}"
+  orch_api_url="${orch_base_url}/api/v1"
+
   az deployment group create \
     --name apim-dev \
     --resource-group $MATCH_RESOURCE_GROUP \
@@ -65,6 +75,7 @@ main () {
       apiName=$APIM_NAME \
       publisherEmail=$publisher_email \
       publisherName="$PUBLISHER_NAME" \
+      orchestratorUrl=$orch_api_url \
       location=$LOCATION \
       resourceTags="$RESOURCE_TAGS"
 
