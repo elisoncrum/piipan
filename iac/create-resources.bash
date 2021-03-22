@@ -29,7 +29,7 @@ PG_AAD_ADMIN=piipan-admins
 PG_SERVER_NAME=participant-records
 
 # Base name of query tool app
-QUERY_TOOL_APP_NAME=piipan-query-tool
+QUERY_TOOL_APP_NAME=${PREFIX}-app-query-tool-${ENV}
 QUERY_TOOL_FRONTDOOR_NAME=querytool
 
 # Display name of service principal account responsible for CI/CD tasks
@@ -414,6 +414,23 @@ main () {
   # $orch_api to be set.
   echo "Creating App Service resources for query tool app"
 
+  echo "Create Front Door and WAF policy for query tool app"
+  suffix=$(web_app_host_suffix)
+  query_tool_host=${QUERY_TOOL_APP_NAME}${suffix}
+  ./add-front-door-to-app.bash \
+    $azure_env \
+    $RESOURCE_GROUP \
+    $QUERY_TOOL_FRONTDOOR_NAME \
+    $query_tool_host
+
+  front_door_id=$(\
+  az network front-door show \
+    --name $QUERY_TOOL_FRONTDOOR_NAME \
+    --resource-group $RESOURCE_GROUP \
+    --query frontdoorId \
+    --output tsv)
+  echo "Front Door iD: ${front_door_id}"
+
   orch_api_uri=$(\
     az functionapp function show \
       -g $MATCH_RESOURCE_GROUP \
@@ -422,28 +439,17 @@ main () {
       --query invokeUrlTemplate \
       -o tsv)
 
-  query_tool_name=$(\
-    az deployment group create \
-      --name $QUERY_TOOL_APP_NAME \
-      --resource-group $RESOURCE_GROUP \
-      --template-file ./arm-templates/query-tool-app.json \
-      --query properties.outputs.appName.value \
-      --output tsv \
-      --parameters \
-        location=$LOCATION \
-        resourceTags="$RESOURCE_TAGS" \
-        appName=$QUERY_TOOL_APP_NAME \
-        servicePlan=$APP_SERVICE_PLAN \
-        OrchApiUri=$orch_api_uri)
-
-  echo "Create Front Door and WAF policy for query tool app"
-  suffix=$(web_app_host_suffix)
-  query_tool_host=${query_tool_name}${suffix}
-  ./add-front-door-to-app.bash \
-    $azure_env \
-    $RESOURCE_GROUP \
-    $QUERY_TOOL_FRONTDOOR_NAME \
-    $query_tool_host
+  az deployment group create \
+    --name $QUERY_TOOL_APP_NAME \
+    --resource-group $RESOURCE_GROUP \
+    --template-file ./arm-templates/query-tool-app.json \
+    --parameters \
+      location=$LOCATION \
+      resourceTags="$RESOURCE_TAGS" \
+      appName=$QUERY_TOOL_APP_NAME \
+      servicePlan=$APP_SERVICE_PLAN \
+      frontDoorId=$front_door_id \
+      OrchApiUri=$orch_api_uri
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash $azure_env

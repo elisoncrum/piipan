@@ -66,6 +66,52 @@
                     "mode": "[parameters('wafMode')]",
                     "enabledState": "Enabled"
                 },
+                "customRules": {
+                    "rules": [
+                        /* Allow GSA IP's */
+                        {
+                            "name": "IPAllowListRule",
+                            "enabledState": "Enabled",
+                            "priority": 300, /* Lower number denotes higher priority. This Allow Rule must be a highger priority than the Deny rule below. */
+                            "ruleType": "MatchRule",
+                            "rateLimitDurationInMinutes": 1,
+                            "rateLimitThreshold": 100,
+                            "matchConditions": [
+                                {
+                                    "matchVariable": "RemoteAddr",
+                                    "operator": "IPMatch",
+                                    "negateCondition": false,
+                                    "matchValue": [
+                                        "159.142.0.0/16" /* GSA IP range */
+                                    ],
+                                    "transforms": []
+                                }
+                            ],
+                            "action": "Allow"
+                        },
+                        /* Deny any non-GSA IP's */
+                        {
+                            "name": "IPDenyListRule",
+                            "enabledState": "Enabled",
+                            "priority": 301,
+                            "ruleType": "MatchRule",
+                            "rateLimitDurationInMinutes": 1,
+                            "rateLimitThreshold": 100,
+                            "matchConditions": [
+                                {
+                                    "matchVariable": "RemoteAddr",
+                                    "operator": "IPMatch",
+                                    "negateCondition": true, /* This is a double negative meaning "deny all IP's NOT within the matched range" */
+                                    "matchValue": [
+                                        "159.142.0.0/16" /* GSA IP range */
+                                    ],
+                                    "transforms": []
+                                }
+                            ],
+                            "action": "Block"
+                        }
+                    ]
+                },
                 "managedRules": {
                     "managedRuleSets": [
                         {
