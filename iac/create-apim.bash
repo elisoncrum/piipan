@@ -67,6 +67,11 @@ main () {
   orch_base_url="https://${orch_base_url}"
   orch_api_url="${orch_base_url}/api/v1"
 
+  # Edit policy template with proper application ID URI
+  APP_URI_PLACEHOLDER="{applicationUri}"
+  policy_path=$(dirname "$0")/apim-policy.xml
+  policy_xml=$(sed "s,$APP_URI_PLACEHOLDER,${orch_base_url}," $policy_path)
+
   az deployment group create \
     --name apim-dev \
     --resource-group $MATCH_RESOURCE_GROUP \
@@ -76,6 +81,7 @@ main () {
       publisherEmail=$publisher_email \
       publisherName="$PUBLISHER_NAME" \
       orchestratorUrl=$orch_api_url \
+      policyXml="$policy_xml" \
       location=$LOCATION \
       resourceTags="$RESOURCE_TAGS"
 

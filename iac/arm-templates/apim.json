@@ -19,6 +19,9 @@
         },
         "orchestratorUrl": {
             "type": "String"
+        },
+        "policyXml": {
+            "type": "String"
         }
     },
     "variables": {
@@ -121,6 +124,20 @@
                         "description": "Bad request. Missing one of the required properties in the request body."
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-query/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('matchSetName'), 'post-query')]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]",
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "value": "[parameters('policyXml')]",
+                "format": "xml"
             }
         }
     ],
