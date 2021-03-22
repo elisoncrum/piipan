@@ -11,6 +11,7 @@ MatchQueryRequest:
 MatchQuery:
   type: object
   required:
+    - first
     - last
     - dob
     - ssn

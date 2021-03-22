@@ -11,7 +11,6 @@ namespace Piipan.QueryTool
         [JsonPropertyName("first")]
         public string FirstName { get; set; }
 
-        [Required]
         [Display(Name = "Middle Name")]
         [JsonPropertyName("middle")]
         public string MiddleName { get; set; }
