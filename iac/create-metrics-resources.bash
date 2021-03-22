@@ -27,7 +27,7 @@ set_constants () {
   # Name of secret used to store the PostgreSQL metrics server admin password
   PG_SECRET_NAME=metrics-pg-admin
   # Base name of dashboard app
-  DASHBOARD_APP_NAME=piipan-dashboard
+  DASHBOARD_APP_NAME=${PREFIX}-app-dashboard-${ENV}
   DASHBOARD_FRONTDOOR_NAME=dashboard
 }
 
@@ -232,9 +232,25 @@ EOF
     func azure functionapp publish $API_APP_NAME --dotnet
   popd
 
-  # Deploying Dashboard App here because it now relies on info from metrics api.
-  # If we can get the metrics api function app name dynamically without deploying,
-  # then this can be moved to its own file.
+  ## Dashboard stuff
+
+  echo "Create Front Door and WAF policy for dashboard app"
+  suffix=$(web_app_host_suffix)
+  dashboard_host=${DASHBOARD_APP_NAME}${suffix}
+  ./add-front-door-to-app.bash \
+    $azure_env \
+    $RESOURCE_GROUP \
+    $DASHBOARD_FRONTDOOR_NAME \
+    $dashboard_host
+
+  front_door_id=$(\
+  az network front-door show \
+    --name ${PREFIX}-fd-${DASHBOARD_FRONTDOOR_NAME}-${ENV} \
+    --resource-group $RESOURCE_GROUP \
+    --query frontdoorId \
+    --output tsv)
+  echo "Front Door iD: ${front_door_id}"
+
   metrics_api_uri=$(\
     az functionapp function show \
       -g $METRICS_RESOURCE_GROUP \
@@ -245,28 +261,17 @@ EOF
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
-  dashboard_host_prefix=$(\
-    az deployment group create \
-      --name $DASHBOARD_APP_NAME \
-      --resource-group $RESOURCE_GROUP \
-      --template-file ./arm-templates/dashboard-app.json \
-      --query properties.outputs.appName.value \
-      --output tsv \
-      --parameters \
-        location=$LOCATION \
-        resourceTags="$RESOURCE_TAGS" \
-        appName=$DASHBOARD_APP_NAME \
-        servicePlan=$APP_SERVICE_PLAN \
-        metricsApiUri=$metrics_api_uri)
-
-  echo "Create Front Door and WAF policy for dashboard app"
-  suffix=$(web_app_host_suffix)
-  dashboard_host=${dashboard_host_prefix}${suffix}
-  ./add-front-door-to-app.bash \
-    $azure_env \
-    $RESOURCE_GROUP \
-    $DASHBOARD_FRONTDOOR_NAME \
-    $dashboard_host
+  az deployment group create \
+    --name $DASHBOARD_APP_NAME \
+    --resource-group $RESOURCE_GROUP \
+    --template-file ./arm-templates/dashboard-app.json \
+    --parameters \
+      location=$LOCATION \
+      resourceTags="$RESOURCE_TAGS" \
+      appName=$DASHBOARD_APP_NAME \
+      servicePlan=$APP_SERVICE_PLAN \
+      frontDoorId=$front_door_id \
+      metricsApiUri=$metrics_api_uri
 
   script_completed
 }

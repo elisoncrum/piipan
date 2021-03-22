@@ -5,6 +5,9 @@
         "appName": {
             "type": "string"
         },
+        "frontDoorId": {
+            "type": "string"
+        },
         "location": {
             "type": "string"
         },
@@ -19,16 +22,24 @@
         }
     },
     "variables": {
-        "appName": "[concat(parameters('appName'), '-', uniqueString(resourceGroup().id))]",
+        "appName": "[concat(parameters('appName'))]",
         "sku": "S1",
         "baseSiteConfig": {
             "linuxFxVersion": "DOTNETCORE|3.1",
             "ipSecurityRestrictions": [
+                /* Restricts access to Front Door resource only */
+                /* https://docs.microsoft.com/en-us/azure/app-service/app-service-ip-restrictions#manage-access-restriction-rules-programmatically */
                 {
-                    "ipAddress": "159.142.0.0/16",
+                    "ipAddress": "AzureFrontDoor.Backend",
+                    "tag": "ServiceTag",
                     "action": "Allow",
-                    "name": "GSA IP range",
-                    "priority": 100
+                    "priority": 100,
+                    "name": "Allow Azure Front Door access",
+                    "headers": {
+                        "x-azure-fdid": [
+                            "[concat(parameters('frontDoorId'))]"
+                        ]
+                    }
                 }
             ],
             "ftpsState": "Disabled",
