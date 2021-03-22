@@ -20,7 +20,6 @@ namespace Piipan.Match.Orchestrator
         public string Last { get; set; }
 
         [JsonProperty("first", Required = Required.Always)]
-        [JsonConverter(typeof(NullConverter))]
         public string First { get; set; }
 
         [JsonProperty("middle", NullValueHandling = NullValueHandling.Ignore)]
