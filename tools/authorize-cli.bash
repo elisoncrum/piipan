@@ -22,6 +22,10 @@ main () {
   verify_cloud
 
   app_uri=$2
+
+  # For references to hard-coded ID see:
+  # - https://docs.microsoft.com/en-us/azure-stack/user/azure-stack-rest-api-use?view=azs-2008#example
+  # - https://github.com/Azure/azure-cli/blob/24e0b9ef8716e16b9e38c9bb123a734a6cf550eb/src/azure-cli-core/azure/cli/core/_profile.py#L65
   CLI_ID="04b07795-8ddb-461a-bbee-02f9e1bf7b46"
 
   object_id=$(\
