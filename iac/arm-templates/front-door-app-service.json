@@ -89,7 +89,7 @@
                             ],
                             "action": "Allow"
                         },
-                        /* Deny any non-GSA IP's */
+                        /* Deny all IP's */
                         {
                             "name": "IPDenyListRule",
                             "enabledState": "Enabled",
@@ -100,11 +100,8 @@
                             "matchConditions": [
                                 {
                                     "matchVariable": "RemoteAddr",
-                                    "operator": "IPMatch",
-                                    "negateCondition": true, /* This is a double negative meaning "deny all IP's NOT within the matched range" */
-                                    "matchValue": [
-                                        "159.142.0.0/16" /* GSA IP range */
-                                    ],
+                                    "operator": "Any",
+                                    "matchValue": [], /* The matchValue key is required, but can be empty for the "Any" operator */
                                     "transforms": []
                                 }
                             ],
