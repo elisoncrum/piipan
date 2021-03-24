@@ -16,21 +16,6 @@ python3 validate.py example.csv
 ```
 Any errors present in the supplied CSV file will be printed to `stdout`.
 
-## Uploading files
-
-There are a variety of ways to upload files to your provided Azure blob storage resource. We recommend using any of the Azure-supported tools in the programming language of your choice, which are listed in full [here](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction#about-blob-storage). Popular tools are:
-
-- [.NET](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage)
-- [Java](https://docs.microsoft.com/en-us/java/api/overview/azure/storage?view=azure-java-stable)
-- [Node.js](https://github.com/Azure/azure-sdk-for-js/tree/master/sdk/storage)
-- [Python](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-python)
-
-You will need an Azure Access Key and a Connection string in order to use these tools. Contact a project representative to gain these credentials.
-
-You can also upload files in a Put Blob request through Azure Blob Storage's [REST API](https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob) which would require simililar key-based credentials.
-
-For more information on managing Azure Blob Storage, see [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction).
-
 ## Notes
 - Microsoft Excel is notorious for mangling CSV files. By default, it will reformat date fields, remove leading zeros in integer-like strings, etc. Round-tripping CSV files using Excel is only possible through careful import and export:
   1. Open a new workbook
