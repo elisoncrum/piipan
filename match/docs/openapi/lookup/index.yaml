@@ -4,8 +4,6 @@ info:
   title: "Lookup ID Endpoint"
   version: 1.0.0
   description: "API for providing a Lookup ID and receiving the original match data"
-tags:
-  - name: "Match"
 servers:
   - url: "/v1"
 paths:
