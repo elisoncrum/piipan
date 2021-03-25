@@ -10,7 +10,13 @@ AzCopy is a Microsoft-supported command line utility that you can use to upload 
 
 [Download AzCopy for your environment](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#run-azcopy)
 
-[How to upload files using AzCopy](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-blobs-upload)
+Example command to upload a csv file to a storage account:
+
+```
+azcopy copy '<yourfile.csv>' '<provided-storage-url>'
+```
+
+For more details on using AzCopy, visit the [Microsoft documentation](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-blobs-upload).
 
 ### Programmatically
 
@@ -29,4 +35,4 @@ You can also upload files in a Put Blob request through Azure Blob Storage's [RE
 
 ## Access
 
-For all of these uploads methods, you'll need an Azure Access Key and a Connection string to the storage resource. Contact a project representative to gain these credentials.
+For all of these uploads methods, you'll need an Azure Access Key and a Connection string to the storage resource. Contact a project representative to gain these credentials, specifying your intended upload method.
