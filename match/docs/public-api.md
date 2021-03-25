@@ -18,7 +18,7 @@ For a general overview of APIM, refer to [Microsoft's documentation](https://doc
 
 To call an endpoint:
 
-1. [Procure an API key](#managing-api-keys)
+1. [Obtain an API key](#managing-api-keys)
 1. Send a request, passing the API key in the `Ocp-Apim-Subscription-Key` header
 
 ## Managing endpoints
