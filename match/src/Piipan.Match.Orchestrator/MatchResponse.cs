@@ -7,6 +7,9 @@ namespace Piipan.Match.Orchestrator
 
     public class MatchQueryResponse
     {
+        [JsonProperty("lookup_id")]
+        public string LookupId { get; set; }
+
         [JsonProperty("matches")]
         public List<PiiRecord> Matches { get; set; }
 

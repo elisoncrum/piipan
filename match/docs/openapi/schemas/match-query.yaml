@@ -40,6 +40,7 @@ MatchQueryResponse:
   properties:
     lookup_id:
       type: string
+      nullable: true
       description: "the identifier of the match request"
     matches:
       type: array
