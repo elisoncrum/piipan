@@ -36,9 +36,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[5.0.3, )",
-        "resolved": "5.0.3",
-        "contentHash": "IDx2tijhyXGz7tVXQH0iGnCnW0ReSUy3UC99ytSklJKscob5WV8eLZWuT/jqYBq0l07RmZOSrdjUEDEetsgDIA==",
+        "requested": "[5.0.4, )",
+        "resolved": "5.0.4",
+        "contentHash": "wuJUsrhOKaR41ZB9Ecw9ZEpQzMQ5bRahl7w+pt4noVMDkDPbw4cMHV8UfNKeZSPLXaN4yWXPR2QgJ+2vG/85VQ==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
@@ -1924,7 +1924,7 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "5.0.3"
+          "Npgsql": "5.0.4"
         }
       }
     }
