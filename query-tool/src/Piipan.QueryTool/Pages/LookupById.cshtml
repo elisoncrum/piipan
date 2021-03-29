@@ -6,7 +6,7 @@
 }
 <div class="grid-container">
     <h2>@Model.Title</h2>
-    <form asp-page="Index" class="usa-form">
+    <form asp-page="LookupById" class="usa-form">
         <fieldset class="usa-fieldset">
             @if (!string.IsNullOrEmpty(Model.RequestError)) {
                     <div class="usa-alert usa-alert--error usa-alert--slim">
