@@ -1,28 +1,26 @@
 @model List<PiiRecord>
 @if (Model != null && Model.Any())
 {
-      <h2>Results</h2>
-      <table class="usa-table">
-          <thead>
-              <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">DOB</th>
-                  <th scope="col">SSN</th>
-                  <th scope="col">State</th>
-                  <th scope="col">Lookup ID</th>
-              </tr>
-          </thead>
-          <tbody>
+    <h2>Results</h2>
+    <table class="usa-table">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">DOB</th>
+            <th scope="col">SSN</th>
+            <th scope="col">State</th>
+        </tr>
+    </thead>
+    <tbody>
         @foreach (var record in @Model)
-      {
-              <tr>
-                  <td>@record.FirstName @record.MiddleName @record.LastName</td>
-                  <td>@record.DateOfBirth</td>
-                  <td>@record.SocialSecurityNum</td>
-                  <td>@record.StateName</td>
-                  <td>@record.LookupId</td>
-              </tr>
-      }
-          </tbody>
-      </table>
+            {
+                <tr>
+                    <td>@record.FirstName @record.MiddleName @record.LastName</td>
+                    <td>@record.DateOfBirth</td>
+                    <td>@record.SocialSecurityNum</td>
+                    <td>@record.StateName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
