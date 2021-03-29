@@ -54,30 +54,5 @@
             <input class="usa-button" type="submit" value="Submit" />
         </fieldset>
     </form>
-    @if (Model.QueryResult != null && Model.QueryResult.Any())
-    {
-        <h2>Results</h2>
-        <table class="usa-table">
-            <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">DOB</th>
-                    <th scope="col">SSN</th>
-                    <th scope="col">State</th>
-                </tr>
-            </thead>
-            <tbody>
-        @foreach (var record in @Model.QueryResult)
-            {
-                <tr>
-                    <td>@record.FirstName @record.MiddleName @record.LastName</td>
-                    <td>@record.DateOfBirth</td>
-                    <td>@record.SocialSecurityNum</td>
-                    <td>@record.StateName</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
-
+    <partial name="_ResultsTable" model="Model.QueryResult"/>
 </div>

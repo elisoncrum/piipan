@@ -1,0 +1,50 @@
+@page
+@model LookupByIdModel
+
+@{
+    ViewData["Title"] = "NAC Query Tool";
+}
+<div class="grid-container">
+    <h2>@Model.Title</h2>
+    <form asp-page="Index" class="usa-form">
+        <fieldset class="usa-fieldset">
+            @if (!string.IsNullOrEmpty(Model.RequestError)) {
+                    <div class="usa-alert usa-alert--error usa-alert--slim">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">@Model.RequestError</p>
+                        </div>
+                    </div>
+            }
+            else if (Model.NoResults)
+            {
+                    <div class="usa-alert usa-alert--info usa-alert--slim usa-alert--validation">
+                        <div class="usa-alert__body">
+                            <p class="usa-alert__text">Your search did not return any results.</p>
+                        </div>
+                    </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="usa-alert usa-alert--error usa-alert--validation">
+                    <div class="usa-alert__body">
+                        <ul>
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                @foreach (var error in modelState.Errors)
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+            <legend class="usa-legend">Search by Lookup ID</legend>
+            <label class="usa-label" asp-for="Query.LookupId"></label>
+            <input class="usa-input" type="text" asp-for="Query.LookupId" />
+            <input class="usa-button" type="submit" value="Submit" />
+        </fieldset>
+    </form>
+    <partial name="_ResultsTable" model="Model.QueryResult"/>
+</div>
