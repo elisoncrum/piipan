@@ -72,7 +72,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | OrchestratorApi | the single Function App for the Orchestrator API |
 | DashboardApp | the single Dashboard App Service |
 | QueryApp | the single Query tool App Service |
-| PublicApi | the single API Management instance for the external-facing matching API |
+| DualPartApi | the single API Management instance for the external-facing matching API |
 
 In the Azure Portal, tags can be added to resource lists using the "Manage view" and/or "Edit columns" menu item that appears at the top left of the view. Specific tag values can also be filtered via "Add filter".
 
