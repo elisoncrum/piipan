@@ -26,8 +26,8 @@ main () {
   # Required service principal name
   name="${storage_acct_name}-external"
 
-  # Optional output format
-  output=${3:-json}
+  # Role ID for Storage Blob Data Contributor
+  ROLE_ID=ba92f5b4-2d11-453d-a403-e96b0029c9fe
 
   # Get resource id of storage account
   scope=`az resource show -g $RESOURCE_GROUP -n $storage_acct_name --resource-type "Microsoft.Storage/storageAccounts" --query id --output tsv`
@@ -38,7 +38,7 @@ main () {
   echo "Creating/resetting service principal $name"
   az ad sp create-for-rbac \
     --name $name \
-    --role ba92f5b4-2d11-453d-a403-e96b0029c9fe \
+    --role $ROLE_ID \
     --scopes $scope
 
   script_completed
