@@ -1,8 +1,8 @@
-# Public API
+# Duplicate participation API
 
 ## Summary
 
-The public API is intended as a collection of external-facing endpoints for consumption by state systems. It is managed as an Azure API Management (APIM) instance and deployed by the [IaC](../../docs/iac.md).
+The duplicate participation API is intended as a collection of external-facing endpoints for consumption by state systems. It is managed as an Azure API Management (APIM) instance and deployed by the [IaC](../../docs/iac.md).
 
 Currently the API includes a single endpoint which maps to the [orchestrator](orchestrator-match.md) API's query endpoint.
 
@@ -23,7 +23,7 @@ To call an endpoint:
 
 ## Managing endpoints
 
-In APIM, endpoints take the form of operations. Operations are collected together within a parent resource called an API ([details](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts#-apis-and-operations)). Operations and their associated resources are managed in the [apim.json ARM template](../../iac/arm-templates/apim.json). New operations can be added to the Public API by including additional `Microsoft.ApiManagement/service/apis/operations` resources in the template.
+In APIM, endpoints take the form of operations. Operations are collected together within a parent resource called an API ([details](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts#-apis-and-operations)). Operations and their associated resources are managed in the [apim.json ARM template](../../iac/arm-templates/apim.json). New operations can be added to the duplicate participation API by including additional `Microsoft.ApiManagement/service/apis/operations` resources in the template.
 
 An operation's endpoint is constructed using the following components, all provided via the ARM template:
 

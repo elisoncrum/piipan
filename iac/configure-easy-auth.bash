@@ -259,7 +259,7 @@ main () {
 
   query_tool_name=$(get_resources $QUERY_APP_TAG $RESOURCE_GROUP)
 
-  public_api_name=$(get_resources $PUBLIC_API_TAG $MATCH_RESOURCE_GROUP)
+  dp_api_name=$(get_resources $DUP_PART_API_TAG $MATCH_RESOURCE_GROUP)
 
   orch_identity=$(\
     az webapp identity show \
@@ -275,9 +275,9 @@ main () {
       --query principalId \
       --output tsv)
 
-  public_api_identity=$(\
+  dp_api_identity=$(\
     az apim show \
-      --name $public_api_name \
+      --name $dp_api_name \
       --resource-group $MATCH_RESOURCE_GROUP \
       --query identity.principalId \
       --output tsv)
@@ -297,11 +297,11 @@ main () {
     $ORCH_API_APP_ROLE \
     $query_tool_identity
 
-  echo "Configure Easy Auth for OrchestratorApi and PublicApi"
+  echo "Configure Easy Auth for OrchestratorApi and DupPartApi"
   configure_easy_auth_pair \
     $orch_name $MATCH_RESOURCE_GROUP \
     $ORCH_API_APP_ROLE \
-    $public_api_identity
+    $dp_api_identity
 
   script_completed
 }
