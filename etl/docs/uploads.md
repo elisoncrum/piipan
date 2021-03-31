@@ -22,7 +22,7 @@ All of these items will vary between test and production environments.
 
 Upon receiving these credentials, you'll first authorize AzCopy through a [service principal approach](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-authorize-azure-active-directory?toc=/azure/storage/blobs/toc.json#authorize-a-service-principal).
 
-First save the password:
+First, save the password to the `AZCOPY_SPA_CLIENT_SECRET` environment variable, taking care to avoid saving it in your command-line history:
 
 PowerShell: `$env:AZCOPY_SPA_CLIENT_SECRET="$(Read-Host -prompt "Enter key")"`
 
