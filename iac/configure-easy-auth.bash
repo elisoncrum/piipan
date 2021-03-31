@@ -259,7 +259,7 @@ main () {
 
   query_tool_name=$(get_resources $QUERY_APP_TAG $RESOURCE_GROUP)
 
-  dp_api_name=$(get_resources $DUAL_PART_API_TAG $MATCH_RESOURCE_GROUP)
+  dp_api_name=$(get_resources $DUP_PART_API_TAG $MATCH_RESOURCE_GROUP)
 
   orch_identity=$(\
     az webapp identity show \
@@ -297,7 +297,7 @@ main () {
     $ORCH_API_APP_ROLE \
     $query_tool_identity
 
-  echo "Configure Easy Auth for OrchestratorApi and DualParticipationApi"
+  echo "Configure Easy Auth for OrchestratorApi and DuplicateParticipationApi"
   configure_easy_auth_pair \
     $orch_name $MATCH_RESOURCE_GROUP \
     $ORCH_API_APP_ROLE \

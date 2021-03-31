@@ -8,4 +8,4 @@
 * [Orchestrator PII matching API](./docs/orchestrator-match.md)
 * [Match ID Lookup](./docs/lookup.md)
 * [OpenAPI specifications](./docs/openapi.md)
-* [Dual participation API](./docs/dual-participation-api.md)
+* [Duplicate participation API](./docs/duplicate-participation-api.md)

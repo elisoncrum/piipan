@@ -26,9 +26,9 @@
     },
     "variables": {
         "systemTypeTag": {
-            "SysType": "DualPartApi"
+            "SysType": "DupPartApi"
         },
-        "displayName": "Dual participation API",
+        "displayName": "Duplicate participation API",
         "matchSetName": "match"
     },
     "resources": [
