@@ -32,5 +32,10 @@ namespace Piipan.Match.Orchestrator
 
         [JsonProperty("ssn", Required = Required.Always)]
         public string Ssn { get; set; }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.None);
+        }
     }
 }

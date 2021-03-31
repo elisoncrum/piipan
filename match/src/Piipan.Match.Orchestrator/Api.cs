@@ -60,6 +60,11 @@ namespace Piipan.Match.Orchestrator
             try
             {
                 response.Matches = await Match(request, log);
+
+                if (response.Matches.Count > 0)
+                {
+                    response.LookupId = LookupId.Generate(request.Query.ToJson());
+                }
             }
             catch (Exception ex)
             {
