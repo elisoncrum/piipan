@@ -29,6 +29,12 @@
         },
         "resourceTags": {
             "type": "object"
+        },
+        "vnetName": {
+            "type": "string"
+        },
+        "subnetName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -63,7 +69,27 @@
                             "type": "string"
                         },
                         "resourceTags": {
-                            "type": "object",
+                            "type": "object"
+                        },
+                        "subnetPrefix": {
+                            "type": "string",
+                            "defaultValue": "10.0.0.0/24",
+                            "metadata": {
+                                "description": "The address space for the subnet."
+                            }
+                        },
+                        "vnetAddressPrefix": {
+                            "type": "string",
+                            "defaultValue": "10.0.0.0/16",
+                            "metadata": {
+                                "description": "The address space reserved for this virtual network in CIDR notation."
+                            }
+                        },
+                        "vnetName": {
+                            "type": "string"
+                        },
+                        "subnetName": {
+                            "type": "string"
                         }
                     },
                     "variables": {
@@ -87,6 +113,33 @@
                     },
                     "resources": [
                         {
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "apiVersion": "2020-06-01",
+                            "name": "[parameters('vnetName')]",
+                            "location": "[parameters('location')]",
+                            "properties": {
+                                "addressSpace": {
+                                    "addressPrefixes": [
+                                        "[parameters('vnetAddressPrefix')]"
+                                    ]
+                                }
+                            },
+                            "resources": [
+                                {
+                                    "type": "subnets",
+                                    "apiVersion": "2020-06-01",
+                                    "name": "[parameters('subnetName')]",
+                                    "location": "[parameters('location')]",
+                                    "dependsOn": [
+                                        "[parameters('vnetName')]"
+                                    ],
+                                    "properties": {
+                                        "addressPrefix": "[parameters('subnetPrefix')]"
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             "type": "Microsoft.DBforPostgreSQL/servers",
                             "apiVersion": "2017-12-01-preview",
                             "kind": "",
@@ -106,13 +159,28 @@
                                 "previewFeature": "",
                                 "infrastructureEncryption": "Disabled"
                             },
+                            /* VNet Rules only work for GeneralPurpose and above tiers */
                             "sku": {
-                                "name": "B_Gen5_1",
-                                "tier": "Basic",
-                                "capacity": 1,
+                                "name": "GP_Gen5_2",
+                                "tier": "GeneralPurpose",
+                                "capacity": 2,
                                 "size": 5120,
                                 "family": "Gen5"
-                            }
+                            },
+                            "resources": [
+                                {
+                                    "type": "virtualNetworkRules",
+                                    "apiVersion": "2017-12-01",
+                                    "name": "vnetrule-participant-records-dev",
+                                    "dependsOn": [
+                                        "[resourceId('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
+                                    ],
+                                    "properties": {
+                                        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
+                                        "ignoreMissingVnetServiceEndpoint": true
+                                    }
+                                }
+                            ]
                         },
                         {
                             "type": "Microsoft.DBforPostgreSQL/servers/firewallRules",
@@ -155,6 +223,12 @@
                             },
                             "secretName": "[parameters('secretName')]"
                         }
+                    },
+                    "vnetName": {
+                        "value": "[parameters('vnetName')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('subnetName')]"
                     }
                 }
             }
