@@ -21,7 +21,7 @@ namespace Piipan.Match.Orchestrator
             var md5 = MD5.Create();
             var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(value));
 
-            // Reduce hash to 32 bits to fit into 7 encoded characters (29^7 > 2^32)
+            // Only keep the first 32-bits from the 128-bit hash so as to fit into 7 encoded characters (29^7 > 2^32)
             long hashInt = BitConverter.ToUInt32(hashBytes, 0);
 
             // Encode using custom alphabet
