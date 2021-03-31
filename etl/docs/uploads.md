@@ -7,7 +7,7 @@ Once you have [validated the format](./bulk-import.md) of your participant data 
 
 AzCopy is a Microsoft-supported command line utility that you can use to upload files to Azure blob storage resources.
 
-[Download AzCopy for your environment](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#run-azcopy)
+[Download AzCopy for your environment](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10#download-azcopy)
 
 #### Authorization
 
