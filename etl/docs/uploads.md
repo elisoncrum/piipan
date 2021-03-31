@@ -1,6 +1,6 @@
 ## Uploading Participant Data
 
-> ⚠️ This documentation is under active development and subject to change.
+> ⚠️ The service API for the bulk upload of PII data is not stable enough for client development. This documentation describes a _temporary_ approach that should allow states to quickly provide test data to our system with out expending development effort unnecessarily.
 
 Once you have [validated the format](./bulk-import.md) of your participant data CSV, our recommended approach for uploading the file is through AzCopy.
 #### AzCopy
