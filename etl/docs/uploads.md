@@ -26,7 +26,7 @@ First save the password:
 
 PowerShell: `$env:AZCOPY_SPA_CLIENT_SECRET="$(Read-Host -prompt "Enter key")"`
 
-Bash: `export AZCOPY_SPA_CLIENT_SECRET=<password>`
+Bash: `read -s -p "Enter key " AZCOPY_SPA_CLIENT_SECRET && export AZCOPY_SPA_CLIENT_SECRET`
 
 Then login using the application id and tenant id:
 
