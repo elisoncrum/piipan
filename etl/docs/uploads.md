@@ -2,7 +2,7 @@
 
 > ⚠️ The service API for the bulk upload of PII data is not stable enough for client development. This documentation describes a _temporary_ approach that should allow states to quickly provide test data to our system with out expending development effort unnecessarily.
 
-Once you have [validated the format](./bulk-import.md) of your participant data CSV, our recommended approach for uploading the file is through AzCopy.
+Once you have [validated the format](./bulk-import.md) of your participant data CSV, you can upload the file to the system through AzCopy.
 #### AzCopy
 
 AzCopy is a Microsoft-supported command line utility that you can use to upload files to Azure blob storage resources.
