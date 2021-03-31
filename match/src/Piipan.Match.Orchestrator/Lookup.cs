@@ -1,5 +1,54 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Logging;
+
 namespace Piipan.Match.Orchestrator
 {
+    static class Lookup
+    {
+        const int InsertRetries = 10;
+        const string PartitionKey = "lookup";
+
+        /// <summary>
+        /// Generate a `lookup_id` based on the provided MatchQuery and save to storage
+        /// using the provided ITableStorage instance.
+        /// </summary>
+        /// <returns>Unique `lookup_id` string for saved query</returns>
+        /// <param name="query">MatchQuery instance for saving</param>
+        /// <param name="tableStorage">handle to the table storage instance</param>
+        /// <param name="log">handle to the function log</param>
+        public static async Task<string> Save(MatchQuery query, ITableStorage<QueryEntity> tableStorage, ILogger log)
+        {
+            var entity = new QueryEntity(PartitionKey, LookupId.Generate());
+            entity.Body = query.ToJson();
+
+            // Lookup IDs are generated randomly from a large pool, but collision
+            // is still possible. Retry failed inserts a limited number of times.
+            var retries = 0;
+            while (retries < InsertRetries)
+            {
+                try
+                {
+                    var inserted = await tableStorage.InsertAsync(entity);
+                    return inserted.RowKey;
+                }
+                catch (StorageException)
+                {
+                    if (retries > 1)
+                    {
+                        log.LogWarning($"{retries} connsecutive lookup ID collisions.");
+                    }
+
+                    entity.RowKey = LookupId.Generate();
+                    retries++;
+                }
+            }
+
+            throw new Exception($"Lookup table insert failed after {InsertRetries} retries.");
+        }
+    }
+
     static class LookupId
     {
         private const string Chars = "23456789BCDFGHJKLMNPQRSTVWXYZ";
