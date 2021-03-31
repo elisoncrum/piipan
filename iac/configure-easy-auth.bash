@@ -297,7 +297,7 @@ main () {
     $ORCH_API_APP_ROLE \
     $query_tool_identity
 
-  echo "Configure Easy Auth for OrchestratorApi and DuplicateParticipationApi"
+  echo "Configure Easy Auth for OrchestratorApi and DupPartApi"
   configure_easy_auth_pair \
     $orch_name $MATCH_RESOURCE_GROUP \
     $ORCH_API_APP_ROLE \
