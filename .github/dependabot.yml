@@ -74,3 +74,13 @@ updates:
     interval: daily
     time: "09:00"
   open-pull-requests-limit: 10
+- package-ecosystem: nuget
+  directory: "/query-tool/src/Piipan.QueryTool"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/query-tool/tests/Piipan.QueryTool.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
