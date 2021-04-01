@@ -63,7 +63,7 @@ namespace Piipan.Match.Orchestrator
 
                 if (response.Matches.Count > 0)
                 {
-                    response.LookupId = LookupId.Generate(request.Query.ToJson());
+                    response.LookupId = LookupId.Generate();
                 }
             }
             catch (Exception ex)

@@ -42,6 +42,12 @@
           "Newtonsoft.Json": "11.0.2"
         }
       },
+      "Nanoid": {
+        "type": "Direct",
+        "requested": "[2.1.0, )",
+        "resolved": "2.1.0",
+        "contentHash": "V0eSnsq+Oeqf9uVPBH02kYE5p92s6Revskt4Cmqg3DIsiDoqrKKdlmqXvaFaehO3pS1Osu9BTtl3lMSRqPlbzw=="
+      },
       "Newtonsoft.Json.Schema": {
         "type": "Direct",
         "requested": "[3.0.14, )",
