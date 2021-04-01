@@ -29,6 +29,10 @@ set_constants () {
   # Name of PostgreSQL server
   PG_SERVER_NAME=participant-records
 
+  # Names of participant records database Vnet and Subnet
+  VNET_NAME=$PREFIX-vnet-$PG_SERVER_NAME-$ENV
+  SUBNET_NAME=$PREFIX-snet-$PG_SERVER_NAME-$ENV
+
   # Base name of query tool app
   QUERY_TOOL_APP_NAME=${PREFIX}-app-query-tool-${ENV}
   QUERY_TOOL_FRONTDOOR_NAME=querytool
@@ -147,7 +151,9 @@ main () {
       serverName=$PG_SERVER_NAME \
       secretName=$PG_SECRET_NAME \
       vaultName=$VAULT_NAME \
-      resourceTags="$RESOURCE_TAGS"
+      resourceTags="$RESOURCE_TAGS" \
+      vnetName=$VNET_NAME \
+      subnetName=$SUBNET_NAME
 
   # The AD admin can't be specified in the PostgreSQL ARM template,
   # unlike in Azure SQL
