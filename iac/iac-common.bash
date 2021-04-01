@@ -8,7 +8,7 @@ PER_STATE_MATCH_API_TAG="SysType=PerStateMatchApi"
 ORCHESTRATOR_API_TAG="SysType=OrchestratorApi"
 DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
-PUBLIC_API_TAG="SysType=PublicApi"
+DUP_PART_API_TAG="SysType=DupPartApi"
 
 # Identity object ID for the Azure environment account
 CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`

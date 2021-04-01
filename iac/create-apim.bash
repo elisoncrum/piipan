@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# Creates the API Management instance for managing the public-facing
-# match API. Assumes an Azure user with the Global Administrator role
-# has signed in with the Azure CLI. See install-extensions.bash for
-# prerequisite Azure CLI extensions. Deployment can take ~45 minutes
-# for new instances.
+# Creates the API Management instance for managing the external-facing
+# duplicate participation API. Assumes an Azure user with the Global
+# Administrator role has signed in with the Azure CLI.
+# See install-extensions.bash for prerequisite Azure CLI extensions.
+# Deployment can take ~45 minutes for new instances.
 #
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
@@ -53,7 +53,7 @@ main () {
   source $(dirname "$0")/env/${azure_env}.bash
   verify_cloud
 
-  APIM_NAME=apim-publicapi-${ENV}
+  APIM_NAME=apim-duppartapi-${ENV}
   PUBLISHER_NAME='API Administrator'
   publisher_email=$2
 

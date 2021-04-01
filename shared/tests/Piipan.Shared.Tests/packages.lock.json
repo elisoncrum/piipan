@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "Azure.Core": {
         "type": "Direct",
-        "requested": "[1.11.0, )",
-        "resolved": "1.11.0",
-        "contentHash": "yzA3cdN69MNr+UsPxg5R/11JYXi7N4aCNlUqBA03hRVCwIp4tdrEbujKKYSj2j/9yGGrKYKTOSWgw9Z2kihswQ==",
+        "requested": "[1.12.0, )",
+        "resolved": "1.12.0",
+        "contentHash": "ugGtSfCu6dk3+qnYKsl10ImutPD8OKWwmtKHMeUi//rK5XHC4HDVouyhepB9OTB4DV0O4uKnUknXP30cSZtfhg==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.0.0",
           "System.Buffers": "4.5.0",
@@ -1706,7 +1706,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.11.0",
+          "Azure.Core": "1.12.0",
           "Azure.Identity": "1.3.0"
         }
       }

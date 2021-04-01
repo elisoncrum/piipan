@@ -31,6 +31,8 @@ The following environment variables are required by both the Metrics Functions a
 | Name | |
 |---|---|
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
+| `CloudName` | [details](../../docs/iac.md#\:\~\:text=CloudName) |
+| `KeyVaultName` | [details](../../docs/iac.md#\:\~\:text=KeyVaultName) |
 
 ## Testing
 

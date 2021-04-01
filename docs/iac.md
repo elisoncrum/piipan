@@ -50,7 +50,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 
 | Name | Value | Used by |
 |---|---|---|
-| `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.State, PiipanMetricsFunctions, Piipan.Metrics.Api |
+| `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.State, Piipan.Metrics.Collect, Piipan.Metrics.Api |
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
 | `StateApiEndpointStrings` | Serialized JSON array of endpoints strings for accessing each per-state matching API. | Piipan.Match.Orchestrator |
@@ -72,7 +72,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | OrchestratorApi | the single Function App for the Orchestrator API |
 | DashboardApp | the single Dashboard App Service |
 | QueryApp | the single Query tool App Service |
-| PublicApi | the single API Management instance for the external-facing matching API |
+| DupPartApi | the single API Management instance for the external-facing matching API |
 
 In the Azure Portal, tags can be added to resource lists using the "Manage view" and/or "Edit columns" menu item that appears at the top left of the view. Specific tag values can also be filtered via "Add filter".
 

@@ -14,7 +14,8 @@ Subsystems:
 * [Extract-Transform-Load (ETL)](../etl/README.md)
 * [Active Match API](../match/README.md)
 * [Query Tool & Collaboration app](../query-tool/README.md)
-* [Dashboard](../dashboard/README.md)
+* [Dashboard app](../dashboard/README.md)
+* [Metrics](../metrics/README.md)
 
 Misc:
 * [Engineering Team Practices](./engineering-team-practices.md)

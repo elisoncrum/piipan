@@ -33,6 +33,9 @@ set_constants () {
   QUERY_TOOL_APP_NAME=${PREFIX}-app-query-tool-${ENV}
   QUERY_TOOL_FRONTDOOR_NAME=querytool
 
+  # Base name of lookup API storage account
+  LOOKUP_STORAGE_NAME=stlookupapi${ENV}
+
   # Display name of service principal account responsible for CI/CD tasks
   SP_NAME_CICD=piipan-cicd
 
@@ -403,6 +406,7 @@ main () {
       --parameters \
         resourceTags="$RESOURCE_TAGS" \
         location=$LOCATION \
+        LookupStorageName=$LOOKUP_STORAGE_NAME \
         StateApiUriStrings=$match_api_uris)
 
   echo "Waiting to publish function app"
