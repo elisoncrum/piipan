@@ -136,12 +136,16 @@ namespace Piipan.Match.Orchestrator
             var stateRequests = new List<Task<MatchQueryResponse>>();
             var stateApiUris = StateApiUris();
 
-            // Loop through each state, compile results
-            // XXX Refactor to leverage async operations
             foreach (var uri in stateApiUris)
             {
-                var stateMatches = await MatchState(uri, request, log);
-                matches.AddRange(stateMatches.Matches);
+                stateRequests.Add(MatchState(uri, request, log));
+            }
+
+            await Task.WhenAll(stateRequests.ToArray());
+
+            foreach (var stateRequest in stateRequests)
+            {
+                matches.AddRange(stateRequest.Result.Matches);
             }
 
             return matches;
