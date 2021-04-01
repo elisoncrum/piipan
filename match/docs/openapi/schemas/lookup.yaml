@@ -1,0 +1,8 @@
+#/components/schemas/LookupIdResponse
+LookupIdResponse:
+  type: "object"
+  required:
+    - data
+  properties:
+    data:
+      $ref: 'match-query.yaml#/MatchQuery'

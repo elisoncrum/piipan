@@ -6,13 +6,22 @@
 # which have been secured using App Service Authentication. Only intended
 # for development environments.
 #
-# usage: assign-app-role.bash function-name role-name
+# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# See iac/env for available environments.
+#
+# usage: assign-app-role.bash <azure-env> <func-app-name> <role-name>
 
 source $(dirname "$0")/common.bash || exit
+source $(dirname "$0")/../iac/iac-common.bash || exit
 
 main () {
-  function=$1
-  role=$2
+  # Load agency/subscription/deployment-specific settings
+  azure_env=$1
+  source $(dirname "$0")/../iac/env/${azure_env}.bash
+  verify_cloud
+
+  function=$2
+  role=$3
 
   # Get function's application object
   application=$(\
@@ -49,10 +58,12 @@ main () {
     \"appRoleId\": \"${role_id}\"
   }"
 
+  domain=$(graph_host_suffix)
+
   # Assign application role
   az rest \
     --method POST \
-    --uri "https://graph.microsoft.com/v1.0/users/${user}/appRoleAssignments" \
+    --uri "https://graph${domain}/v1.0/users/${user}/appRoleAssignments" \
     --headers 'Content-Type=application/json' \
     --body "$json"
 }

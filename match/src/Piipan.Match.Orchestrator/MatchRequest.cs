@@ -19,8 +19,7 @@ namespace Piipan.Match.Orchestrator
         [JsonProperty("last", Required = Required.Always)]
         public string Last { get; set; }
 
-        [JsonProperty("first", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(NullConverter))]
+        [JsonProperty("first", Required = Required.Always)]
         public string First { get; set; }
 
         [JsonProperty("middle", NullValueHandling = NullValueHandling.Ignore)]
@@ -33,5 +32,10 @@ namespace Piipan.Match.Orchestrator
 
         [JsonProperty("ssn", Required = Required.Always)]
         public string Ssn { get; set; }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.None);
+        }
     }
 }

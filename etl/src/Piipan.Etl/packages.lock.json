@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "CsvHelper": {
         "type": "Direct",
-        "requested": "[26.0.1, )",
-        "resolved": "26.0.1",
-        "contentHash": "8osOmXbxzY8S1w21t5ilmWPIlo0DrfYNUklJvLiBWcb33Sm6v5jATN0DmCsBS5KVLYdwX+vnx+FIGoGF+rJwkw==",
+        "requested": "[26.1.0, )",
+        "resolved": "26.1.0",
+        "contentHash": "bcyX9U6OYwx2P5pSgyiULEpGPVu8m+SMnC4atB9W8Srp+jQbsvAwgZ1PxSNfhM4CULhShYTDz22ABroCaxEpOQ==",
         "dependencies": {
           "Microsoft.CSharp": "4.5.0"
         }
@@ -58,9 +58,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[5.0.3, )",
-        "resolved": "5.0.3",
-        "contentHash": "IDx2tijhyXGz7tVXQH0iGnCnW0ReSUy3UC99ytSklJKscob5WV8eLZWuT/jqYBq0l07RmZOSrdjUEDEetsgDIA==",
+        "requested": "[5.0.4, )",
+        "resolved": "5.0.4",
+        "contentHash": "wuJUsrhOKaR41ZB9Ecw9ZEpQzMQ5bRahl7w+pt4noVMDkDPbw4cMHV8UfNKeZSPLXaN4yWXPR2QgJ+2vG/85VQ==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }

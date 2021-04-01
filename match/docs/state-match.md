@@ -13,7 +13,7 @@ An initial API for matching PII on a per-state basis:
     - If the request is not valid (malformed, missing required data, etc), the function returns a 400 response. Currently no error messaging is included in the response.
     - If the request is valid, the function uses a per-state managed identity to connect to the state-specific database in the `participant-records` cluster and queries for matching records. A 200 response is returned containing any matching record(s).
 
-While all states have separate function apps, managed identities, and databases, the function code is identical across each state.
+While all states have separate function apps, managed identities, databases, and Azure Active Directory resources, the function code is identical across each state.
 
 ## Environment variables
 
@@ -24,6 +24,7 @@ The following environment variables are required by `Query` and are set by the [
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
 | `StateName` | [details](../../docs/iac.md#\:\~\:text=StateName) |
 | `StateAbbr` | [details](../../docs/iac.md#\:\~\:text=StateAbbr) |
+| `CloudName` | [details](../../docs/iac.md#\:\~\:text=CloudName) |
 
 ## Local development
 
@@ -38,13 +39,7 @@ To build and run the app with this limited functionality:
 
 ## Manual deployment
 
-These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription. Running the IaC will set up a Function app for each participating state. Each app is associated with a storage account, an application insights instance, a state-specific managed identity, and a state-specific database. All settings necessary for connecting the app to the state database are automatically stored in the app's configuration.
-
-### Database setup
-
-See the [ETL database setup instructions](../../etl/docs/etl.md#database-setup).
-
-### App deployment
+These instructions assume that the [piipan infrastructure](../../docs/iac.md) has been established in the Azure subscription.
 
 Deploy the app using the Functions Core Tools, making sure to pass the `--dotnet` flag:
 
@@ -56,20 +51,12 @@ func azure functionapp publish <app_name> --dotnet
 
 ## Authentication and authorization
 
-Each Function App is configured to use Azure App Service Authentication (aka "Easy Auth") to control access and authenticate incoming requests. This authentication is activated by the IaC. Configuration details can also be seen in the Portal at {Function App} > Authentication / Authorization. The details of implementation are:
-
-- An Azure Active Directory App (aka, the app registration) is registered and configured for the Function App (aka, the API)
-- A generic application role named is added to the app registration and assigned to any consumers of the API (i.e., the orchestrator's system-assigned identity)
-- The API is configured to require all incoming requests to first authenticate with the app registration
-
-At a practical level, this implementation enforces the following authentication flow:
-
-1. The client application requests a token from the app registration
-1. The app registration grants a token if the client is a member of the AAD tenant and is assigned one of the app registration's application roles
-1. The client includes the token as an authentication header in the request sent to the API's query endpoint
-1. Easy auth validates the token (a `401 unauthorized` is returned if validation fails)
-1. The API executes the request
+Each Function App is configured to use Azure App Service Authentication (aka "Easy Auth") to control access and authenticate incoming requests. This configuration is performed as part of the IaC process. See [Securing our internal APIs](../../docs/securing-internal-apis.md) for implementation details.
 
 ## Remote testing
 
-With authentication enabled, there is currently no way to access the remote per-state APIs directly. Verify functionality by sending requests through the [orchestrator API](orchestrator-match.md).
+To test a deployed state API from your local environment:
+1. Assign your Azure user account the `StateApi.Query` role for the remote state Function App. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script. E.g., `./assign-app-role.bash tts/dev <remote state name> StateApi.Query`.
+1. Add the Azure CLI as an authorized client application to the remote state Function App's application object. This can be done using [`tools/authorize-cli.bash`](../../tools/authorize-cli.bash). E.g., `./authorize-cli.bash tts/dev <application ID URI>`, where [`application ID URI`](../../docs/securing-internal-apis.md#application-id-uri) is the base URL of the Function App *without a trailing slash*.
+1. Retrieve a token for your user using the Azure CLI: `az account get-access-token --resource <application ID URI>`.
+1. Send a request to the remote endpoint—perhaps using a tool like Postman or `curl`—and include the access token in the Authorization header: `Authorization: Bearer {token}`.

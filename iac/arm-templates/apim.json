@@ -1,0 +1,150 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiName": {
+            "type": "String"
+        },
+        "resourceTags": {
+            "type": "object"
+        },
+        "location": {
+            "type": "String"
+        },
+        "publisherEmail": {
+            "type": "String"
+        },
+        "publisherName": {
+            "type": "String"
+        },
+        "orchestratorUrl": {
+            "type": "String"
+        },
+        "policyXml": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "systemTypeTag": {
+            "SysType": "DupPartApi"
+        },
+        "displayName": "Duplicate participation API",
+        "matchSetName": "match"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ApiManagement/service",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[parameters('apiName')]",
+            "location": "[parameters('location')]",
+            "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "publisherEmail": "[parameters('publisherEmail')]",
+                "publisherName": "[parameters('publisherName')]",
+                "hostnameConfigurations": [
+                    {
+                        "type": "Proxy",
+                        "hostName": "[concat(parameters('apiName'), '.azure-api.net')]",
+                        "defaultSslBinding": true
+                    }
+                ],
+                /* Explicity asserting security settings rather than relying on defaults. */
+                "customProperties": {
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Ssl30": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "false",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "false"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apiVersionSets",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "displayName": "[variables('displayName')]",
+                "versioningScheme": "Segment"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]"
+            ],
+            "properties": {
+                "displayName": "[variables('displayName')]",
+                "subscriptionRequired": true,
+                "protocols": [
+                    "https"
+                ],
+                "path": "",
+                "apiVersion": "v1",
+                "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]",
+                "serviceUrl": "[parameters('orchestratorUrl')]"
+            }
+        },
+        /* XXX generate via OpenAPI spec rather than hardcode */
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-query')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]"
+            ],
+            "properties": {
+                "displayName": "Search for all matching PII records",
+                "method": "POST",
+                "urlTemplate": "/query",
+                "description": "Queries all state databases for any PII records that are an exact match to the full name, date of birth, and social security number in the request body's `query` property.",
+                "responses": [
+                    {
+                        "statusCode": 200,
+                        "description": "Matching PII records, if any exist"
+                    },
+                    {
+                        "statusCode": 400,
+                        "description": "Bad request. Missing one of the required properties in the request body."
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-query/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('matchSetName'), 'post-query')]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]",
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "value": "[parameters('policyXml')]",
+                "format": "xml"
+            }
+        }
+    ],
+    "outputs": {
+        "apimName": {
+            "type": "string",
+            "value": "[parameters('apiName')]"
+        }
+    }
+}

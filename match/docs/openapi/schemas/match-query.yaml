@@ -11,6 +11,7 @@ MatchQueryRequest:
 MatchQuery:
   type: object
   required:
+    - first
     - last
     - dob
     - ssn
@@ -37,6 +38,10 @@ MatchQuery:
 MatchQueryResponse:
   type: object
   properties:
+    lookup_id:
+      type: string
+      nullable: true
+      description: "the identifier of the match request"
     matches:
       type: array
       items:

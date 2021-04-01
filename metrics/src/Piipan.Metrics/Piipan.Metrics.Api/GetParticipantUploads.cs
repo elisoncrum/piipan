@@ -195,12 +195,20 @@ namespace Piipan.Metrics.Api
         {
             // Environment variable (and placeholder) established
             // during initial function app provisioning in IaC
+            const string CloudName = "CloudName";
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
+            const string GovernmentCloud = "AzureUSGovernment";
             const string secretName = "metrics-pg-admin";
             const string vaultNameKey = "KeyVaultName";
-            string? vaultName = Environment.GetEnvironmentVariable(vaultNameKey);
+
+            string? vaultName = Environment.GetEnvironmentVariable(vaultNameKey); 
             var kvUri = $"https://{vaultName}.vault.azure.net";
+
+            var cn = Environment.GetEnvironmentVariable(CloudName);
+            if (cn == GovernmentCloud) {
+                kvUri = $"https://{vaultName}.vault.usgovcloudapi.net";
+            }
 
             var builder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable(DatabaseConnectionString));

@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Piipan.Dashboard.Pages;
-using Piipan.Dashboard.Api;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Piipan.Dashboard.Api;
+using Piipan.Dashboard.Pages;
 using Xunit;
 
 namespace Piipan.Dashboard.Tests
@@ -21,7 +22,10 @@ namespace Piipan.Dashboard.Tests
         public void BeforeOnGetAsync_TitleIsCorrect()
         {
             var mockApi = new Mock<IParticipantUploadRequest>();
-            var pageModel = new ParticipantUploadsModel(mockApi.Object);
+            var pageModel = new ParticipantUploadsModel(
+                mockApi.Object,
+                new NullLogger<ParticipantUploadsModel>()
+            );
             Assert.Equal("Participant Uploads", pageModel.Title);
         }
 
@@ -42,7 +46,10 @@ namespace Piipan.Dashboard.Tests
         {
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
             var mockApi = new Mock<IParticipantUploadRequest>();
-            var pageModel = new ParticipantUploadsModel(mockApi.Object);
+            var pageModel = new ParticipantUploadsModel(
+                mockApi.Object,
+                new NullLogger<ParticipantUploadsModel>()
+            );
             Assert.Matches("http://example.com", pageModel.BaseUrl);
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
@@ -51,7 +58,10 @@ namespace Piipan.Dashboard.Tests
         public void BeforeOnGetAsync_initializesParticipantUploadResults()
         {
             var mockApi = new Mock<IParticipantUploadRequest>();
-            var pageModel = new ParticipantUploadsModel(mockApi.Object);
+            var pageModel = new ParticipantUploadsModel(
+                mockApi.Object,
+                new NullLogger<ParticipantUploadsModel>()
+            );
             Assert.IsType<List<ParticipantUpload>>(pageModel.ParticipantUploadResults);
         }
 
@@ -69,7 +79,10 @@ namespace Piipan.Dashboard.Tests
             var mockApi = mockApiWithResponse(data, meta);
             var pageContext = MockPageContext(new DefaultHttpContext());
             // setup page model with mocks
-            var pageModel = new ParticipantUploadsModel(mockApi.Object)
+            var pageModel = new ParticipantUploadsModel(
+                mockApi.Object,
+                new NullLogger<ParticipantUploadsModel>()
+            )
             {
                 PageContext = pageContext
             };
@@ -102,7 +115,10 @@ namespace Piipan.Dashboard.Tests
             httpContext.Request.Form = form;
             var pageContext = MockPageContext(httpContext);
             // setup page model with mocks
-            var pageModel = new ParticipantUploadsModel(mockApi.Object)
+            var pageModel = new ParticipantUploadsModel(
+                mockApi.Object,
+                new NullLogger<ParticipantUploadsModel>()
+            )
             {
                 PageContext = pageContext
             };
