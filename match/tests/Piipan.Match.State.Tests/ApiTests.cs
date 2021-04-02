@@ -225,22 +225,6 @@ namespace Piipan.Match.State.Tests
             Assert.Equal(bodyFormatted, request.ToJson());
         }
 
-        // SQL contains null
-        [Fact]
-        public void SqlHasIsNullCondition()
-        {
-            // Arrange
-            var body = JsonBody(@"{last:'Last', first: 'First', dob: '1970-01-01', ssn: '000-00-0000'}");
-            var logger = Mock.Of<ILogger>();
-
-            // Act
-            MatchQueryRequest request = Api.Parse(body, logger);
-            (var sql, var parameters) = Api.Prepare(request, logger);
-
-            // Assert
-            Assert.Contains("middle IS NULL", sql);
-        }
-
         // SQL contains strings
         [Fact]
         public void SqlHasEqualCondition()
@@ -254,7 +238,6 @@ namespace Piipan.Match.State.Tests
             (var sql, var parameters) = Api.Prepare(request, logger);
 
             // Assert
-            Assert.Contains("middle=@middle", sql);
             Assert.Contains("first=@first", sql);
         }
 
