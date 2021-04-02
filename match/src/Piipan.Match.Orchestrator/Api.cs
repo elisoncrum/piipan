@@ -79,6 +79,24 @@ namespace Piipan.Match.Orchestrator
             return (ActionResult)new JsonResult(response);
         }
 
+        /// <summary>
+        /// API endpoint for retrieving a MatchQuery using a lookup ID
+        /// </summary>
+        /// <param name="req">incoming HTTP request</param>
+        /// <param name="lookupId">lookup ID string (pulled from route)</param>
+        /// <param name="log">handle to the function log</param>
+        [FunctionName("lookup_ids")]
+        public async Task<IActionResult> LookupIds(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "lookups_ids/{lookupId}")] HttpRequest req,
+            string lookupId,
+            ILogger log)
+        {
+            LookupResponse response = new LookupResponse { Data = null };
+            response.Data = await Lookup.Retrieve(lookupId, _lookupStorage, log);
+
+            return (ActionResult)new JsonResult(response);
+        }
+
         private MatchQueryRequest Parse(string requestBody, ILogger log)
         {
             // Assume failure
