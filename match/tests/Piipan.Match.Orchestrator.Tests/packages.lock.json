@@ -669,6 +669,11 @@
           "System.Runtime": "4.3.0"
         }
       },
+      "Nanoid": {
+        "type": "Transitive",
+        "resolved": "2.1.0",
+        "contentHash": "V0eSnsq+Oeqf9uVPBH02kYE5p92s6Revskt4Cmqg3DIsiDoqrKKdlmqXvaFaehO3pS1Osu9BTtl3lMSRqPlbzw=="
+      },
       "ncrontab.signed": {
         "type": "Transitive",
         "resolved": "3.3.0",
@@ -1803,6 +1808,7 @@
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Extensions.Http": "3.1.13",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
+          "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Piipan.Shared": "1.0.0"
         }
