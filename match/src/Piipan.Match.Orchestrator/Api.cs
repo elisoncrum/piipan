@@ -87,7 +87,7 @@ namespace Piipan.Match.Orchestrator
         /// <param name="log">handle to the function log</param>
         [FunctionName("lookup_ids")]
         public async Task<IActionResult> LookupIds(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "lookups_ids/{lookupId}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "lookup_ids/{lookupId}")] HttpRequest req,
             string lookupId,
             ILogger log)
         {
