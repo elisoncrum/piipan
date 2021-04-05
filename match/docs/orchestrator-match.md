@@ -8,7 +8,11 @@
 ## Summary
 
 An initial API for matching PII data across all participating states.
-1. JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
+
+The orchestrator matching API is implemented in the `Piipan.Match.Orchestrator` project and deployed to an Azure Function App.
+
+To query the API:
+1. A JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
 1. The `POST` event triggers a function named `Query` in the orchestrator Function App.
     - If the request is unauthorized (does not include a valid bearer token), the function returns a `401` response.
     - If the request is not valid (malformed, missing required data, etc), the function returns a `400` response. Currently no error messaging is included in the response.
@@ -17,7 +21,7 @@ An initial API for matching PII data across all participating states.
 
 ## Environment variables
 
-The following environment variables are required by `Query` and are set by the [IaC](../../docs/iac.md):
+The following environment variables are required by the orchestrator and are set by the [IaC](../../docs/iac.md):
 
 | Name | |
 |---|---|

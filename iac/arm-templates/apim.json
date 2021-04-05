@@ -139,6 +139,57 @@
                 "value": "[parameters('policyXml')]",
                 "format": "xml"
             }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/get-lookup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]"
+            ],
+            "properties": {
+                "displayName": "Retrieve original match data",
+                "method": "GET",
+                "urlTemplate": "/lookup_ids/{lookupId}",
+                "description": "Get the original match data related to a lookup ID. User can provide a lookup ID and receive the match data associated with it.",
+                "templateParameters": [
+                    {
+                        "name": "lookupId",
+                        "description": "User-provided lookup ID",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": [
+                    {
+                        "statusCode": 200,
+                        "description": "Original active match data"
+                    },
+                    {
+                        "statusCode": 400,
+                        "description": "bad request"
+                    },
+                    {
+                        "statusCode": 404,
+                        "description": "not found"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/get-lookup/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('matchSetName'), 'get-lookup')]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]",
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "value": "[parameters('policyXml')]",
+                "format": "xml"
+            }
         }
     ],
     "outputs": {
