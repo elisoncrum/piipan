@@ -4,7 +4,12 @@
 
 The duplicate participation API is intended as a collection of external-facing endpoints for consumption by state systems. It is managed as an Azure API Management (APIM) instance and deployed by the [IaC](../../docs/iac.md).
 
-Currently the API includes a single endpoint which maps to the [orchestrator](orchestrator-match.md) API's query endpoint.
+The API includes the following endpoints:
+
+| Endpoint | Backend | Function |
+|---|---|---|
+| `/query` | [Orchestrator Function App](orchestrator-match.md) | `Query` |
+| `/lookup_ids/{lookupId}` | [Orchestrator Function App](orchestrator-match.md) | `LookupIds`|
 
 For a general overview of APIM, refer to [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/api-management/). Piipan makes use of the following concepts:
 
