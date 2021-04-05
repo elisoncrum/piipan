@@ -111,13 +111,25 @@ namespace Piipan.Match.Orchestrator.Tests
             return mockTokenProvider;
         }
 
-        static Mock<ITableStorage<QueryEntity>> MockLookupStorage()
+        public static Mock<ITableStorage<QueryEntity>> MockLookupStorage()
         {
-            var entity = new QueryEntity("partition", "rowkey");
+            var mockQuery = FullRequest();
             var mockLookupStorage = new Mock<ITableStorage<QueryEntity>>();
+
+            // Attempts to store a lookup ID should result in a QueryEntity
             mockLookupStorage
-                .Setup(t => t.InsertAsync(It.IsAny<QueryEntity>()))
+                .Setup(ts => ts.InsertAsync(It.IsAny<QueryEntity>()))
                 .Returns<QueryEntity>(e => Task.FromResult(e));
+
+            // Attempts to retrieve QueryEntity should result in a QueryEntity
+            mockLookupStorage
+                .Setup(ts => ts.PointQueryAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns<string, string>((pk, rk) =>
+                {
+                    var qe = new QueryEntity(pk, rk);
+                    qe.Body = mockQuery.Query.ToJson();
+                    return Task.FromResult(qe);
+                });
 
             return mockLookupStorage;
         }

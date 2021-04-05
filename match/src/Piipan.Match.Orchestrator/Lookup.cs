@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Piipan.Match.Orchestrator
 {
@@ -46,6 +47,26 @@ namespace Piipan.Match.Orchestrator
             }
 
             throw new Exception($"Lookup table insert failed after {InsertRetries} retries.");
+        }
+
+        /// <summary>
+        /// Retrieve a row from storage using a lookup ID
+        /// </summary>
+        /// <returns>QueryEntity representing the retrieved row</returns>
+        /// <param name="lookupId">the unique lookup ID (RowKey) for the row</param>
+        /// <param name="tableStorage">handle to the table storage instance</param>
+        /// <param name="log">handle to the function log</param>
+        public static async Task<MatchQuery> Retrieve(string lookupId, ITableStorage<QueryEntity> tableStorage, ILogger log)
+        {
+            MatchQuery query = null;
+            var row = await tableStorage.PointQueryAsync(PartitionKey, lookupId);
+
+            if (row != null)
+            {
+                query = JsonConvert.DeserializeObject<MatchQuery>(row.Body);
+            }
+
+            return query;
         }
     }
 
