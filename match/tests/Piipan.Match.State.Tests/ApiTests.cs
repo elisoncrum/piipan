@@ -238,7 +238,23 @@ namespace Piipan.Match.State.Tests
             (var sql, var parameters) = Api.Prepare(request, logger);
 
             // Assert
-            Assert.Contains("first=@first", sql);
+            Assert.Contains("upper(first)=upper(@first)", sql);
+        }
+
+        [Fact]
+        public void SqlHasNormlizedName()
+        {
+            // Arrange
+            var body = JsonBody(@"{last:'Last', first: 'First', middle: 'Middle', dob: '1970-01-01', ssn: '000-00-0000'}");
+            var logger = Mock.Of<ILogger>();
+
+            // Act
+            MatchQueryRequest request = Api.Parse(body, logger);
+            (var sql, var parameters) = Api.Prepare(request, logger);
+
+            // Assert
+            Assert.Contains("upper(last)=upper(@last)", sql);
+            Assert.Contains("upper(first)=upper(@first)", sql);
         }
 
         [Fact]
