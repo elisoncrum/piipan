@@ -8,6 +8,28 @@
 
 source $(dirname "$0")/common.bash || exit
 
+restore () {
+  options=${1:- }
+  dotnet restore $options > /dev/null
+}
+
+update () {
+  options=$1
+
+  # Don't want grep to result in error code for whole pipeline if no
+  # new packages found; see https://unix.stackexchange.com/a/581991
+  list=$(dotnet list package --outdated $options | tr -s ' ' | { grep '>' || test $? = 1; } | cut -f 3,6 -d ' ')
+  while IFS=, read line; do
+    trimmed=$(echo "$line" | tr -d '[:space:]')
+    if [ "$trimmed" != "" ]; then
+      package=$(echo $line | cut -f1 -d ' ')
+      version=$(echo $line | cut -f2 -d ' ')
+
+      dotnet add package --version $version $package
+    fi
+  done <<< "$list"
+}
+
 main () {
   start_path="$1"
   options="--highest-minor"
@@ -20,30 +42,22 @@ main () {
   # Sort so `src` projects are updated before `tests` projects
   projects=$(find "$start_path" -name "*.csproj" | sort)
 
-  while IFS=, read csproj; do
-    dn=$(dirname $csproj)
+  # Different dependency chains will cause errors or missed updates if
+  # individual projects are restored, updated, and force-restored one by
+  # one. Avoid this issue by running each operation against all projects
+  # before proceeding to the next.
+  operations=("restore" "update ${options}" "restore --force-evaluate")
 
-    pushd "$dn" > /dev/null
-      # Some projects will complain that "No assets file was found..."
-      # if you try to find outdated packages before running restore.
-      dotnet restore > /dev/null
+  for op in "${operations[@]}"
+  do
+    while IFS=, read csproj; do
+      dn=$(dirname $csproj)
 
-      # Don't want grep to result in error code for whole pipeline if no
-      # new packages found; see https://unix.stackexchange.com/a/581991
-      list=$(dotnet list package --outdated $options | tr -s ' ' | { grep '>' || test $? = 1; } | cut -f 3,6 -d ' ')
-      while IFS=, read line; do
-        trimmed=$(echo "$line" | tr -d '[:space:]')
-        if [ "$trimmed" != "" ]; then
-          package=$(echo $line | cut -f1 -d ' ')
-          version=$(echo $line | cut -f2 -d ' ')
-
-          dotnet add package --version $version $package
-        fi
-      done <<< "$list"
-
-      dotnet restore --force-evaluate
-    popd > /dev/null
-  done <<< "$projects"
+      pushd "$dn" > /dev/null
+        $op
+      popd > /dev/null
+    done <<< "$projects"
+  done
 
   script_completed
 }
