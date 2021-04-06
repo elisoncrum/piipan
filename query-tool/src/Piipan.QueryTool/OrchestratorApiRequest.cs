@@ -20,13 +20,18 @@ namespace Piipan.QueryTool
         }
 
         public string RequestUrl;
-        public Dictionary<string, IQueryable> Query = new Dictionary<string, IQueryable>();
+        public Dictionary<string, object> Query = new Dictionary<string, object>();
         private readonly IAuthorizedApiClient _apiClient;
 
         public async Task<List<PiiRecord>> SendQuery(string url, IQueryable query)
         {
             RequestUrl = url;
-            Query.Add("query", query);
+
+            if (query is PiiRecord) {
+                Query.Add("query", query as PiiRecord);
+            } else if (query is Lookup) {
+                Query.Add("query", query as Lookup);
+            }
             return await QueryOrchestrator();
         }
 
