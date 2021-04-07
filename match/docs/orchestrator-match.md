@@ -8,7 +8,11 @@
 ## Summary
 
 An initial API for matching PII data across all participating states.
-1. JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
+
+The orchestrator matching API is implemented in the `Piipan.Match.Orchestrator` project and deployed to an Azure Function App.
+
+To query the API:
+1. A JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
 1. The `POST` event triggers a function named `Query` in the orchestrator Function App.
     - If the request is unauthorized (does not include a valid bearer token), the function returns a `401` response.
     - If the request is not valid (malformed, missing required data, etc), the function returns a `400` response. Currently no error messaging is included in the response.
@@ -17,11 +21,13 @@ An initial API for matching PII data across all participating states.
 
 ## Environment variables
 
-The following environment variables are required by `Query` and are set by the [IaC](../../docs/iac.md):
+The following environment variables are required by the orchestrator and are set by the [IaC](../../docs/iac.md):
 
 | Name | |
 |---|---|
 | `StateApiUriStrings` | [details](../../docs/iac.md#\:\~\:text=StateApiUriStrings) |
+| `LookupConnectionString` | [details](../../docs/iac.md#\:\~\:text=LookupConnectionString) |
+| `LookupTableName` | [details](../../docs/iac.md#\:\~\:text=LookupTableName) |
 
 ## Binding to state APIs
 
@@ -33,16 +39,16 @@ At runtime, the app requests an authentication token from the state app's Active
 
 ## Local development
 
-Local development is achieved by connecting a locally running instance of the orchestrator API to remote instances of the state APIs. When running locally, `Startup.cs` conditionally configures the `Piipan.Shared.Autentication.AuthorizedJsonApiClient` dependency to use Azure CLI credentials when obtaining access tokens. To make use of this functionality:
+Local development is achieved by connecting a locally running instance of the orchestrator API to remote instances of the bound resources (per-state APIs, lookup table). When running locally, `Startup.cs` conditionally configures the `Piipan.Shared.Autentication.AuthorizedJsonApiClient` dependency to use Azure CLI credentials when obtaining access tokens for the per-state APIs. To make use of this functionality:
 
 1. Run `func azure functionapp fetch-app-settings <remote orchestrator name>` to ensure you have up-to-date local settings configured in `local.settings.json`.
 1. Run `func settings add DEVELOPMENT true` to add a `"DEVELOPMENT"` setting with a value of `"true"` to `local.settings.json`. This triggers the orchestrator to use your Azure CLI credentials when authenticating with the state APIs.
 1. Assign your user account the `StateApi.Query` role for each state the orchestrator queries. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script. E.g., `./assign-app-role.bash tts/dev <remote state function name> StateApi.Query`.
 1. Add the Azure CLI as an authorized client application to each state API's application object. This can be done using [`tools/authorize-cli.bash`](../../tools/authorize-cli.bash). E.g., `./authorize-cli.bash tts/dev <application ID URI>`, where [`application ID URI`](../../docs/securing-internal-apis.md#application-id-uri) is the base URL of the API's Azure Function *without a trailing slash*.
 
-With the orchestrator running locally (`func start` or `dotnet watch msbuild /t:RunFunctions`), any requests to the local endpoint will now use the user account authorized with Azure CLI to obtain access tokens from the state APIs.
+With the orchestrator running locally (`func start` or `dotnet watch msbuild /t:RunFunctions`), any requests to the local endpoint will now use the user account authorized with Azure CLI to obtain access tokens from the per-state APIs.
 
-A true local development approach with locally run instances of the per-state APIs and participant records database does not yet exist.
+A true local development approach with locally run instances of the per-state APIs, lookup table, and participant records database does not yet exist.
 
 ### App deployment
 

@@ -1,44 +1,38 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Piipan.Shared.Authentication;
 using Xunit;
 
 namespace Piipan.Match.Orchestrator.Tests
 {
     public class LookupTests
     {
-        const string json = "{last: 'Last', first: 'First', middle: 'Middle', dob: '2020-01-01', ssn: '000-00-0000'}";
-        const string json2 = "{last: 'last', first: 'first', middle: 'middle', dob: '2021-01-01', ssn: '000-11-1111'}";
 
-        [Fact]
-        public void Deterministic()
+        static Api ConstructMockedApi()
         {
-            var str = json;
-            var id = LookupId.Generate(str);
+            var apiClient = Mock.Of<IAuthorizedApiClient>();
+            var lookupStorage = ApiTests.MockLookupStorage();
+            var api = new Api(apiClient, lookupStorage.Object);
 
-            Assert.Equal(id, LookupId.Generate(str));
+            return api;
         }
 
-        [Theory]
-        [InlineData(json)]
-        [InlineData(json2)]
-        [InlineData("ABC123")]
-        [InlineData("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")]
-        public void ConformsToLength(string value)
+        [Fact]
+        public void LookupIdConformsToLength()
         {
-            var id = LookupId.Generate(value);
+            var id = LookupId.Generate();
 
             Assert.Equal(7, id.Length);
         }
 
-        [Theory]
-        [InlineData(json)]
-        [InlineData(json2)]
-        [InlineData("ABC123")]
-        [InlineData("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")]
-        public void ConformsToAlphabet(string value)
+        [Fact]
+        public void LookupIdConformsToAlphabet()
         {
             var disallowed = "01AEIOUabcdefghijklmnopqrstuvwxyz";
-            var id = LookupId.Generate(value);
+            var id = LookupId.Generate();
 
             foreach (char c in disallowed)
             {
@@ -47,16 +41,40 @@ namespace Piipan.Match.Orchestrator.Tests
         }
 
         [Fact]
-        public void Collisions()
+        public void LookupResponseJson()
         {
-            var ids = new List<string>{
-                LookupId.Generate(json),
-                LookupId.Generate(json + " "),
-                LookupId.Generate(json2),
-                LookupId.Generate(json2 + " ")
+            var mq = new MatchQuery
+            {
+                First = "first",
+                Middle = "middle",
+                Last = "last",
+                Dob = new DateTime(1970, 1, 1),
+                Ssn = "000-00-0000"
             };
+            var lr = new LookupResponse { Data = mq };
 
-            Assert.Equal(ids.Distinct().Count(), ids.Count);
+            Assert.Contains("\"first\": \"first\"", lr.ToJson());
+            Assert.Contains("\"middle\": \"middle\"", lr.ToJson());
+            Assert.Contains("\"last\": \"last\"", lr.ToJson());
+            Assert.Contains("\"dob\": \"1970-01-01\"", lr.ToJson());
+            Assert.Contains("\"ssn\": \"000-00-0000\"", lr.ToJson());
+        }
+
+        [Fact]
+        public async void SuccessfulApiCall()
+        {
+            // Arrange
+            var api = ConstructMockedApi();
+
+            // Act
+            var result = await api.LookupIds(Mock.Of<HttpRequest>(), "ABC1234", Mock.Of<ILogger>());
+            var jsonResult = result as JsonResult;
+            var lookupResponse = jsonResult.Value as LookupResponse;
+
+            // Assert
+            Assert.IsType<JsonResult>(result);
+            Assert.IsType<LookupResponse>(jsonResult.Value);
+            Assert.IsType<MatchQuery>(lookupResponse.Data);
         }
     }
 }

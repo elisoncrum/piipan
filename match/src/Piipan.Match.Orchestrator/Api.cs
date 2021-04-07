@@ -20,10 +20,12 @@ namespace Piipan.Match.Orchestrator
     public class Api
     {
         private readonly IAuthorizedApiClient _apiClient;
+        private readonly ITableStorage<QueryEntity> _lookupStorage;
 
-        public Api(IAuthorizedApiClient apiClient)
+        public Api(IAuthorizedApiClient apiClient, ITableStorage<QueryEntity> lookupStorage)
         {
             _apiClient = apiClient;
+            _lookupStorage = lookupStorage;
         }
 
         /// <summary>
@@ -63,7 +65,7 @@ namespace Piipan.Match.Orchestrator
 
                 if (response.Matches.Count > 0)
                 {
-                    response.LookupId = LookupId.Generate(request.Query.ToJson());
+                    response.LookupId = await Lookup.Save(request.Query, _lookupStorage, log);
                 }
             }
             catch (Exception ex)
@@ -73,6 +75,24 @@ namespace Piipan.Match.Orchestrator
                 log.LogError(ex.Message);
                 return (ActionResult)new InternalServerErrorResult();
             }
+
+            return (ActionResult)new JsonResult(response);
+        }
+
+        /// <summary>
+        /// API endpoint for retrieving a MatchQuery using a lookup ID
+        /// </summary>
+        /// <param name="req">incoming HTTP request</param>
+        /// <param name="lookupId">lookup ID string (pulled from route)</param>
+        /// <param name="log">handle to the function log</param>
+        [FunctionName("lookup_ids")]
+        public async Task<IActionResult> LookupIds(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "lookup_ids/{lookupId}")] HttpRequest req,
+            string lookupId,
+            ILogger log)
+        {
+            LookupResponse response = new LookupResponse { Data = null };
+            response.Data = await Lookup.Retrieve(lookupId, _lookupStorage, log);
 
             return (ActionResult)new JsonResult(response);
         }
@@ -136,12 +156,16 @@ namespace Piipan.Match.Orchestrator
             var stateRequests = new List<Task<MatchQueryResponse>>();
             var stateApiUris = StateApiUris();
 
-            // Loop through each state, compile results
-            // XXX Refactor to leverage async operations
             foreach (var uri in stateApiUris)
             {
-                var stateMatches = await MatchState(uri, request, log);
-                matches.AddRange(stateMatches.Matches);
+                stateRequests.Add(MatchState(uri, request, log));
+            }
+
+            await Task.WhenAll(stateRequests.ToArray());
+
+            foreach (var stateRequest in stateRequests)
+            {
+                matches.AddRange(stateRequest.Result.Matches);
             }
 
             return matches;

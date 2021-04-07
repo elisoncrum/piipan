@@ -111,12 +111,36 @@ namespace Piipan.Match.Orchestrator.Tests
             return mockTokenProvider;
         }
 
+        public static Mock<ITableStorage<QueryEntity>> MockLookupStorage()
+        {
+            var mockQuery = FullRequest();
+            var mockLookupStorage = new Mock<ITableStorage<QueryEntity>>();
+
+            // Attempts to store a lookup ID should result in a QueryEntity
+            mockLookupStorage
+                .Setup(ts => ts.InsertAsync(It.IsAny<QueryEntity>()))
+                .Returns<QueryEntity>(e => Task.FromResult(e));
+
+            // Attempts to retrieve QueryEntity should result in a QueryEntity
+            mockLookupStorage
+                .Setup(ts => ts.PointQueryAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns<string, string>((pk, rk) =>
+                {
+                    var qe = new QueryEntity(pk, rk);
+                    qe.Body = mockQuery.Query.ToJson();
+                    return Task.FromResult(qe);
+                });
+
+            return mockLookupStorage;
+        }
+
         static Api Construct()
         {
             var client = new HttpClient();
             var tokenProvider = new EasyAuthTokenProvider();
             var apiClient = new AuthorizedJsonApiClient(client, tokenProvider);
-            var api = new Api(apiClient);
+            var lookupStorage = Mock.Of<ITableStorage<QueryEntity>>();
+            var api = new Api(apiClient, lookupStorage);
 
             return api;
         }
@@ -126,8 +150,9 @@ namespace Piipan.Match.Orchestrator.Tests
             var mockTokenProvider = MockTokenProvider("|token|");
             var client = new HttpClient(handler.Object);
             var apiClient = new AuthorizedJsonApiClient(client, mockTokenProvider.Object);
+            var lookupStorage = MockLookupStorage();
 
-            var api = new Api(apiClient);
+            var api = new Api(apiClient, lookupStorage.Object);
 
             return api;
         }
