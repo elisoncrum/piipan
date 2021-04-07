@@ -26,15 +26,7 @@ namespace Piipan.QueryTool
         public async Task<List<PiiRecord>> SendQuery(string url, IQueryable query)
         {
             RequestUrl = url;
-
-            if (query is PiiRecord)
-            {
-                Query.Add("query", query as PiiRecord);
-            }
-            else if (query is Lookup)
-            {
-                Query.Add("query", query as Lookup);
-            }
+            Query.Add("query", query);
             return await QueryOrchestrator();
         }
 
@@ -48,7 +40,19 @@ namespace Piipan.QueryTool
                 var requestUri = new Uri(RequestUrl);
                 var jsonString = JsonSerializer.Serialize(Query);
                 var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var resp = await _apiClient.PostAsync(requestUri, requestBody);
+                HttpResponseMessage resp = null;
+
+                if (Query["query"] is Lookup)
+                {
+                    var lookup = Query["query"] as Lookup;
+                    requestUri = new Uri(requestUri, $"lookup_ids/{lookup.LookupId}");
+                    resp = await _apiClient.GetAsync(requestUri);
+                }
+                else if (Query["query"] is PiiRecord)
+                {
+                    resp = await _apiClient.PostAsync(requestUri, requestBody);
+                }
+
                 var streamTask = await resp.Content.ReadAsStreamAsync();
                 var json = await JsonSerializer.DeserializeAsync<OrchestratorApiResponse>(streamTask);
                 Matches = json.matches;
