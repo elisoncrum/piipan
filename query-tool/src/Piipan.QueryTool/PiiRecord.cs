@@ -43,7 +43,7 @@ namespace Piipan.QueryTool
         public string StateAbbr { get; set; }
 
         [Display(Name = "Lookup ID")]
-        [JsonPropertyName("lookupId")]
+        [JsonPropertyName("lookup_id")]
         public string LookupId {get; set;}
     }
 }

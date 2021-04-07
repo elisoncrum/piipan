@@ -8,7 +8,7 @@ namespace Piipan.QueryTool
     {
         [Required]
         [Display(Name = "Lookup ID")]
-        [JsonPropertyName("lookupId")]
+        [JsonPropertyName("lookup_id")]
         public string LookupId { get; set; }
     }
 }
