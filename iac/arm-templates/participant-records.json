@@ -34,6 +34,12 @@
             "type": "string"
         },
         "subnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the subnet the database will use."
+            }
+        },
+        "privateEndpointName": {
             "type": "string"
         }
     },
@@ -71,28 +77,19 @@
                         "resourceTags": {
                             "type": "object"
                         },
-                        "subnetPrefix": {
-                            "type": "string",
-                            "defaultValue": "10.0.0.0/24",
-                            "metadata": {
-                                "description": "The address space for the subnet."
-                            }
-                        },
-                        "vnetAddressPrefix": {
-                            "type": "string",
-                            "defaultValue": "10.0.0.0/16",
-                            "metadata": {
-                                "description": "The address space reserved for this virtual network in CIDR notation."
-                            }
-                        },
                         "vnetName": {
                             "type": "string"
                         },
                         "subnetName": {
                             "type": "string"
+                        },
+                        "privateEndpointName": {
+                            "type": "string"
                         }
                     },
                     "variables": {
+                        "privateDnsZoneName": "privatelink.postgres.database.azure.com",
+                        "pvtendpointdnsgroupname": "[concat(parameters('privateEndpointName'),'/dnsgroup')]",
                         "firewallrules": {
                             "batch": {
                                 "rules": [
@@ -112,33 +109,7 @@
                         }
                     },
                     "resources": [
-                        {
-                            "type": "Microsoft.Network/virtualNetworks",
-                            "apiVersion": "2020-06-01",
-                            "name": "[parameters('vnetName')]",
-                            "location": "[parameters('location')]",
-                            "properties": {
-                                "addressSpace": {
-                                    "addressPrefixes": [
-                                        "[parameters('vnetAddressPrefix')]"
-                                    ]
-                                }
-                            },
-                            "resources": [
-                                {
-                                    "type": "subnets",
-                                    "apiVersion": "2020-06-01",
-                                    "name": "[parameters('subnetName')]",
-                                    "location": "[parameters('location')]",
-                                    "dependsOn": [
-                                        "[parameters('vnetName')]"
-                                    ],
-                                    "properties": {
-                                        "addressPrefix": "[parameters('subnetPrefix')]"
-                                    }
-                                }
-                            ]
-                        },
+                        // Postgres server
                         {
                             "type": "Microsoft.DBforPostgreSQL/servers",
                             "apiVersion": "2017-12-01-preview",
@@ -157,7 +128,8 @@
                                     "storageAutoGrow": "Enabled"
                                 },
                                 "previewFeature": "",
-                                "infrastructureEncryption": "Disabled"
+                                "infrastructureEncryption": "Disabled",
+                                "publicNetworkAccess": "Enabled" // This gets disabled later in iac
                             },
                             /* VNet Rules only work for GeneralPurpose and above tiers */
                             "sku": {
@@ -166,22 +138,9 @@
                                 "capacity": 2,
                                 "size": 5120,
                                 "family": "Gen5"
-                            },
-                            "resources": [
-                                {
-                                    "type": "virtualNetworkRules",
-                                    "apiVersion": "2017-12-01",
-                                    "name": "vnetrule-participant-records-dev",
-                                    "dependsOn": [
-                                        "[resourceId('Microsoft.DBforPostgreSQL/servers/', parameters('serverName'))]"
-                                    ],
-                                    "properties": {
-                                        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
-                                        "ignoreMissingVnetServiceEndpoint": true
-                                    }
-                                }
-                            ]
+                            }
                         },
+                        // firewall rules
                         {
                             "type": "Microsoft.DBforPostgreSQL/servers/firewallRules",
                             "apiVersion": "2017-12-01",
@@ -199,6 +158,82 @@
                             "properties": {
                                 "startIpAddress": "[variables('firewallrules').batch.rules[copyIndex()].StartIpAddress]",
                                 "endIpAddress": "[variables('firewallrules').batch.rules[copyIndex()].EndIpAddress]"
+                            }
+                        },
+                        // privateEndpoint
+                        {
+                            "type": "Microsoft.Network/privateEndpoints",
+                            "apiVersion": "2020-06-01",
+                            "name": "[parameters('privateEndpointName')]",
+                            "location": "[parameters('location')]",
+                            "dependsOn": [
+                                "[parameters('serverName')]"
+                            ],
+                            "properties": {
+                                "subnet": {
+                                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+                                },
+                                "privateLinkServiceConnections": [
+                                    {
+                                        "name": "[parameters('privateEndpointName')]",
+                                        "properties": {
+                                            "privateLinkServiceId": "[resourceId('Microsoft.DBforPostgreSQL/servers',parameters('ServerName'))]",
+                                            "groupIds": [
+                                                "postgresqlServer"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        // privateDnsZone
+                        {
+                            "type": "Microsoft.Network/privateDnsZones",
+                            "apiVersion": "2020-01-01",
+                            "name": "[variables('privateDnsZoneName')]",
+                            "location": "global",
+                            "dependsOn": [
+                            ],
+                            "properties": ""
+                        },
+                        // link private DNS zone to virtual network
+                        {
+                            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+                            "apiVersion": "2020-01-01",
+                            "name": "[concat(variables('privateDnsZoneName'), '/', variables('privateDnsZoneName'), '-link')]",
+                            "location": "global",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                            ],
+                            "properties": {
+                                "registrationEnabled": false,
+                                "virtualNetwork": {
+                                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+                                }
+                            }
+                        },
+                        /***
+                        The dns group configures the private endpoint to the private DNS zone.
+                        In portal, see private endpoint -> DNS Configuration
+                        ***/
+                        {
+                            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+                            "apiVersion": "2020-06-01",
+                            "name": "[variables('pvtendpointdnsgroupname')]",
+                            "location": "[parameters('location')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]",
+                                "[parameters('privateEndpointName')]"
+                            ],
+                            "properties": {
+                                "privateDnsZoneConfigs": [
+                                    {
+                                        "name": "config1",
+                                        "properties": {
+                                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                                        }
+                                    }
+                                ]
                             }
                         }
                     ]
@@ -229,6 +264,9 @@
                     },
                     "subnetName": {
                         "value": "[parameters('subnetName')]"
+                    },
+                    "privateEndpointName": {
+                        "value": "[parameters('privateEndpointName')]"
                     }
                 }
             }
