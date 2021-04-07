@@ -78,17 +78,30 @@ namespace Piipan.Shared.Authentication.Tests
         public async void GetAsync()
         {
             // Arrange
-            var tokenProvider = MockTokenProvider("|token|");
-            var httpClient = new HttpClient();
+            var token = "|token|";
+            var content = "ok";
+            var messageHandler = MockMessageHandler(HttpStatusCode.OK, content);
+            var tokenProvider = MockTokenProvider(token);
+            var httpClient = new HttpClient(messageHandler.Object);
             var apiClient = new AuthorizedJsonApiClient(httpClient, tokenProvider.Object);
             var uri = new Uri("https://localhost/");
 
-            // Assert
-            await Assert.ThrowsAsync<NotImplementedException>(async () =>
-            {
-                await apiClient.GetAsync(uri);
-            });
+            // Act
+            var response = await apiClient.GetAsync(uri);
+            var result = await response.Content.ReadAsStringAsync();
 
+            // Assert
+            Assert.Equal(content, result);
+            messageHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.Method == HttpMethod.Get
+                    && req.RequestUri == uri
+                    && req.Headers.Authorization.ToString() == $"Bearer {token}"
+                ),
+                ItExpr.IsAny<CancellationToken>()
+            );
         }
     }
 

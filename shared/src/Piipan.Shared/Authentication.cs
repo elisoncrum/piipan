@@ -49,7 +49,6 @@ namespace Piipan.Shared.Authentication
         /// Send an asynchronous GET request to an API endpoint
         /// </summary>
         /// <param name="uri">URI of the API endpoint</param>
-        /// <remarks>Not yet implemented</remarks>
         Task<HttpResponseMessage> GetAsync(Uri uri);
     }
 
@@ -99,9 +98,12 @@ namespace Piipan.Shared.Authentication
             return response;
         }
 
-        public Task<HttpResponseMessage> GetAsync(Uri uri)
+        public async Task<HttpResponseMessage> GetAsync(Uri uri)
         {
-            throw new NotImplementedException("GetAsync method not yet implemented.");
+            var requestMessage = await PrepareRequest(uri, HttpMethod.Get);
+            var response = await _client.SendAsync(requestMessage);
+
+            return response;
         }
     }
 }
