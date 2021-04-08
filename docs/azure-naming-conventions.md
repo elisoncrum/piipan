@@ -1,48 +1,40 @@
-# Our Naming Conventions for Azure
+# Naming convention for Azure resources
 
-Our naming convention is similar to [Azure's guidelines](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming#example-names-storage) with a few tweaks to fit our system's needs:
+Our naming convention for Azure resources is based on the [Azure guidelines](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming) with a few tweaks:
 
+&lt;prefix>-&lt;resource_type>-&lt;app_name>-&lt;environment>
+
+For example:
 ```
-[prefix]-[resource_type]-[app_name]-[environment]
+tts-func-metricsapi-dev
 ```
+This resource name would be interpreted as referring to an Azure Function App, which implements our metrics API, for the development environment, hosted within a Technology Transformation Service (TTS) Azure subscription.
 
-Example for an Azure Function App in production:
+A few Azure resource types (e.g., storage accounts) have [very restrictive naming rules](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules) that prevent the use of hyphens and/or significantly limit name length. In these cases:
+- drop hyphens, but otherwise apply the naming convention;
+- shorten &lt;app_name> until it fits within the required character length and document it.
 
-```
-fns-func-metricsapi-prod
-```
+## Naming Components
 
-## Name Properties
+| Name | Description | 
+| ---- | ----------- |
+| prefix | Makes resource name globally unique in an Azure cloud, typically a short value that denotes agency/service. It is optional for resources that are not global in scope, e.g., VNets, resource groups, subscription topics. |
+| resource_type | abbreviation of resource type, based on the [Azure documentation](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming#example-names-general); e.g., `psql`, `func`, `app` |
+| app_name | concise name to denote purpose |
+| environment | either `dev`, `test`, `stage`, or `prod`|
 
-| name | description | required? | dev value | prod value |
-| ---- | ----------- | --------- | --- | ---- |
-| prefix | denotes agency (required for agency environment) | no for dev; yes for prod | none | "fns" |
-| resource_type | abbreviation of Azure resource type | yes | [see list of Azure examples](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming#example-names-general) | same as dev name |
-| app_name | unique name that denotes subsystem; should be short but descriptive | yes | one of: ["match", "orch", "query", "metrics"] | same as dev |
-| environment | denotes environment in which resource is deployed| yes | "dev" | "prod" |
 
-## Example names for metrics resources:
+## Examples:
 
-| resource | dev name | prod name |
-| ------- | ------------ | ---------- |
-| Resource Group | rg-metrics-dev | [to be named by partner] |
-| Key Vault | kvmetricsdev | fnskvmetricsprod |
-| Database | db-metrics-dev | fns-db-metrics-prod |
-| API function app | func-metricsapi-dev | fns-func-metricsapi-prod |
-| Collection function app | func-metricscollect-dev | fns-func-metricscollect-prod |
-| Application Insights for API app | ins-metricsapi-dev | fns-ins-metricsapi-prod |
-| Application Insights for Collection app | ins-metricscollect-dev | fns-ins-metricscollect-prod |
-| Storage for API app | stmetricsapidev | fnsstmetricsapiprod |
-| Storage for Collection app | stmetricscoldev | fnsstmetricscolprod |
-
-### Hyphenation and Name Truncation
-
-A few Azure resource groups disallow hyphens, namely Storage Accounts. In these cases, hyphens are removed but the naming convention otherwise stays the same.
-
-If in the event a name is too long, try to shorten the app_name until it fits within the required character length and document it.
-
-For more information, see [naming rules for Azure resources](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules).
+| resource | example |
+| -------- | ------- |
+| Resource Group | `rg-core-dev` |
+| Key Vault | `tts-kv-metrics-dev` |
+| Managed Identity | `id-eaadmin-dev` |
+| Database for PostgreSQL | `tts-psql-metrics-dev` |
+| Function App | `tts-func-metricscollect-dev` |
+| Storage Account | `ttsstmetricsapidev` |
 
 ## Notes
-- Top-level resource groups are named by partner agency and provided to us.
-- Although Azure docs recommend appending an Azure location to the end of names (eg: -westus), we found this made names too long in Azure Government environments.
+
+Azure regions are not currently incorporated into the naming convention. This may need to be revisited as we address disaster recovery scenarios. Also, Azure Government cloud regions are generally longer in length than public cloud regions (e.g., `usgovarizona` vs `westus`) and will need to be abbreviated if region is added to our resource names.
