@@ -5,6 +5,9 @@
         "resourceTags": {
             "type": "object"
         },
+        "stateAbbr": {
+            "type": "string"
+        },
         "stateName": {
             "type": "string"
         },
@@ -146,6 +149,10 @@
                         {
                             "name": "CloudName",
                             "value": "[parameters('cloudName')]"
+                        },
+                        {
+                            "name": "StateAbbr",
+                            "value": "[parameters('stateAbbr')]"
                         }
                     ]
                 }

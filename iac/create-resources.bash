@@ -424,6 +424,7 @@ main () {
           identityGroup=$RESOURCE_GROUP \
           location=$LOCATION \
           azAuthConnectionString=$az_serv_str \
+          stateAbbr="$abbr" \
           stateName="$name" \
           functionAppName="$func_app_name" \
           storageAccountName="$storage_acct_name" \
