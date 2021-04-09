@@ -25,7 +25,9 @@ namespace Piipan.QueryTool.Pages
         [BindProperty]
         public Lookup Query { get; set; }
 
-        public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
+        public Dictionary<string,object> QueryResult { get; private set; } = new Dictionary<string,object>();
+        public List<PiiRecord> Records { get; private set; }
+
         public String RequestError { get; private set; }
         public bool NoResults = false;
 
@@ -41,7 +43,9 @@ namespace Piipan.QueryTool.Pages
                 try
                 {
                     _logger.LogInformation("Query form submitted");
-                    NoResults = QueryResult.Count == 0;
+                    var matches = QueryResult["matches"] as List<PiiRecord>;
+                    NoResults = matches.Count == 0;
+                    Records = matches;
                     Title = "NAC Query Results";
                 }
                 catch (Exception exception)
