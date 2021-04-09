@@ -87,8 +87,8 @@
       },
       "FluentValidation": {
         "type": "Transitive",
-        "resolved": "9.5.4",
-        "contentHash": "dnAz4PUtSSa+8EGWDUmEZujOa9rvzxln4BgokZZfO2Gbcj0612TMISU4vkvL60qIy5DI/sDF9Oy1iMXr7sJW3A=="
+        "resolved": "10.0.1",
+        "contentHash": "Nxf2U2JjcPy4vxZ4PzuyX32JcU7mB9oceXDyztGcAYmorAZD/fz513dschMzrgO1q7RRItaNtbqiTYtWCDRxfA=="
       },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Transitive",
@@ -1920,7 +1920,7 @@
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.78",
-          "FluentValidation": "9.5.4",
+          "FluentValidation": "10.0.1",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
           "Newtonsoft.Json.Schema": "3.0.14",
