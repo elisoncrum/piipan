@@ -253,7 +253,7 @@ main () {
   ORCH_API_APP_ROLE='OrchestratorApi.Query'
 
   match_func_names=($(\
-    get_resources $PER_STATE_MATCH_API_TAG $MATCH_RESOURCE_GROUP))
+    get_resources $PER_STATE_MATCH_API_TAG $RESOURCE_GROUP))
 
   orch_name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
 
@@ -286,7 +286,7 @@ main () {
   do
     echo "Configure Easy Auth for PerStateMatchApi:${func} and OrchestratorApi"
     configure_easy_auth_pair \
-      $func $MATCH_RESOURCE_GROUP \
+      $func $RESOURCE_GROUP \
       $STATE_API_APP_ROLE \
       $orch_identity
   done

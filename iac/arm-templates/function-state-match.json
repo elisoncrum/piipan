@@ -5,10 +5,10 @@
         "resourceTags": {
             "type": "object"
         },
-        "stateName": {
+        "stateAbbr": {
             "type": "string"
         },
-        "stateAbbr": {
+        "stateName": {
             "type": "string"
         },
         "location": {
@@ -25,12 +25,24 @@
         },
         "cloudName": {
             "type": "string"
+        },
+        "functionAppName": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "managedIdentityName": {
+            "type": "string"
+        },
+        "appServicePlanName": {
+            "type": "string"
         }
     },
     "variables": {
-        "functionAppName": "[concat(parameters('stateAbbr'), 'func', uniqueString(resourceGroup().id))]",
-        "hostingPlanName": "matchapi",
-        "storageAccountName": "[concat(parameters('stateAbbr'), 'fstor', uniquestring(resourceGroup().id))]",
+        "functionAppName": "[parameters('functionAppName')]",
+        "storageAccountName": "[parameters('storageAccountName')]",
+        "managedIdentityName": "[parameters('managedIdentityName')]",
         "functionWorkerRuntime": "dotnet",
         "storageAccountType": "Standard_LRS",
         "systemTypeTag": {
@@ -39,7 +51,7 @@
         "applicationInsightsTag": {
             "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('functionAppName')))]": "Resource"
         },
-        "identityName": "[concat(parameters('stateAbbr'), 'admin')]"
+        "identityName": "[variables('managedIdentityName')]"
     },
     "resources": [
         {
@@ -52,21 +64,6 @@
                 "name": "[variables('storageAccountType')]"
             },
             "kind": "Storage"
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2020-06-01",
-            "name": "[variables('hostingPlanName')]",
-            "tags": "[parameters('resourceTags')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
-            },
-            "properties": {
-                "name": "[variables('hostingPlanName')]",
-                "computeMode": "Dynamic"
-            }
         },
         {
             "type": "Microsoft.Web/sites",
@@ -82,11 +79,10 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "httpsOnly": true,
                 "siteConfig": {
                     "ftpsState": "Disabled",
@@ -143,10 +139,6 @@
                             "value": "[parameters('stateName')]"
                         },
                         {
-                            "name": "StateAbbr",
-                            "value": "[parameters('stateAbbr')]"
-                        },
-                        {
                             "name": "AzureServicesAuthConnectionString",
                             "value": "[parameters('azAuthConnectionString')]"
                         },
@@ -157,6 +149,10 @@
                         {
                             "name": "CloudName",
                             "value": "[parameters('cloudName')]"
+                        },
+                        {
+                            "name": "StateAbbr",
+                            "value": "[parameters('stateAbbr')]"
                         }
                     ]
                 }

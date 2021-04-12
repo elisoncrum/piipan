@@ -2,10 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "stateAbbreviation": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 2
+        "uniqueStorageName": {
+            "type": "string"
         },
         "resourceTags": {
             "type": "object"
@@ -15,7 +13,7 @@
         }
     },
     "variables": {
-        "uniqueStorageName": "[concat(toLower(parameters('stateAbbreviation')), 'fstor', uniqueString(resourceGroup().id))]"
+        "uniqueStorageName": "[parameters('uniqueStorageName')]"
     },
     "resources": [
         {
