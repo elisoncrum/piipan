@@ -64,13 +64,6 @@
                                 "description": "The address space for the function app subnet."
                             }
                         },
-                        "matchSubnetPrefix": {
-                            "type": "string",
-                            "defaultValue": "10.0.2.0/24",
-                            "metadata": {
-                                "description": "The address space for the function app subnet."
-                            }
-                        },
                         "vnetAddressPrefix": {
                             "type": "string",
                             "defaultValue": "10.0.0.0/16",
