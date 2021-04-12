@@ -532,6 +532,10 @@ main () {
   # Establish metrics sub-system
   ./create-metrics-resources.bash $azure_env
 
+  # If running full iac script for the first time in new resource groups,
+  # un-comment this line:
+  # ./create-apim.bash $azure_env $APIM_EMAIL
+
   # Configures App Service Authentication between:
   #   - PerStateMatchApi and OrchestratorApi
   #   - OrchestratorApi and QueryApp

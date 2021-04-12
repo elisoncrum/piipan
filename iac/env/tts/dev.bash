@@ -18,3 +18,6 @@ PREFIX=fns
 
 # Either AzureCloud or AzureUSGovernment
 CLOUD_NAME=AzureCloud
+
+# used to create API Management resources
+APIM_EMAIL="<your email here>"
