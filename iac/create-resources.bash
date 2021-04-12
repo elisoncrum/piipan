@@ -30,13 +30,13 @@ set_constants () {
   PG_SERVER_NAME=participant-records
 
   # Names of participant records database Vnet and Subnet
-  VNET_NAME=$PREFIX-vnet-core-$ENV
-  DB_SUBNET_NAME=$PREFIX-snet-core-$ENV # Subnet database private endpoint uses
-  FUNC_SUBNET_NAME=$PREFIX-snet-functionapps-$ENV # Subnet function apps uses
-  PRIVATE_ENDPOINT_NAME=$PREFIX-pe-$PG_SERVER_NAME-$ENV
+  VNET_NAME=vnet-core-$ENV
+  DB_SUBNET_NAME=snet-core-$ENV # Subnet database private endpoint uses
+  FUNC_SUBNET_NAME=snet-functionapps-$ENV # Subnet function apps uses
+  PRIVATE_ENDPOINT_NAME=pe-$PG_SERVER_NAME-$ENV
 
   # Base name of query tool app
-  QUERY_TOOL_APP_NAME=${PREFIX}-app-query-tool-${ENV}
+  QUERY_TOOL_APP_NAME=app-query-tool-${ENV}
   QUERY_TOOL_FRONTDOOR_NAME=querytool
 
   # Base name of lookup API storage account
@@ -49,7 +49,7 @@ set_constants () {
   TENANT_ID=$(az account show --query homeTenantId -o tsv)
 
   # App service plan name for function apps
-  APP_SERVICE_PLAN_FUNC_NAME="${PREFIX}-plan-functionapps-${ENV}"
+  APP_SERVICE_PLAN_FUNC_NAME="plan-functionapps-${ENV}"
   APP_SERVICE_PLAN_FUNC_SKU=P1V2
   APP_SERVICE_PLAN_FUNC_KIND=functionapp
 }
@@ -274,10 +274,10 @@ main () {
     abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
 
     # Per-state Function App
-    func_app=${PREFIX}-func-${abbr}etl-${ENV}
+    func_app=func-${abbr}etl-${ENV}
 
     # Storage account for the Function app for its own use;
-    func_stor=${PREFIX}stor${abbr}etl${ENV}
+    func_stor=stor${abbr}etl${ENV}
 
     # Managed identity to access database
     identity=`state_managed_id_name $abbr`
@@ -408,8 +408,8 @@ main () {
         --output tsv)
     db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
     az_serv_str=`az_connection_string $RESOURCE_GROUP $identity`
-    func_app_name=${PREFIX}-func-${abbr}match-${ENV}
-    storage_acct_name=${PREFIX}stor${abbr}match${ENV}
+    func_app_name=func-${abbr}match-${ENV}
+    storage_acct_name=stor${abbr}match${ENV}
 
     echo "Deploying ${name} function resources"
     func_name=$(\
@@ -542,7 +542,7 @@ main () {
   ./configure-easy-auth.bash $azure_env
 
   echo "Secure database connection"
-  ./secure-resources.bash \
+  ./remove-external-network.bash \
     $azure_env \
     $RESOURCE_GROUP \
     $PG_SERVER_NAME

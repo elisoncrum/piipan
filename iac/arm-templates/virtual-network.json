@@ -57,7 +57,7 @@
                                 "description": "The address space for the subnet."
                             }
                         },
-                        "etlSubnetPrefix": {
+                        "funcSubnetPrefix": {
                             "type": "string",
                             "defaultValue": "10.0.1.0/24",
                             "metadata": {
@@ -114,7 +114,7 @@
                                     {
                                         "name": "[parameters('funcSubnetName')]",
                                         "properties": {
-                                            "addressPrefix": "[parameters('etlSubnetPrefix')]",
+                                            "addressPrefix": "[parameters('funcSubnetPrefix')]",
                                             "privateEndpointNetworkPolicies": "Disabled",
                                             "delegations": [
                                                 {

@@ -9,7 +9,7 @@
 #   server_name (eg: fns-db-participant-records-dev)
 #
 # Usage:
-# ./iac/secure-resources.bash tts/dev rg-core-dev fns-db-participant-records-dev
+# ./iac/remove-external-network.bash tts/dev rg-core-dev fns-db-participant-records-dev
 
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
@@ -29,7 +29,7 @@ main () {
 		--query "[].id" \
 		--output tsv`
 
-	len=`echo $ids | awk '{print length}'`
+	len=${#ids}
 	if [ $len -gt 1 ]; then
 		echo "Remove all firewall rules from database"
 		az postgres server firewall-rule delete \
