@@ -16,7 +16,10 @@
     },
     "variables": {
         "uniqueStorageName": "[concat(toLower(parameters('stateAbbreviation')), 'state', uniqueString(resourceGroup().id))]",
-        "containerName": "upload"
+        "containerName": "upload",
+        "systemTypeTag": {
+            "SysType": "PerStateStorage"
+        }
     },
     "resources": [
         {
@@ -24,7 +27,7 @@
             "apiVersion": "2019-04-01",
             "name": "[variables('uniqueStorageName')]",
             "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",
+            "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "sku": {
                 "name": "Standard_LRS"
             },

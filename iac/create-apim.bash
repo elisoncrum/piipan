@@ -46,8 +46,40 @@ clean_defaults () {
     -y
 }
 
-main () {
+storage_account_domain () {
+  local base=".blob.core.windows.net/"
 
+  # https://docs.microsoft.com/en-us/azure/azure-government/compare-azure-government-global-azure
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    base=".blob.core.usgovcloudapi.net/"
+  fi
+
+  echo $base
+}
+
+generate_policy () {
+  local path=$(dirname "$0")/$1
+  local uri=$2
+  local APP_URI_PLACEHOLDER="{applicationUri}"
+  local xml=$(< $path)
+
+  xml=${xml/$APP_URI_PLACEHOLDER/$uri}
+
+  echo $xml
+}
+
+grant_blob () {
+  local assignee=$1
+  local storage_account=$2
+  local DEFAULT_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+
+  az role assignment create \
+    --role "Storage Blob Data Contributor" \
+    --assignee $assignee \
+    --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}"
+}
+
+main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
@@ -58,6 +90,8 @@ main () {
   publisher_email=$2
 
   orch_name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
+  upload_accounts=($(get_resources $PER_STATE_STORAGE_TAG $RESOURCE_GROUP))
+
   orch_base_url=$(\
     az functionapp show \
       -g $MATCH_RESOURCE_GROUP \
@@ -67,23 +101,34 @@ main () {
   orch_base_url="https://${orch_base_url}"
   orch_api_url="${orch_base_url}/api/v1"
 
-  # Edit policy template with proper application ID URI
-  APP_URI_PLACEHOLDER="{applicationUri}"
-  policy_path=$(dirname "$0")/apim-policy.xml
-  policy_xml=$(sed "s,$APP_URI_PLACEHOLDER,${orch_base_url}," $policy_path)
+  duppart_policy_xml=$(generate_policy apim-duppart-policy.xml ${orch_base_url})
+  upload_policy_xml=$(generate_policy apim-bulkupload-policy.xml https://storage.azure.com/)
 
-  az deployment group create \
-    --name apim-dev \
-    --resource-group $MATCH_RESOURCE_GROUP \
-    --template-file ./arm-templates/apim.json \
-    --parameters \
-      apiName=$APIM_NAME \
-      publisherEmail=$publisher_email \
-      publisherName="$PUBLISHER_NAME" \
-      orchestratorUrl=$orch_api_url \
-      policyXml="$policy_xml" \
-      location=$LOCATION \
-      resourceTags="$RESOURCE_TAGS"
+  upload_domain=$(storage_account_domain)
+
+  apim_identity=$(\
+    az deployment group create \
+      --name apim-dev \
+      --resource-group $MATCH_RESOURCE_GROUP \
+      --template-file ./arm-templates/apim.json \
+      --query properties.outputs.identity.value.principalId \
+      --output tsv \
+      --parameters \
+        apiName=$APIM_NAME \
+        publisherEmail=$publisher_email \
+        publisherName="$PUBLISHER_NAME" \
+        orchestratorUrl=$orch_api_url \
+        dupPartPolicyXml="$duppart_policy_xml" \
+        uploadAccounts="${upload_accounts[*]}" \
+        uploadBaseDomain="$upload_domain" \
+        uploadPolicyXml="$upload_policy_xml" \
+        location=$LOCATION \
+        resourceTags="$RESOURCE_TAGS")
+
+  for account in "${upload_accounts[@]}"
+  do
+    grant_blob $apim_identity $account
+  done
 
   # Clear out default example resources
   # See: https://stackoverflow.com/a/64297708
