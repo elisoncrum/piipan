@@ -24,7 +24,7 @@ These three elements translate to three main areas of the API that states will i
 
 ### Environments
 
-Seperate endpoints and credentials will be provoded for each environment.
+Seperate endpoints and credentials will be provided for each environment.
 
 | environment | purpose |
 |---|---|
@@ -34,16 +34,26 @@ Seperate endpoints and credentials will be provoded for each environment.
 
 ### Endpoints Overview
 
-| endpoint | description | Type | Parameters | Response | Authentication | Instructions |
+| Endpoint | Description | Type |
 |---|---|---|---|---|---|---|
-| `/BulkUpload` | uploads bulk participant data to the system | POST | a CSV file [in this format](../etl/docs/bulk-import.md) | [coming soon] | contact us | [link](./etl/docs/upload.md) |
-| [coming soon] | query for status on data processing from a bulk upload | POST | [coming soon] | [coming soon] | contact us | [coming soon] |
-| `/query` | query for active matches | POST | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | refer to the [OpenApi Schema](../match/docs/openapi/orchestrator/index.yaml) | contact us | [coming soon] |
-| `lookup_ids/:id` | Returns PII for a Lookup ID | GET | Lookup ID | [coming soon] | contact us | [coming soon] |
+| `/BulkUpload` | uploads bulk participant data to the system | POST |
+| [coming soon] | query for status on data processing from a bulk upload | POST |
+| `/query` | query for active matches | POST |
+| `lookup_ids/:id` | Returns PII for a Lookup ID | GET |
+
+Detailed documentation for each endpoint can be found [here](./openapi/generated/duplicate-participation-api/openapi.md).
 
 ## Authentication
 
-To use all endpoints, states will need two sets of credentials: one for bulk uploading and another for the rest of the endpoints. Contact us for access.
+Users will obtain two API subscription keys that will be rotated on a rolling basis. Keys will be placed into request headers.
+
+Example using cURL:
+
+```
+curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
+```
+
+Different endpoints may require different sets of keys. Contact us for access to these keys.
 
 ## Feedback
 

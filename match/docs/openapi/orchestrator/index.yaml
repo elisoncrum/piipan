@@ -10,29 +10,4 @@ servers:
   - url: "/v1"
 paths:
   /query:
-    post:
-      tags:
-        - "Match"
-      summary: "Search for all matching PII records"
-      description: "Queries all state databases for any PII records that are an exact match to the full name, date of birth, and social security number in the request body's `query` property."
-      requestBody:
-        $ref: '#/components/requestBodies/MatchQueryRequest'
-      responses:
-        '200':
-          description: "Matching PII records, if any exist"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MatchQueryResponse'
-        '400':
-          description: "Bad request. Missing one of the required properties in the request body."
-components:
-  requestBodies:
-    MatchQueryRequest:
-      $ref: '../schemas/match-query.yaml#/MatchQueryRequest'
-  schemas:
-    MatchQueryResponse:
-      $ref: '../schemas/match-query.yaml#/MatchQueryResponse'
-    PiiRecord:
-      $ref: '../schemas/pii-record.yaml#/PiiRecord'
-
+    $ref: './query.yaml'
