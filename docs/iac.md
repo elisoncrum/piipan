@@ -7,7 +7,7 @@ All prerequisites are available in [Azure Cloud Shell](https://docs.microsoft.co
 - [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
-- `bash` shell, `/dev/urandom`, `sed` – included in macOS, Linux, Git for Windows
+- `bash` shell, `/dev/urandom` – included in macOS, Linux, Git for Windows
 - `psql` client for PostgreSQL
 
 ## Steps
@@ -70,6 +70,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 
 | Value | Description |
 |---|---|
+| PerStateStorage | one of _N_ storage accounts for per-state bulk PII uploads |
 | PerStateMatchApi | one of _N_ API Function Apps for Per-state matching |
 | OrchestratorApi | the single Function App for the Orchestrator API |
 | DashboardApp | the single Dashboard App Service |

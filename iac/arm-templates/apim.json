@@ -20,7 +20,16 @@
         "orchestratorUrl": {
             "type": "String"
         },
-        "policyXml": {
+        "dupPartPolicyXml": {
+            "type": "String"
+        },
+        "uploadAccounts": {
+            "type": "String"
+        },
+        "uploadBaseDomain": {
+            "type": "String"
+        },
+        "uploadPolicyXml": {
             "type": "String"
         }
     },
@@ -28,8 +37,16 @@
         "systemTypeTag": {
             "SysType": "DupPartApi"
         },
-        "displayName": "Duplicate participation API",
-        "matchSetName": "match"
+        "matchDisplayName": "Duplicate participation API",
+        "matchSetName": "match",
+        "uploadDisplayName": "Bulk upload API",
+        "uploadSetName": "bulk-upload",
+        "uploadAccountsList": "[split(parameters('uploadAccounts'), ' ')]",
+        "copy": [{
+            "name": "uploadApiNames",
+            "count": "[length(variables('uploadAccountsList'))]",
+            "input": "[concat(variables('uploadSetName'), '-', variables('uploadAccountsList')[copyIndex('uploadApiNames')])]"
+        }]
     },
     "resources": [
         {
@@ -76,7 +93,7 @@
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
             "properties": {
-                "displayName": "[variables('displayName')]",
+                "displayName": "[variables('matchDisplayName')]",
                 "versioningScheme": "Segment"
             }
         },
@@ -89,7 +106,7 @@
                 "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]"
             ],
             "properties": {
-                "displayName": "[variables('displayName')]",
+                "displayName": "[variables('matchDisplayName')]",
                 "subscriptionRequired": true,
                 "protocols": [
                     "https"
@@ -136,7 +153,7 @@
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
             "properties": {
-                "value": "[parameters('policyXml')]",
+                "value": "[parameters('dupPartPolicyXml')]",
                 "format": "xml"
             }
         },
@@ -187,15 +204,102 @@
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
             "properties": {
-                "value": "[parameters('policyXml')]",
+                "value": "[parameters('dupPartPolicyXml')]",
                 "format": "xml"
+            }
+        },
+
+        /* Bulk upload API(s) */
+        {
+            "type": "Microsoft.ApiManagement/service/apiVersionSets",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()])]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "displayName": "[concat(variables('uploadAccountsList')[copyIndex()], ' ', variables('uploadDisplayName'))]",
+                "versioningScheme": "Segment"
+            },
+            "copy": {
+                "name": "per-state-upload-api-vs",
+                "count": "[length(variables('uploadAccountsList'))]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()])]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+            ],
+            "properties": {
+                "displayName": "[concat(variables('uploadAccountsList')[copyIndex()], ' ', variables('uploadDisplayName'))]",
+                "subscriptionRequired": true,
+                "protocols": [
+                    "https"
+                ],
+                "path": "[variables('uploadAccountsList')[copyIndex()]]",
+                "apiVersion": "v1",
+                "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
+                "serviceUrl": "[concat('https://', variables('uploadAccountsList')[copyIndex()], parameters('uploadBaseDomain'))]"
+            },
+            "copy": {
+                "name": "per-state-upload-apis",
+                "count": "[length(variables('uploadAccountsList'))]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/policies",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+            ],
+            "properties": {
+                "value": "[parameters('uploadPolicyXml')]",
+                "format": "xml"
+            },
+            "copy": {
+                "name": "per-state-upload-policies",
+                "count": "[length(variables('uploadAccountsList'))]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+            ],
+            "properties": {
+                "displayName": "Upload bulk PII data",
+                "method": "PUT",
+                "urlTemplate": "/upload/{filename}",
+                "description": "Upload a CSV file of bulk PII data",
+                "templateParameters": [
+                    {
+                        "name": "filename",
+                        "description": "User-provided CSV filename",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": []
+            },
+            "copy": {
+                "name": "per-state-upload-ops",
+                "count": "[length(variables('uploadAccountsList'))]"
             }
         }
     ],
     "outputs": {
-        "apimName": {
-            "type": "string",
-            "value": "[parameters('apiName')]"
+        "identity": {
+            "type": "object",
+            "value": "[reference(parameters('apiName'), '2020-06-01-preview', 'Full').identity]"
         }
     }
 }
