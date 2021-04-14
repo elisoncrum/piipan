@@ -58,10 +58,12 @@ storage_account_domain () {
 }
 
 generate_policy () {
-  local path=$(dirname "$0")/$1
+  local path
+  path=$(dirname "$0")/$1
   local uri=$2
   local APP_URI_PLACEHOLDER="{applicationUri}"
-  local xml=$(< $path)
+  local xml
+  xml=$(< $path)
 
   xml=${xml/$APP_URI_PLACEHOLDER/$uri}
 
