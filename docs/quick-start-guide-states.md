@@ -1,6 +1,7 @@
 # Quick-Start Guide for States
 
 > This documentation is for state use
+
 > ⚠️  Under construction
 
 For a high-level view of system architecture, go [here](../README.md).
@@ -36,7 +37,7 @@ Seperate endpoints and credentials will be provided for each environment.
 ### Endpoints Overview
 
 | Endpoint | Description | Type |
-|---|---|---|---|---|---|---|
+|---|---|---|
 | `/<state-abbreviation>/upload/:filename` | uploads bulk participant data to the system | POST |
 | `/query` | query for active matches | POST |
 | `/lookup_ids/:id` | Returns PII for a Lookup ID | GET |
