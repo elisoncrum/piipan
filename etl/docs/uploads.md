@@ -1,8 +1,8 @@
 ## Uploading Participant Data
 
-> ⚠️ The service API for the bulk upload of PII data is not stable enough for client development. This documentation describes the nascent API and a _temporary_ approach that should allow states to quickly provide test data to our system with out expending development effort unnecessarily.
+> ⚠️ This documentation describes the bulk upload API and a _temporary_ upload approach using AzCopy that should allow states to quickly provide test data to our system with out expending development effort unnecessarily.
 
-Once you have [validated the format](./bulk-import.md) of your participant data CSV, you can upload the file to the system through AzCopy.
+Once you have [validated the format](./bulk-import.md) of your participant data CSV, you can upload the file to the system through the bulk upload API or AzCopy.
 
 ### AzCopy
 
@@ -56,8 +56,7 @@ The bulk upload API consists of a single HTTP `PUT` endpoint that you can use to
 
 Contact a project representative to gain the necessary information for calling the API. You will receive:
 - An API endpoint specific to your state, in the format `https://<api-domain>/<state-identifier>/upload/`
-- A primary API key
-- A secondary API key
+- An API key
 
 #### Uploading a file
 
@@ -69,14 +68,14 @@ https://<api-domain>/<state-identifer>/upload/bulk-data.csv
 ```
 
 Second, send a `PUT` request to the endpoint and include the following headers:
-- `Ocp-Apim-Subscription-Key: <api-key>` — where `<api-key>` is either your primary or secondary key.
-- `Content-Length: <filesize>` — where `<filesize>` is the size of the file you are uploading, in bytes. Many tools (like `curl` or [Postman](https://www.postman.com/)) will automatically include this header for you.
+- `Ocp-Apim-Subscription-Key: <api-key>` — where `<api-key>` is the API key you were provided.
+- `Content-Length: <filesize>` — where `<filesize>` is the size of the file you are uploading, in bytes. Many tools (like `curl`, Powershell's `Invoke-WebRequest`, or [Postman](https://www.postman.com/)) will automatically include this header for you.
 
 If your file is successfully uploaded you will receive an HTTP response with a `201 created` status.
 
 ##### Example using Powershell
 
-To call the API from Powershell using `Invoke-WebRequest`, run the following command substituting `<endpoint-url>` with the full endpoint URL (containing filename), `<api-key>` with your primary key, and `<path-to-csv>` with the path the CSV file you are uploading.
+To call the API from Powershell using `Invoke-WebRequest`, run the following command substituting `<endpoint-url>` with the full endpoint URL (containing filename), `<api-key>` with your API key, and `<path-to-csv>` with the path the CSV file you are uploading.
 
 ```
 $url = '<endpoint-url>'
@@ -91,7 +90,7 @@ Invoke-WebRequest -Uri $url -Method Put -Headers $headers -Body $body
 
 ##### Example using `curl`
 
-To call the API from a bash shell using `curl`, run the following command substituting `<endpoint-url>` with the full endpoint URL (containing filename), `<api-key>` with your primary key, and `<path-to-csv>` with the path the CSV file you are uploading.
+To call the API from a bash shell using `curl`, run the following command substituting `<endpoint-url>` with the full endpoint URL (containing filename), `<api-key>` with your API key, and `<path-to-csv>` with the path the CSV file you are uploading.
 
 ```
 curl --location --request PUT '<endpoint-url>' \
@@ -101,9 +100,3 @@ curl --location --request PUT '<endpoint-url>' \
 ```
 
 *Note: `curl` automatically includes the required `Content-Length` header.*
-
-#### Managing API keys
-
-In order to support credential rotation without downtime, you will be issued two API keys: one primary and one secondary. Either can be used to make API calls.
-
-For example: in the event your primary key needs to be regenerated, you can temporarily switch to using your secondary key until the updated primary key has been issued.
