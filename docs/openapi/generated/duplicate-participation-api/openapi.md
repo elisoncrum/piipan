@@ -1,10 +1,14 @@
 <!-- Generator: Widdershins v4.0.1 -->
 
-<h1 id="duplicate-participation-api">Duplicate Participation API v0.1.0</h1>
+<h1 id="duplicate-participation-api">Duplicate Participation API v1.0.0</h1>
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
 The API for the Duplicate Participation system where bulk upload, matching, and lookups will occur
+
+Base URLs:
+
+* <a href="/v1">/v1</a>
 
 <h1 id="duplicate-participation-api-match">Match</h1>
 
@@ -14,7 +18,7 @@ The API for the Duplicate Participation system where bulk upload, matching, and 
 
 ```shell
 # You can also use wget
-curl -X POST /query \
+curl -X POST /v1/query \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json'
 
@@ -104,7 +108,7 @@ This operation does not require authentication
 
 ```shell
 # You can also use wget
-curl -X GET /lookup_ids/{id} \
+curl -X GET /v1/lookup_ids/{id} \
   -H 'Accept: application/json'
 
 ```

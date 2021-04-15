@@ -1,5 +1,3 @@
-> :warning Developer documentation only
-
 # State-facing API Specification
 
 ## Prerequisites
