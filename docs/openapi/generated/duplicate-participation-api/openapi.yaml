@@ -10,6 +10,7 @@ servers:
 paths:
   /query:
     post:
+      operationId: Query for Matches
       tags:
         - Match
       summary: Search for all matching PII records
@@ -99,6 +100,7 @@ paths:
           description: Bad request. Missing one of the required properties in the request body.
   '/lookup_ids/{id}':
     get:
+      operationId: Get Lookups by ID
       tags:
         - Lookup
       summary: get the original match data related to a Lookup ID
@@ -119,3 +121,11 @@ paths:
           description: Bad request
         '404':
           description: Not Found
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Ocp-Apim-Subscription-Key

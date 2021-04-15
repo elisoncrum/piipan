@@ -10,9 +10,16 @@ Base URLs:
 
 * <a href="/v1">/v1</a>
 
+# Authentication
+
+* API Key (ApiKeyAuth)
+    - Parameter Name: **Ocp-Apim-Subscription-Key**, in: header. 
+
 <h1 id="duplicate-participation-api-match">Match</h1>
 
-## post__query
+## Query for Matches
+
+<a id="opIdQuery for Matches"></a>
 
 > Code samples
 
@@ -20,7 +27,8 @@ Base URLs:
 # You can also use wget
 curl -X POST /v1/query \
   -H 'Content-Type: application/json' \
-  -H 'Accept: application/json'
+  -H 'Accept: application/json' \
+  -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
 
@@ -44,12 +52,6 @@ Queries all state databases for any PII records that are an exact match to the f
 }
 ```
 
-<h3 id="post__query-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|body|body|object|true|none|
-
 > Example responses
 
 > 200 Response
@@ -72,14 +74,14 @@ Queries all state databases for any PII records that are an exact match to the f
 }
 ```
 
-<h3 id="post__query-responses">Responses</h3>
+<h3 id="query-for-matches-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Matching PII records, if any exist|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request. Missing one of the required properties in the request body.|None|
 
-<h3 id="post__query-responseschema">Response Schema</h3>
+<h3 id="query-for-matches-responseschema">Response Schema</h3>
 
 Status Code **200**
 
@@ -96,20 +98,24 @@ Status Code **200**
 |»» state_abbr|string|false|none|State/territory two-letter postal abbreviation|
 |»» exception|string|false|none|Placeholder for value indicating special processing instructions|
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+ApiKeyAuth
 </aside>
 
 <h1 id="duplicate-participation-api-lookup">Lookup</h1>
 
-## get__lookup_ids_{id}
+## Get Lookups by ID
+
+<a id="opIdGet Lookups by ID"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
 curl -X GET /v1/lookup_ids/{id} \
-  -H 'Accept: application/json'
+  -H 'Accept: application/json' \
+  -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
 
@@ -135,7 +141,7 @@ User can provide a Lookup ID and receive the match data associated with it
 }
 ```
 
-<h3 id="get__lookup_ids_{id}-responses">Responses</h3>
+<h3 id="get-lookups-by-id-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -143,9 +149,10 @@ User can provide a Lookup ID and receive the match data associated with it
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request|None|
 |404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not Found|None|
 
-<h3 id="get__lookup_ids_{id}-responseschema">Response Schema</h3>
+<h3 id="get-lookups-by-id-responseschema">Response Schema</h3>
 
-<aside class="success">
-This operation does not require authentication
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+ApiKeyAuth
 </aside>
 

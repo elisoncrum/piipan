@@ -18,7 +18,7 @@ main () {
     pushd ./generated/duplicate-participation-api/
         widdershins \
             --language_tabs 'shell:curl:request' \
-            --expandBody \
+            --omitBody \
             --omitHeader \
             --shallowSchemas \
             openapi.yaml \

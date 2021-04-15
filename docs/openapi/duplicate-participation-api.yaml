@@ -12,3 +12,11 @@ paths:
     $ref: '../../match/docs/openapi/orchestrator/query.yaml'
   /lookup_ids/{id}:
     $ref: '../../match/docs/openapi/lookup/id.yaml'
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Ocp-Apim-Subscription-Key
