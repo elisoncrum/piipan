@@ -37,7 +37,7 @@ Seperate endpoints and credentials will be provided for each environment.
 
 | Endpoint | Description | Type |
 |---|---|---|---|---|---|---|
-| `/<state-abbr>/upload` | uploads bulk participant data to the system | POST |
+| `/<state-abbreviation>/upload/:filename` | uploads bulk participant data to the system | POST |
 | `/query` | query for active matches | POST |
 | `/lookup_ids/:id` | Returns PII for a Lookup ID | GET |
 
