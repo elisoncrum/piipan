@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: Duplicate Participation API
+  version: 1.0.0
+  description: 'The API for the Duplicate Participation system where bulk upload, matching, and lookups will occur'
+servers:
+  - url: /v1
+paths:
+  /query:
+    post:
+      operationId: Query for Matches
+      tags:
+        - Match
+      summary: Search for all matching PII records
+      description: 'Queries all state databases for any PII records that are an exact match to the full name, date of birth, and social security number in the request body''s `query` property.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: object
+                  required:
+                    - first
+                    - last
+                    - dob
+                    - ssn
+                  properties:
+                    first:
+                      type: string
+                      description: PII record's first name
+                    middle:
+                      type: string
+                      description: PII record's middle name
+                    last:
+                      type: string
+                      description: PII record's last name
+                    ssn:
+                      type: string
+                      description: PII record's social security number
+                      pattern: '^\d{3}-\d{2}-\d{4}$'
+                    dob:
+                      type: string
+                      format: date
+                      description: PII record's date of birth
+      responses:
+        '200':
+          description: 'Matching PII records, if any exist'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lookup_id:
+                    type: string
+                    nullable: true
+                    description: the identifier of the match request
+                  matches:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - last
+                        - ssn
+                        - dob
+                      properties:
+                        first:
+                          type: string
+                          description: First name
+                        middle:
+                          type: string
+                          description: Middle name
+                        last:
+                          type: string
+                          description: Last name
+                        ssn:
+                          type: string
+                          description: Social Security number
+                          pattern: '^\d{3}-\d{2}-\d{4}$'
+                        dob:
+                          type: string
+                          format: date
+                          description: Date of birth
+                        state_name:
+                          type: string
+                          description: Full state/territory name
+                        state_abbr:
+                          type: string
+                          description: State/territory two-letter postal abbreviation
+                        exception:
+                          type: string
+                          description: Placeholder for value indicating special processing instructions
+        '400':
+          description: Bad request. Missing one of the required properties in the request body.
+  '/lookup_ids/{id}':
+    get:
+      operationId: Get Lookups by ID
+      tags:
+        - Lookup
+      summary: get the original match data related to a Lookup ID
+      description: User can provide a Lookup ID and receive the match data associated with it
+      responses:
+        '200':
+          description: original active match data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/paths/~1query/post/requestBody/content/application~1json/schema/properties/query'
+        '400':
+          description: Bad request
+        '404':
+          description: Not Found
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Ocp-Apim-Subscription-Key

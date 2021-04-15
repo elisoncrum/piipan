@@ -5,6 +5,8 @@ MatchQueryRequest:
     application/json:
       schema:
         type: object
+        required:
+            - query
         properties:
           query:
             $ref: '#/MatchQuery'
@@ -45,4 +47,4 @@ MatchQueryResponse:
     matches:
       type: array
       items:
-        $ref: 'pii-record.yaml#/PiiRecord'
+        $ref: './pii-record.yaml#/PiiRecord'

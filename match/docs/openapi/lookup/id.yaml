@@ -1,0 +1,17 @@
+get:
+  operationId: "Get Lookups by ID"
+  tags:
+    - "Lookup"
+  summary: "get the original match data related to a Lookup ID"
+  description: "User can provide a Lookup ID and receive the match data associated with it"
+  responses:
+    '200':
+      description: "original active match data"
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/lookup.yaml#/LookupIdResponse'
+    '400':
+      description: "Bad request"
+    '404':
+      description: "Not Found"
