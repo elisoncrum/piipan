@@ -1,14 +1,8 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Moq.Protected;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Authentication;
 using Xunit;
@@ -17,81 +11,94 @@ namespace Piipan.QueryTool.Tests
 {
     public class OrchestratorApiRequestTests
     {
-        static Mock<ITokenProvider> MockTokenProvider(string value)
-        {
-            var token = new AccessToken(value, DateTimeOffset.Now);
-            var mockTokenProvider = new Mock<ITokenProvider>();
-            mockTokenProvider
-                .Setup(t => t.RetrieveAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult(token));
-
-            return mockTokenProvider;
-        }
-
-        static Mock<HttpMessageHandler> MockHttpMessageHandler(string statusCode, string response)
-        {
-            var handlerMock = new Mock<HttpMessageHandler>();
-
-            handlerMock
-              .Protected()
-              .Setup<Task<HttpResponseMessage>>(
-                  "SendAsync",
-                  ItExpr.IsAny<HttpRequestMessage>(),
-                  ItExpr.IsAny<CancellationToken>()
-              )
-              .ReturnsAsync(new HttpResponseMessage()
-              {
-                  StatusCode = (HttpStatusCode)Enum.Parse(typeof(HttpStatusCode), statusCode, true),
-                  Content = new StringContent(response)
-              });
-
-            return handlerMock;
-        }
-
-        static AuthorizedJsonApiClient ConstructMocked(Mock<HttpMessageHandler> handler)
-        {
-            var mockTokenProvider = MockTokenProvider("|token|");
-            var client = new HttpClient(handler.Object);
-            var apiClient = new AuthorizedJsonApiClient(client, mockTokenProvider.Object);
-            return apiClient;
-        }
-
         [Fact]
-        public async void TestQueryOrchestrator()
+        public async void TestMatch()
         {
             // arrange
             var mockResponse = @"{
+                ""lookup_id"": ""BBB2222"",
                 ""matches"": [
                     {
                         ""first"": ""Theodore"",
                         ""middle"": ""Carri"",
-                        ""last"": ""Farrington""
+                        ""last"": ""Farrington"",
+                        ""ssn"": ""000-00-0000"",
+                        ""dob"": ""2021-01-01"",
+                        ""state_abbr"": ""ea"",
+                        ""state_name"": ""Echo Alpha""
                     }
                 ]
             }";
-
-            var handlerMock = MockHttpMessageHandler("OK", mockResponse);
-            var httpClient = new HttpClient(handlerMock.Object);
-            var mockApiClient = ConstructMocked(handlerMock);
-            var query = new PiiRecord();
-            var jsonString = JsonSerializer.Serialize(query);
-            var requestBody = new StringContent(jsonString, Encoding.UTF8, "application/json");
-
-            var _apiRequest = new OrchestratorApiRequest(mockApiClient, new NullLogger<IndexModel>());
+            var query = new PiiRecord
+            {
+                FirstName = "Theodore",
+                MiddleName = "Carri",
+                LastName = "Farrington"
+            };
+            var clientMock = new Mock<IAuthorizedApiClient>();
+            clientMock
+                .Setup(c => c.PostAsync(It.IsAny<Uri>(), It.IsAny<StringContent>()).Result)
+                .Returns(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(mockResponse)
+                });
+            var api = new OrchestratorApiRequest(
+                clientMock.Object,
+                new Uri("https://localhost/"),
+                new NullLogger<IndexModel>());
 
             // act
-            var TestQueryResult = await _apiRequest.SendQuery("http://example.com", query);
+            var result = await api.Match(query);
 
             // assert
-            Assert.Single(TestQueryResult);
-            Assert.Equal("Theodore", TestQueryResult[0].FirstName);
-            Assert.Equal("Farrington", TestQueryResult[0].LastName);
-            handlerMock.Protected().Verify(
-              "SendAsync",
-              Times.AtLeastOnce(),
-              ItExpr.Is<HttpRequestMessage>(req => req.Method == HttpMethod.Post),
-              ItExpr.IsAny<CancellationToken>()
-            );
+            Assert.IsType<MatchResponse>(result);
+            Assert.Single(result.matches);
+            Assert.Equal("BBB2222", result.lookupId);
+            Assert.Equal("Theodore", result.matches[0].FirstName);
+            Assert.Equal("Carri", result.matches[0].MiddleName);
+            Assert.Equal("Farrington", result.matches[0].LastName);
+            Assert.Equal("000-00-0000", result.matches[0].SocialSecurityNum);
+            Assert.Equal(new DateTime(2021, 1, 1), result.matches[0].DateOfBirth);
+            Assert.Equal("ea", result.matches[0].StateAbbr);
+            Assert.Equal("Echo Alpha", result.matches[0].StateName);
+        }
+
+        [Fact]
+        public async void TestLookup()
+        {
+            var mockResponse = @"{
+                ""data"": {
+                    ""first"": ""Theodore"",
+                    ""middle"": ""Carri"",
+                    ""last"": ""Farrington"",
+                    ""ssn"": ""000-00-0000"",
+                    ""dob"": ""2021-01-01""
+                }
+            }";
+            var clientMock = new Mock<IAuthorizedApiClient>();
+            clientMock
+                .Setup(c => c.GetAsync(It.IsAny<Uri>()).Result)
+                .Returns(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(mockResponse)
+                });
+            var api = new OrchestratorApiRequest(
+                clientMock.Object,
+                new Uri("https://localhost/"),
+                new NullLogger<IndexModel>());
+
+            // act
+            var result = await api.Lookup("BCD2345");
+
+            // assert
+            Assert.IsType<LookupResponse>(result);
+            Assert.Equal("Theodore", result.data.FirstName);
+            Assert.Equal("Carri", result.data.MiddleName);
+            Assert.Equal("Farrington", result.data.LastName);
+            Assert.Equal("000-00-0000", result.data.SocialSecurityNum);
+            Assert.Equal(new DateTime(2021, 1, 1), result.data.DateOfBirth);
         }
     }
 }

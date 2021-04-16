@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,34 +18,29 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _apiClient = apiClient;
-            _apiRequest = new OrchestratorApiRequest(_apiClient, _logger);
+            var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
+            _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
         }
 
         [BindProperty]
         public Lookup Query { get; set; }
-
-        public Dictionary<string,object> QueryResult { get; private set; } = new Dictionary<string,object>();
-        public List<PiiRecord> Records { get; private set; }
-
+        public LookupResponse Record { get; set; }
         public String RequestError { get; private set; }
         public bool NoResults = false;
 
-        public async Task<IActionResult> OnPostAsync(Lookup query)
+        public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)
             {
-                QueryResult = await _apiRequest.SendQuery(
-                    Environment.GetEnvironmentVariable("OrchApiUri"),
-                    query
-                );
-
                 try
                 {
-                    _logger.LogInformation("Query form submitted");
-                    var matches = QueryResult["matches"] as List<PiiRecord>;
-                    NoResults = matches.Count == 0;
-                    Records = matches;
-                    Title = "NAC Query Results";
+                    _logger.LogInformation("Lookup form submitted");
+
+                    LookupResponse result = await _apiRequest.Lookup(Query.LookupId);
+
+                    Record = result;
+                    NoResults = (Record == null || Record.data == null);
+                    Title = "NAC Lookup Results";
                 }
                 catch (Exception exception)
                 {
@@ -54,6 +48,7 @@ namespace Piipan.QueryTool.Pages
                     RequestError = "There was an error running your search";
                 }
             }
+
             return Page();
         }
 

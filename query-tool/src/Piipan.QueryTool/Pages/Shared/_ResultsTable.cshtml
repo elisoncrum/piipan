@@ -1,8 +1,9 @@
-@model List<PiiRecord>
-@if (Model != null && Model.Any())
+@model MatchResponse
+@if (Model != null && Model.matches.Any())
 {
     <h2>Results</h2>
     <table class="usa-table">
+    <caption>Lookup ID: @Model.lookupId</caption>
     <thead>
         <tr>
             <th scope="col">Name</th>
@@ -12,7 +13,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var record in @Model)
+        @foreach (var record in @Model.matches)
             {
                 <tr>
                     <td>@record.FirstName @record.MiddleName @record.LastName</td>

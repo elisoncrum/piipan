@@ -4,6 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace Piipan.QueryTool
 {
+    public class MatchRequest
+    {
+        [JsonPropertyName("query")]
+        public PiiRecord Query { get; set; }
+    }
+
     public class PiiRecord : IQueryable
     {
         [Required]
@@ -44,6 +50,6 @@ namespace Piipan.QueryTool
 
         [Display(Name = "Lookup ID")]
         [JsonPropertyName("lookup_id")]
-        public string LookupId {get; set;}
+        public string LookupId { get; set; }
     }
 }

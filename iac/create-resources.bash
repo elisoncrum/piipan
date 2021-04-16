@@ -510,12 +510,12 @@ main () {
   echo "Front Door iD: ${front_door_id}"
 
   orch_api_uri=$(\
-    az functionapp function show \
+    az functionapp show \
       -g $MATCH_RESOURCE_GROUP \
       -n $orch_name \
-      --function-name Query \
-      --query invokeUrlTemplate \
+      --query defaultHostName \
       -o tsv)
+  orch_api_uri="https://${orch_api_uri}/api/v1/"
 
   az deployment group create \
     --name $QUERY_TOOL_APP_NAME \
