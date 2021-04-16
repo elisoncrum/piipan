@@ -6,6 +6,8 @@ info:
 servers:
   - url: "/v1"
 paths:
+  '/{state}/upload/{filename}':
+    $ref: '../../etl/docs/openapi/upload.yaml'
   /query:
     $ref: '../../match/docs/openapi/orchestrator/query.yaml'
   /lookup_ids/{id}:
