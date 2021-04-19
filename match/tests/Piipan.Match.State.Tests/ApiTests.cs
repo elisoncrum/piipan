@@ -238,7 +238,7 @@ namespace Piipan.Match.State.Tests
             (var sql, var parameters) = Api.Prepare(request, logger);
 
             // Assert
-            Assert.Contains("upper(first)=upper(@first)", sql);
+            Assert.Contains("upper(last)=upper(@last)", sql);
         }
 
         [Fact]
@@ -254,7 +254,6 @@ namespace Piipan.Match.State.Tests
 
             // Assert
             Assert.Contains("upper(last)=upper(@last)", sql);
-            Assert.Contains("upper(first)=upper(@first)", sql);
         }
 
         [Fact]
