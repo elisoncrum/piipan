@@ -13,9 +13,9 @@
       },
       "FluentValidation": {
         "type": "Direct",
-        "requested": "[10.0.3, )",
-        "resolved": "10.0.3",
-        "contentHash": "FfMIVWEgyio5l/IMVSYm3olf5GR96g6q7PuDYgbvw8BsGFQuN3SRTTI5QUYtI0E86tdzNrM9w8u2o+QLtRaI0A=="
+        "requested": "[10.0.4, )",
+        "resolved": "10.0.4",
+        "contentHash": "LqEYHuF5gXBJzG9/aUQS50TJP5cZgh/twvPLV7iTtFFGF6isGBkNXOhr9VwmSjlFRIVOqcMtkGuHwuPbU+XpoQ=="
       },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Direct",

@@ -100,8 +100,8 @@
       },
       "FluentValidation": {
         "type": "Transitive",
-        "resolved": "10.0.3",
-        "contentHash": "FfMIVWEgyio5l/IMVSYm3olf5GR96g6q7PuDYgbvw8BsGFQuN3SRTTI5QUYtI0E86tdzNrM9w8u2o+QLtRaI0A=="
+        "resolved": "10.0.4",
+        "contentHash": "LqEYHuF5gXBJzG9/aUQS50TJP5cZgh/twvPLV7iTtFFGF6isGBkNXOhr9VwmSjlFRIVOqcMtkGuHwuPbU+XpoQ=="
       },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Transitive",
@@ -2108,7 +2108,7 @@
       "piipan.match.orchestrator": {
         "type": "Project",
         "dependencies": {
-          "FluentValidation": "10.0.3",
+          "FluentValidation": "10.0.4",
           "Microsoft.Azure.Cosmos.Table": "1.0.8",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Extensions.Http": "3.1.14",
