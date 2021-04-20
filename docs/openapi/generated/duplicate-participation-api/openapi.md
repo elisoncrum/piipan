@@ -15,6 +15,55 @@ Base URLs:
 * API Key (ApiKeyAuth)
     - Parameter Name: **Ocp-Apim-Subscription-Key**, in: header. 
 
+<h1 id="duplicate-participation-api-upload">Upload</h1>
+
+## Upload a File
+
+<a id="opIdUpload a File"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X PUT /v1/{state}/upload/{filename} \
+  -H 'Content-Type: text/plain' \
+  -H 'Content-Length: 0' \
+  -H 'Ocp-Apim-Subscription-Key: API_KEY'
+
+```
+
+`PUT /{state}/upload/{filename}`
+
+*Upload a CSV file of bulk participant data*
+
+> Body parameter
+
+```
+string
+
+```
+
+<h3 id="upload-a-file-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|state|path|string|true|Postal code of state|
+|filename|path|string|true|Name of file being uploaded|
+|Content-Length|header|integer|true|none|
+
+<h3 id="upload-a-file-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|File uploaded|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
+|411|[Length Required](https://tools.ietf.org/html/rfc7231#section-6.5.10)|Content-Length not provided|None|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+ApiKeyAuth
+</aside>
+
 <h1 id="duplicate-participation-api-match">Match</h1>
 
 ## Query for Matches
