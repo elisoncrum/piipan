@@ -8,7 +8,7 @@ For a high-level view of system architecture, go [here](../README.md).
 
 ## System Status
 
-All three API's are in Alpha stage and under active development. We plan on having API's ready for state testing in a sandbox environment by end of April 2021.
+API's are in Alpha stage and under active development. We plan on having API's ready for state testing in a sandbox environment by end of April 2021.
 
 ## API Overview
 
@@ -21,7 +21,7 @@ In order to participate, states will need to:
 These three elements translate to three main areas of the API that states will integrate into their existing eligibility systems and workflows:
 
 1. States will upload participant data through a scheduled [CSV upload](../etl/README.md)
-2. Eligibility workers will conduct matches through [Active Matching](../match/README.md)
+2. Eligibility workers will conduct matches through [Active Matching](./openapi/generated/duplicate-participation-api/openapi.md#match)
 3. Eligibility workers will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#Lookup)
 
 ### Environments
@@ -30,9 +30,9 @@ Seperate endpoints and credentials will be provided for each environment.
 
 | environment | purpose |
 |---|---|
-| sandbox | for initial testing of the integration; fake data only |
-| pre-production | for testing with actual data at scale; data is not used in production |
-| production | actual data used in the production system |
+| Sandbox | For initial testing of the integration; fake data only |
+| Pre-Production | For testing with actual data at scale; data is not used in production |
+| Production | Actual data used in the production system |
 
 ### Endpoints Overview
 
