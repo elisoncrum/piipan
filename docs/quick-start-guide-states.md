@@ -1,14 +1,14 @@
 # Quick-Start Guide for States
 
-> This documentation is for state use
+> This documentation is for state use.
 
 > ⚠️  Under construction
 
-For a high-level view of system architecture, go [here](../README.md).
+A high-level view of the system architecture can be found [here](../README.md).
 
 ## System Status
 
-All three API's are in Alpha stage and under active development. We plan on having API's ready for state testing in a sandbox environment by end of April 2021.
+All three APIs are in Alpha stage and under active development. We plan on having APIs ready for state testing in a sandbox environment by the end of April 2021.
 
 ## API Overview
 
@@ -21,14 +21,14 @@ In order to participate, states will need to:
 These three elements translate to three main areas of the API that states will integrate into their existing eligibility systems and workflows:
 
 1. States will upload participant data through a scheduled [CSV upload](../etl/README.md)
-2. Eligibility workers will conduct matches through [Active Matching](../match/README.md)
-3. Eligibility workers will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#Lookup)
+2. States will conduct matches through [Active Matching](../match/README.md)
+3. States will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#Lookup)
 
 ### Environments
 
 Seperate endpoints and credentials will be provided for each environment.
 
-| environment | purpose |
+| Environment | Purpose |
 |---|---|
 | sandbox | for initial testing of the integration; fake data only |
 | pre-production | for testing with actual data at scale; data is not used in production |
@@ -56,8 +56,8 @@ curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
 
 ## Feedback
 
-We track API issues through [Github Issues](https://github.com/18F/piipan/issues).
+Got any feedback for us? We track API issues through [Github Issues](https://github.com/18F/piipan/issues).
 
-We also have a Microsoft Teams channel for daily communication (forthcoming).
+We also have a Microsoft Teams channel for daily communication with state agency engineers.
 
 
