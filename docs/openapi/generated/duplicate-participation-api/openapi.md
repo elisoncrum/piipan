@@ -47,7 +47,7 @@ string
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|state|path|string|true|Postal code of state|
+|state|path|string|true|state abbreviation|
 |filename|path|string|true|Name of file being uploaded|
 |Content-Length|header|integer|true|none|
 
