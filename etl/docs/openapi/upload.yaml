@@ -6,7 +6,7 @@ put:
   parameters:
     - name: state
       in: path
-      description: Postal code of state
+      description: state abbreviation
       required: true
       schema:
         type: string

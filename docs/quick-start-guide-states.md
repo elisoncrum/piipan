@@ -36,7 +36,7 @@ Seperate endpoints and credentials will be provided for each environment.
 
 ### Endpoints Overview
 
-| Endpoint | Description | Type |
+| Endpoint | Description | Request Type |
 |---|---|---|
 | `/<state-abbreviation>/upload/:filename` | uploads bulk participant data to the system | POST |
 | `/query` | query for active matches | POST |
