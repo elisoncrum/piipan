@@ -59,6 +59,10 @@ namespace Piipan.Match.Orchestrator
         public static async Task<MatchQuery> Retrieve(string lookupId, ITableStorage<QueryEntity> tableStorage, ILogger log)
         {
             MatchQuery query = null;
+
+            // Case-insensitive matching
+            lookupId = lookupId.ToUpper();
+
             var row = await tableStorage.PointQueryAsync(PartitionKey, lookupId);
 
             if (row != null)
