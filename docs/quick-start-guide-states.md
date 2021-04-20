@@ -20,7 +20,7 @@ In order to participate, states will need to:
 
 These three elements translate to three main areas of the API that states will integrate into their existing eligibility systems and workflows:
 
-1. States will upload participant data through a scheduled [CSV upload](../etl/README.md)
+1. States will upload participant data through a scheduled [CSV upload](./openapi/generated/duplicate-participation-api/openapi.md#upload) (CSV formatting instructions can be found [here](https://github.com/18F/piipan/blob/main/etl/docs/bulk-import.md))
 2. Eligibility workers will conduct matches through [Active Matching](./openapi/generated/duplicate-participation-api/openapi.md#match)
 3. Eligibility workers will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#Lookup)
 
