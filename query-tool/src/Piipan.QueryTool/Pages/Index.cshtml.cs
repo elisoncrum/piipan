@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,29 +18,28 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _apiClient = apiClient;
-            _apiRequest = new OrchestratorApiRequest(_apiClient, _logger);
+            var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
+            _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
         }
 
         [BindProperty]
         public PiiRecord Query { get; set; }
-
-        public List<PiiRecord> QueryResult { get; private set; } = new List<PiiRecord>();
+        public MatchResponse QueryResult { get; private set; }
         public String RequestError { get; private set; }
         public bool NoResults = false;
 
-        public async Task<IActionResult> OnPostAsync(PiiRecord query)
+        public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)
             {
-                QueryResult = await _apiRequest.SendQuery(
-                    Environment.GetEnvironmentVariable("OrchApiUri"),
-                    query
-                );
-
                 try
                 {
                     _logger.LogInformation("Query form submitted");
-                    NoResults = QueryResult.Count == 0;
+
+                    MatchResponse result = await _apiRequest.Match(Query);
+
+                    QueryResult = result;
+                    NoResults = QueryResult.matches.Count == 0;
                     Title = "NAC Query Results";
                 }
                 catch (Exception exception)
@@ -50,6 +48,7 @@ namespace Piipan.QueryTool.Pages
                     RequestError = "There was an error running your search";
                 }
             }
+
             return Page();
         }
 

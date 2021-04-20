@@ -1,0 +1,25 @@
+@model LookupResponse
+@if (Model != null && Model.data != null)
+{
+    <h2>Result</h2>
+    <table class="usa-table">
+    <thead>
+        <tr>
+            <th scope="col">First name</th>
+            <th scope="col">Middle name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">DOB</th>
+            <th scope="col">SSN</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.data.FirstName</td>
+            <td>@Model.data.MiddleName</td>
+            <td>@Model.data.LastName</td>
+            <td>@Model.data.DateOfBirth</td>
+            <td>@Model.data.SocialSecurityNum</td>
+        </tr>
+    </tbody>
+</table>
+}

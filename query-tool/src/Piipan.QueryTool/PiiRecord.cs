@@ -4,7 +4,13 @@ using System.Text.Json.Serialization;
 
 namespace Piipan.QueryTool
 {
-    public class PiiRecord
+    public class MatchRequest
+    {
+        [JsonPropertyName("query")]
+        public PiiRecord Query { get; set; }
+    }
+
+    public class PiiRecord : IQueryable
     {
         [Required]
         [Display(Name = "First Name")]
@@ -41,5 +47,9 @@ namespace Piipan.QueryTool
         [Display(Name = "StateAbbr")]
         [JsonPropertyName("state_abbr")]
         public string StateAbbr { get; set; }
+
+        [Display(Name = "Lookup ID")]
+        [JsonPropertyName("lookup_id")]
+        public string LookupId { get; set; }
     }
 }

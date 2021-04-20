@@ -10,9 +10,9 @@ using Xunit;
 
 namespace Piipan.QueryTool.Tests
 {
-    public class IndexPageTests
+    public class LookupByIdPageTests
     {
-        public IndexPageTests()
+        public LookupByIdPageTests()
         {
             Environment.SetEnvironmentVariable("OrchApiUri", "https://localhost/");
         }
@@ -21,10 +21,7 @@ namespace Piipan.QueryTool.Tests
         {
             var clientMock = new Mock<IAuthorizedApiClient>();
             clientMock
-                .Setup(c => c.PostAsync(
-                    It.Is<Uri>(u => u.ToString().Contains("/query")),
-                    It.IsAny<StringContent>()
-                ))
+                .Setup(c => c.GetAsync(It.Is<Uri>(u => u.ToString().Contains("lookup_ids/"))))
                 .Returns(Task.FromResult(new HttpResponseMessage()
                 {
                     StatusCode = statusCode,
@@ -38,22 +35,22 @@ namespace Piipan.QueryTool.Tests
         public void TestBeforeOnGet()
         {
             // arrange
-
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
-            var pageModel = new IndexModel(
-                new NullLogger<IndexModel>(),
+            var pageModel = new LookupByIdModel(
+                new NullLogger<LookupByIdModel>(),
                 mockApiClient
                 );
             // act
             // assert
             Assert.Equal("", pageModel.Title);
         }
+
         [Fact]
         public void TestAfterOnGet()
         {
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient);
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockApiClient);
 
             // act
             pageModel.OnGet();
@@ -63,85 +60,59 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async void MatchSetsResults()
+        public async void LookupSetsRecord()
         {
             // arrange
             var returnValue = @"{
-                ""lookup_id"": ""BBB2222"",
-                ""matches"": [{
+                ""data"": {
                     ""first"": ""Theodore"",
                     ""middle"": ""Carri"",
                     ""last"": ""Farrington"",
                     ""ssn"": ""000-00-0000"",
-                    ""dob"": ""2021-01-01"",
-                    ""state_abbr"": ""ea"",
-                    ""state_name"": ""Echo Alpha""
-                }]
+                    ""dob"": ""2021-01-01""
+                }
             }";
-            var requestPii = new PiiRecord
-            {
-                FirstName = "Theodore",
-                LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
-                DateOfBirth = new DateTime(2021, 1, 1)
-            };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
-            pageModel.Query = requestPii;
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient);
+            pageModel.Query = new Lookup { LookupId = "BCD2345" };
 
             // act
             await pageModel.OnPostAsync();
 
             // assert
-            Assert.IsType<MatchResponse>(pageModel.QueryResult);
-            Assert.NotNull(pageModel.QueryResult);
-            Assert.NotNull(pageModel.QueryResult.matches);
+            Assert.IsType<LookupResponse>(pageModel.Record);
+            Assert.NotNull(pageModel.Record);
+            Assert.NotNull(pageModel.Record.data);
             Assert.False(pageModel.NoResults);
         }
 
         [Fact]
-        public async void MatchNoResults()
+        public async void LookupNoResults()
         {
             // arrange
             var returnValue = @"{
-                ""lookup_id"": null,
-                ""matches"": []
+                ""data"": null
             }";
-            var requestPii = new PiiRecord
-            {
-                FirstName = "Theodore",
-                LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
-                DateOfBirth = new DateTime(2021, 1, 1)
-            };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
-            pageModel.Query = requestPii;
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient);
+            pageModel.Query = new Lookup { LookupId = "BCD2345" };
 
             // act
             await pageModel.OnPostAsync();
 
             // assert
-            Assert.IsType<MatchResponse>(pageModel.QueryResult);
-            Assert.Null(pageModel.QueryResult.lookupId);
-            Assert.Empty(pageModel.QueryResult.matches);
+            Assert.IsType<LookupResponse>(pageModel.Record);
+            Assert.Null(pageModel.Record.data);
             Assert.True(pageModel.NoResults);
         }
 
         [Fact]
-        public async void MatchCapturesApiError()
+        public async void LookupCapturesApiError()
         {
             // arrange
-            var requestPii = new PiiRecord
-            {
-                FirstName = "Theodore",
-                LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
-                DateOfBirth = new DateTime(2021, 1, 1)
-            };
             var mockClient = clientMock(HttpStatusCode.BadRequest, "");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
-            pageModel.Query = requestPii;
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient);
+            pageModel.Query = new Lookup { LookupId = "BCD2345" };
 
             // act
             await pageModel.OnPostAsync();

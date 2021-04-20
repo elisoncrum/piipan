@@ -8,20 +8,21 @@
     <h2>@Model.Title</h2>
     <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
-            @if (!string.IsNullOrEmpty(Model.RequestError)) {
-                    <div class="usa-alert usa-alert--error usa-alert--slim">
-                        <div class="usa-alert__body">
-                            <p class="usa-alert__text">@Model.RequestError</p>
-                        </div>
+            @if (!string.IsNullOrEmpty(Model.RequestError))
+            {
+                <div class="usa-alert usa-alert--error usa-alert--slim">
+                    <div class="usa-alert__body">
+                        <p class="usa-alert__text">@Model.RequestError</p>
                     </div>
+                </div>
             }
             else if (Model.NoResults)
             {
-                    <div class="usa-alert usa-alert--info usa-alert--slim usa-alert--validation">
-                        <div class="usa-alert__body">
-                            <p class="usa-alert__text">Your search did not return any results.</p>
-                        </div>
+                <div class="usa-alert usa-alert--info usa-alert--slim usa-alert--validation">
+                    <div class="usa-alert__body">
+                        <p class="usa-alert__text">Your search did not return any results.</p>
                     </div>
+                </div>
             }
 
             @if (!ViewData.ModelState.IsValid)
@@ -54,30 +55,5 @@
             <input class="usa-button" type="submit" value="Submit" />
         </fieldset>
     </form>
-    @if (Model.QueryResult != null && Model.QueryResult.Any())
-    {
-        <h2>Results</h2>
-        <table class="usa-table">
-            <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">DOB</th>
-                    <th scope="col">SSN</th>
-                    <th scope="col">State</th>
-                </tr>
-            </thead>
-            <tbody>
-        @foreach (var record in @Model.QueryResult)
-            {
-                <tr>
-                    <td>@record.FirstName @record.MiddleName @record.LastName</td>
-                    <td>@record.DateOfBirth</td>
-                    <td>@record.SocialSecurityNum</td>
-                    <td>@record.StateName</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
-
+    <partial name="_ResultsTable" model="Model.QueryResult" />
 </div>
