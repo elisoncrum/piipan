@@ -27,10 +27,9 @@ commands:
           name: Run dev version of app for pa11y testing
           working_directory: << parameters.directory >>
           command: dotnet run
-          background: true
       - run:
           name: wait for app to spin up
-          command: sleep 15s
+          command: sleep 20s
       - run:
           name: run pa11y
           working_directory: << parameters.directory >>
