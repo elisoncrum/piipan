@@ -158,6 +158,8 @@ jobs:
   accessibility_query_tool:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:3.1
+    environment:
+      OrchApiUri: "http://example.com"
     steps:
       - run_pa11y:
           directory: query-tool/src/Piipan.QueryTool
@@ -166,6 +168,7 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
+      - accessibility_query_tool
       - test
       - build
       - deploy:
