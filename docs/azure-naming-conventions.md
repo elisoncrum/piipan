@@ -21,7 +21,7 @@ A few Azure resource types (e.g., storage accounts) have [very restrictive nami
 | prefix | Makes resource name globally unique in an Azure cloud, typically a short value that denotes agency/service. It is optional for resources that are not global in scope, e.g., VNets, resource groups, subscription topics. |
 | resource_type | abbreviation of resource type, based on the [Azure documentation](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming#example-names-general); e.g., `psql`, `func`, `app` |
 | app_name | concise name to denote purpose |
-| environment | either `dev`, `test`, `preprod`, or `prod`|
+| environment | either `dev`, `test`, `stage`, or `prod`|
 
 
 ## Examples:
