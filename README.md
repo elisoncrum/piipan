@@ -5,6 +5,12 @@
 
 *A system for storing and matching Personal Identifiable Information (PII) records.*
 
+## Quick Links
+- [Quick-Start Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
+- [Architecture diagram](https://raw.githubusercontent.com/18F/piipan/main/docs/piipan-architecture.png)
+
+## Overview
+
 Piipan is a reference model for program integrity initiatives that aim to prevent multiple enrollment in federally-funded, but state-managed benefit programs. Under this model, each state regularly submits their entire list of program participants (i.e., their unique PII) to a federally run instance of Piipan. State-level eligibility workers for the benefit program then query Piipan as part of their (re)certification process; if the applicant is found to be receiving benefits in another state, the eligibility worker deconflicts the multiple enrollment.
 
 Paramount quality attributes of this system include:
