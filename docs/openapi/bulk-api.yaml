@@ -1,19 +1,19 @@
 openapi: 3.0.0
 info:
-  title: Bulk upload API
+  title: "Bulk API"
   version: 1.0.0
-  description: API for uploading bulk participant data
+  description: "The API for performing bulk uploads"
 tags:
   - name: "Upload"
 servers:
   - url: /bulk/{stateAbbr}/v1
     variables:
       stateAbbr:
-        default: ea
+        default: none
         description: Lowercase two-letter postal code abbreviation
 paths:
   '/upload/{filename}':
-    $ref: './upload.yaml'
+    $ref: '../../etl/docs/openapi/upload.yaml'
 security:
   - ApiKeyAuth: []
 components:
