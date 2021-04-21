@@ -8,7 +8,7 @@ A high-level view of the system architecture can be found [here](../README.md).
 
 ## System Status
 
-APIs are in Alpha stage and under active development. We plan on having APIs ready for state testing in a sandbox environment by the end of April 2021.
+APIs are in Alpha stage and under active development. We plan on having APIs ready for state testing by the end of April 2021.
 
 ## API Overview
 
