@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
 
 namespace Piipan.QueryTool
@@ -22,7 +23,11 @@ namespace Piipan.QueryTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            services.AddRazorPages().AddMvcOptions(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
+            });
+
             services.AddSingleton<IAuthorizedApiClient>((s) =>
             {
                 ITokenProvider tokenProvider;
