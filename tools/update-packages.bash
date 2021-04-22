@@ -15,6 +15,9 @@ restore () {
 
 update () {
   options=$1
+  if [ "$1" = "--highest-major" ]; then
+      options=""
+  fi
 
   # Don't want grep to result in error code for whole pipeline if no
   # new packages found; see https://unix.stackexchange.com/a/581991
@@ -34,9 +37,7 @@ main () {
   start_path="$1"
   options="--highest-minor"
   if [ "$#" = "2" ]; then
-    if [ "$2" = "--highest-major" ]; then
-      options=""
-    fi
+    options="$2"
   fi
 
   # Sort so `src` projects are updated before `tests` projects
