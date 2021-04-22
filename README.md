@@ -5,6 +5,12 @@
 
 *A system for storing and matching Personal Identifiable Information (PII) records.*
 
+## Quick links
+- [Quick Start Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
+- [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/main/docs/piipan-architecture.png)
+
+## Overview
+
 Piipan is a reference model for program integrity initiatives that aim to prevent multiple enrollment in federally-funded, but state-managed benefit programs. Under this model, each state regularly submits their entire list of program participants (i.e., their unique PII) to a federally run instance of Piipan. State-level eligibility workers for the benefit program then query Piipan as part of their (re)certification process; if the applicant is found to be receiving benefits in another state, the eligibility worker deconflicts the multiple enrollment.
 
 Paramount quality attributes of this system include:
@@ -14,8 +20,8 @@ Paramount quality attributes of this system include:
 * Adaptability to policy changes and multiple benefit programs
 
 Further, this reference model is motivated and guided by [Sec. 4011 of the 2018 Farm Bill](https://www.congress.gov/bill/115th-congress/house-bill/2/text), *Interstate data matching to prevent multiple issuances*, which mandates that the information made available by state agencies:
-* shall be used only for the purpose of preventing multiple enrollment;
-* shall not be retained for longer than is necessary.
+* Shall be used only for the purpose of preventing multiple enrollment
+* Shall not be retained for longer than is necessary
 
 ## High-level architecture
 
@@ -29,7 +35,7 @@ Piipan is designed to be a cloud-native system. It is under active development a
 * Collaboration
 * Batch-driven Passive Match
  
-A diagram depicting these anticipated subsystems is below:
+Here is a diagram depicting these anticipated subsystems:
 
 <p align="center">
   <a href="./docs/piipan-architecture.png"><img src="./docs/piipan-architecture.png" alt="High-level architecture"></a>
