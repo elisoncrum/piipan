@@ -5,9 +5,9 @@
 
 *A system for storing and matching Personal Identifiable Information (PII) records.*
 
-## Quick Links
-- [Quick-Start Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
-- [Architecture diagram](https://raw.githubusercontent.com/18F/piipan/main/docs/piipan-architecture.png)
+## Quick links
+- [Quick Start Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
+- [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/main/docs/piipan-architecture.png)
 
 ## Overview
 
@@ -20,8 +20,8 @@ Paramount quality attributes of this system include:
 * Adaptability to policy changes and multiple benefit programs
 
 Further, this reference model is motivated and guided by [Sec. 4011 of the 2018 Farm Bill](https://www.congress.gov/bill/115th-congress/house-bill/2/text), *Interstate data matching to prevent multiple issuances*, which mandates that the information made available by state agencies:
-* shall be used only for the purpose of preventing multiple enrollment;
-* shall not be retained for longer than is necessary.
+* Shall be used only for the purpose of preventing multiple enrollment
+* Shall not be retained for longer than is necessary
 
 ## High-level architecture
 
