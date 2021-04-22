@@ -35,7 +35,7 @@ Piipan is designed to be a cloud-native system. It is under active development a
 * Collaboration
 * Batch-driven Passive Match
  
-A diagram depicting these anticipated subsystems is below:
+Here is a diagram depicting these anticipated subsystems:
 
 <p align="center">
   <a href="./docs/piipan-architecture.png"><img src="./docs/piipan-architecture.png" alt="High-level architecture"></a>
