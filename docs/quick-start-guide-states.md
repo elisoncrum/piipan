@@ -1,4 +1,4 @@
-# Quick-Start Guide for States
+# Quickstart Guide for States
 
 > This documentation is for state use.
 
