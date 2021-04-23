@@ -53,7 +53,7 @@ pg_connection_string () {
   server=$1
   db=$2
   user=$3
-  user=`echo ${user//-/_}`
+  user=${user//-/_}
 
   base=`az postgres show-connection-string \
     --server-name $server \

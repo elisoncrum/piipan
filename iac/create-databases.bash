@@ -135,7 +135,7 @@ EOF
 #     Active Directory admin, not the out-of-the-box, non-AD "superuser" login
 #   - Active Directory roles (e.g., managed identities or the AD admin
 #     user/group for the cluster) cannot be added to non-AD roles
-#   - Managed identitiy roles can only be established through CREATE, not via 
+#   - Managed identitiy roles can only be established through CREATE, not via
 #     GRANT on an existing role; this is likely due to the identity client id
 #     being specified via the password parameter, which is stored as a one-way
 #     hash in pg_authid
@@ -192,7 +192,7 @@ main () {
       --query clientId --output tsv`
 
     # Database role takes AD managed identity name and formats it for postgres naming rules
-    role=`echo ${identity//-/_}`
+    role=${identity//-/_}
     create_managed_role $db $role $client_id
     config_managed_role $db $role
   done < states.csv
