@@ -6,7 +6,7 @@
 *A system for storing and matching Personal Identifiable Information (PII) records.*
 
 ## Quick links
-- [Quick Start Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
+- [Quickstart Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
 - [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/main/docs/piipan-architecture.png)
 
 ## Overview
