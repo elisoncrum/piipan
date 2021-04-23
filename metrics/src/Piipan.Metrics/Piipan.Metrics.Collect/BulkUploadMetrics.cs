@@ -56,12 +56,13 @@ namespace Piipan.Metrics.Collect
             var tmp = new { url = "" };
             var data = JsonConvert.DeserializeAnonymousType(jsondata, tmp);
 
-            Regex regex = new Regex("^https://([a-z]+)state");
+            Regex regex = new Regex("^https://([a-z]+)upload");
             Match match = regex.Match(data.url);
 
             if (match.Success)
             {
-                return match.Groups[1].Value;
+                var val = match.Groups[1].Value;
+                return val.Substring(val.Length - 2); // parses abbreviation from match value
             }
             else
             {

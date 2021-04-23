@@ -41,7 +41,7 @@ main () {
     db=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
     owner=$db
     admin=`state_managed_id_name $db $ENV`
-    admin=`echo "$admin" | tr '-' '_'`
+    admin=`echo ${admin//-/_}`
 
     echo "Applying DDL to database $db..."
     apply_ddl $db $owner $admin

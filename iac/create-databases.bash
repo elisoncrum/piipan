@@ -192,7 +192,7 @@ main () {
       --query clientId --output tsv`
 
     # Database role takes AD managed identity name and formats it for postgres naming rules
-    role=`echo "$identity" | tr '-' '_'`
+    role=`echo ${identity//-/_}`
     create_managed_role $db $role $client_id
     config_managed_role $db $role
   done < states.csv
