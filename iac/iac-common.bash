@@ -130,4 +130,18 @@ graph_host_suffix () {
     echo ".microsoft.com"
   fi
 }
+
+state_managed_id_name () {
+  abbr=$1
+  env=$2
+
+  echo "id-${abbr}admin-${env}"
+}
+
+state_event_grid_topic_name () {
+  abbr=$1
+  env=$2
+
+  echo "evgt-${abbr}upload-${env}"
+}
 ### END Functions

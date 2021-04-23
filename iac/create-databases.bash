@@ -1,13 +1,15 @@
 #!/bin/bash
 
 source $(dirname "$0")/../tools/common.bash || exit
+source $(dirname "$0")/iac-common.bash || exit
 
-# Require PGHOST, PGUSER, PGPASSWORD be set by the caller;
+# Require PGHOST, PGUSER, PGPASSWORD and $ENV be set by the caller;
 # PGUSER and PGPASSWORD should correspond to the out-of-the-box,
 # non-AD "superuser" administrtor login
 : "$PGHOST"
 : "$PGUSER"
 : "$PGPASSWORD"
+: "$ENV"
 
 # Azure user connection string will be of the form:
 # administatorLogin@serverName
@@ -183,16 +185,14 @@ main () {
 
     db=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
 
-    # As in create-resources.bash, managed identities use the
-    # state abbreviation as its prefix, and `admin` as its suffix
-    identity=${db}admin
+    identity=`state_managed_id_name $db $ENV`
     client_id=`az identity show \
       --resource-group $RESOURCE_GROUP \
       --name $identity \
       --query clientId --output tsv`
 
-    # Database role has the same name as its corresponding AD managed identity
-    role=$identity
+    # Database role takes AD managed identity name and formats it for postgres naming rules
+    role=`echo "$identity" | tr '-' '_'`
     create_managed_role $db $role $client_id
     config_managed_role $db $role
   done < states.csv

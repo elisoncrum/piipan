@@ -15,7 +15,7 @@ source $(dirname "$0")/iac-common.bash || exit
 
 set_constants () {
   # Name of Key Vault
-  VAULT_NAME=secret-keeper-$ENV
+  VAULT_NAME=$PREFIX-kv-core-$ENV
 
   # Name of secret used to store the PostgreSQL server admin password
   PG_SECRET_NAME=particpants-records-admin
@@ -27,20 +27,21 @@ set_constants () {
   PG_AAD_ADMIN=piipan-admins
 
   # Name of PostgreSQL server
-  PG_SERVER_NAME=participant-records
+  PG_SERVER_NAME=$PREFIX-psql-participants-$ENV
 
   # Names of participant records database Vnet and Subnet
   VNET_NAME=vnet-core-$ENV
-  DB_SUBNET_NAME=snet-core-$ENV # Subnet database private endpoint uses
-  FUNC_SUBNET_NAME=snet-functionapps-$ENV # Subnet function apps uses
-  PRIVATE_ENDPOINT_NAME=pe-$PG_SERVER_NAME-$ENV
+  DB_SUBNET_NAME=snet-participants-$ENV # Subnet database private endpoint uses
+  FUNC_SUBNET_NAME=snet-apps1-$ENV # Subnet function apps uses
+  PRIVATE_ENDPOINT_NAME=pe-participants-$ENV
 
   # Base name of query tool app
-  QUERY_TOOL_APP_NAME=app-query-tool-${ENV}
-  QUERY_TOOL_FRONTDOOR_NAME=querytool
+  QUERY_TOOL_APP_NAME=$PREFIX-app-querytool-$ENV
+  QUERY_TOOL_FRONTDOOR_NAME=$PREFIX-fd-querytool-$ENV
+  QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
 
   # Base name of lookup API storage account
-  LOOKUP_STORAGE_NAME=stlookupapi${ENV}
+  LOOKUP_STORAGE_NAME=${PREFIX}stlookupapi${ENV}
 
   # Display name of service principal account responsible for CI/CD tasks
   SP_NAME_CICD=piipan-cicd
@@ -49,9 +50,13 @@ set_constants () {
   TENANT_ID=$(az account show --query homeTenantId -o tsv)
 
   # App service plan name for function apps
-  APP_SERVICE_PLAN_FUNC_NAME="plan-functionapps-${ENV}"
+  APP_SERVICE_PLAN_FUNC_NAME=plan-apps1-$ENV
   APP_SERVICE_PLAN_FUNC_SKU=P1V2
   APP_SERVICE_PLAN_FUNC_KIND=functionapp
+
+  # Orchestrator Function app and its blob storage
+  ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
+  ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
 }
 
 # Generate the storage account connection string for the corresponding
@@ -87,13 +92,6 @@ az_connection_string () {
     echo "RunAs=App;AppId=${client_id}"
 }
 
-# creating a function for this since we need it in a few different iterations
-state_managed_id_name () {
-  abbr=$1
-
-  echo "${abbr}admin"
-}
-
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
@@ -119,16 +117,6 @@ main () {
         databaseSubnetName=$DB_SUBNET_NAME \
         funcSubnetName=$FUNC_SUBNET_NAME
 
-  # uniqueString is used pervasively in our ARM templates to create globally
-  # identifiers from the resource group id, but it is not available in the CLI.
-  # As we need to reference that unique value elsewhere, extract it out from
-  # a dummy template.
-  DEFAULT_UNIQ_STR=`az deployment group create \
-    --resource-group $RESOURCE_GROUP \
-    --template-file ./arm-templates/unique-string.json \
-    --query properties.outputs.uniqueString.value \
-    -o tsv`
-
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
   DEFAULT_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
@@ -147,13 +135,15 @@ main () {
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
   while IFS=, read -r abbr name ; do
-      echo "Creating storage for $name ($abbr)"
+      abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
+      func_stor_name=${PREFIX}st${abbr}upload${ENV}
+      echo "Creating storage for $name ($func_stor_name)"
       az deployment group create \
-      --name "${abbr}-blob-storage" \
+      --name $func_stor_name \
       --resource-group $RESOURCE_GROUP \
       --template-file ./arm-templates/blob-storage.json \
       --parameters \
-        stateAbbreviation=$abbr \
+        storageAccountName=$func_stor_name \
         resourceTags="$RESOURCE_TAGS" \
         location=$LOCATION
   done < states.csv
@@ -200,7 +190,7 @@ main () {
   while IFS=, read -r abbr name ; do
       echo "Creating managed identity for $name ($abbr)"
       abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
-      identity=`state_managed_id_name $abbr`
+      identity=`state_managed_id_name $abbr $ENV`
       az identity create -g $RESOURCE_GROUP -n $identity
   done < states.csv
 
@@ -226,7 +216,7 @@ main () {
     --name $PG_SERVER_NAME \
     --resource-type "Microsoft.DbForPostgreSQL/servers" \
     --query properties.fullyQualifiedDomainName -o tsv`
-
+  export ENV=$ENV
   # Multiple PostgreSQL databases cannot be created with an ARM template;
   # detailed database/schema/role configuration can't be done with an ARM
   # template either. Instead, we access the PostgreSQL server from a trusted
@@ -274,13 +264,13 @@ main () {
     abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
 
     # Per-state Function App
-    func_app=func-${abbr}etl-${ENV}
+    func_app=$PREFIX-func-${abbr}etl-$ENV
 
     # Storage account for the Function app for its own use;
-    func_stor=stor${abbr}etl${ENV}
+    func_stor=${PREFIX}st${abbr}etl${ENV}
 
     # Managed identity to access database
-    identity=`state_managed_id_name $abbr`
+    identity=`state_managed_id_name $abbr $ENV`
 
     # Per-state database
     db_name=${abbr}
@@ -290,14 +280,16 @@ main () {
     func_name=BulkUpload
 
     # Per-state storage account for bulk upload;
-    # matches name generated in blob-storage.json
-    stor_name=${abbr}state${DEFAULT_UNIQ_STR}
+    # matches name passed to blob-storage.json
+    stor_name=${PREFIX}st${abbr}upload${ENV}
 
     # System topic for per-state upload (create blob) events
-    topic_name=${abbr}-blob-topic
+    # same as topic name in create-metrics-resources.bash
+    topic_name=evgt-${abbr}upload-$ENV
+    topic_name=`state_event_grid_topic_name $abbr $ENV`
 
     # Subscription to upload events that get routed to Function
-    sub_name=${abbr}-blob-subscription
+    sub_name=evgs-${abbr}upload-$ENV
 
     # Every Function app needs a storage account for its own internal use;
     # e.g., bindings state, keys, function code. Keep this separate from
@@ -398,7 +390,7 @@ main () {
     echo "Creating match API function app for $name ($abbr)"
     abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
 
-    identity=`state_managed_id_name $abbr`
+    identity=`state_managed_id_name $abbr $ENV`
     db_name=${abbr}
     client_id=$(\
       az identity show \
@@ -408,8 +400,8 @@ main () {
         --output tsv)
     db_conn_str=`pg_connection_string $PG_SERVER_NAME $db_name $identity`
     az_serv_str=`az_connection_string $RESOURCE_GROUP $identity`
-    func_app_name=func-${abbr}match-${ENV}
-    storage_acct_name=stor${abbr}match${ENV}
+    func_app_name=$PREFIX-func-${abbr}match-$ENV
+    storage_acct_name=${PREFIX}st${abbr}match${ENV}
 
     echo "Deploying ${name} function resources"
     func_name=$(\
@@ -466,25 +458,24 @@ main () {
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools.
   match_api_uris="[${match_api_uris:1}]"
-  orch_name=$(\
-    az deployment group create \
-      --name orch-api \
-      --resource-group $MATCH_RESOURCE_GROUP \
-      --template-file  ./arm-templates/function-orch-match.json \
-      --query properties.outputs.functionAppName.value \
-      --output tsv \
-      --parameters \
-        resourceTags="$RESOURCE_TAGS" \
-        location=$LOCATION \
-        LookupStorageName=$LOOKUP_STORAGE_NAME \
-        StateApiUriStrings=$match_api_uris)
+  az deployment group create \
+    --name orch-api \
+    --resource-group $MATCH_RESOURCE_GROUP \
+    --template-file  ./arm-templates/function-orch-match.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location=$LOCATION \
+      functionAppName=$ORCHESTRATOR_FUNC_APP_NAME \
+      storageAccountName=$ORCHESTRATOR_FUNC_APP_STORAGE_NAME \
+      LookupStorageName=$LOOKUP_STORAGE_NAME \
+      StateApiUriStrings=$match_api_uris
 
   echo "Waiting to publish function app"
   sleep 60
 
-  echo "Publishing ${orch_name} function app"
+  echo "Publishing ${ORCHESTRATOR_FUNC_APP_NAME} function app"
   pushd ../match/src/Piipan.Match.Orchestrator
-  func azure functionapp publish $orch_name --dotnet
+  func azure functionapp publish $ORCHESTRATOR_FUNC_APP_NAME --dotnet
   popd
 
   # Create App Service resources for query tool app.
@@ -499,11 +490,12 @@ main () {
     $azure_env \
     $RESOURCE_GROUP \
     $QUERY_TOOL_FRONTDOOR_NAME \
+    $QUERY_TOOL_WAF_NAME \
     $query_tool_host
 
   front_door_id=$(\
   az network front-door show \
-    --name ${PREFIX}-fd-${QUERY_TOOL_FRONTDOOR_NAME}-${ENV} \
+    --name $QUERY_TOOL_FRONTDOOR_NAME \
     --resource-group $RESOURCE_GROUP \
     --query frontdoorId \
     --output tsv)
@@ -512,7 +504,7 @@ main () {
   orch_api_uri=$(\
     az functionapp show \
       -g $MATCH_RESOURCE_GROUP \
-      -n $orch_name \
+      -n $ORCHESTRATOR_FUNC_APP_NAME \
       --query defaultHostName \
       -o tsv)
   orch_api_uri="https://${orch_api_uri}/api/v1/"
@@ -532,8 +524,9 @@ main () {
   # Establish metrics sub-system
   ./create-metrics-resources.bash $azure_env
 
+  # API Management instances need to be created before configuring Easy Auth.
   # If running full iac script for the first time in new resource groups,
-  # un-comment this line:
+  # un-comment this line. Otherwise, leave it commented out:
   # ./create-apim.bash $azure_env $APIM_EMAIL
 
   # Configures App Service Authentication between:

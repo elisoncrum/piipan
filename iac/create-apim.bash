@@ -87,7 +87,7 @@ main () {
   source $(dirname "$0")/env/${azure_env}.bash
   verify_cloud
 
-  APIM_NAME=apim-duppartapi-${ENV}
+  APIM_NAME=${PREFIX}-apim-duppartapi-${ENV}
   PUBLISHER_NAME='API Administrator'
   publisher_email=$2
 
