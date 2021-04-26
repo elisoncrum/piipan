@@ -15,7 +15,7 @@ source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/iac-common.bash || exit
 
 set_constants () {
-  DB_SERVER_NAME=${PREFIX}-db-metrics-${ENV}
+  DB_SERVER_NAME=$PREFIX-psql-core-$ENV
   DB_ADMIN_NAME=piipanadmin
   DB_NAME=metrics
   DB_TABLE_NAME=participant_uploads
@@ -23,12 +23,24 @@ set_constants () {
   DB_CONN_STR=`pg_connection_string $DB_SERVER_NAME $DB_NAME $DB_ADMIN_NAME`
   # Name of Key Vault
   VAULT_NAME_KEY=KeyVaultName
-  VAULT_NAME=${PREFIX}-kv-metrics-${ENV}
+  VAULT_NAME=$PREFIX-kv-metrics-$ENV
   # Name of secret used to store the PostgreSQL metrics server admin password
   PG_SECRET_NAME=metrics-pg-admin
-  # Base name of dashboard app
-  DASHBOARD_APP_NAME=${PREFIX}-app-dashboard-${ENV}
-  DASHBOARD_FRONTDOOR_NAME=dashboard
+  # Dashboard App Info
+  DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV
+  DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
+  DASHBOARD_WAF_NAME=wafdashboard${ENV}
+  # Metrics Collection Info
+  COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
+  COLLECT_APP_ID=metricscol
+  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}
+  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}
+  COLLECT_FUNC=BulkUploadMetrics
+  # Metrics API Info
+  API_APP_FILEPATH=Piipan.Metrics.Api
+  METRICS_API_APP_ID=metricsapi
+  API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
+  API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
 }
 
 main () {
@@ -98,11 +110,6 @@ main () {
 EOF
 
   # Create Metrics Collect Function App in Azure
-  COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
-  COLLECT_APP_ID=metricscol
-  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}
-  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}
-  COLLECT_FUNC=BulkUploadMetrics
 
   # Will need to revisit how to successfully deploy this app through an arm template
   # Need a storage account to publish function app to:
@@ -165,8 +172,8 @@ EOF
   while IFS=, read -r abbr name ; do
       echo "Subscribing to ${name} blob events"
       abbr=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
-      sub_name=${abbr}-blob-metrics-subscription
-      topic_name=${abbr}-blob-topic
+      sub_name=evgs-${abbr}metricsupload-${ENV}
+      topic_name=`state_event_grid_topic_name $abbr $ENV`
 
       az eventgrid system-topic event-subscription create \
           --name $sub_name \
@@ -179,32 +186,29 @@ EOF
   done < states.csv
 
   # Create Metrics API Function App in Azure
-  API_APP_FILEPATH=Piipan.Metrics.Api
-  METRICS_API_APP_ID=metricsapi
 
   # Will need to revisit how to successfully deploy this app through an arm template
   # Need a storage account to publish function app to:
   echo "Creating storage account for metrics api"
   az storage account create \
-    --name "${PREFIX}st${METRICS_API_APP_ID}${ENV}" \
+    --name $API_APP_STORAGE_NAME \
     --location $LOCATION \
     --resource-group $METRICS_RESOURCE_GROUP \
     --sku Standard_LRS
 
   # Create the function app in Azure
   echo "Creating function app metrics api"
-  API_APP_NAME="${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}"
   az functionapp create \
     --resource-group $METRICS_RESOURCE_GROUP \
     --consumption-plan-location $LOCATION \
     --runtime dotnet \
     --functions-version 3 \
     --name $API_APP_NAME \
-    --storage-account "${PREFIX}st${METRICS_API_APP_ID}${ENV}"
+    --storage-account $API_APP_STORAGE_NAME
 
   az functionapp config appsettings set \
       --resource-group $METRICS_RESOURCE_GROUP \
-      --name "${PREFIX}-func-${METRICS_API_APP_ID}-${ENV}" \
+      --name $API_APP_NAME \
       --settings \
         $DB_CONN_STR_KEY="$DB_CONN_STR" \
         $VAULT_NAME_KEY="$VAULT_NAME" \
@@ -241,11 +245,12 @@ EOF
     $azure_env \
     $RESOURCE_GROUP \
     $DASHBOARD_FRONTDOOR_NAME \
+    $DASHBOARD_WAF_NAME \
     $dashboard_host
 
   front_door_id=$(\
   az network front-door show \
-    --name ${PREFIX}-fd-${DASHBOARD_FRONTDOOR_NAME}-${ENV} \
+    --name $DASHBOARD_FRONTDOOR_NAME \
     --resource-group $RESOURCE_GROUP \
     --query frontdoorId \
     --output tsv)

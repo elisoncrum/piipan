@@ -1,9 +1,11 @@
 #!/bin/bash
-# 
+#
 # Creates participant records tables and their access controls for
 # each configured state. PGHOST, PGUSER, PGPASSWORD must be set.
 #
 # usage: apply-ddl.bash
+
+source $(dirname "$0")/../iac/iac-common.bash || exit
 
 set -e
 
@@ -13,6 +15,7 @@ set -u
 : "$PGHOST"
 : "$PGUSER"
 : "$PGPASSWORD"
+: "$ENV"
 
 # Azure user connection string will be of the form:
 # administatorLogin@serverName
@@ -37,8 +40,9 @@ main () {
   while IFS=, read -r abbr name ; do
     db=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
     owner=$db
-    admin=${db}admin
-    
+    admin=`state_managed_id_name $db $ENV`
+    admin=${admin//-/_}
+
     echo "Applying DDL to database $db..."
     apply_ddl $db $owner $admin
 

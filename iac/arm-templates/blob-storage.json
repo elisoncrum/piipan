@@ -2,20 +2,18 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "stateAbbreviation": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 2
-        },
         "resourceTags": {
             "type": "object"
         },
         "location": {
             "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
         }
     },
     "variables": {
-        "uniqueStorageName": "[concat(toLower(parameters('stateAbbreviation')), 'state', uniqueString(resourceGroup().id))]",
+        "uniqueStorageName": "[parameters('storageAccountName')]",
         "containerName": "upload",
         "systemTypeTag": {
             "SysType": "PerStateStorage"

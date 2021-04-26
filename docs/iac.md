@@ -25,12 +25,24 @@ To (re)create the Azure resources that `piipan` uses:
 ```
     az login
 ```
+
+**NOTE**: When running `create-resources` for the first time in new resource groups, `create-apim` should be run within `create-resources`, after creating the rest of the Azure resources but before configuring Easy Auth.
+
+To do this, set an `APIM_EMAIL` address in your environment file, then un-comment this line in `iac/create-resources.bash`:
+```
+# ./create-apim.bash $azure_env $APIM_EMAIL
+```
+
+On subsequent runs of `create-resources`, this line can be commented out and you can run `create-apim` independently (see below).
+
 5. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments).
 ```
     cd iac
     ./create-resources.bash tts/dev
 ```
-6. Run `create-apim`, which deploys ARM template and runs associated CLI commands to create an Azure API Management (APIM) instance, specifying the [name of the deployment environment](#deployment-environments) and an administrator email (a required property which can be subsequently changed). If the APIM instance does not already exist this script can take ~45 minutes to complete.
+### Creating API Management Instances
+
+Run `create-apim`, which deploys ARM template and runs associated CLI commands to create an Azure API Management (APIM) instance, specifying the [name of the deployment environment](#deployment-environments) and an administrator email (a required property which can be subsequently changed). If the APIM instance does not already exist this script can take ~45 minutes to complete.
 ```
     ./create-apim.bash tts/dev your-email
 ```

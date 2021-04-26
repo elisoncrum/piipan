@@ -177,7 +177,7 @@
                                     {
                                         "name": "[parameters('privateEndpointName')]",
                                         "properties": {
-                                            "privateLinkServiceId": "[resourceId('Microsoft.DBforPostgreSQL/servers',parameters('ServerName'))]",
+                                            "privateLinkServiceId": "[resourceId('Microsoft.DBforPostgreSQL/servers',parameters('serverName'))]",
                                             "groupIds": [
                                                 "postgresqlServer"
                                             ]

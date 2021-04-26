@@ -13,12 +13,18 @@
         },
         "StateApiUriStrings": {
             "type": "string"
+        },
+        "functionAppName": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
         }
     },
     "variables": {
-        "functionAppName": "[concat('ofunc', uniqueString(resourceGroup().id))]",
+        "functionAppName": "[parameters('functionAppName')]",
         "hostingPlanName": "matchapi",
-        "storageAccountName": "[concat('ofstor', uniquestring(resourceGroup().id))]",
+        "storageAccountName": "[parameters('storageAccountName')]",
         "lookupTableName": "lookup",
         "functionWorkerRuntime": "dotnet",
         "storageAccountType": "Standard_LRS",

@@ -1,13 +1,15 @@
 #!/bin/bash
 
 source $(dirname "$0")/../tools/common.bash || exit
+source $(dirname "$0")/iac-common.bash || exit
 
-# Require PGHOST, PGUSER, PGPASSWORD be set by the caller;
+# Require PGHOST, PGUSER, PGPASSWORD and $ENV be set by the caller;
 # PGUSER and PGPASSWORD should correspond to the out-of-the-box,
 # non-AD "superuser" administrtor login
 : "$PGHOST"
 : "$PGUSER"
 : "$PGPASSWORD"
+: "$ENV"
 
 # Azure user connection string will be of the form:
 # administatorLogin@serverName
@@ -133,7 +135,7 @@ EOF
 #     Active Directory admin, not the out-of-the-box, non-AD "superuser" login
 #   - Active Directory roles (e.g., managed identities or the AD admin
 #     user/group for the cluster) cannot be added to non-AD roles
-#   - Managed identitiy roles can only be established through CREATE, not via 
+#   - Managed identitiy roles can only be established through CREATE, not via
 #     GRANT on an existing role; this is likely due to the identity client id
 #     being specified via the password parameter, which is stored as a one-way
 #     hash in pg_authid
@@ -183,16 +185,14 @@ main () {
 
     db=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
 
-    # As in create-resources.bash, managed identities use the
-    # state abbreviation as its prefix, and `admin` as its suffix
-    identity=${db}admin
+    identity=`state_managed_id_name $db $ENV`
     client_id=`az identity show \
       --resource-group $RESOURCE_GROUP \
       --name $identity \
       --query clientId --output tsv`
 
-    # Database role has the same name as its corresponding AD managed identity
-    role=$identity
+    # Database role takes AD managed identity name and formats it for postgres naming rules
+    role=${identity//-/_}
     create_managed_role $db $role $client_id
     config_managed_role $db $role
   done < states.csv

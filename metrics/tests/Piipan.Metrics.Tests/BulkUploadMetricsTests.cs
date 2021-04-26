@@ -10,7 +10,7 @@ namespace Piipan.Metrics.Tests
 {
     public class BulkUploadMetricsTests
     {
-        public string badUrl = "foobar";
+        public string badUrl = "eastate";
 
         static EventGridEvent EventMock(Object dataObject)
         {
