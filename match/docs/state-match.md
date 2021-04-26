@@ -4,6 +4,7 @@
 - [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [.NET Core SDK 3.1](https://dotnet.microsoft.com/download)
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- [Docker](https://docs.docker.com/get-docker/) (for running integration tests)
 
 ## Summary
 
@@ -36,6 +37,24 @@ To build and run the app with this limited functionality:
 
 1. Fetch any app settings using `func azure functionapp fetch-app-settings {app-name}`. The app name can be retrieved from the Portal.
 1. Run `func start` or, if hot reloading is desired, `dotnet watch msbuild /t:RunFunctions`.
+
+## Unit / integration tests
+
+Unit tests are contained within `Piipan.Match.State.Tests` and integration tests within `Piipan.Match.State.IntegrationTests`.
+
+To run unit tests:
+
+```
+cd match/tests/Piipan.Match.State.Tests
+dotnet test
+```
+
+Integration tests are run by connecting to a PostgreSQL Docker container. With Docker installed on your machine, run the integration tests using Docker Compose:
+
+```
+cd match/tests/
+docker-compose run --rm app dotnet test /code/match/tests/Piipan.Match.State.IntegrationTests/Piipan.Match.State.IntegrationTests.csproj
+```
 
 ## Manual deployment
 
