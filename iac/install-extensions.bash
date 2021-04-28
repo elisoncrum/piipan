@@ -7,7 +7,7 @@
 source $(dirname "$0")/../tools/common.bash || exit
 
 # Array of extension names
-declare -a extensions=("db-up")
+declare -a extensions=("db-up" "front-door")
 
 for name in ${extensions[@]}; do
   echo "Installing '$name'..."
