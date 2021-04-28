@@ -16,14 +16,6 @@ Virtualization can achieve this. In a traditional on-premises setup, resources w
 
 Microsoft documentation on this subject is extensive, and specific implementation varies between resource types (see resources below for a starting point).
 
-Here’s a brief overview of how these resources fit together, using a Postgres database server and a Function App that communicates with it as an example:
-1. A VNet is established, with subnets dedicated to certain resource types
-1. For the database server, a private link is created and claims one of the VNet’s subnets.
-1. An App Service plan is created for the function app and any other apps needing to talk to this database server, claiming another one of the VNet’s subnets
-1. The function app is put onto the App Service plan, allowing it to be integrated into the Vnet
-1. Once an app is integrated into the VNet, it will automatically use the database server’s private link to communicate with it.
-1. Public access to the database server is then disabled, allowing only resources in the VNet to communicate with it.
-
 Azure has an older service to use with VNets called Service Endpoints, and this was explored as an option. With Service Endpoints, there is no extra resource to implement—the cost is built into the VNet itself. Private Links are a separate resource with its own costs. However, Service Endpoints still use the public IP address of a PaaS resource in order to communicate with the VNet. With Private Links, a resource gets a private IP address on the Virtual Network, effectively injecting the resource into the VNet.
 
 For every new type of resource needing Virtual Network integration, a cost-benefit analysis should be done. For many Azure resources, integrating with a Virtual Network requires a more costly pricing plan. API Management, for example, would need a pricing plan upwards of [~$2,700 per month](https://docs.microsoft.com/en-us/azure/api-management/api-management-using-with-internal-vnet#availability). Web Apps will need a [Premium Plan](https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#matrix-of-networking-features). Therefore it’s worth considering the “must-haves” versus the “nice-to-haves” of VNet integration.

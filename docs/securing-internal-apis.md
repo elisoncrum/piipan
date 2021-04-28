@@ -8,7 +8,9 @@ To secure endpoints in production, the APIs use [App Service Authentication](htt
 
 Once secured, the APIs are protected from unauthorized access both externally and internally, consistent with the aims of a [Zero Trust Architecture](https://csrc.nist.gov/publications/detail/sp/800-207/final).
 
-This document details how the internal APIs are utilized, how to secure them, how to authorize client applications, and defines the various objects involved in the process.
+Another layer of security we employ is routing internal communication between as many Azure resources as possible over a Virtual Network, in order to block exposure to the public internet and decrease the attack surface of the system.
+
+This document details how the internal APIs are utilized, how to secure them, how to authorize client applications, how to set up a virtual network, and defines the various objects involved in the process.
 
 ## Table of contents
 - [API model](#api-model)
@@ -18,6 +20,7 @@ This document details how the internal APIs are utilized, how to secure them, ho
 - [Making authenticated API calls](#making-authenticated-api-calls)
 - [Definitions](#definitions)
 - [Miscellaneous notes](#miscellaneous-notes)
+- [Virtual Network Integration](#virtual-network-integration)
 
 ## API model
 
@@ -32,7 +35,7 @@ Piipan's internal APIs follow a traditional client–server model where communic
 ## Resources involved
 
 In the Azure environment, the resources involved in authenticated client–server communication are divided between two domains:
-- Azure resources (e.g., Azure Functions, App Service apps, database clusters, etc) and 
+- Azure resources (e.g., Azure Functions, App Service apps, database clusters, etc) and
 - Azure AD resources (e.g., application objects, service principals, user accounts, etc).
 Azure resources provide the application logic (i.e., sending requests and responses), while their related Azure AD resources handle authentication and authorization.
 
@@ -206,3 +209,24 @@ If the Azure resource is destroyed, so to is its system-assigned identity's serv
 
 - Some Azure resources can function as *both* a client *and* a server. Take for example Piipan's Orchestrator API. When it is *called* by the Query Tool, it is operating as the server. When it is *calling* the individual state APIs, it is operating as the client. In this case the Orchestrator API has two service principals: one for its system-assigned identity when operating as a client, and one for its local application object instance when it is operating as a server.
 - App Service Authentication [handles all HTTP requests](https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization#on-windows) before they reach the application. Any requests that reach the application have already been authorized. Consequently, when an Azure Function is utilizing App Service Authentication, the application itself is configured with an [`AuthLevel` of `Anonymous`](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger?tabs=csharp#configuration).
+
+## Virtual Network Integration
+
+Since Azure resources are all PaaS systems, Azure uses what they call Private Links and Private Endpoints within Virtual Networks (VNet) to achieve a virtualized and entirely private setup.
+
+Microsoft documentation on this subject is extensive, and specific implementation varies between resource types (see documentation below for a starting point). For more on why we decided to use Private Endpoints over other options, read the [Decision Record](./adr/0013-use-private-links.md).
+
+Here’s a brief overview of how these resources fit together, using a Postgres database server and a Function App that communicates with it as an example:
+
+1. A VNet is established, with subnets dedicated to certain resource types.
+1. For the database server, a private link is created and claims one of the VNet’s subnets.
+1. An App Service plan is created for the function app and any other apps needing to talk to this database server, claiming another one of the VNet’s subnets.
+1. The function app is put onto the App Service plan, allowing it to be integrated into the Vnet.
+1. Once an app is integrated into the VNet, it will automatically use the database server’s private link to communicate with it.
+1. Public access to the database server is then disabled, allowing only resources in the VNet to communicate with it.
+
+**Relevant documentation**
+
+- [What is Azure Private Endpoint?](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview)
+- [What is Azure Private Link?](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview)
+- [Private Link for Azure Database for PostgreSQL-Single server](https://docs.microsoft.com/en-us/azure/postgresql/concepts-data-access-and-security-private-link)
