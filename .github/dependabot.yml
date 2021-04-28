@@ -39,6 +39,11 @@ updates:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
+  directory: "/match/tests/Piipan.Match.State.IntegrationTests"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
   directory: "/match/tests/Piipan.Match.Orchestrator.Tests"
   schedule:
     interval: daily
