@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,6 @@ namespace Piipan.Match.State.Tests
 {
     public class ApiTests
     {
-
         void SetEnvironment()
         {
             Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
@@ -225,84 +223,6 @@ namespace Piipan.Match.State.Tests
             Assert.Equal(bodyFormatted, request.ToJson());
         }
 
-        // SQL contains strings
-        [Fact]
-        public void SqlHasEqualCondition()
-        {
-            // Arrange
-            var body = JsonBody(@"{last:'Last', first: 'First', middle: 'Middle', dob: '1970-01-01', ssn: '000-00-0000'}");
-            var logger = Mock.Of<ILogger>();
-
-            // Act
-            MatchQueryRequest request = Api.Parse(body, logger);
-            (var sql, var parameters) = Api.Prepare(request, logger);
-
-            // Assert
-            Assert.Contains("upper(last)=upper(@last)", sql);
-        }
-
-        [Fact]
-        public void SqlHasNormlizedName()
-        {
-            // Arrange
-            var body = JsonBody(@"{last:'Last', first: 'First', middle: 'Middle', dob: '1970-01-01', ssn: '000-00-0000'}");
-            var logger = Mock.Of<ILogger>();
-
-            // Act
-            MatchQueryRequest request = Api.Parse(body, logger);
-            (var sql, var parameters) = Api.Prepare(request, logger);
-
-            // Assert
-            Assert.Contains("upper(last)=upper(@last)", sql);
-        }
-
-        [Fact]
-        public void PiiRecordHasStateData()
-        {
-            // Arrange
-            SetEnvironment();
-            var record = FullRecord();
-
-            // Assert
-            Assert.Equal("ea", record.StateAbbr);
-            Assert.Equal("Echo Alpha", record.StateName);
-        }
-
-        [Fact]
-        public void PiiRecordJsonMatchesObject()
-        {
-            // Arrange
-            SetEnvironment();
-            var record = FullRecord();
-            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\"\n}";
-
-            // Assert
-            Assert.Equal(expected, record.ToJson());
-        }
-
-        [Fact]
-        public void MatchResponseJsonMatchesObject()
-        {
-            // Arrange
-            SetEnvironment();
-            var record = FullRecord();
-            var response = new MatchQueryResponse
-            {
-                Matches = new List<PiiRecord>()
-            };
-            var expected = "{\n  \"matches\": [\n    {" +
-                    "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state_name\": \"Echo Alpha\",\n      \"state_abbr\": \"ea\"" +
-                    "\n    }\n  ]\n}";
-
-            // Act
-            response.Matches.Add(record);
-
-            // Assert
-            Assert.Equal(expected, response.ToJson());
-        }
-
-        // XXX Match occurs on same last name but different first name
         // XXX Connection string contains appropriate config
-        // XXX Valid request returns JsonResult
     }
 }
