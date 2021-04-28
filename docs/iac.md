@@ -53,7 +53,8 @@ Configuration for each environment is in `iac/env` in a corresponding, `source`-
 
 | Name | Description |
 |---|---|
-| `tts/dev` | TTS-owned Azure commercial cloud, updated continuously within a sprint |
+| `tts/dev`  | TTS-owned Azure commercial cloud, updated continuously within a sprint |
+| `tts/test` | TTS-owned Azure commercial cloud, updated at the end of each sprint |
 
 
 ## Environment variables
