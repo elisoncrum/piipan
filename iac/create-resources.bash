@@ -525,9 +525,7 @@ main () {
   ./create-metrics-resources.bash $azure_env
 
   # API Management instances need to be created before configuring Easy Auth.
-  # If running full iac script for the first time in new resource groups,
-  # un-comment this line. Otherwise, leave it commented out:
-  # ./create-apim.bash $azure_env $APIM_EMAIL
+  ./create-apim.bash $azure_env $APIM_EMAIL
 
   # Configures App Service Authentication between:
   #   - PerStateMatchApi and OrchestratorApi
