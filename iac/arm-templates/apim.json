@@ -2,6 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "env": {
+            "type": "String"
+        },
+        "prefix": {
+            "type": "String"
+        },
         "apiName": {
             "type": "String"
         },
@@ -23,7 +29,7 @@
         "dupPartPolicyXml": {
             "type": "String"
         },
-        "uploadAccounts": {
+        "uploadStates": {
             "type": "String"
         },
         "uploadBaseDomain": {
@@ -40,13 +46,21 @@
         "matchDisplayName": "Duplicate participation API",
         "matchSetName": "match",
         "uploadDisplayName": "Bulk upload API",
-        "uploadSetName": "bulk-upload",
-        "uploadAccountsList": "[split(parameters('uploadAccounts'), ' ')]",
-        "copy": [{
-            "name": "uploadApiNames",
-            "count": "[length(variables('uploadAccountsList'))]",
-            "input": "[concat(variables('uploadSetName'), '-', variables('uploadAccountsList')[copyIndex('uploadApiNames')])]"
-        }]
+        "uploadSetName": "bulk",
+        "uploadStatesList": "[split(toLower(parameters('uploadStates')), ' ')]",
+        "copy": [
+            {
+                "name": "uploadApiNames",
+                "count": "[length(variables('uploadStatesList'))]",
+                "input": "[concat(variables('uploadSetName'), '-', variables('uploadStatesList')[copyIndex('uploadApiNames')])]"
+            },
+            // Generate storage account names based on naming convention: {prefix}st{state-abbr}upload{env}
+            {
+                "name": "uploadAccountNames",
+                "count": "[length(variables('uploadStatesList'))]",
+                "input": "[concat(parameters('prefix'), 'st', variables('uploadStatesList')[copyIndex('uploadAccountNames')], 'upload', parameters('env'))]"
+            }
+        ]
     },
     "resources": [
         {
@@ -218,12 +232,12 @@
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
             "properties": {
-                "displayName": "[concat(variables('uploadAccountsList')[copyIndex()], ' ', variables('uploadDisplayName'))]",
+                "displayName": "[concat(toUpper(variables('uploadStatesList')[copyIndex()]), ' ', variables('uploadDisplayName'))]",
                 "versioningScheme": "Segment"
             },
             "copy": {
                 "name": "per-state-upload-api-vs",
-                "count": "[length(variables('uploadAccountsList'))]"
+                "count": "[length(variables('uploadStatesList'))]"
             }
         },
         {
@@ -235,19 +249,19 @@
                 "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
             ],
             "properties": {
-                "displayName": "[concat(variables('uploadAccountsList')[copyIndex()], ' ', variables('uploadDisplayName'))]",
+                "displayName": "[concat(toUpper(variables('uploadStatesList')[copyIndex()]), ' ', variables('uploadDisplayName'))]",
                 "subscriptionRequired": true,
                 "protocols": [
                     "https"
                 ],
-                "path": "[variables('uploadAccountsList')[copyIndex()]]",
+                "path": "[concat(variables('uploadSetName'), '/', variables('uploadStatesList')[copyIndex()])]",
                 "apiVersion": "v1",
                 "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
-                "serviceUrl": "[concat('https://', variables('uploadAccountsList')[copyIndex()], parameters('uploadBaseDomain'))]"
+                "serviceUrl": "[concat('https://', variables('uploadAccountNames')[copyIndex()], parameters('uploadBaseDomain'))]"
             },
             "copy": {
                 "name": "per-state-upload-apis",
-                "count": "[length(variables('uploadAccountsList'))]"
+                "count": "[length(variables('uploadStatesList'))]"
             }
         },
         {
@@ -259,12 +273,12 @@
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
             ],
             "properties": {
-                "value": "[parameters('uploadPolicyXml')]",
+                "value": "[replace(parameters('uploadPolicyXml'), '{storageAccountName}', variables('uploadAccountNames')[copyIndex()])]",
                 "format": "xml"
             },
             "copy": {
                 "name": "per-state-upload-policies",
-                "count": "[length(variables('uploadAccountsList'))]"
+                "count": "[length(variables('uploadStatesList'))]"
             }
         },
         {
@@ -292,7 +306,7 @@
             },
             "copy": {
                 "name": "per-state-upload-ops",
-                "count": "[length(variables('uploadAccountsList'))]"
+                "count": "[length(variables('uploadStatesList'))]"
             }
         }
     ],

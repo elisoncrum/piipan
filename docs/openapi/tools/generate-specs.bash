@@ -11,7 +11,7 @@ set -e
 set -u
 
 main () {
-    specs=(duplicate-participation-api)
+    specs=(bulk-api duplicate-participation-api)
 
     for s in "${specs[@]}"
     do
