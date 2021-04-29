@@ -10,7 +10,6 @@
 # usage: create-resources.bash <azure-env>
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 # App Service Authentication is done at the Azure tenant level
 TENANT_ID=$(az account show --query homeTenantId -o tsv)
@@ -246,6 +245,7 @@ main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  source $(dirname "$0")/iac-common.bash
   verify_cloud
 
   # Name of application roles authorized to call match APIs

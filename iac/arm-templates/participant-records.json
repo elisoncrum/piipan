@@ -131,7 +131,7 @@
                                 "infrastructureEncryption": "Disabled",
                                 "publicNetworkAccess": "Enabled" // This gets disabled later in iac
                             },
-                            /* VNet Rules only work for GeneralPurpose and above tiers */
+                            /* VNet Private Endpoints only work for GeneralPurpose and above tiers */
                             "sku": {
                                 "name": "GP_Gen5_2",
                                 "tier": "GeneralPurpose",

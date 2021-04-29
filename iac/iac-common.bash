@@ -10,6 +10,7 @@ ORCHESTRATOR_API_TAG="SysType=OrchestratorApi"
 DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
+METRICS_TAG="SysType=Metrics"
 
 # Identity object ID for the Azure environment account
 CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
@@ -19,6 +20,11 @@ SUBSCRIPTION_ID=`az account show --query id -o tsv`
 
 # Name of App Service Plan, used by both query tool and dashboard
 APP_SERVICE_PLAN=piipan-app-plan
+
+# App Service Plan used by function apps with VNet integration
+APP_SERVICE_PLAN_FUNC_NAME=plan-apps1-$ENV
+APP_SERVICE_PLAN_FUNC_SKU=P1V2
+APP_SERVICE_PLAN_FUNC_KIND=functionapp
 
 # Name of environment variable used to pass database connection strings
 # to app or function code
@@ -38,6 +44,14 @@ CLOUD_NAME_STR_KEY=CloudName
 
 # For connection strings, our established placeholder value
 PASSWORD_PLACEHOLDER='{password}'
+
+# Virtual Network and Subnets
+VNET_NAME=vnet-core-$ENV
+DB_SUBNET_NAME=snet-participants-$ENV # Subnet that participants database private endpoint uses
+DB_2_SUBNET_NAME=snet-core-$ENV # Subnet that core database private endpoint uses
+FUNC_SUBNET_NAME=snet-apps1-$ENV # Subnet function apps use
+PRIVATE_ENDPOINT_NAME=pe-participants-$ENV
+CORE_DB_PRIVATE_ENDPOINT_NAME=pe-core-$ENV
 ### END Constants
 
 ### Functions

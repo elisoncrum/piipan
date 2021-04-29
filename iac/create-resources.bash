@@ -11,7 +11,6 @@
 # usage: create-resources.bash <azure-env>
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 set_constants () {
   # Name of Key Vault
@@ -29,12 +28,6 @@ set_constants () {
   # Name of PostgreSQL server
   PG_SERVER_NAME=$PREFIX-psql-participants-$ENV
 
-  # Names of participant records database Vnet and Subnet
-  VNET_NAME=vnet-core-$ENV
-  DB_SUBNET_NAME=snet-participants-$ENV # Subnet database private endpoint uses
-  FUNC_SUBNET_NAME=snet-apps1-$ENV # Subnet function apps uses
-  PRIVATE_ENDPOINT_NAME=pe-participants-$ENV
-
   # Base name of query tool app
   QUERY_TOOL_APP_NAME=$PREFIX-app-querytool-$ENV
   QUERY_TOOL_FRONTDOOR_NAME=$PREFIX-fd-querytool-$ENV
@@ -48,11 +41,6 @@ set_constants () {
 
   # App Service Authentication is done at the Azure tenant level
   TENANT_ID=$(az account show --query homeTenantId -o tsv)
-
-  # App service plan name for function apps
-  APP_SERVICE_PLAN_FUNC_NAME=plan-apps1-$ENV
-  APP_SERVICE_PLAN_FUNC_SKU=P1V2
-  APP_SERVICE_PLAN_FUNC_KIND=functionapp
 
   # Orchestrator Function app and its blob storage
   ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
@@ -96,6 +84,7 @@ main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  source $(dirname "$0")/iac-common.bash
   verify_cloud
 
   set_constants
@@ -115,6 +104,7 @@ main () {
         resourceTags="$RESOURCE_TAGS" \
         vnetName=$VNET_NAME \
         databaseSubnetName=$DB_SUBNET_NAME \
+        database2SubnetName=$DB_2_SUBNET_NAME \
         funcSubnetName=$FUNC_SUBNET_NAME
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix

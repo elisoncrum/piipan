@@ -18,7 +18,13 @@
         "databaseSubnetName": {
             "type": "string",
             "metadata": {
-                "description": "The name of the subnet the database will use."
+                "description": "The name of the subnet the first database will use."
+            }
+        },
+        "database2SubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the subnet the second database will use."
             }
         },
         "funcSubnetName": {
@@ -54,7 +60,7 @@
                             "type": "string",
                             "defaultValue": "10.0.0.0/24",
                             "metadata": {
-                                "description": "The address space for the subnet."
+                                "description": "The address space for the first database subnet."
                             }
                         },
                         "funcSubnetPrefix": {
@@ -62,6 +68,13 @@
                             "defaultValue": "10.0.1.0/24",
                             "metadata": {
                                 "description": "The address space for the function app subnet."
+                            }
+                        },
+                        "database2subnetPrefix": {
+                            "type": "string",
+                            "defaultValue": "10.0.2.0/24",
+                            "metadata": {
+                                "description": "The address space for the second database subnet."
                             }
                         },
                         "vnetAddressPrefix": {
@@ -75,6 +88,9 @@
                             "type": "string"
                         },
                         "databaseSubnetName": {
+                            "type": "string"
+                        },
+                        "database2SubnetName": {
                             "type": "string"
                         },
                         "funcSubnetName": {
@@ -101,6 +117,13 @@
                                         "name": "[parameters('databaseSubnetName')]",
                                         "properties": {
                                             "addressPrefix": "[parameters('subnetPrefix')]",
+                                            "privateEndpointNetworkPolicies": "Disabled"
+                                        }
+                                    },
+                                    {
+                                        "name": "[parameters('database2SubnetName')]",
+                                        "properties": {
+                                            "addressPrefix": "[parameters('database2SubnetPrefix')]",
                                             "privateEndpointNetworkPolicies": "Disabled"
                                         }
                                     },
@@ -136,6 +159,9 @@
                     },
                     "databaseSubnetName": {
                         "value": "[parameters('databaseSubnetName')]"
+                    },
+                    "database2SubnetName": {
+                        "value": "[parameters('database2SubnetName')]"
                     },
                     "funcSubnetName": {
                         "value": "[parameters('funcSubnetName')]"
