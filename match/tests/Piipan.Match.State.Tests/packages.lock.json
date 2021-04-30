@@ -79,8 +79,8 @@
       },
       "Dapper": {
         "type": "Transitive",
-        "resolved": "2.0.78",
-        "contentHash": "vLPwL2HZXp/DN17Eu7sg6GMEj02alq7jcy6atn5Gv8i96b9Hu1UoxlCrhInUPfSFLQQiD8O7pdWAE1fdUEO/1Q==",
+        "resolved": "2.0.90",
+        "contentHash": "e4YjOLJptnpwHIbP8HxjaYf7So9lhUC43rvvGMEkH4Q4CiVlm4rOxYDo0HyuHlMQKj0U5Ob/nCMm52TUhTaZQg==",
         "dependencies": {
           "System.Reflection.Emit.Lightweight": "4.7.0"
         }
@@ -1919,7 +1919,7 @@
       "piipan.match.state": {
         "type": "Project",
         "dependencies": {
-          "Dapper": "2.0.78",
+          "Dapper": "2.0.90",
           "FluentValidation": "10.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.NET.Sdk.Functions": "3.0.11",
