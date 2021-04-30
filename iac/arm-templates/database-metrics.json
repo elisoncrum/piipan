@@ -78,6 +78,10 @@
             "metadata": {
                 "description": "name of the Virtual Network subnet delegated to the private endpoint"
             }
+        },
+        "privateDnsZoneName": {
+            "type": "string",
+            "defaultValue": "privatelink.postgres.database.azure.com"
         }
     },
     "resources": [
@@ -130,6 +134,9 @@
                         },
                         "subnetName": {
                             "type": "string"
+                        },
+                        "privateDnsZoneName": {
+                            "type": "string"
                         }
                     },
                     "variables": {
@@ -154,7 +161,6 @@
                         "systemTypeTag": {
                             "SysType": "[parameters('systemTypeTag')]"
                         },
-                        "privateDnsZoneName": "privatelink.postgres.database.azure.com",
                         "pvtendpointdnsgroupname": "[concat(parameters('privateEndpointName'),'/dnsgroup')]"
                     },
                     "resources": [
@@ -237,7 +243,7 @@
                         {
                             "type": "Microsoft.Network/privateDnsZones",
                             "apiVersion": "2020-01-01",
-                            "name": "[variables('privateDnsZoneName')]",
+                            "name": "[parameters('privateDnsZoneName')]",
                             "location": "global",
                             "dependsOn": [
                             ],
@@ -247,10 +253,10 @@
                         {
                             "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
                             "apiVersion": "2020-01-01",
-                            "name": "[concat(variables('privateDnsZoneName'), '/', variables('privateDnsZoneName'), '-link')]",
+                            "name": "[concat(parameters('privateDnsZoneName'), '/', parameters('privateDnsZoneName'), '-link')]",
                             "location": "global",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]"
                             ],
                             "properties": {
                                 "registrationEnabled": false,
@@ -269,7 +275,7 @@
                             "name": "[variables('pvtendpointdnsgroupname')]",
                             "location": "[parameters('location')]",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]",
+                                "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]",
                                 "[parameters('privateEndpointName')]"
                             ],
                             "properties": {
@@ -277,7 +283,7 @@
                                     {
                                         "name": "config1",
                                         "properties": {
-                                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', parameters('privateDnsZoneName'))]"
                                         }
                                     }
                                 ]
@@ -314,6 +320,9 @@
                     },
                     "subnetName": {
                         "value": "[parameters('subnetName')]"
+                    },
+                    "privateDnsZoneName": {
+                        "value": "[parameters('privateDnsZoneName')]"
                     }
                 }
             }

@@ -159,4 +159,14 @@ state_event_grid_topic_name () {
 
   echo "evgt-${abbr}upload-${env}"
 }
+
+private_dns_zone () {
+  base=privatelink.postgres.database.azure.com
+
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    base=${base/.postgres.database.azure.com/.postgres.database.usgovcloudapi.net}
+  fi
+
+  echo $base
+}
 ### END Functions

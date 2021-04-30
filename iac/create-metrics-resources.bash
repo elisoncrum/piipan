@@ -42,6 +42,8 @@ set_constants () {
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
   # System tag
   METRICS_SYSTEM_TAG_VALUE=Metrics
+
+  PRIVATE_DNS_ZONE=`private_dns_zone`
 }
 
 main () {
@@ -90,6 +92,7 @@ main () {
       vnetName=$VNET_NAME \
       subnetName=$DB_2_SUBNET_NAME \
       privateEndpointName=$CORE_DB_PRIVATE_ENDPOINT_NAME \
+      privateDnsZoneName=$PRIVATE_DNS_ZONE \
       resourceTags="$RESOURCE_TAGS" \
       systemTypeTag=$METRICS_SYSTEM_TAG_VALUE
 

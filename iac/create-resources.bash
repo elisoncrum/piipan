@@ -45,6 +45,8 @@ set_constants () {
   # Orchestrator Function app and its blob storage
   ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
+
+  PRIVATE_DNS_ZONE=`private_dns_zone`
 }
 
 # Generate the storage account connection string for the corresponding
@@ -103,9 +105,9 @@ main () {
         location=$LOCATION \
         resourceTags="$RESOURCE_TAGS" \
         vnetName=$VNET_NAME \
-        databaseSubnetName=$DB_SUBNET_NAME \
-        database2SubnetName=$DB_2_SUBNET_NAME \
-        funcSubnetName=$FUNC_SUBNET_NAME
+        peParticipantsSubnetName=$DB_SUBNET_NAME \
+        peCoreSubnetName=$DB_2_SUBNET_NAME \
+        appServicePlanSubnetName=$FUNC_SUBNET_NAME
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
@@ -163,7 +165,8 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       vnetName=$VNET_NAME \
       subnetName=$DB_SUBNET_NAME \
-      privateEndpointName=$PRIVATE_ENDPOINT_NAME
+      privateEndpointName=$PRIVATE_ENDPOINT_NAME \
+      privateDnsZoneName=$PRIVATE_DNS_ZONE
 
 
   # The AD admin can't be specified in the PostgreSQL ARM template,
