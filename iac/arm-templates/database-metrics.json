@@ -22,13 +22,6 @@
                 "description": "Resource Tags for project"
             }
         },
-        "systemTypeTag": {
-            "type": "string",
-            "defaultValue": "Metrics",
-            "metadata": {
-                "description": "Tag used to identify related resources for a subsystem"
-            }
-        },
         "secretName": {
             "type": "string",
             "metadata": {
@@ -119,13 +112,6 @@
                                 "description": "Server Name for Azure database for PostgreSQL"
                             }
                         },
-                        "systemTypeTag": {
-                            "type": "string",
-                            "defaultValue": "Metrics",
-                            "metadata": {
-                                "description": "Tag used to identify related resources for a subsystem"
-                            }
-                        },
                         "privateEndpointName": {
                             "type": "string"
                         },
@@ -158,9 +144,6 @@
                                 ]
                             }
                         },
-                        "systemTypeTag": {
-                            "SysType": "[parameters('systemTypeTag')]"
-                        },
                         "pvtendpointdnsgroupname": "[concat(parameters('privateEndpointName'),'/dnsgroup')]"
                     },
                     "resources": [
@@ -170,7 +153,7 @@
                             "apiVersion": "2017-12-01-preview",
                             "name": "[parameters('serverName')]",
                             "location": "[parameters('location')]",
-                            "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
+                            "tags": "[parameters('resourceTags')]",
                             "sku": {
                                 "name": "GP_Gen5_2",
                                 "tier": "GeneralPurpose",

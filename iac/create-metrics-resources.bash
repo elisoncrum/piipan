@@ -40,8 +40,6 @@ set_constants () {
   METRICS_API_APP_ID=metricsapi
   API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
-  # System tag
-  METRICS_SYSTEM_TAG_VALUE=Metrics
 
   PRIVATE_DNS_ZONE=`private_dns_zone`
 }
@@ -65,8 +63,7 @@ main () {
       name=$VAULT_NAME \
       location=$LOCATION \
       objectId=$CURRENT_USER_OBJID \
-      resourceTags="$RESOURCE_TAGS" \
-      systemTypeTag=$METRICS_SYSTEM_TAG_VALUE
+      resourceTags="$RESOURCE_TAGS"
 
   # Set PG Secret in key vault
   # By default, Azure CLI will print the password set in Key Vault; instead
@@ -93,8 +90,7 @@ main () {
       subnetName=$DB_2_SUBNET_NAME \
       privateEndpointName=$CORE_DB_PRIVATE_ENDPOINT_NAME \
       privateDnsZoneName=$PRIVATE_DNS_ZONE \
-      resourceTags="$RESOURCE_TAGS" \
-      systemTypeTag=$METRICS_SYSTEM_TAG_VALUE
+      resourceTags="$RESOURCE_TAGS"
 
   ### Database stuff
   # Create database within db server (command is idempotent)
@@ -129,7 +125,7 @@ EOF
     --location $LOCATION \
     --resource-group $METRICS_RESOURCE_GROUP \
     --sku Standard_LRS \
-    --tags $METRICS_TAG Project=$PROJECT_TAG
+    --tags Project=$PROJECT_TAG
 
   # Create the function app in Azure
   echo "Creating function app $COLLECT_APP_NAME in Azure"
@@ -140,7 +136,7 @@ EOF
     --functions-version 3 \
     --name $COLLECT_APP_NAME \
     --storage-account $COLLECT_STORAGE_NAME \
-    --tags $METRICS_TAG Project=$PROJECT_TAG
+    --tags Project=$PROJECT_TAG
 
   # Integrate function app into Virtual Network
   echo "Integrating $COLLECT_APP_NAME into virtual network"
@@ -215,7 +211,7 @@ EOF
     --location $LOCATION \
     --resource-group $METRICS_RESOURCE_GROUP \
     --sku Standard_LRS \
-    --tags $METRICS_TAG Project=$PROJECT_TAG
+    --tags Project=$PROJECT_TAG
 
   # Create the function app in Azure
   echo "Creating function app $API_APP_NAME"
@@ -226,7 +222,7 @@ EOF
     --functions-version 3 \
     --name $API_APP_NAME \
     --storage-account $API_APP_STORAGE_NAME \
-    --tags $METRICS_TAG Project=$PROJECT_TAG
+    --tags Project=$PROJECT_TAG
 
   # Integrate function app into Virtual Network
   echo "Integrating $API_APP_NAME into virtual network"

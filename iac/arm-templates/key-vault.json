@@ -13,27 +13,17 @@
         },
         "resourceTags": {
             "type": "object"
-        },
-        "systemTypeTag": {
-            "type": "string",
-            "defaultValue": "None",
-            "metadata": {
-                "description": "Tag used to identify related resources for a subsystem"
-            }
         }
     },
     "variables": {
-        "name": "[parameters('name')]",
-        "systemTypeTag": {
-            "SysType": "[parameters('systemTypeTag')]"
-        }
+        "name": "[parameters('name')]"
     },
     "resources": [
         {
             "apiVersion": "2018-02-14",
             "name": "[variables('name')]",
             "location": "[parameters('location')]",
-            "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
+            "tags": "[parameters('resourceTags')]",
             "type": "Microsoft.KeyVault/vaults",
             "properties": {
                 "enabledForDeployment": false,
