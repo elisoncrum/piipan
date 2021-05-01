@@ -81,6 +81,17 @@ grant_blob () {
     --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}"
 }
 
+get_state_abbrs () {
+  local state_abbrs=()
+
+  while IFS=, read -r abbr name ; do
+    abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
+    state_abbrs+=("${abbr}")
+  done < states.csv
+
+  echo "${state_abbrs[*]}"
+}
+
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
@@ -93,8 +104,6 @@ main () {
   publisher_email=$2
 
   orch_name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
-  upload_accounts=($(get_resources $PER_STATE_STORAGE_TAG $RESOURCE_GROUP))
-
   orch_base_url=$(\
     az functionapp show \
       -g $MATCH_RESOURCE_GROUP \
@@ -105,9 +114,11 @@ main () {
   orch_api_url="${orch_base_url}/api/v1"
 
   duppart_policy_xml=$(generate_policy apim-duppart-policy.xml ${orch_base_url})
-  upload_policy_xml=$(generate_policy apim-bulkupload-policy.xml https://storage.azure.com/)
 
   upload_domain=$(storage_account_domain)
+  upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
+  upload_policy_xml=$(< $upload_policy_path)
+  state_abbrs=$(get_state_abbrs)
 
   apim_identity=$(\
     az deployment group create \
@@ -117,17 +128,20 @@ main () {
       --query properties.outputs.identity.value.principalId \
       --output tsv \
       --parameters \
+        env=$ENV \
+        prefix=$PREFIX \
         apiName=$APIM_NAME \
         publisherEmail=$publisher_email \
         publisherName="$PUBLISHER_NAME" \
         orchestratorUrl=$orch_api_url \
         dupPartPolicyXml="$duppart_policy_xml" \
-        uploadAccounts="${upload_accounts[*]}" \
+        uploadStates="$state_abbrs" \
         uploadBaseDomain="$upload_domain" \
         uploadPolicyXml="$upload_policy_xml" \
         location=$LOCATION \
         resourceTags="$RESOURCE_TAGS")
 
+  upload_accounts=($(get_resources $PER_STATE_STORAGE_TAG $RESOURCE_GROUP))
   for account in "${upload_accounts[@]}"
   do
     grant_blob $apim_identity $account

@@ -10,7 +10,7 @@ A high-level view of the system architecture can be found [here](../README.md).
 
 APIs are in Alpha stage and under active development. We plan on having APIs ready for state testing by the end of April 2021.
 
-## API Overview
+## APIs Overview
 
 In order to participate, states will need to:
 
@@ -18,15 +18,15 @@ In order to participate, states will need to:
 1. Conduct matches against the system
 1. Take appropriate action on those matches
 
-These three elements translate to three main areas of the API that states will integrate into their existing eligibility systems and workflows:
+These three elements translate to three main API calls that states will integrate into their existing eligibility systems and workflows:
 
-1. States will upload participant data through a scheduled [CSV upload](./openapi/generated/duplicate-participation-api/openapi.md#upload) (CSV formatting instructions can be found [here](https://github.com/18F/piipan/blob/main/etl/docs/bulk-import.md))
-2. States will conduct matches through [Active Matching](./openapi/generated/duplicate-participation-api/openapi.md#match)
-3. States will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#Lookup)
+1. States will upload participant data through a scheduled [CSV upload](./openapi/generated/bulk-api/openapi.md#bulk-api-upload) (CSV formatting instructions can be found [here](https://github.com/18F/piipan/blob/main/etl/docs/bulk-import.md))
+2. States will conduct matches through [Active Matching](./openapi/generated/duplicate-participation-api/openapi.md#duplicate-participation-api-match)
+3. States will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#duplicate-participation-api-lookup)
 
 ### Environments
 
-Seperate endpoints and credentials will be provided for each environment.
+Separate endpoints and credentials will be provided for each environment.
 
 | Environment | Purpose |
 |---|---|
@@ -36,17 +36,28 @@ Seperate endpoints and credentials will be provided for each environment.
 
 ### Endpoints Overview
 
+Endpoints are separated into two logical APIs:
+
+#### Bulk upload API
+
+[Detailed documentation](./openapi/generated/bulk-api/openapi.md)
+
 | Endpoint | Description | Request Type |
 |---|---|---|
-| `/<state-abbreviation>/upload/:filename` | uploads bulk participant data to the system | POST |
+| `/upload/:filename` | uploads bulk participant data to the system | PUT |
+
+#### Duplicate participation API
+
+[Detailed documentation](./openapi/generated/duplicate-participation-api/openapi.md)
+
+| Endpoint | Description | Request Type |
+|---|---|---|
 | `/query` | query for active matches | POST |
 | `/lookup_ids/:id` | Returns PII for a Lookup ID | GET |
 
-Detailed documentation for each endpoint can be found [here](./openapi/generated/duplicate-participation-api/openapi.md).
-
 ## Authentication
 
-States will be issued API keys that are placed into request headers to authenticate a web service call. The bulk upload API requires a separate API key from the query and lookup APIs.
+States will be issued API keys that are placed into request headers to authenticate a web service call. The bulk upload API requires a separate API key from the duplicate participation API.
 
 Example using cURL:
 
@@ -59,5 +70,3 @@ curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
 Got any feedback for us? We track API issues through [Github Issues](https://github.com/18F/piipan/issues).
 
 We also have a Microsoft Teams channel for daily communication with state agency engineers.
-
-
