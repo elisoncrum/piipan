@@ -16,19 +16,18 @@
 # usage: create-apim.bash <azure-env> <admin-email>
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 clean_defaults () {
   local group=$1
   local apim=$2
-  
+
   # Delete "echo API" example API
   az apim api delete \
     --api-id echo-api \
     -g ${group} \
     -n ${apim} \
     -y
-  
+
   # Delete default "Starter" and "Unlimited" products and their associated
   # product subscriptions
   az apim product delete \
@@ -37,7 +36,7 @@ clean_defaults () {
     -g ${group} \
     -n ${apim} \
     -y
-  
+
   az apim product delete \
     --product-id unlimited \
     --delete-subscriptions true \
