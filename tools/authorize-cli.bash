@@ -13,12 +13,12 @@
 # usage: assign-app-role.bash <azure-env> <app-uri>
 
 source $(dirname "$0")/common.bash || exit
-source $(dirname "$0")/../iac/iac-common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/../iac/env/${azure_env}.bash
+  source $(dirname "$0")/../iac/iac-common.bash
   verify_cloud
 
   app_uri=$2
