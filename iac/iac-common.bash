@@ -20,6 +20,11 @@ SUBSCRIPTION_ID=`az account show --query id -o tsv`
 # Name of App Service Plan, used by both query tool and dashboard
 APP_SERVICE_PLAN=piipan-app-plan
 
+# App Service Plan used by function apps with VNet integration
+APP_SERVICE_PLAN_FUNC_NAME=plan-apps1-$ENV
+APP_SERVICE_PLAN_FUNC_SKU=P1V2
+APP_SERVICE_PLAN_FUNC_KIND=functionapp
+
 # Name of environment variable used to pass database connection strings
 # to app or function code
 DB_CONN_STR_KEY=DatabaseConnectionString
@@ -38,6 +43,14 @@ CLOUD_NAME_STR_KEY=CloudName
 
 # For connection strings, our established placeholder value
 PASSWORD_PLACEHOLDER='{password}'
+
+# Virtual Network and Subnets
+VNET_NAME=vnet-core-$ENV
+DB_SUBNET_NAME=snet-participants-$ENV # Subnet that participants database private endpoint uses
+DB_2_SUBNET_NAME=snet-core-$ENV # Subnet that core database private endpoint uses
+FUNC_SUBNET_NAME=snet-apps1-$ENV # Subnet function apps use
+PRIVATE_ENDPOINT_NAME=pe-participants-$ENV
+CORE_DB_PRIVATE_ENDPOINT_NAME=pe-core-$ENV
 ### END Constants
 
 ### Functions
@@ -144,5 +157,15 @@ state_event_grid_topic_name () {
   env=$2
 
   echo "evgt-${abbr}upload-${env}"
+}
+
+private_dns_zone () {
+  base=privatelink.postgres.database.azure.com
+
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    base=${base/.postgres.database.azure.com/.postgres.database.usgovcloudapi.net}
+  fi
+
+  echo $base
 }
 ### END Functions

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 # Require PGHOST, PGUSER, PGPASSWORD and $ENV be set by the caller;
 # PGUSER and PGPASSWORD should correspond to the out-of-the-box,
@@ -145,6 +144,7 @@ EOF
 # https://info.enterprisedb.com/rs/069-ALB-339/images/Multitenancy%20Approaches%20Whitepaper.pdf
 main () {
   RESOURCE_GROUP=$1
+  source $(dirname "$0")/iac-common.bash
 
   echo "Baseline $TEMPLATE_DB before creating new databases from it"
   config_db $TEMPLATE_DB

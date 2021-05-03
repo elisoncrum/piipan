@@ -12,7 +12,6 @@
 # usage: create-metrics-resources.bash <azure-env>
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 set_constants () {
   DB_SERVER_NAME=$PREFIX-psql-core-$ENV
@@ -41,12 +40,15 @@ set_constants () {
   METRICS_API_APP_ID=metricsapi
   API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
+
+  PRIVATE_DNS_ZONE=`private_dns_zone`
 }
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  source $(dirname "$0")/iac-common.bash
   verify_cloud
 
   set_constants
@@ -84,6 +86,10 @@ main () {
       serverName=$DB_SERVER_NAME \
       secretName=$PG_SECRET_NAME \
       vaultName=$VAULT_NAME \
+      vnetName=$VNET_NAME \
+      subnetName=$DB_2_SUBNET_NAME \
+      privateEndpointName=$CORE_DB_PRIVATE_ENDPOINT_NAME \
+      privateDnsZoneName=$PRIVATE_DNS_ZONE \
       resourceTags="$RESOURCE_TAGS"
 
   ### Database stuff
@@ -118,17 +124,27 @@ EOF
     --name $COLLECT_STORAGE_NAME \
     --location $LOCATION \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --sku Standard_LRS
+    --sku Standard_LRS \
+    --tags Project=$PROJECT_TAG
 
   # Create the function app in Azure
   echo "Creating function app $COLLECT_APP_NAME in Azure"
   az functionapp create \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --consumption-plan-location $LOCATION \
+    --plan $APP_SERVICE_PLAN_FUNC_NAME \
     --runtime dotnet \
     --functions-version 3 \
     --name $COLLECT_APP_NAME \
-    --storage-account $COLLECT_STORAGE_NAME
+    --storage-account $COLLECT_STORAGE_NAME \
+    --tags Project=$PROJECT_TAG
+
+  # Integrate function app into Virtual Network
+  echo "Integrating $COLLECT_APP_NAME into virtual network"
+  az functionapp vnet-integration add \
+    --name $COLLECT_APP_NAME \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --subnet $FUNC_SUBNET_NAME \
+    --vnet $VNET_NAME
 
   # Waiting before publishing the app, since publishing immediately after creation returns an   App Not Found error
   # Waiting was the best solution I could find. More info in these GH issues:
@@ -194,17 +210,27 @@ EOF
     --name $API_APP_STORAGE_NAME \
     --location $LOCATION \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --sku Standard_LRS
+    --sku Standard_LRS \
+    --tags Project=$PROJECT_TAG
 
   # Create the function app in Azure
-  echo "Creating function app metrics api"
+  echo "Creating function app $API_APP_NAME"
   az functionapp create \
     --resource-group $METRICS_RESOURCE_GROUP \
-    --consumption-plan-location $LOCATION \
+    --plan $APP_SERVICE_PLAN_FUNC_NAME \
     --runtime dotnet \
     --functions-version 3 \
     --name $API_APP_NAME \
-    --storage-account $API_APP_STORAGE_NAME
+    --storage-account $API_APP_STORAGE_NAME \
+    --tags Project=$PROJECT_TAG
+
+  # Integrate function app into Virtual Network
+  echo "Integrating $API_APP_NAME into virtual network"
+  az functionapp vnet-integration add \
+    --name $API_APP_NAME \
+    --resource-group $METRICS_RESOURCE_GROUP \
+    --subnet $FUNC_SUBNET_NAME \
+    --vnet $VNET_NAME
 
   az functionapp config appsettings set \
       --resource-group $METRICS_RESOURCE_GROUP \
@@ -259,7 +285,7 @@ EOF
   metrics_api_uri=$(\
     az functionapp function show \
       -g $METRICS_RESOURCE_GROUP \
-      -n  $API_APP_NAME \
+      -n $API_APP_NAME \
       --function-name GetParticipantUploads \
       --query invokeUrlTemplate \
       --output tsv)
@@ -277,6 +303,12 @@ EOF
       servicePlan=$APP_SERVICE_PLAN \
       frontDoorId=$front_door_id \
       metricsApiUri=$metrics_api_uri
+
+  echo "Secure database connection"
+  ./remove-external-network.bash \
+    $azure_env \
+    $METRICS_RESOURCE_GROUP \
+    $DB_SERVER_NAME
 
   script_completed
 }

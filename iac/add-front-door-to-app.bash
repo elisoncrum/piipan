@@ -13,11 +13,11 @@
 # ./iac/add-front-door-to-app.bash tts/dev rg-core-dev dashboard my-dashboard-123.azurewebsites.net
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 main () {
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  source $(dirname "$0")/iac-common.bash
   verify_cloud
 
   resource_group=$2

@@ -11,12 +11,12 @@
 # usage: upload.bash <azure-env> <path-to-file> <storage-account>
 
 source $(dirname "$0")/../../tools/common.bash || exit
-source $(dirname "$0")/../../iac/iac-common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/../../iac/env/${azure_env}.bash
+  source $(dirname "$0")/../../iac/iac-common.bash
   verify_cloud
 
   file_path=$2

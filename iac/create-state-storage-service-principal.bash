@@ -14,13 +14,13 @@
 # usage: create-service-principal.bash <azure-env> <storage-account-name>
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   storage_acct_name=$2
   source $(dirname "$0")/env/${azure_env}.bash
+  source $(dirname "$0")/iac-common.bash
   verify_cloud
 
   # Required service principal name

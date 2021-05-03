@@ -16,12 +16,12 @@
 # usage: create-service-principal.bash <azure-env> <service-principal-name> [<output-format>]
 
 source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/iac-common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source $(dirname "$0")/env/${azure_env}.bash
+  source $(dirname "$0")/iac-common.bash
   verify_cloud
 
   # Required service principal name

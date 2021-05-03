@@ -11,10 +11,10 @@ RESOURCE_GROUP=rg-core-$ENV
 MATCH_RESOURCE_GROUP=rg-match-$ENV
 
 # Resource group for metrics
-METRICS_RESOURCE_GROUP=rg-metrics-$ENV
+METRICS_RESOURCE_GROUP=$RESOURCE_GROUP
 
 # Prefix for resource identifiers
-PREFIX=fns
+PREFIX=tts
 
 # Either AzureCloud or AzureUSGovernment
 CLOUD_NAME=AzureCloud

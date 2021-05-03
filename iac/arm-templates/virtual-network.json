@@ -15,13 +15,19 @@
         "vnetName": {
             "type": "string"
         },
-        "databaseSubnetName": {
+        "peParticipantsSubnetName": {
             "type": "string",
             "metadata": {
-                "description": "The name of the subnet the database will use."
+                "description": "The name of the subnet the first database will use."
             }
         },
-        "funcSubnetName": {
+        "peCoreSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the subnet the second database will use."
+            }
+        },
+        "appServicePlanSubnetName": {
             "type": "string",
             "metadata": {
                 "description": "The name of the subnet etl apps will use."
@@ -50,18 +56,25 @@
                         "resourceTags": {
                             "type": "object"
                         },
-                        "subnetPrefix": {
+                        "peParticipantsSubnetPrefix": {
                             "type": "string",
                             "defaultValue": "10.0.0.0/24",
                             "metadata": {
-                                "description": "The address space for the subnet."
+                                "description": "The address space for the first database subnet."
                             }
                         },
-                        "funcSubnetPrefix": {
+                        "appServicePlanSubnetPrefix": {
                             "type": "string",
                             "defaultValue": "10.0.1.0/24",
                             "metadata": {
                                 "description": "The address space for the function app subnet."
+                            }
+                        },
+                        "peCoreSubnetPrefix": {
+                            "type": "string",
+                            "defaultValue": "10.0.2.0/24",
+                            "metadata": {
+                                "description": "The address space for the second database subnet."
                             }
                         },
                         "vnetAddressPrefix": {
@@ -74,10 +87,13 @@
                         "vnetName": {
                             "type": "string"
                         },
-                        "databaseSubnetName": {
+                        "peParticipantsSubnetName": {
                             "type": "string"
                         },
-                        "funcSubnetName": {
+                        "peCoreSubnetName": {
+                            "type": "string"
+                        },
+                        "appServicePlanSubnetName": {
                             "type": "string"
                         }
                     },
@@ -98,16 +114,23 @@
                                 },
                                 "subnets": [
                                     {
-                                        "name": "[parameters('databaseSubnetName')]",
+                                        "name": "[parameters('peParticipantsSubnetName')]",
                                         "properties": {
-                                            "addressPrefix": "[parameters('subnetPrefix')]",
+                                            "addressPrefix": "[parameters('peParticipantsSubnetPrefix')]",
                                             "privateEndpointNetworkPolicies": "Disabled"
                                         }
                                     },
                                     {
-                                        "name": "[parameters('funcSubnetName')]",
+                                        "name": "[parameters('peCoreSubnetName')]",
                                         "properties": {
-                                            "addressPrefix": "[parameters('funcSubnetPrefix')]",
+                                            "addressPrefix": "[parameters('peCoreSubnetPrefix')]",
+                                            "privateEndpointNetworkPolicies": "Disabled"
+                                        }
+                                    },
+                                    {
+                                        "name": "[parameters('appServicePlanSubnetName')]",
+                                        "properties": {
+                                            "addressPrefix": "[parameters('appServicePlanSubnetPrefix')]",
                                             "privateEndpointNetworkPolicies": "Disabled",
                                             "delegations": [
                                                 {
@@ -134,11 +157,14 @@
                     "vnetName": {
                         "value": "[parameters('vnetName')]"
                     },
-                    "databaseSubnetName": {
-                        "value": "[parameters('databaseSubnetName')]"
+                    "peParticipantsSubnetName": {
+                        "value": "[parameters('peParticipantsSubnetName')]"
                     },
-                    "funcSubnetName": {
-                        "value": "[parameters('funcSubnetName')]"
+                    "peCoreSubnetName": {
+                        "value": "[parameters('peCoreSubnetName')]"
+                    },
+                    "appServicePlanSubnetName": {
+                        "value": "[parameters('appServicePlanSubnetName')]"
                     }
                 }
             }
