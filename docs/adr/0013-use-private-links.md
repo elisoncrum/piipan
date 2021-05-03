@@ -1,6 +1,6 @@
-# 13. Use Private Links as much as possible
+# 13. Use Azure Private Endpoints for Azure Database for PostgreSQL instances
 
-Date: 2021-04-26
+Date: 2021-05-03
 
 ## Status
 
@@ -8,38 +8,38 @@ Accepted
 
 ## Context
 
-By default, Azure resources are accessed through the public internet. From a security standpoint, this is not ideal because it exposes network traffic to eavesdropping.
+By default, many Azure PaaS (Platform-as-a-Service) resources are exposed to the internet via a public IP address. This is not ideal because it increases the attack surface of the system. As we move towards production, we would like to improve our security posture by strictly limiting network access of internal resources to only the necessary components.
 
-Azure has a variety of methods to secure the Paas (Platform-as-a-Service) resources we use, which can be layered on top of one another. Until now, we have been using Firewall and WAF policies as our main security layer. As we move towards a production system, additional security layers are desired, particularly ones that entirely avoid communication over a public network.
+An Azure Virtual Network (VNet) can be used to create a private overlay network for system components to communicate over and allow us to disable public network access to a PaaS resource. It can also permit us to restrict outbound network traffic (to varying degrees) with a network security group.
 
-Virtualization can achieve this. In a traditional on-premises setup, resources would be housed on a Virtual Machine. Since Azure resources are all PaaS systems, Azure uses what they call Private Links and Private Endpoints within Virtual Networks (VNet) to achieve a virtualized and entirely private setup.
+Microsoft has two approaches to route network requests between internal resources over a VNet: Service Endpoints and Private Endpoints.
 
-Microsoft documentation on this subject is extensive, and specific implementation varies between resource types (see resources below for a starting point).
+Service Endpoints is an older Azure feature. It has some characteristics to note:
 
-Azure has an older service to use with VNets called Service Endpoints, and this was explored as an option. With Service Endpoints, there is no extra resource to implement—the cost is built into the VNet itself. Private Links are a separate resource with its own costs. However, Service Endpoints still use the public IP address of a PaaS resource in order to communicate with the VNet. With Private Links, a resource gets a private IP address on the Virtual Network, effectively injecting the resource into the VNet.
+- The destination resource (e.g., PostgreSQL) must remain publicly addressable. Enforcement of inbound network access is done via a resource-specific firewall rule that only permits traffic from a VNet subnet.
+- Outbound traffic from the source (initiating) resource is not limited to a specific destination resource, but all resources of that particular service class (e.g., all SQL PaaS resources in Azure). This makes it difficult to add safeguards for data exfiltration.
 
-For every new type of resource needing Virtual Network integration, a cost-benefit analysis should be done. For many Azure resources, integrating with a Virtual Network requires a more costly pricing plan. API Management, for example, would need a pricing plan upwards of [~$2,700 per month](https://docs.microsoft.com/en-us/azure/api-management/api-management-using-with-internal-vnet#availability). Web Apps will need a [Premium Plan](https://docs.microsoft.com/en-us/azure/azure-functions/functions-networking-options#matrix-of-networking-features). Therefore it’s worth considering the “must-haves” versus the “nice-to-haves” of VNet integration.
+Private Endpoints is a more recent addition to Azure and has more granular controls:
 
+- It permits network traffic from the VNet to only a specific resource.
+- In a least some cases, the public access point for the destination resource can be completely disabled.
+
+Private Endpoints has a recurring cost, very roughly estimating our network usage, it is on the order of $10 a month per endpoint.
+
+Service Endpoints and Private Endpoints are only available for certain PaaS resources. And VNet support is a prerequisite feature for both approaches but VNet support is only available at certain pricing tiers of Azure PaaS offerings. The intersection of endpoint, VNet, and public interface features is complex and not uniform across PaaS and requires further research spikes.
 ## Decision
 
-We plan to deploy as many Azure resources as possible into a Virtual Network, unless we deem it unreasonably costly to do so.
-
-We also plan to keep using Firewall and WAF policies to limit public inbound traffic.
-
-The first resource we integrated into our VNet was the Postgres database server that will house the system’s PII, and all apps that communicate directly with this server’s databases. Future plans involve integrating:
-1. Metrics Postgres server, and the apps that talk to that server
-1. Orchestrator API
-1. Per-state blob storage accounts
-1. Web apps (dashboard and query tool)
-1. API Management
+We will incorporate the Private Endpoint and VNet approach for just our Azure Database for PostgreSQL instances and that related VNet configuration that allows Function Apps to communicate with those PostgreSQL instances.
 
 ## Consequences
 
+PostgreSQL and App Service plans need to be changed to more expensive plans, General and Premium respectively.
+
 Since it’s more straightforward for resources that communicate with each other to be housed in the same Virtual Network, resources needing the same VNet will be grouped into the same resource group.
 
-To save on cost, we will use one Premium App Service plan and house all VNet-integrated apps on it.
+Cost may also encourage us to use a different resource group and/or pricing plan schemas for dev and testing environments than we do for production. In other cases, a cost/benefit analysis may lead us to not use VNet at all in certain limited circumstances (e.g., API Management only supports VNet at its Premium pricing level, which is almost $3k a month). Finally, cost may also require us to revisit the highly segregated, per-state Function Apps in the design, as at $10 a month per Function Apps, the Private EndPoint approach becomes prohibitive.
 
-Cost may also encourage us to use a different resource group and/or pricing plan schemas for dev and testing environments than we do for production.
+Since we are only initially shifting a portion of our subsystem to communicate over a VNet, that leaves the rest of the system communicating over their publicly addressable IPs, relying on their authentication mechanisms and their PaaS-specific firewalls as security layers.
 
 ## Resources
 - [What is Azure Private Endpoint?](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-overview)
