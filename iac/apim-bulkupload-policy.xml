@@ -3,7 +3,7 @@
 <policies>
     <inbound>
         <base />
-        <authentication-managed-identity resource="https://{storageAccountName}.blob.core.windows.net" />
+        <authentication-managed-identity resource="{storageResourceId}" />
 
         <!--
             Required blob storage API headers
