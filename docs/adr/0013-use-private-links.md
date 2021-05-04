@@ -29,7 +29,7 @@ Private Endpoints has a recurring cost; very roughly estimating our network usag
 Service Endpoints and Private Endpoints are only available for certain PaaS resources. And VNet support is a prerequisite feature for both approaches but VNet support is only available at certain pricing tiers of Azure PaaS offerings. The intersection of endpoint, VNet, and public interface features is complex and not uniform across PaaS and requires further research spikes.
 ## Decision
 
-We will incorporate the Private Endpoint and VNet approach for just our Azure Database for PostgreSQL instances and that related VNet configuration that allows Function Apps to communicate with those PostgreSQL instances.
+We will incorporate the Private Endpoint and VNet approach for just our Azure Database for PostgreSQL instances and the related VNet configuration that allows Function Apps to communicate with those PostgreSQL instances. This choice allows us to completely disable the public interface to our internal databases – the most security sensitive components of the system – without undue cost.
 
 ## Consequences
 
