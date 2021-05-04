@@ -47,4 +47,4 @@ The connection between an operation and a backend server is made by specifying t
 
 API keys are managed as [subscriptions](https://docs.microsoft.com/en-us/azure/api-management/api-management-subscriptions) in APIM. Each subscription is granted a primary and secondary API key to support credential rotation without downtime. Subscriptions can be scoped to a single API, a group of APIs (called a [product](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts#--products)), or all APIs.
 
-Piipan has not yet established a detailed policy for issuing and managing keys. For now, keys are created and managed ad-hoc by system developers via the Portal (Portal > {APIM instance} > Subscriptions).
+Currently, keys are created and managed ad-hoc by system developers via the Portal (Portal > {APIM instance} > Subscriptions).
