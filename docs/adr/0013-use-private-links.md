@@ -37,7 +37,7 @@ PostgreSQL and App Service plans need to be changed to more expensive plans, Gen
 
 Since it’s more straightforward for resources that communicate with each other to be housed in the same Virtual Network, resources needing the same VNet will be grouped into the same resource group.
 
-Cost may also encourage us to use a different resource group and/or pricing plan schemas for dev and testing environments than we do for production. In other cases, a cost/benefit analysis may lead us to not use VNet at all in certain limited circumstances (e.g., API Management only supports VNet at its Premium pricing level, which is almost $3k a month). Finally, cost may also require us to revisit the highly segregated, per-state Function Apps in the design, as at $10 a month per Function Apps, the Private EndPoint approach becomes prohibitive.
+Cost may also encourage us to use a different resource group and/or pricing plan schemas for dev and testing environments than we do for production. In other cases, a cost/benefit analysis may lead us to not use a VNet at all in certain, limited circumstances (e.g., API Management only supports VNets at its Premium pricing level, which is almost $3k a month). Finally, cost may also require us to revisit the highly segregated, per-state Function Apps in the system design – at $10 a month per Function App, the Private EndPoint approach becomes prohibitive.
 
 Since we are only initially shifting a portion of our subsystem to communicate over a VNet, that leaves the rest of the system communicating over their publicly addressable IPs, relying on their authentication mechanisms and their PaaS-specific firewalls as security layers.
 
