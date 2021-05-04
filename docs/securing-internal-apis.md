@@ -212,7 +212,7 @@ If the Azure resource is destroyed, so to is its system-assigned identity's serv
 
 ## Virtual Network Integration
 
-Since Azure resources are all PaaS systems, Azure uses what they call Private Links and Private Endpoints within Virtual Networks (VNet) to achieve a virtualized and entirely private setup.
+Azure Private Links, Private Endpoints, and Virtual Networks (VNets) can be used to achieve a virtualized and entirely private network for communication between Azure resources.
 
 Microsoft documentation on this subject is extensive, and specific implementation varies between resource types (see documentation below for a starting point). For more on why we decided to use Private Endpoints over other options, read the [Decision Record](./adr/0013-use-private-links.md).
 
