@@ -275,7 +275,7 @@
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
             ],
             "properties": {
-                "value": "[replace(parameters('uploadPolicyXml'), '{storageAccountName}', variables('uploadAccountNames')[copyIndex()])]",
+                "value": "[replace(parameters('uploadPolicyXml'), '{storageResourceId}', concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase')))]",
                 "format": "xml"
             },
             "copy": {
