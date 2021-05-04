@@ -233,6 +233,8 @@ configure_easy_auth_pair () {
   func_app_sp=$(create_aad_app_sp $func $func_app_reg_id)
 
   # Activate App Service Authentication for the Function App API
+  # Wait a bit so we can find the SP in AAD when we search for it
+  sleep 60
   enable_easy_auth $func $group
 
   # Give the client component access to the Function App API
