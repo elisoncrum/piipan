@@ -24,7 +24,7 @@ Private Endpoints is a more recent addition to Azure and has more granular contr
 - It permits network traffic from the VNet to only a specific resource.
 - In a least some cases, the public access point for the destination resource can be completely disabled.
 
-Private Endpoints has a recurring cost, very roughly estimating our network usage, it is on the order of $10 a month per endpoint.
+Private Endpoints has a recurring cost; very roughly estimating our network usage, it is on the order of $10 a month per endpoint.
 
 Service Endpoints and Private Endpoints are only available for certain PaaS resources. And VNet support is a prerequisite feature for both approaches but VNet support is only available at certain pricing tiers of Azure PaaS offerings. The intersection of endpoint, VNet, and public interface features is complex and not uniform across PaaS and requires further research spikes.
 ## Decision
