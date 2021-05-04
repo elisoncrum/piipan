@@ -45,17 +45,6 @@ clean_defaults () {
     -y
 }
 
-storage_account_domain () {
-  local base=".blob.core.windows.net/"
-
-  # https://docs.microsoft.com/en-us/azure/azure-government/compare-azure-government-global-azure
-  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
-    base=".blob.core.usgovcloudapi.net/"
-  fi
-
-  echo $base
-}
-
 generate_policy () {
   local path
   path=$(dirname "$0")/$1
@@ -114,7 +103,6 @@ main () {
 
   duppart_policy_xml=$(generate_policy apim-duppart-policy.xml ${orch_base_url})
 
-  upload_domain=$(storage_account_domain)
   upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
   upload_policy_xml=$(< $upload_policy_path)
   state_abbrs=$(get_state_abbrs)
@@ -129,13 +117,13 @@ main () {
       --parameters \
         env=$ENV \
         prefix=$PREFIX \
+        cloudName="$CLOUD_NAME" \
         apiName=$APIM_NAME \
         publisherEmail=$publisher_email \
         publisherName="$PUBLISHER_NAME" \
         orchestratorUrl=$orch_api_url \
         dupPartPolicyXml="$duppart_policy_xml" \
         uploadStates="$state_abbrs" \
-        uploadBaseDomain="$upload_domain" \
         uploadPolicyXml="$upload_policy_xml" \
         location=$LOCATION \
         resourceTags="$RESOURCE_TAGS")

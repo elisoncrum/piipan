@@ -8,6 +8,9 @@
         "prefix": {
             "type": "String"
         },
+        "cloudName": {
+            "type": "String"
+        },
         "apiName": {
             "type": "String"
         },
@@ -32,9 +35,6 @@
         "uploadStates": {
             "type": "String"
         },
-        "uploadBaseDomain": {
-            "type": "String"
-        },
         "uploadPolicyXml": {
             "type": "String"
         }
@@ -43,6 +43,8 @@
         "systemTypeTag": {
             "SysType": "DupPartApi"
         },
+        "apimUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.azure-api.us', '.azure-api.net')]",
+        "uploadUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.blob.core.usgovcloudapi.net/', '.blob.core.windows.net/')]",
         "matchDisplayName": "Duplicate participation API",
         "matchSetName": "match",
         "uploadDisplayName": "Bulk upload API",
@@ -82,7 +84,7 @@
                 "hostnameConfigurations": [
                     {
                         "type": "Proxy",
-                        "hostName": "[concat(parameters('apiName'), '.azure-api.net')]",
+                        "hostName": "[concat(parameters('apiName'), variables('apimUriBase'))]",
                         "defaultSslBinding": true
                     }
                 ],
@@ -257,7 +259,7 @@
                 "path": "[concat(variables('uploadSetName'), '/', variables('uploadStatesList')[copyIndex()])]",
                 "apiVersion": "v1",
                 "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
-                "serviceUrl": "[concat('https://', variables('uploadAccountNames')[copyIndex()], parameters('uploadBaseDomain'))]"
+                "serviceUrl": "[concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase'))]"
             },
             "copy": {
                 "name": "per-state-upload-apis",
