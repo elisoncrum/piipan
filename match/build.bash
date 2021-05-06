@@ -20,28 +20,31 @@
 source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/../tools/build-common.bash || exit
 
-set_constants () {
-  DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV # TODO: make this DRY
-}
-
 run_deploy () {
   azure_env=$1
   source $(dirname "$0")/../iac/env/${azure_env}.bash
   source $(dirname "$0")/../iac/iac-common.bash
   verify_cloud
-  set_constants
 
-  echo "Publishing project"
-  dotnet publish -o ./artifacts
-  echo "Deploying to Azure Environment ${azure_env}"
-  pushd ./artifacts
-    zip -r dashboard.zip .
-  popd
-  az webapp deployment \
-    source config-zip \
-    -g $RESOURCE_GROUP \
-    -n $DASHBOARD_APP_NAME \
-    --src ./artifacts/dashboard.zip
+  match_function_apps=($(get_resources $PER_STATE_MATCH_API_TAG $RESOURCE_GROUP))
+
+  for app in "${match_function_apps[@]}"
+  do
+    echo "\nPublish ${app} to Azure Environment ${azure_env}"
+    pushd ./src/Piipan.Match.State
+      func azure functionapp publish $app --dotnet
+    popd
+  done
+
+  orch_function_apps=($(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP))
+
+  for app in "${orch_function_apps[@]}"
+  do
+    echo "\nPublish ${app} to Azure Environment ${azure_env}"
+    pushd ./src/Piipan.Match.Orchestrator
+      func azure functionapp publish $app --dotnet
+    popd
+  done
 }
 
 main $@

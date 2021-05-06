@@ -21,7 +21,7 @@ source $(dirname "$0")/../tools/common.bash || exit
 source $(dirname "$0")/../tools/build-common.bash || exit
 
 set_constants () {
-  DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV # TODO: make this DRY
+  QUERY_TOOL_APP_NAME=$PREFIX-app-querytool-$ENV # TODO: make this DRY
 }
 
 run_deploy () {
@@ -30,7 +30,6 @@ run_deploy () {
   source $(dirname "$0")/../iac/iac-common.bash
   verify_cloud
   set_constants
-
   echo "Publishing project"
   dotnet publish -o ./artifacts
   echo "Deploying to Azure Environment ${azure_env}"
@@ -40,7 +39,7 @@ run_deploy () {
   az webapp deployment \
     source config-zip \
     -g $RESOURCE_GROUP \
-    -n $DASHBOARD_APP_NAME \
+    -n $QUERY_TOOL_APP_NAME \
     --src ./artifacts/dashboard.zip
 }
 
