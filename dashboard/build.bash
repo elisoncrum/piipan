@@ -10,14 +10,12 @@
 # ./build.bash
 # ./build.bash -t
 # ./build.bash -d tts/dev
-#
-# Note: -t and -d flags are exclusive. When used together, it will only run in test mode.
 
 source $(dirname "$0")/../tools/common.bash || exit
 
 # set modes
 test_mode="false"
-azure_env=""
+azure_env="none"
 
 while getopts ":td:" arg; do
 	case "${arg}" in
@@ -31,35 +29,41 @@ set_constants () {
   DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV # TODO: make this DRY
 }
 
-main () {
-  test_mode=$1
-  azure_env=$2
+run_tests () {
+  echo "Running tests"
+  dotnet test
+}
+
+run_deploy () {
+  azure_env=$1
   source $(dirname "$0")/../iac/env/${azure_env}.bash
   source $(dirname "$0")/../iac/iac-common.bash
   verify_cloud
-
   set_constants
+  echo "Publishing project"
+  dotnet publish -o ./artifacts
+  echo "Deploying to Azure Environment ${azure_env}"
+  pushd ./artifacts
+    zip -r dashboard.zip .
+  popd
+  az webapp deployment \
+    source config-zip \
+    -g $RESOURCE_GROUP \
+    -n $DASHBOARD_APP_NAME \
+    --src ./artifacts/dashboard.zip
+}
 
-  # run build
+main () {
+  test_mode=$1
+  azure_env=$2
+
   dotnet build
 
   if [ "$test_mode" = "true" ]; then
-    echo "Running tests"
-    dotnet test
-  else
-    echo "Publishing project"
-    dotnet publish -o ./artifacts
-    if [ "$azure_env" != "" ]; then
-      echo "Deploying to Azure Environment ${azure_env}"
-      pushd ./artifacts
-        zip -r dashboard.zip .
-      popd
-      az webapp deployment \
-        source config-zip \
-        -g $RESOURCE_GROUP \
-        -n $DASHBOARD_APP_NAME \
-        --src ./artifacts/dashboard.zip
-    fi
+    run_tests
+  fi
+  if [ "$azure_env" != "none" ]; then
+    run_deploy $azure_env
   fi
 
   script_completed
