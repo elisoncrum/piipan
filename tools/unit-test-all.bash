@@ -3,34 +3,39 @@
 # Unit test all subsystems in repo
 #
 # Optional Flags:
-# -c Run tests in continuous integration mode
+# -c  Run tests in continuous integration mode
 #
-# usage: ./unit-test-all.bash
+# usage:
+# ./unit-test-all.bash
+# ./unit-test-all.bash -c
 
 source $(dirname "$0")/common.bash || exit
 
-ci='false'
 
-while getopts ':c' arg; do
-	case "${arg}" in
-		c) ci='true' ;;
-	esac
-done
+main () {
+  ci_mode='false'
 
-subsystems=(dashboard etl match metrics query-tool shared)
+  while getopts ':c' arg; do
+    case "${arg}" in
+      c) ci_mode='true' ;;
+    esac
+  done
 
-for s in "${subsystems[@]}"
-do
-	pushd ../$s/
-		echo "\nTesting ${s}"
-		if [ "$ci" = "true" ]; then
-			dotnet test -p:ContinuousIntegrationBuild=true \
-				--collect:"XPlat Code Coverage" \
-				-- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
-		else
-			dotnet test
-		fi
-	popd
-done
+  subsystems=(dashboard etl match metrics query-tool shared)
 
-script_completed
+  for s in "${subsystems[@]}"
+  do
+    pushd ../$s/
+      echo "\nTesting ${s}"
+      if [ "$ci_mode" = "true" ]; then
+        ./build.bash test -c
+      else
+        ./build.bash test
+      fi
+    popd
+  done
+
+  script_completed
+}
+
+main @$
