@@ -68,6 +68,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 
 | Value | Description |
 |---|---|
+| PerStateEtl | one of _N_ function apps for per-state bulk ETL process |
 | PerStateStorage | one of _N_ storage accounts for per-state bulk PII uploads |
 | PerStateMatchApi | one of _N_ API Function Apps for Per-state matching |
 | OrchestratorApi | the single Function App for the Orchestrator API |

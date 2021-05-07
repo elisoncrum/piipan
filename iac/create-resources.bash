@@ -302,7 +302,7 @@ main () {
     az functionapp create \
       --resource-group $RESOURCE_GROUP \
       --plan $APP_SERVICE_PLAN_FUNC_NAME \
-      --tags Project=$PROJECT_TAG \
+      --tags Project=$PROJECT_TAG $PER_STATE_ETL_TAG \
       --runtime dotnet \
       --functions-version 3 \
       --os-type Windows \

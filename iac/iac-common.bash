@@ -4,6 +4,7 @@ PROJECT_TAG=piipan
 RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
 
 # Tag filters for system types; descriptions are in iac.md
+PER_STATE_ETL_TAG="SysType=PerStateEtl"
 PER_STATE_STORAGE_TAG="SysType=PerStateStorage"
 PER_STATE_MATCH_API_TAG="SysType=PerStateMatchApi"
 ORCHESTRATOR_API_TAG="SysType=OrchestratorApi"
