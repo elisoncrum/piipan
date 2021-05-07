@@ -4,15 +4,16 @@
 # Relies on a solutions file (sln) in the subsystem root directory
 #
 # Arguments:
-# build                   Build project binaries
-# test                    Run tests
-# deploy [-e <azure_env>] Deploy to specified Azure Environment (e.g. tts/dev)
+# [none]                Build project binaries
+# test                  Run tests
+# deploy -e <azure_env> Deploy to specified Azure Environment (e.g. tts/dev)
 #
-# Description
-# When deploying, an optional environment flag [-e] can be passed. Defaults to tts/dev.
+# Description:
+# When passed no arguments, script runs in build mode.
+# When deploying, an environment flag [-e] must be passed.
 #
 # Usage:
-# ./build.bash build
+# ./build.bash
 # ./build.bash test
 # ./build.bash deploy
 # ./build.bash deploy -e tts/test

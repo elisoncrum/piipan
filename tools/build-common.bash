@@ -22,8 +22,8 @@ run_tests () {
 # The Main runner for build scripts
 # switches between build modes (build, test, deploy)
 main () {
-  mode=$1
-  azure_env="tts/dev"
+  mode=${1:-build} # set default mode to "build"
+  azure_env=""
 
   case "$mode" in
     deploy)
@@ -50,7 +50,15 @@ main () {
 
   if [ "$mode" = "build" ];   then run_build; fi
   if [ "$mode" = "test" ];    then run_tests; fi
-  if [ "$mode" = "deploy" ];  then run_deploy $azure_env; fi
+  if [[ "$mode" = "deploy" ]]; then
+    if [[ "$azure_env" = "" ]]; then
+      echo "You must specify an azure environment using the -e flag"
+      echo "Example: ./build.bash deploy -e tts/dev"
+      exit 1
+    else
+      run_deploy $azure_env
+    fi
+  fi
 
   script_completed
 }
