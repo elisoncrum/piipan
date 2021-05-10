@@ -13,22 +13,48 @@ run_build () {
   dotnet build
 }
 
-# runs all tests
+# runs tests
 run_tests () {
   echo "Running tests"
   dotnet test
 }
 
-# The Main runner for build scripts
-# switches between build modes (build, test, deploy)
+# run tests in continuous integration mode
+run_tests_ci () {
+  echo "Running tests in CI mode"
+  dotnet test \
+    -p:ContinuousIntegrationBuild=true \
+    --collect:"XPlat Code Coverage" \
+    -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+}
+
+# Builds project with optional testing and app deployment
+# Relies on a solutions file (sln) in the subsystem root directory
+#
+# Arguments:
+# [none]                Build project binaries
+# test [-c]             Run tests
+# deploy -e <azure_env> Deploy to specified Azure Environment (e.g. tts/dev)
+#
+# Description:
+# When passed no arguments, script runs in build mode.
+# When deploying, an environment flag [-e] must be passed.
+# When testing, an optional flag [-c] can be passed to run in Continuous Integration mode.
+#
+# Usage:
+# ./build.bash
+# ./build.bash test
+# ./build.bash test -c
+# ./build.bash deploy
+# ./build.bash deploy -e tts/test
 main () {
   mode=${1:-build} # set default mode to "build"
   azure_env=""
+  ci_mode="false"
 
   case "$mode" in
     deploy)
       shift # Remove `deploy` from the argument list
-
     while getopts ":e:" opt; do
       case ${opt} in
         e )
@@ -46,10 +72,28 @@ main () {
     done
     shift $((OPTIND -1))
     ;;
+
+    test)
+      shift # remove 'test' from argument list
+    while getopts ":c" opt; do
+      case ${opt} in
+        c )
+          ci_mode='true'
+          ;;
+      esac
+    done
+    shift $((OPTIND -1))
+    ;;
   esac
 
   if [ "$mode" = "build" ];   then run_build; fi
-  if [ "$mode" = "test" ];    then run_tests; fi
+  if [[ "$mode" = "test" ]]; then
+    if [[ "$ci_mode" = "true" ]]; then
+      run_tests_ci
+    else
+      run_tests
+    fi
+  fi
   if [[ "$mode" = "deploy" ]]; then
     if [[ "$azure_env" = "" ]]; then
       echo "You must specify an azure environment using the -e flag"
