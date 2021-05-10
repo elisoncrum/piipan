@@ -51,9 +51,6 @@ main () {
           echo "Invalid Option: -$OPTARG requires an argument" 1>&2
           exit 1
           ;;
-        c )
-          ci_mode='true'
-          ;;
       esac
     done
     shift $((OPTIND -1))

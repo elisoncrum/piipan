@@ -38,4 +38,4 @@ main () {
   script_completed
 }
 
-main @$
+main $@
