@@ -13,21 +13,21 @@ namespace Piipan.QueryTool
     public class PiiRecord : IQueryable
     {
         [Required]
-        [Display(Name = "First Name")]
+        [Display(Name = "First name")]
         [JsonPropertyName("first")]
         public string FirstName { get; set; }
 
-        [Display(Name = "Middle Name")]
+        [Display(Name = "Middle name")]
         [JsonPropertyName("middle")]
         public string MiddleName { get; set; }
 
         [Required]
-        [Display(Name = "Last Name")]
+        [Display(Name = "Last name")]
         [JsonPropertyName("last")]
         public string LastName { get; set; }
 
         [Required]
-        [Display(Name = "Date of Birth")]
+        [Display(Name = "Date of birth")]
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
         [JsonPropertyName("dob")]
