@@ -16,7 +16,7 @@ paths:
       tags:
         - "Match"
       summary: "Search for matching PII records"
-      description: "Queries the state database for any PII records that are an exact match to the full name, date of birth, and social security number in the request body's `query` property."
+      description: "Queries the state database for any PII records that are an exact match to the last name, date of birth, and social security number in the request body's `query` property."
       requestBody:
         $ref: '#/components/requestBodies/MatchQueryRequest'
       responses:

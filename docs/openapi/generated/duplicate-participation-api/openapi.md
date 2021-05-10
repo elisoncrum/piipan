@@ -36,7 +36,7 @@ curl -X POST /v1/query \
 
 *Search for all matching PII records*
 
-Queries all state databases for any PII records that are an exact match to the full name, date of birth, and social security number in the request body's `query` property.
+Queries all state databases for any PII records that are an exact match to the last name, date of birth, and social security number in the request body's `query` property.
 
 > Body parameter
 
