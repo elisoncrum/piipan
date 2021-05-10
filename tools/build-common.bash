@@ -28,8 +28,25 @@ run_tests_ci () {
     -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
 }
 
-# The Main runner for build scripts
-# switches between build modes (build, test, deploy)
+# Builds project with optional testing and app deployment
+# Relies on a solutions file (sln) in the subsystem root directory
+#
+# Arguments:
+# [none]                Build project binaries
+# test [-c]             Run tests
+# deploy -e <azure_env> Deploy to specified Azure Environment (e.g. tts/dev)
+#
+# Description:
+# When passed no arguments, script runs in build mode.
+# When deploying, an environment flag [-e] must be passed.
+# When testing, an optional flag [-c] can be passed to run in Continuous Integration mode.
+#
+# Usage:
+# ./build.bash
+# ./build.bash test
+# ./build.bash test -c
+# ./build.bash deploy
+# ./build.bash deploy -e tts/test
 main () {
   mode=${1:-build} # set default mode to "build"
   azure_env=""
