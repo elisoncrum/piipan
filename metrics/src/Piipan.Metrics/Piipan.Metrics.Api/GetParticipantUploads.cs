@@ -150,7 +150,7 @@ namespace Piipan.Metrics.Api
             return statement;
         }
 
-        public static int StrToIntWithDefault(string s, int @default)
+        public static int StrToIntWithDefault(string? s, int @default)
         {
             int number;
             if (int.TryParse(s, out number))

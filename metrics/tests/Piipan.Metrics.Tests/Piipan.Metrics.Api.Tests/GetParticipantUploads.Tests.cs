@@ -155,7 +155,7 @@ namespace Piipan.Metrics.Tests
                         page,
                         perPage,
                         total);
-                    Assert.Equal(null, result);
+                    Assert.Null(result);
                 }
                 // when state is passed, result includes state param
                 [Fact]
@@ -204,7 +204,7 @@ namespace Piipan.Metrics.Tests
                         page,
                         perPage,
                         total);
-                    Assert.Equal(null, result);
+                    Assert.Null(result);
                 }
                 // when state is passed, result includes state param
                 [Fact]
