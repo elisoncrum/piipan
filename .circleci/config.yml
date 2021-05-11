@@ -157,7 +157,7 @@ workflows:
   build-and-deploy:
     jobs:
       - shellcheck/check:
-          dir: tools
+          dir: iac
       - test
       - build
       - deploy:
