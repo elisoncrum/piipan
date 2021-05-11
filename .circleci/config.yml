@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   azure-cli: circleci/azure-cli@1.1.0
+  shellcheck: circleci/shellcheck@2.2.3
 
 commands:
   run_pa11y:
@@ -38,6 +39,15 @@ commands:
           command: pa11y-ci
 
 jobs:
+  shellcheck:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - shellcheck/install
+      - run:
+          name: Run Shellcheck
+          command: find ./ -type f \( -name '*.sh' -o -name '*.bash' -o -name '*.ksh' -o -name '*.bashrc' -o -name '*.bash_profile' -o -name '*.bash_login' -o -name '*.bash_logout' \) | xargs shellcheck -x
   test:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:3.1
@@ -155,10 +165,12 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
+      - shellcheck
       - test
       - build
       - deploy:
           requires:
+            - shellcheck
             - test
             - build
           filters:
