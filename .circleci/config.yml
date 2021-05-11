@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   azure-cli: circleci/azure-cli@1.1.0
+  shellcheck: circleci/shellcheck@2.2.3
 
 commands:
   run_pa11y:
@@ -47,6 +48,8 @@ jobs:
           POSTGRES_DB: ea
     steps:
       - checkout
+      - shellcheck/check:
+          dir: ./tools
       - run:
           name: Setup Code Climate reporter
           command: |
