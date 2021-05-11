@@ -48,9 +48,6 @@ jobs:
           POSTGRES_DB: ea
     steps:
       - checkout
-      - shellcheck/install
-      - shellcheck/check:
-          dir: ./tools
       - run:
           name: Setup Code Climate reporter
           command: |
@@ -159,6 +156,8 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
+      - shellcheck/check:
+          dir: ./tools
       - test
       - build
       - deploy:
