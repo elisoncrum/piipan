@@ -31,6 +31,7 @@ namespace Piipan.Metrics.Tests
                 Assert.Equal(5, meta.total);
             }
 
+            [Fact]
             public static void HasANextPage()
             {
                 var meta = new Meta();
@@ -38,6 +39,7 @@ namespace Piipan.Metrics.Tests
                 Assert.Equal("foobar", meta.nextPage);
             }
 
+            [Fact]
             public static void HasAPrevPage()
             {
                 var meta = new Meta();
