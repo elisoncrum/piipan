@@ -48,6 +48,7 @@ jobs:
           POSTGRES_DB: ea
     steps:
       - checkout
+      - shellcheck/install
       - shellcheck/check:
           dir: ./tools
       - run:
