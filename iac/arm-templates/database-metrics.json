@@ -173,7 +173,8 @@
                                     "storageAutoGrow": "Enabled"
                                 },
                                 "previewFeature": "",
-                                "infrastructureEncryption": "Disabled"
+                                "infrastructureEncryption": "Disabled",
+                                "publicNetworkAccess": "Enabled" // This gets disabled later in iac
                             }
                         },
                         // firewall rules
