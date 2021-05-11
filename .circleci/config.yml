@@ -157,7 +157,8 @@ workflows:
   build-and-deploy:
     jobs:
       - shellcheck/check:
-          dir: iac
+          dir: tools
+          pattern: "*.bash"
       - test
       - build
       - deploy:
