@@ -157,7 +157,6 @@ workflows:
   build-and-deploy:
     jobs:
       - shellcheck/check:
-          dir: ./
           pattern: "*.bash"
       - test
       - build
