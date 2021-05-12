@@ -6,8 +6,8 @@
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit
-# shellcheck source=./iac/iac-common.bash
-source "$(dirname "$0")"/../iac/iac-common.bash || exit
+# shellcheck source=./tools/build-common.bash
+source "$(dirname "$0")"/../tools/build-common.bash || exit
 
 set_constants () {
    # TODO: make more DRY
@@ -23,8 +23,8 @@ run_deploy () {
   source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
   source "$(dirname "$0")"/../iac/iac-common.bash
-  verify_cloud
 
+  verify_cloud
   set_constants
 
   echo "Publish ${COLLECT_APP_NAME} to Azure Environment ${azure_env}"
