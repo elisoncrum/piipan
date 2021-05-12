@@ -80,6 +80,10 @@ main () {
         c )
           ci_mode='true'
           ;;
+        * )
+          echo "usage: test [-c]"
+          exit 1
+          ;;
       esac
     done
     shift $((OPTIND -1))
@@ -100,7 +104,7 @@ main () {
       echo "Example: ./build.bash deploy -e tts/dev"
       exit 1
     else
-      run_deploy $azure_env
+      run_deploy "$azure_env"
     fi
   fi
 

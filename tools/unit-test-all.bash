@@ -9,7 +9,8 @@
 # ./unit-test-all.bash
 # ./unit-test-all.bash -c
 
-source $(dirname "$0")/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/common.bash || exit
 
 
 main () {
@@ -17,7 +18,13 @@ main () {
 
   while getopts ':c' arg; do
     case "${arg}" in
-      c) ci_mode='true' ;;
+      c )
+        ci_mode='true'
+        ;;
+      * )
+        echo "usage: [-c]"
+        exit 1
+        ;;
     esac
   done
 
@@ -25,8 +32,8 @@ main () {
 
   for s in "${subsystems[@]}"
   do
-    pushd ../$s/
-      echo "\nTesting ${s}"
+    pushd ../"$s"/
+      echo "Testing ${s}"
       if [ "$ci_mode" = "true" ]; then
         ./build.bash test -c
       else
@@ -38,4 +45,4 @@ main () {
   script_completed
 }
 
-main $@
+main "$@"

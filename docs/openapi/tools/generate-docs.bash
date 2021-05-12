@@ -20,7 +20,7 @@ main () {
 
   for s in "${specs[@]}"
   do
-    pushd ./generated/${s}/
+    pushd ./generated/"${s}"/
     widdershins \
         --language_tabs 'shell:curl:request' \
         --omitBody \

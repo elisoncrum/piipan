@@ -47,7 +47,7 @@ jobs:
       - shellcheck/install
       - run:
           name: Run Shellcheck
-          command: find ./ -type f \( -name '*.sh' -o -name '*.bash' \) | xargs shellcheck -x
+          command: find ./ -type f \( -name '*.bash' \) | xargs shellcheck -x -e SC2207
   test:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:3.1

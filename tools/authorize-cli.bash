@@ -12,13 +12,16 @@
 #
 # usage: assign-app-role.bash <azure-env> <app-uri>
 
-source $(dirname "$0")/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/../iac/env/${azure_env}.bash
-  source $(dirname "$0")/../iac/iac-common.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/../iac/iac-common.bash || exit
   verify_cloud
 
   app_uri=$2
@@ -30,14 +33,14 @@ main () {
 
   object_id=$(\
     az ad app show \
-      --id $app_uri \
+      --id "$app_uri" \
       --query objectId \
       -o tsv)
   permission_id=$(\
     az rest \
       -m GET \
       -u "https://graph.microsoft.com/v1.0/applications/${object_id}" \
-      --query 'api.oauth2PermissionScopes[?value == `user_impersonation`].id' \
+      --query "api.oauth2PermissionScopes[?value == $(user_impersonation)].id" \
       -o tsv)
   json="{
     \"api\": {

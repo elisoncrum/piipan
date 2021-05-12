@@ -10,23 +10,26 @@
 #
 # usage: upload.bash <azure-env> <path-to-file> <storage-account>
 
-source $(dirname "$0")/../../tools/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../../tools/common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/../../iac/env/${azure_env}.bash
-  source $(dirname "$0")/../../iac/iac-common.bash
+  source "$(dirname "$0")"/../../iac/env/"${azure_env}".bash
+  source "$(dirname "$0")"/../../iac/iac-common.bash
   verify_cloud
 
   file_path=$2
   storage_account=$3
 
+  name=$(basename "$file_path")
+
   az storage blob upload \
-    --account-name $storage_account \
+    --account-name "$storage_account" \
     --container-name upload \
-    --name `basename $file_path` \
-    --file $file_path \
+    --name "$name" \
+    --file "$file_path" \
     --auth-mode login
 }
 

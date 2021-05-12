@@ -12,24 +12,27 @@
 #
 # usage: test-lookup-api.bash <azure-env> <lookup-id>
 
-source $(dirname "$0")/../../tools/common.bash || exit
-source $(dirname "$0")/../../iac/iac-common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../../tools/common.bash || exit
+# shellcheck source=./iac/iac-common.bash
+source "$(dirname "$0")"/../../iac/iac-common.bash || exit
 
 LOOKUP_API_FUNC_NAME="lookup_ids"
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/../../iac/env/${azure_env}.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/../../iac/env/"${azure_env}".bash
   verify_cloud
 
   lookup_id=$2
 
-  name=$(get_resources $ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP)
+  name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
   resource_uri=$(\
     az functionapp show \
-      -g $MATCH_RESOURCE_GROUP \
-      -n $name \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$name" \
       --query defaultHostName \
       -o tsv)
   resource_uri="https://${resource_uri}"
@@ -37,19 +40,20 @@ main () {
   echo "Retrieving access token from ${resource_uri}"
   token=$(\
     az account get-access-token \
-      --resource ${resource_uri} \
+      --resource "$resource_uri" \
       --query accessToken \
       -o tsv
   )
 
   endpoint_uri=$(\
     az functionapp function show \
-      -g $MATCH_RESOURCE_GROUP \
-      -n $name \
-      --function-name $LOOKUP_API_FUNC_NAME \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$name" \
+      --function-name "$LOOKUP_API_FUNC_NAME" \
       --query invokeUrlTemplate \
       -o tsv)
-  endpoint_uri=$(echo $endpoint_uri | sed "s/{lookupid}/$lookup_id/")
+  # shellcheck disable=SC2001
+  endpoint_uri=$(echo "$endpoint_uri" | sed "s/{lookupid}/$lookup_id/")
 
   echo "Submitting request to ${endpoint_uri}"
   curl \
@@ -57,7 +61,7 @@ main () {
     --header "Authorization: Bearer ${token}" \
     --include
 
-  echo "\n"
+  printf "\n"
 
   script_completed
 

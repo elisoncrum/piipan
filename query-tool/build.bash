@@ -4,8 +4,10 @@
 # Relies on a solutions file (sln) in the subsystem root directory
 # See build-common.bash for usage details
 
-source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/../tools/build-common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../tools/common.bash || exit
+# shellcheck source=./iac/iac-common.bash
+source "$(dirname "$0")"/../iac/iac-common.bash || exit
 
 set_constants () {
   QUERY_TOOL_APP_NAME=$PREFIX-app-querytool-$ENV # TODO: make this DRY
@@ -13,8 +15,10 @@ set_constants () {
 
 run_deploy () {
   azure_env=$1
-  source $(dirname "$0")/../iac/env/${azure_env}.bash
-  source $(dirname "$0")/../iac/iac-common.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
   set_constants
   echo "Publishing project"
@@ -25,9 +29,9 @@ run_deploy () {
   popd
   az webapp deployment \
     source config-zip \
-    -g $RESOURCE_GROUP \
-    -n $QUERY_TOOL_APP_NAME \
+    -g "$RESOURCE_GROUP" \
+    -n "$QUERY_TOOL_APP_NAME" \
     --src ./artifacts/dashboard.zip
 }
 
-main $@
+main "$@"

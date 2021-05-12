@@ -15,7 +15,6 @@ run_deploy () {
   source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
 
-  # shellcheck disable=SC2207
   etl_function_apps=($(get_resources "$PER_STATE_ETL_TAG" "$RESOURCE_GROUP"))
 
   for app in "${etl_function_apps[@]}"

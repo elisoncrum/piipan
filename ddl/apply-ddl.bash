@@ -23,14 +23,14 @@ set -u
 SUPERUSER=${PGUSER%@*}
 
 export PGOPTIONS='--client-min-messages=warning'
-PSQL_OPTS='-v ON_ERROR_STOP=1 -X -q'
+PSQL_OPTS=(-v ON_ERROR_STOP=1 -X -q)
 
 apply_ddl () {
   db=$1
   owner=$2
   admin=$3
 
-  psql "$PSQL_OPTS" -d "$db" \
+  psql "${PSQL_OPTS[@]}" -d "$db" \
     -v owner="$owner" \
     -v admin="$admin" \
     -v superuser="$SUPERUSER" \
@@ -38,7 +38,7 @@ apply_ddl () {
 }
 
 main () {
-  while IFS=, read -r abbr ; do
+  while IFS=, read -r abbr _; do
     db=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     owner=$db
     admin=$(state_managed_id_name "$db" "$ENV")
