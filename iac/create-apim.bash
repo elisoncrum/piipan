@@ -106,8 +106,9 @@ main () {
 
   upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
   upload_policy_xml=$(< "$upload_policy_path")
-  # shellcheck disable=SC2178
-  state_abbrs="$(get_state_abbrs)"
+
+  local state_abbrs
+  state_abbrs=$(get_state_abbrs)
 
   apim_identity=$(\
     az deployment group create \
@@ -125,7 +126,7 @@ main () {
         publisherName="$PUBLISHER_NAME" \
         orchestratorUrl="$orch_api_url" \
         dupPartPolicyXml="$duppart_policy_xml" \
-        uploadStates="${state_abbrs[*]}" \
+        uploadStates="$state_abbrs" \
         uploadPolicyXml="$upload_policy_xml" \
         location="$LOCATION" \
         resourceTags="$RESOURCE_TAGS")
