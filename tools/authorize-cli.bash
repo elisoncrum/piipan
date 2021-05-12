@@ -21,7 +21,7 @@ main () {
   # shellcheck source=./iac/env/tts/dev.bash
   source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
-  source "$(dirname "$0")"/../iac/iac-common.bash || exit
+  source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
 
   app_uri=$2

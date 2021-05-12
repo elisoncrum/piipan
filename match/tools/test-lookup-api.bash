@@ -14,8 +14,6 @@
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit
-# shellcheck source=./iac/iac-common.bash
-source "$(dirname "$0")"/../../iac/iac-common.bash || exit
 
 LOOKUP_API_FUNC_NAME="lookup_ids"
 
@@ -24,6 +22,8 @@ main () {
   azure_env=$1
   # shellcheck source=./iac/env/tts/dev.bash
   source "$(dirname "$0")"/../../iac/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/../../iac/iac-common.bash
   verify_cloud
 
   lookup_id=$2
@@ -52,8 +52,7 @@ main () {
       --function-name "$LOOKUP_API_FUNC_NAME" \
       --query invokeUrlTemplate \
       -o tsv)
-  # shellcheck disable=SC2001
-  endpoint_uri=$(echo "$endpoint_uri" | sed "s/{lookupid}/$lookup_id/")
+  endpoint_uri="${endpoint_uri//\{lookupid\}/$lookup_id}"
 
   echo "Submitting request to ${endpoint_uri}"
   curl \
