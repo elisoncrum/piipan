@@ -1,3 +1,5 @@
+# shellcheck disable=SC2034
+
 # Deployment environment for resource identifiers
 ENV=$(basename "${BASH_SOURCE%.*}")
 

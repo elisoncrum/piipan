@@ -19,10 +19,10 @@ main () {
         generated_path="./generated/${s}/openapi.yaml"
 
         echo "Validating ${spec_path}"
-        swagger-cli validate $spec_path
+        swagger-cli validate "$spec_path"
 
         echo "Generating ${generated_path}"
-        swagger-cli bundle $spec_path -o $generated_path -t yaml
+        swagger-cli bundle "$spec_path" -o "$generated_path" -t yaml
     done
 }
 

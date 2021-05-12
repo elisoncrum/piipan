@@ -13,8 +13,8 @@
 #
 # usage: test-lookup-api.bash <azure-env> <function-name>
 
-source $(dirname "$0")/../../tools/common.bash || exit
-source $(dirname "$0")/../../iac/iac-common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../../tools/common.bash || exit
 
 QUERY_API_FUNC_NAME="query"
 JSON='{
@@ -30,15 +30,18 @@ JSON='{
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/../../iac/env/${azure_env}.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/../../iac/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/../../iac/iac-common.bash
   verify_cloud
 
   name=$2
 
   resource_uri=$(\
     az functionapp show \
-      -g $MATCH_RESOURCE_GROUP \
-      -n $name \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$name" \
       --query defaultHostName \
       -o tsv)
   resource_uri="https://${resource_uri}"
@@ -46,16 +49,16 @@ main () {
   echo "Retrieving access token from ${resource_uri}"
   token=$(\
     az account get-access-token \
-      --resource ${resource_uri} \
+      --resource "${resource_uri}" \
       --query accessToken \
       -o tsv
   )
 
   endpoint_uri=$(\
     az functionapp function show \
-      -g $MATCH_RESOURCE_GROUP \
-      -n $name \
-      --function-name $QUERY_API_FUNC_NAME \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$name" \
+      --function-name "$QUERY_API_FUNC_NAME" \
       --query invokeUrlTemplate \
       -o tsv)
 
@@ -67,7 +70,7 @@ main () {
     --data-raw "$JSON" \
     --include
 
-  echo "\n"
+  printf "\n"
 
   script_completed
 

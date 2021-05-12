@@ -4,8 +4,10 @@
 # Relies on a solutions file (sln) in the subsystem root directory
 # See build-common.bash for usage details
 
-source $(dirname "$0")/../tools/common.bash || exit
-source $(dirname "$0")/../tools/build-common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../tools/common.bash || exit
+# shellcheck source=./tools/build-common.bash
+source "$(dirname "$0")"/../tools/build-common.bash || exit
 
 set_constants () {
   DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV # TODO: make this DRY
@@ -13,8 +15,8 @@ set_constants () {
 
 run_deploy () {
   azure_env=$1
-  source $(dirname "$0")/../iac/env/${azure_env}.bash
-  source $(dirname "$0")/../iac/iac-common.bash
+  source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
+  source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
   set_constants
 
@@ -26,9 +28,9 @@ run_deploy () {
   popd
   az webapp deployment \
     source config-zip \
-    -g $RESOURCE_GROUP \
-    -n $DASHBOARD_APP_NAME \
+    -g "$RESOURCE_GROUP" \
+    -n "$DASHBOARD_APP_NAME" \
     --src ./artifacts/dashboard.zip
 }
 
-main $@
+main "$@"

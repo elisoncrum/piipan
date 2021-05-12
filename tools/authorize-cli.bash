@@ -12,13 +12,16 @@
 #
 # usage: assign-app-role.bash <azure-env> <app-uri>
 
-source $(dirname "$0")/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/../iac/env/${azure_env}.bash
-  source $(dirname "$0")/../iac/iac-common.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
 
   app_uri=$2
@@ -27,12 +30,12 @@ main () {
   # - https://docs.microsoft.com/en-us/azure-stack/user/azure-stack-rest-api-use?view=azs-2008#example
   # - https://github.com/Azure/azure-cli/blob/24e0b9ef8716e16b9e38c9bb123a734a6cf550eb/src/azure-cli-core/azure/cli/core/_profile.py#L65
   CLI_ID="04b07795-8ddb-461a-bbee-02f9e1bf7b46"
-
   object_id=$(\
     az ad app show \
-      --id $app_uri \
+      --id "$app_uri" \
       --query objectId \
       -o tsv)
+  # shellcheck disable=SC2016
   permission_id=$(\
     az rest \
       -m GET \

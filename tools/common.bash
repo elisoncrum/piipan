@@ -9,7 +9,7 @@ set -e
 set -u
 
 # Conform more closely to POSIX standard, specifically so command substitutions
-# inherit the value of the -e option. The more targeted inherit_errexit option 
+# inherit the value of the -e option. The more targeted inherit_errexit option
 # would be preferred, but it is not available in bash 3.2, which ships with macOS.
 set -o posix
 
@@ -19,7 +19,7 @@ set -o pipefail
 # Inherit trap on ERR in shell functions, command substitutions, etc.
 set -o errtrace
 
-_script=$(basename $0)
+_script=$(basename "$0")
 
 _err_report () {
   # If the error occurred in a while/done loop or in a function, the trap can

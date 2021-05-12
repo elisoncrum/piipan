@@ -6,11 +6,12 @@
 #
 # usage: update-packages.bash <path> [--highest-major]
 
-source $(dirname "$0")/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/common.bash || exit
 
 restore () {
   options=${1:- }
-  dotnet restore $options > /dev/null
+  dotnet restore "$options" > /dev/null
 }
 
 update () {
@@ -21,14 +22,14 @@ update () {
 
   # Don't want grep to result in error code for whole pipeline if no
   # new packages found; see https://unix.stackexchange.com/a/581991
-  list=$(dotnet list package --outdated $options | tr -s ' ' | { grep '>' || test $? = 1; } | cut -f 3,6 -d ' ')
-  while IFS=, read line; do
+  list=$(dotnet list package --outdated "$options" | tr -s ' ' | { grep '>' || test $? = 1; } | cut -f 3,6 -d ' ')
+  while IFS=, read -r line; do
     trimmed=$(echo "$line" | tr -d '[:space:]')
     if [ "$trimmed" != "" ]; then
-      package=$(echo $line | cut -f1 -d ' ')
-      version=$(echo $line | cut -f2 -d ' ')
+      package=$(echo "$line" | cut -f1 -d ' ')
+      version=$(echo "$line" | cut -f2 -d ' ')
 
-      dotnet add package --version $version $package
+      dotnet add package --version "$version" "$package"
     fi
   done <<< "$list"
 }
@@ -51,8 +52,8 @@ main () {
 
   for op in "${operations[@]}"
   do
-    while IFS=, read csproj; do
-      dn=$(dirname $csproj)
+    while IFS=, read -r csproj; do
+      dn=$(dirname "$csproj")
 
       pushd "$dn" > /dev/null
         $op

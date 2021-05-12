@@ -15,13 +15,16 @@
 #
 # usage: create-service-principal.bash <azure-env> <service-principal-name> [<output-format>]
 
-source $(dirname "$0")/../tools/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../tools/common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/env/${azure_env}.bash
-  source $(dirname "$0")/iac-common.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/iac-common.bash
   verify_cloud
 
   # Required service principal name
@@ -31,12 +34,12 @@ main () {
   output=${3:-json}
 
   # Array of groups to which the service principal will be scoped
-  RESOURCE_GROUPS=($RESOURCE_GROUP $METRICS_RESOURCE_GROUP $MATCH_RESOURCE_GROUP)
+  RESOURCE_GROUPS=("$RESOURCE_GROUP" "$METRICS_RESOURCE_GROUP" "$MATCH_RESOURCE_GROUP")
 
   # Create space-separated list of resource group IDs
   for g in "${RESOURCE_GROUPS[@]}"
   do
-    scope=`az group show -n $g --query id --output tsv`
+    scope=$(az group show -n "$g" --query id --output tsv)
     SCOPES="${SCOPES:+$SCOPES }$scope"
   done
 
@@ -45,11 +48,11 @@ main () {
   # it, creating new credentials and attempting to add the appropriate scopes.
   echo "Creating/resetting service principal $name"
   az ad sp create-for-rbac \
-    --name $name \
+    --name "$name" \
     --role Contributor \
-    --scopes $SCOPES \
+    --scopes "$SCOPES" \
     --only-show-errors \
-    --output $output
+    --output "$output"
 
   script_completed
 }

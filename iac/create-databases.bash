@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source $(dirname "$0")/../tools/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../tools/common.bash || exit
 
 # Require PGHOST, PGUSER, PGPASSWORD and $ENV be set by the caller;
 # PGUSER and PGPASSWORD should correspond to the out-of-the-box,
@@ -21,11 +22,11 @@ TEMPLATE_DB=template1
 APP_SCHEMA=piipan
 
 export PGOPTIONS='--client-min-messages=warning'
-PSQL_OPTS='-v ON_ERROR_STOP=1 -X -q'
+PSQL_OPTS=(-v ON_ERROR_STOP=1 -X -q)
 
 create_role () {
   role=$1
-  psql $PSQL_OPTS -d $TEMPLATE_DB -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d $TEMPLATE_DB -f - <<EOF
     DO \$\$
     BEGIN
       CREATE ROLE $role;
@@ -38,7 +39,7 @@ EOF
 
 config_db () {
   db=$1
-  psql $PSQL_OPTS -d $db -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
     REVOKE ALL ON DATABASE $db FROM public;
     REVOKE ALL ON SCHEMA public FROM public;
     CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
@@ -47,7 +48,7 @@ EOF
 
 config_role () {
   role=$1
-  psql $PSQL_OPTS -d $TEMPLATE_DB -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d $TEMPLATE_DB -f - <<EOF
     ALTER ROLE $role PASSWORD NULL;
     ALTER ROLE $role NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOLOGIN;
     ALTER ROLE $role SET search_path = piipan,public;
@@ -56,11 +57,11 @@ EOF
 
 create_db () {
   db=$1
-  psql $PSQL_OPTS -d $TEMPLATE_DB -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d $TEMPLATE_DB -f - <<EOF
     SELECT 'CREATE DATABASE $db TEMPLATE $TEMPLATE_DB'
       WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$db')\gexec
 EOF
-  psql $PSQL_OPTS -d $db -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
     CREATE SCHEMA IF NOT EXISTS $APP_SCHEMA;
 EOF
 }
@@ -68,7 +69,7 @@ EOF
 set_db_owner () {
   db=$1
   owner=$2
-  psql $PSQL_OPTS -d $db -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
     -- "superuser" account under Azure is not so super; must be a member of the
     -- owner role before being able to create a database with it as owner
     GRANT $owner to $SUPERUSER;
@@ -89,7 +90,7 @@ create_managed_role () {
   # We could drop the role and re-create it, but would require revoking and then
   # restoring all privileges. We might be able to calculate the MD5 hash and compare
   # to value in pg_authid and then at least error and exit if they didn't match.
-  psql $PSQL_OPTS -d $TEMPLATE_DB -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d $TEMPLATE_DB -f - <<EOF
     SET aad_validate_oids_in_tenant = off;
     DO \$\$
     BEGIN
@@ -104,7 +105,7 @@ EOF
 config_managed_role () {
   db=$1
   role=$2
-  psql $PSQL_OPTS -d $db -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
     GRANT CONNECT,TEMPORARY ON DATABASE $db TO $role;
     GRANT $db to $role;
     GRANT USAGE ON SCHEMA $APP_SCHEMA to $role;
@@ -144,7 +145,7 @@ EOF
 # https://info.enterprisedb.com/rs/069-ALB-339/images/Multitenancy%20Approaches%20Whitepaper.pdf
 main () {
   RESOURCE_GROUP=$1
-  source $(dirname "$0")/iac-common.bash
+  source "$(dirname "$0")"/iac-common.bash
 
   echo "Baseline $TEMPLATE_DB before creating new databases from it"
   config_db $TEMPLATE_DB
@@ -153,48 +154,45 @@ main () {
   while IFS=, read -r abbr name ; do
     echo "Creating owner role and database for $name ($abbr)"
 
-    db=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
+    db=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     owner=$db
 
-    create_role $owner
-    config_role $owner
+    create_role "$owner"
+    config_role "$owner"
 
-    create_db $db
-    set_db_owner $db $owner
-    config_db $db
+    create_db "$db"
+    set_db_owner "$db" "$owner"
+    config_db "$db"
   done < states.csv
 
   # Assumes there's only the single admin group that was set elsewhere
-  PG_AAD_ADMIN=`az postgres server ad-admin list \
-    --server-name $PG_SERVER_NAME \
-    --resource-group $RESOURCE_GROUP \
-    --query "[0].login" -o tsv`
-
-  # Initial environment variables are for the non-AD "superuser"
-  SAVED_PGPASSWORD=$PGPASSWORD
-  SAVED_PGUSER=$PGUSER
+  PG_AAD_ADMIN=$(az postgres server ad-admin list \
+    --server-name "$PG_SERVER_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --query "[0].login" -o tsv)
 
   # Authenticate under the AD "superuser" group, in order to create managed
   # identities. Assumes the current user is a member of PG_AAD_ADMIN.
-  export PGPASSWORD=`az account get-access-token --resource-type oss-rdbms \
-     --query accessToken --output tsv`
+  PGPASSWORD=$(az account get-access-token --resource-type oss-rdbms \
+    --query accessToken --output tsv)
+  export PGPASSWORD
   export PGUSER=${PG_AAD_ADMIN}@$PG_SERVER_NAME
 
   while IFS=, read -r abbr name ; do
     echo "Creating managed identity roles for $name ($abbr)"
 
-    db=`echo "$abbr" | tr '[:upper:]' '[:lower:]'`
+    db=$(echo "$abbr"| tr '[:upper:]' '[:lower:]')
 
-    identity=`state_managed_id_name $db $ENV`
-    client_id=`az identity show \
-      --resource-group $RESOURCE_GROUP \
-      --name $identity \
-      --query clientId --output tsv`
+    identity=$(state_managed_id_name "$db" "$ENV")
+    client_id=$(az identity show \
+      --resource-group "$RESOURCE_GROUP" \
+      --name "$identity" \
+      --query clientId --output tsv)
 
     # Database role takes AD managed identity name and formats it for postgres naming rules
     role=${identity//-/_}
-    create_managed_role $db $role $client_id
-    config_managed_role $db $role
+    create_managed_role "$db" "$role" "$client_id"
+    config_managed_role "$db" "$role"
   done < states.csv
 
   script_completed

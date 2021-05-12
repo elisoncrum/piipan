@@ -11,13 +11,16 @@
 #
 # usage: assign-app-role.bash <azure-env> <func-app-name> <role-name>
 
-source $(dirname "$0")/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/common.bash || exit
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/../iac/env/${azure_env}.bash
-  source $(dirname "$0")/../iac/iac-common.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/../iac/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
 
   function=$2
@@ -26,21 +29,21 @@ main () {
   # Get function's application object
   application=$(\
     az ad app list \
-      --display-name ${function} \
+      --display-name "${function}" \
       --query "[0].appId" \
       --output tsv)
 
   # Get application role ID from application object
   role_id=$(\
     az ad app show \
-      --id ${application} \
+      --id "${application}" \
       --query "appRoles[?value == '${role}'].id" \
       --output tsv)
 
   # Get application object's service principal
   service_principal=$(\
     az ad sp list \
-      --display-name ${function} \
+      --display-name "${function}" \
       --filter "appId eq '${application}'" \
       --query [0].objectId \
       --output tsv)

@@ -5,7 +5,8 @@
 #
 # usage: delete-resources.bash <azure-env>
 
-source $(dirname "$0")/../tools/common.bash || exit
+# shellcheck source=./tools/common.bash
+source "$(dirname "$0")"/../tools/common.bash || exit
 
 purge () {
   local group=$1
@@ -13,8 +14,8 @@ purge () {
 
   # Disable info output by querying for non-existent property
   az deployment group create \
-    -g $group \
-    -f $(dirname "$0")/arm-templates/unique-string.json \
+    -g "$group" \
+    -f "$(dirname "$0")"/arm-templates/unique-string.json \
     --mode Complete \
     --query doesNotExist
 }
@@ -22,8 +23,10 @@ purge () {
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
-  source $(dirname "$0")/env/${azure_env}.bash
-  source $(dirname "$0")/iac-common.bash
+  # shellcheck source=./iac/env/tts/dev.bash
+  source "$(dirname "$0")"/env/"${azure_env}".bash
+  # shellcheck source=./iac/iac-common.bash
+  source "$(dirname "$0")"/iac-common.bash
   verify_cloud
 
   echo "This script will delete all resources hosted on $CLOUD_NAME in ${azure_env}."
@@ -31,9 +34,9 @@ main () {
   read -p "Proceed with bulk delete? (Yes or No) " -r
   if [[ $REPLY =~ ^[yY]es$ ]]; then
 
-    purge $RESOURCE_GROUP
-    purge $MATCH_RESOURCE_GROUP
-    purge $METRICS_RESOURCE_GROUP
+    purge "$RESOURCE_GROUP"
+    purge "$MATCH_RESOURCE_GROUP"
+    purge "$METRICS_RESOURCE_GROUP"
 
   else
     exit 1

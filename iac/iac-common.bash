@@ -1,3 +1,5 @@
+# shellcheck disable=SC2034
+
 ### Constants
 # It's helpful to tag all piipan-related resources
 PROJECT_TAG=piipan
@@ -13,10 +15,10 @@ QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
 
 # Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=`az ad signed-in-user show --query objectId --output tsv`
+CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
 
 # The default Azure subscription
-SUBSCRIPTION_ID=`az account show --query id -o tsv`
+SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
 # Name of App Service Plan, used by both query tool and dashboard
 APP_SERVICE_PLAN=piipan-app-plan
@@ -69,13 +71,13 @@ pg_connection_string () {
   user=$3
   user=${user//-/_}
 
-  base=`az postgres show-connection-string \
-    --server-name $server \
-    --database-name $db \
-    --admin-user $user \
+  base=$(az postgres show-connection-string \
+    --server-name "$server" \
+    --database-name "$db" \
+    --admin-user "$user" \
     --admin-password "$PASSWORD_PLACEHOLDER" \
     --query connectionStrings.\"ado.net\" \
-    -o tsv`
+    -o tsv)
 
   # See:
   # https://github.com/Azure/azure-cli-extensions/issues/3143
@@ -108,17 +110,17 @@ get_resources () {
   local res
   res=$(\
     az resource list \
-      --tag $sys_type \
+      --tag "$sys_type" \
       --query "[? resourceGroup == '${group}' ].name" \
       -o tsv)
 
-  local as_array=($res)
+  local as_array=("$res")
   if [[ ${#as_array[@]} -eq 0 ]]; then
     echo "error: no resources found with $sys_type in $group" 1>&2
     return 1
   fi
 
-  echo $res
+  echo "$res"
 }
 
 # hard-coded switches between commerical and government Azure environments
