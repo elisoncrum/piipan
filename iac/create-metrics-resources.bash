@@ -111,7 +111,7 @@ main () {
   export PGPASSWORD=$PG_SECRET
 
   echo "Insert db table"
-  psql -U $DB_ADMIN_NAME@"$DB_SERVER_NAME" -p 5432 -d $DB_NAME -w -v ON_ERROR_STOP=1 -X -q - <<EOF
+  psql -U "$DB_ADMIN_NAME@$DB_SERVER_NAME" -p 5432 -d "$DB_NAME" -w -v ON_ERROR_STOP=1 -X -q - <<EOF
       CREATE TABLE IF NOT EXISTS $DB_TABLE_NAME (
           id serial PRIMARY KEY,
           state VARCHAR(50) NOT NULL,
