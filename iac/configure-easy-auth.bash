@@ -259,11 +259,11 @@ main () {
   match_func_names=($(\
     get_resources "$PER_STATE_MATCH_API_TAG" "$RESOURCE_GROUP"))
 
-  orch_name=$(get_resources "$ORCHESTRATOR_API_TAG $MATCH_RESOURCE_GROUP")
+  orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
 
-  query_tool_name=$(get_resources "$QUERY_APP_TAG $RESOURCE_GROUP")
+  query_tool_name=$(get_resources "$QUERY_APP_TAG" "$RESOURCE_GROUP")
 
-  dp_api_name=$(get_resources "$DUP_PART_API_TAG $MATCH_RESOURCE_GROUP")
+  dp_api_name=$(get_resources "$DUP_PART_API_TAG" "$MATCH_RESOURCE_GROUP")
 
   orch_identity=$(\
     az webapp identity show \
