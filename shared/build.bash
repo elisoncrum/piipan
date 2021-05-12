@@ -6,8 +6,8 @@
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit
-# shellcheck source=./iac/iac-common.bash
-source "$(dirname "$0")"/../iac/iac-common.bash || exit
+# shellcheck source=./tools/build-common.bash
+source "$(dirname "$0")"/../tools/build-common.bash || exit
 
 run_deploy () {
   echo "N/A"
