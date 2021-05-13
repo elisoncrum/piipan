@@ -10,7 +10,7 @@
 source "$(dirname "$0")"/common.bash || exit
 
 restore () {
-  options=${1:- }
+  options=${1:-}
   dotnet restore "$options" > /dev/null
 }
 
