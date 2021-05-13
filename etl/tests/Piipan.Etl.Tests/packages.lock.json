@@ -454,8 +454,8 @@
       },
       "Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator": {
         "type": "Transitive",
-        "resolved": "1.2.0",
-        "contentHash": "u/cBirezWiVNYP09b8GG68Bgz1RfxSkKywUxM3pRjHrsuXzkk0Tqc3w2bHa44oxzmXP+DcjAeY3Gj4QzHaBnzQ==",
+        "resolved": "1.2.2",
+        "contentHash": "vpiNt3JM1pt/WrDIkg7G2DHhIpI4t5I+R9rmXCxIGiby5oPGEolyfiYZdEf2kMMN3SbWzVAbk4Q3jKgFhO9MaQ==",
         "dependencies": {
           "System.Runtime.Loader": "4.3.0"
         }
@@ -695,13 +695,13 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.11",
-        "contentHash": "R92J7RJX+VxQ3pc0ZkduVHIR6tjmDJJE0yGLX9T41S5UFODfLpZ9ykiQcChaGovS3eYLRftm+2gYFTWQtoY5ZA==",
+        "resolved": "3.0.12",
+        "contentHash": "qaiduifDWEFYxnzO7yvbCLvH7brGi0mO+rjJfEEQY+bPMkUWz8uEecBwSfaCsxQKHn2dcpLbIT4Ru2PNZWAPgg==",
         "dependencies": {
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
           "Microsoft.Azure.WebJobs.Extensions": "3.0.6",
           "Microsoft.Azure.WebJobs.Extensions.Http": "[3.0.2, 3.1.0)",
-          "Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator": "1.2.0",
+          "Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator": "1.2.2",
           "Newtonsoft.Json": "11.0.2"
         }
       },
@@ -2154,7 +2154,7 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.4",
-          "Microsoft.NET.Sdk.Functions": "3.0.11",
+          "Microsoft.NET.Sdk.Functions": "3.0.12",
           "Npgsql": "5.0.5"
         }
       }
