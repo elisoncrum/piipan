@@ -29,7 +29,7 @@ namespace Piipan.QueryTool
         [Required]
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date),
-            DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
+            DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         [JsonPropertyName("dob")]
         public DateTime? DateOfBirth { get; set; }
 
