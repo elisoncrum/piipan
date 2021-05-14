@@ -6,6 +6,12 @@ updates:
     interval: daily
     time: "09:00"
   open-pull-requests-limit: 10
+- package-ecosystem: npm
+  directory: "/dashboard/src/Piipan.Dashboard"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
 - package-ecosystem: nuget
   directory: "/dashboard/tests/Piipan.Dashboard.Tests"
   schedule:
@@ -80,6 +86,11 @@ updates:
     time: "09:00"
   open-pull-requests-limit: 10
 - package-ecosystem: nuget
+  directory: "/query-tool/src/Piipan.QueryTool"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: npm
   directory: "/query-tool/src/Piipan.QueryTool"
   schedule:
     interval: daily
