@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -30,10 +31,9 @@ namespace Piipan.Metrics.Api
             try
             {
                 var dbfactory = NpgsqlFactory.Instance;
-                var resultsQueryString = ResultsQueryString(req.Query);
                 var data = await ResultsQuery(
                     dbfactory,
-                    resultsQueryString,
+                    req.Query,
                     log
                 );
                 var meta = new Meta();
@@ -136,17 +136,13 @@ namespace Piipan.Metrics.Api
 
         public static String ResultsQueryString(IQueryCollection query)
         {
-            int limit = StrToIntWithDefault(query["perPage"], 50);
-            int page = StrToIntWithDefault(query["page"], 1);
-            int offset = limit * (page - 1);
             string? state = query["state"];
-
             var statement = "SELECT state, uploaded_at FROM participant_uploads";
             if (!String.IsNullOrEmpty(state))
-                statement += $" WHERE lower(state) LIKE '%{state.ToLower()}%'";
+                statement += $" WHERE lower(state) LIKE @state";
             statement += " ORDER BY uploaded_at DESC";
-            statement += $" LIMIT {limit}";
-            statement += $" OFFSET {offset}";
+            statement += $" LIMIT @limit";
+            statement += $" OFFSET @offset";
             return statement;
         }
 
@@ -160,7 +156,7 @@ namespace Piipan.Metrics.Api
 
         public async static Task<List<ParticipantUpload>> ResultsQuery(
             DbProviderFactory factory,
-            String query,
+            IQueryCollection query,
             ILogger log)
         {
             List<ParticipantUpload> results = new List<ParticipantUpload>();
@@ -173,7 +169,15 @@ namespace Piipan.Metrics.Api
                 using (var cmd = factory.CreateCommand())
                 {
                     cmd.Connection = conn;
-                    cmd.CommandText = query;
+                    cmd.CommandText = ResultsQueryString(query);
+                    string? state = query["state"];
+                    if (!String.IsNullOrEmpty(state))
+                      AddWithValue(cmd, DbType.String, "state", state.ToLower());
+                    int limit = StrToIntWithDefault(query["perPage"], 50);
+                    int page = StrToIntWithDefault(query["page"], 1);
+                    int offset = limit * (page - 1);
+                    AddWithValue(cmd, DbType.Int64, "limit", limit);
+                    AddWithValue(cmd, DbType.Int64, "offset", offset);
                     var reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
@@ -222,6 +226,15 @@ namespace Piipan.Metrics.Api
             }
 
             return builder.ConnectionString;
+        }
+
+        static void AddWithValue(DbCommand cmd, DbType type, String name, object value)
+        {
+            var p = cmd.CreateParameter();
+            p.DbType = type;
+            p.ParameterName = name;
+            p.Value = value;
+            cmd.Parameters.Add(p);
         }
     }
 }
