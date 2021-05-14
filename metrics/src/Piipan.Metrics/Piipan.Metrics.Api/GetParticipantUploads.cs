@@ -124,8 +124,10 @@ namespace Piipan.Metrics.Api
                     var text = "SELECT COUNT(*) from participant_uploads";
                     string? state = req.Query["state"];
                     if (!String.IsNullOrEmpty(state))
-                        text += $" WHERE lower(state) LIKE '%{state}%'";
+                        text += $" WHERE lower(state) LIKE @state";
                     cmd.CommandText = text;
+                    if (!String.IsNullOrEmpty(state))
+                      AddWithValue(cmd, DbType.String, "state", state.ToLower());
                     count = (Int64)cmd.ExecuteScalar();
                 }
                 conn.Close();
