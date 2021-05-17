@@ -37,12 +37,13 @@ namespace Piipan.Metrics.Tests
                     var logger = Logger();
                     var factory = new Mock<DbProviderFactory>() { DefaultValue = DefaultValue.Mock };
                     var cmd = new Mock<DbCommand>() { DefaultValue = DefaultValue.Mock };
-                    var queryString = "SELECT * from participant_uploads";
+                    var requestQuery = new Mock<IQueryCollection>();
+                    requestQuery.SetupGet(q => q["state"]).Returns(new StringValues("ea"));
                     factory.Setup(f => f.CreateCommand()).Returns(cmd.Object);
 
                     var results = await GetParticipantUploads.ResultsQuery(
                         factory.Object,
-                        queryString,
+                        requestQuery.Object,
                         logger.Object
                     );
 
@@ -70,7 +71,7 @@ namespace Piipan.Metrics.Tests
                     var requestQuery = new Mock<IQueryCollection>();
                     requestQuery.SetupGet(q => q["state"]).Returns(new StringValues("ea"));
                     var result = GetParticipantUploads.ResultsQueryString(requestQuery.Object);
-                    Assert.Matches(@"WHERE lower\(state\) LIKE '%ea%'", result);
+                    Assert.Matches(@"WHERE lower\(state\) LIKE @state", result);
                 }
 
                 // when state query param is not present, result includes a WHERE statement
@@ -79,28 +80,25 @@ namespace Piipan.Metrics.Tests
                 {
                     var requestQuery = new Mock<IQueryCollection>();
                     var result = GetParticipantUploads.ResultsQueryString(requestQuery.Object);
-                    Assert.DoesNotMatch(@"WHERE lower\(state\) LIKE '%ea%'", result);
+                    Assert.DoesNotMatch(@"WHERE lower\(state\) LIKE @state", result);
                 }
 
-                // when perPage param is present, result includes it as LIMIT
+                // sql query includes a LIMIT
                 [Fact]
-                public void WhenPerPagePresent()
+                public void LimitIncluded()
                 {
                     var requestQuery = new Mock<IQueryCollection>();
-                    requestQuery.SetupGet(q => q["perPage"]).Returns(new StringValues("10"));
                     var result = GetParticipantUploads.ResultsQueryString(requestQuery.Object);
-                    Assert.Matches("LIMIT 10", result);
+                    Assert.Matches("LIMIT @limit", result);
                 }
 
-                // when perPage param is > 1, result string has correct OFFSET
+                // sql query has an OFFSET
                 [Fact]
                 public void OffsetIsCorrect()
                 {
                     var requestQuery = new Mock<IQueryCollection>();
-                    requestQuery.SetupGet(q => q["page"]).Returns(new StringValues("3"));
-                    requestQuery.SetupGet(q => q["perPage"]).Returns(new StringValues("10"));
                     var result = GetParticipantUploads.ResultsQueryString(requestQuery.Object);
-                    Assert.Matches("OFFSET 20", result);
+                    Assert.Matches("OFFSET @offset", result);
                 }
             }
 
