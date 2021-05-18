@@ -32,14 +32,10 @@ set_constants () {
   DASHBOARD_WAF_NAME=wafdashboard${ENV}
   # Metrics Collection Info
   COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
-  COLLECT_APP_ID=metricscol
-  COLLECT_APP_NAME=${PREFIX}-func-${COLLECT_APP_ID}-${ENV}
-  COLLECT_STORAGE_NAME=${PREFIX}st${COLLECT_APP_ID}${ENV}
+  COLLECT_STORAGE_NAME=${PREFIX}st${METRICS_COLLECT_APP_ID}${ENV}
   COLLECT_FUNC=BulkUploadMetrics
   # Metrics API Info
   API_APP_FILEPATH=Piipan.Metrics.Api
-  METRICS_API_APP_ID=metricsapi
-  API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
@@ -123,7 +119,7 @@ EOF
 
   # Will need to revisit how to successfully deploy this app through an arm template
   # Need a storage account to publish function app to:
-  echo "Creating storage account for $COLLECT_APP_NAME"
+  echo "Creating storage account for $METRICS_COLLECT_APP_NAME"
   az storage account create \
     --name "$COLLECT_STORAGE_NAME" \
     --location "$LOCATION" \
@@ -132,20 +128,20 @@ EOF
     --tags Project=$PROJECT_TAG
 
   # Create the function app in Azure
-  echo "Creating function app $COLLECT_APP_NAME in Azure"
+  echo "Creating function app $METRICS_COLLECT_APP_NAME in Azure"
   az functionapp create \
     --resource-group "$METRICS_RESOURCE_GROUP" \
     --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
     --runtime dotnet \
     --functions-version 3 \
-    --name "$COLLECT_APP_NAME" \
+    --name "$METRICS_COLLECT_APP_NAME" \
     --storage-account "$COLLECT_STORAGE_NAME" \
     --tags Project=$PROJECT_TAG
 
   # Integrate function app into Virtual Network
-  echo "Integrating $COLLECT_APP_NAME into virtual network"
+  echo "Integrating $METRICS_COLLECT_APP_NAME into virtual network"
   az functionapp vnet-integration add \
-    --name "$COLLECT_APP_NAME" \
+    --name "$METRICS_COLLECT_APP_NAME" \
     --resource-group "$METRICS_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
@@ -160,7 +156,7 @@ EOF
   echo "configure settings"
   az functionapp config appsettings set \
     --resource-group "$METRICS_RESOURCE_GROUP" \
-    --name "$COLLECT_APP_NAME" \
+    --name "$METRICS_COLLECT_APP_NAME" \
     --settings \
       $DB_CONN_STR_KEY="$DB_CONN_STR" \
       $VAULT_NAME_KEY="$VAULT_NAME" \
@@ -170,7 +166,7 @@ EOF
   # Connect creds from function app to key vault so app can connect to db
   principalId=$(az functionapp identity assign \
     --resource-group "$METRICS_RESOURCE_GROUP" \
-    --name "$COLLECT_APP_NAME" \
+    --name "$METRICS_COLLECT_APP_NAME" \
     --query principalId \
     --output tsv)
 
@@ -180,9 +176,9 @@ EOF
     --secret-permissions get list
 
   # publish the function app
-  echo "Publishing function app $COLLECT_APP_NAME"
+  echo "Publishing function app $METRICS_COLLECT_APP_NAME"
   pushd ../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH
-    func azure functionapp publish "$COLLECT_APP_NAME" --dotnet
+    func azure functionapp publish "$METRICS_COLLECT_APP_NAME" --dotnet
   popd
 
   # Subscribe each dynamically created event blob topic to this function
@@ -218,27 +214,27 @@ EOF
     --tags Project=$PROJECT_TAG
 
   # Create the function app in Azure
-  echo "Creating function app $API_APP_NAME"
+  echo "Creating function app $METRICS_API_APP_NAME"
   az functionapp create \
     --resource-group "$METRICS_RESOURCE_GROUP" \
     --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
     --runtime dotnet \
     --functions-version 3 \
-    --name "$API_APP_NAME" \
+    --name "$METRICS_API_APP_NAME" \
     --storage-account "$API_APP_STORAGE_NAME" \
     --tags Project=$PROJECT_TAG
 
   # Integrate function app into Virtual Network
-  echo "Integrating $API_APP_NAME into virtual network"
+  echo "Integrating $METRICS_API_APP_NAME into virtual network"
   az functionapp vnet-integration add \
-    --name "$API_APP_NAME" \
+    --name "$METRICS_API_APP_NAME" \
     --resource-group "$METRICS_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
 
   az functionapp config appsettings set \
       --resource-group "$METRICS_RESOURCE_GROUP" \
-      --name "$API_APP_NAME" \
+      --name "$METRICS_API_APP_NAME" \
       --settings \
         $DB_CONN_STR_KEY="$DB_CONN_STR" \
         $VAULT_NAME_KEY="$VAULT_NAME" \
@@ -248,7 +244,7 @@ EOF
   # Connect creds from function app to key vault so app can connect to db
   principalId=$(az functionapp identity assign \
     --resource-group "$METRICS_RESOURCE_GROUP" \
-    --name "$API_APP_NAME" \
+    --name "$METRICS_API_APP_NAME" \
     --query principalId \
     --output tsv)
 
@@ -261,9 +257,9 @@ EOF
   sleep 60
 
   # publish metrics function app
-  echo "Publishing function app $API_APP_NAME"
+  echo "Publishing function app $METRICS_API_APP_NAME"
   pushd ../metrics/src/Piipan.Metrics/$API_APP_FILEPATH
-    func azure functionapp publish "$API_APP_NAME" --dotnet
+    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet
   popd
 
   ## Dashboard stuff
@@ -289,8 +285,8 @@ EOF
   metrics_api_uri=$(\
     az functionapp function show \
       -g "$METRICS_RESOURCE_GROUP" \
-      -n "$API_APP_NAME" \
-      --function-name GetParticipantUploads \
+      -n "$METRICS_API_APP_NAME" \
+      --function-name $METRICS_API_FUNCTION_NAME \
       --query invokeUrlTemplate \
       --output tsv)
 

@@ -54,6 +54,13 @@ DB_2_SUBNET_NAME=snet-core-$ENV # Subnet that core database private endpoint use
 FUNC_SUBNET_NAME=snet-apps1-$ENV # Subnet function apps use
 PRIVATE_ENDPOINT_NAME=pe-participants-$ENV
 CORE_DB_PRIVATE_ENDPOINT_NAME=pe-core-$ENV
+
+# Metrics Resources
+METRICS_COLLECT_APP_ID=metricscol
+METRICS_COLLECT_APP_NAME=${PREFIX}-func-${METRICS_COLLECT_APP_ID}-${ENV}
+METRICS_API_APP_ID=metricsapi
+METRICS_API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
+METRICS_API_FUNCTION_NAME=GetParticipantUploads
 ### END Constants
 
 ### Functions
