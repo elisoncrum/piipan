@@ -33,7 +33,7 @@ Piipan is designed to be a cloud-native system. It is under active development a
 * [Dashboard app](./dashboard)
 * [Metrics](./metrics)
 * Collaboration
-* Batch-driven Passive Match
+* Batch-driven Bulk Match
  
 Here is a diagram depicting these anticipated subsystems:
 
@@ -43,7 +43,7 @@ Here is a diagram depicting these anticipated subsystems:
 
 A guiding architectural principle is to treat state agencies and their data as tenants of a platform (i.e., Piipan), and accordingly apply isolation best practices and the principle of least privilege throughout the system.
 
-Finally, this reference model is designed to be extended to support a fully federated system, whereby PII records never leave state-run enclaves in bulk. Under this hypothetical extension, the federally-run API orchestrator would reach back to each state, rather than its own isolated copies of state participant records. And the passive match API would incorporate a Privacy Set Intersection (PSI) protocol, with the federal system acting as a semi-trusted 3rd party. 
+Finally, this reference model is designed to be extended to support a fully federated system, whereby PII records never leave state-run enclaves in bulk. Under this hypothetical extension, the federally-run API orchestrator would reach back to each state, rather than its own isolated copies of state participant records. And the bulk match API would incorporate a Privacy Set Intersection (PSI) protocol, with the federal system acting as a semi-trusted 3rd party. 
 
 ## Implementation
 
