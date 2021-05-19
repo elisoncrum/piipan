@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS participants(
 	dob date NOT NULL,
 	ssn text NOT NULL,
 	exception text,
-	upload_id integer REFERENCES uploads (id)
+	upload_id integer REFERENCES uploads (id),
+  case_id text NOT NULL,
+  participant_id text
 );
 
 COMMENT ON TABLE participants IS 'Program participant Personally Identifiable Information (PII)';
@@ -36,6 +38,8 @@ COMMENT ON COLUMN participants.middle IS 'Participant''s middle name';
 COMMENT ON COLUMN participants.dob IS 'Participant''s date of birth';
 COMMENT ON COLUMN participants.ssn IS 'Participant''s Social Security Number';
 COMMENT ON COLUMN participants.exception IS 'Placeholder for value indicating special processing instructions';
+COMMENT ON COLUMN participants.case_id IS 'state-provided relevant case number or identifier';
+COMMENT ON COLUMN participants.participant_id IS 'state-provided identifier of the participant';
 
 CREATE INDEX IF NOT EXISTS participants_ssn_idx ON participants (ssn, upload_id);
 

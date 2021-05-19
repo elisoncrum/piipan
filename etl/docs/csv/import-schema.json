@@ -44,6 +44,19 @@
         "name": "exception",
         "type": "string",
         "description": "Placeholder for value indicating special processing instructions"
+      },
+      {
+        "name": "case id",
+        "type": "string",
+        "description": "state-provided relevant case number or identifier",
+        "constraints": {
+          "required": true
+        }
+      },
+      {
+        "name": "participant id",
+        "type": "string",
+        "description": "state-provided identifier of the participant. Should not be social security number or any personal identifiable information."
       }
     ]
   }

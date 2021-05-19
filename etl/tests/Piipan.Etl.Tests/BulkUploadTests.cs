@@ -17,7 +17,7 @@ namespace Piipan.Etl.Tests
             var writer = new StreamWriter(stream);
             if (includeHeader)
             {
-                writer.WriteLine("last,first,middle,dob,ssn,exception");
+                writer.WriteLine("last,first,middle,dob,ssn,exception,case id,participant id");
             }
             foreach (var record in records)
             {
@@ -49,7 +49,9 @@ namespace Piipan.Etl.Tests
                 Middle = "Middle",
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = "Exception"
+                Exception = "Exception",
+                CaseId = "CaseId",
+                ParticipantId = "ParticipantId"
             };
         }
 
@@ -62,7 +64,8 @@ namespace Piipan.Etl.Tests
                 Middle = null,
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = null
+                Exception = null,
+                CaseId = "CaseId",
             };
         }
 
@@ -91,7 +94,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,01/01/1970,000-00-0000,Exception"
+                "Last,First,Middle,01/01/1970,000-00-0000,Exception,CaseId,ParticipantId"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -103,6 +106,8 @@ namespace Piipan.Etl.Tests
                 Assert.Equal(new DateTime(1970, 1, 1), record.Dob);
                 Assert.Equal("000-00-0000", record.Ssn);
                 Assert.Equal("Exception", record.Exception);
+                Assert.Equal("CaseId", record.CaseId);
+                Assert.Equal("ParticipantId", record.ParticipantId);
             }
         }
 
@@ -111,7 +116,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,,,01/01/1970,000-00-0000,"
+                "Last,,,01/01/1970,000-00-0000,,CaseId,,"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -120,6 +125,7 @@ namespace Piipan.Etl.Tests
                 Assert.Null(record.First);
                 Assert.Null(record.Middle);
                 Assert.Null(record.Exception);
+                Assert.Null(record.ParticipantId);
             }
         }
 
@@ -127,6 +133,7 @@ namespace Piipan.Etl.Tests
         [InlineData(",,,01/01/1970,000-00-0000,")] // Missing last name
         [InlineData("Last,,,01/01/1970,,")] // Missing SSN
         [InlineData("Last,,,01/01/1970,000000000,")] // Malformed SSN
+        [InlineData("Last,,,01/01/1970,000-00-0000,,,")] // Missing CaseId
         public void ExpectFieldValidationError(String inline)
         {
             var logger = Mock.Of<ILogger>();

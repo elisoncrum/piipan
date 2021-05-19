@@ -70,7 +70,7 @@ namespace Piipan.Etl
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
-                TrimOptions = TrimOptions.Trim,
+                TrimOptions = TrimOptions.Trim
             };
             var csv = new CsvReader(reader, config);
             csv.Context.RegisterClassMap<PiiRecordMap>();
@@ -146,8 +146,8 @@ namespace Piipan.Etl
                     using (var cmd = factory.CreateCommand())
                     {
                         cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id) " +
-                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id)";
+                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id) " +
+                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id)";
 
                         AddWithValue(cmd, DbType.String, "last", record.Last);
                         AddWithValue(cmd, DbType.String, "first", (object)record.First ?? DBNull.Value);
@@ -156,6 +156,8 @@ namespace Piipan.Etl
                         AddWithValue(cmd, DbType.String, "ssn", record.Ssn);
                         AddWithValue(cmd, DbType.String, "exception", (object)record.Exception ?? DBNull.Value);
                         AddWithValue(cmd, DbType.Int64, "upload_id", lastval);
+                        AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
+                        AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
 
                         cmd.ExecuteNonQuery();
                     }
