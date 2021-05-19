@@ -211,6 +211,7 @@ main () {
     --query properties.fullyQualifiedDomainName -o tsv)
   export PGHOST
   export ENV
+  export PREFIX
   # Multiple PostgreSQL databases cannot be created with an ARM template;
   # detailed database/schema/role configuration can't be done with an ARM
   # template either. Instead, we access the PostgreSQL server from a trusted

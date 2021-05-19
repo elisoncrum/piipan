@@ -32,6 +32,14 @@ namespace Piipan.Etl
 
             Map(m => m.Exception).Name("exception")
                 .TypeConverterOption.NullValues(string.Empty);
+
+            Map(m => m.CaseId).Name("case id").Validate(field =>
+            {
+                return !string.IsNullOrEmpty(field.Field);
+            });
+
+            Map(m => m.ParticipantId).Name("participant id")
+                .TypeConverterOption.NullValues(string.Empty);
         }
     }
 }

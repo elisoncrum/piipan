@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS uploads(
 COMMENT ON TABLE uploads IS 'Bulk PII upload events';
 COMMENT ON COLUMN uploads.created_at IS 'Date/time the records were uploaded in bulk';
 COMMENT ON COLUMN uploads.publisher IS 'User or service account that performed the upload';
-	
+
 CREATE TABLE IF NOT EXISTS participants(
 	id serial PRIMARY KEY,
 	last text NOT NULL,
@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS participants(
 	dob date NOT NULL,
 	ssn text NOT NULL,
 	exception text,
-	upload_id integer REFERENCES uploads (id)
+	upload_id integer REFERENCES uploads (id),
+  	case_id text NOT NULL,
+  	participant_id text
 );
 
 COMMENT ON TABLE participants IS 'Program participant Personally Identifiable Information (PII)';
@@ -36,6 +38,8 @@ COMMENT ON COLUMN participants.middle IS 'Participant''s middle name';
 COMMENT ON COLUMN participants.dob IS 'Participant''s date of birth';
 COMMENT ON COLUMN participants.ssn IS 'Participant''s Social Security Number';
 COMMENT ON COLUMN participants.exception IS 'Placeholder for value indicating special processing instructions';
+COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
+COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
 
 CREATE INDEX IF NOT EXISTS participants_ssn_idx ON participants (ssn, upload_id);
 

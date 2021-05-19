@@ -20,6 +20,8 @@ namespace Piipan.Etl
         public string? Middle { get; set; }
         public DateTime Dob { get; set; }
         public string Ssn { get; set; } = null!;
+        public string CaseId { get; set; } = null!;
+        public string? ParticipantId { get; set; }
         public string? Exception { get; set; }
     }
 }
