@@ -38,8 +38,8 @@ COMMENT ON COLUMN participants.middle IS 'Participant''s middle name';
 COMMENT ON COLUMN participants.dob IS 'Participant''s date of birth';
 COMMENT ON COLUMN participants.ssn IS 'Participant''s Social Security Number';
 COMMENT ON COLUMN participants.exception IS 'Placeholder for value indicating special processing instructions';
-COMMENT ON COLUMN participants.case_id IS 'state-provided relevant case number or identifier';
-COMMENT ON COLUMN participants.participant_id IS 'state-provided identifier of the participant';
+COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
+COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
 
 CREATE INDEX IF NOT EXISTS participants_ssn_idx ON participants (ssn, upload_id);
 

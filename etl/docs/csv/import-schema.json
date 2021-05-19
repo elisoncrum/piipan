@@ -48,15 +48,16 @@
       {
         "name": "case id",
         "type": "string",
-        "description": "state-provided relevant case number or identifier",
+        "description": "Participant''s state-specific case identifier",
         "constraints": {
-          "required": true
+          "required": true,
+          "minLength": 1
         }
       },
       {
         "name": "participant id",
         "type": "string",
-        "description": "state-provided identifier of the participant. Should not be social security number or any personal identifiable information."
+        "description": "Participant''s state-specific identifier. Must not be social security number or any personal identifiable information."
       }
     ]
   }
