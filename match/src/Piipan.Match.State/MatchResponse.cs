@@ -51,6 +51,12 @@ namespace Piipan.Match.State
         [JsonProperty("state_abbr")]
         public string StateAbbr { get; }
 
+        [JsonProperty("case_id")]
+        public string CaseId { get; set; }
+
+        [JsonProperty("participant_id")]
+        public string ParticipantId { get; set; }
+
         public string ToJson()
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
