@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS uploads(
 COMMENT ON TABLE uploads IS 'Bulk PII upload events';
 COMMENT ON COLUMN uploads.created_at IS 'Date/time the records were uploaded in bulk';
 COMMENT ON COLUMN uploads.publisher IS 'User or service account that performed the upload';
-	
+
 CREATE TABLE IF NOT EXISTS participants(
 	id serial PRIMARY KEY,
 	last text NOT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS participants(
 	ssn text NOT NULL,
 	exception text,
 	upload_id integer REFERENCES uploads (id),
-  case_id text NOT NULL,
-  participant_id text
+  	case_id text NOT NULL,
+  	participant_id text
 );
 
 COMMENT ON TABLE participants IS 'Program participant Personally Identifiable Information (PII)';
