@@ -114,9 +114,9 @@ namespace Piipan.Match.State.IntegrationTests
                         dob date NOT NULL,
                         ssn text NOT NULL,
                         exception text,
-                        upload_id integer REFERENCES uploads(id)),
+                        upload_id integer REFERENCES uploads(id),
                         case_id text NOT NULL,
-                        participant_id text;";
+                        participant_id text);";
                     cmd.ExecuteNonQuery();
                 }
 
