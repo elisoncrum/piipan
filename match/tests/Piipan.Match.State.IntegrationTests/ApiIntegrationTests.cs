@@ -61,6 +61,7 @@ namespace Piipan.Match.State.IntegrationTests
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(record.ToJson()));
 
+            ClearParticipants();
             Insert(record);
 
             // Act
