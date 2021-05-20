@@ -127,7 +127,8 @@ namespace Piipan.Match.State.IntegrationTests
                 Middle = "Carri",
                 Last = "Farrington",
                 Dob = new DateTime(1931, 10, 13),
-                Ssn = "000-12-3456"
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));
@@ -154,7 +155,8 @@ namespace Piipan.Match.State.IntegrationTests
                 Middle = "Carri",
                 Last = "Farrington",
                 Dob = new DateTime(1931, 10, 13),
-                Ssn = "000-12-3456"
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));
