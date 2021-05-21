@@ -40,6 +40,9 @@ namespace Piipan.Etl
 
             Map(m => m.ParticipantId).Name("participant id")
                 .TypeConverterOption.NullValues(string.Empty);
+
+            Map(m => m.BenefitsEndDate).Name("benefits end month")
+                .TypeConverterOption.NullValues(string.Empty);
         }
     }
 }
