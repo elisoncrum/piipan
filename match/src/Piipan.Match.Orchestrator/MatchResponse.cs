@@ -52,6 +52,10 @@ namespace Piipan.Match.Orchestrator
         [JsonProperty("participant_id")]
         public string ParticipantId { get; set; }
 
+        [JsonProperty("benefits_end_date")]
+        [JsonConverter(typeof(DateTimeConverter))]
+        public DateTime BenefitsEndDate { get; set; }
+
         public string ToJson()
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);

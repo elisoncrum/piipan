@@ -100,6 +100,10 @@ paths:
                         participant_id:
                           type: string
                           description: Participant's state-specific identifier. Must not be social security number or any personal identifiable information.
+                        benefits_end_date:
+                          type: string
+                          format: date
+                          description: Participant's ending benefits date
         '400':
           description: Bad request. Missing one of the required properties in the request body.
   '/lookup_ids/{id}':

@@ -23,7 +23,8 @@ namespace Piipan.Match.State.IntegrationTests
                 Ssn = "000-00-0000",
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
-                ParticipantId = "ParticipantIdExample"
+                ParticipantId = "ParticipantIdExample",
+                BenefitsEndDate = new DateTime(1970, 2, 1)
             };
         }
 
@@ -79,6 +80,7 @@ namespace Piipan.Match.State.IntegrationTests
             Assert.Equal(record.Exception, resultRecord.Matches[0].Exception);
             Assert.Equal(record.CaseId, resultRecord.Matches[0].CaseId);
             Assert.Equal(record.ParticipantId, resultRecord.Matches[0].ParticipantId);
+            Assert.Equal(record.BenefitsEndDate, resultRecord.Matches[0].BenefitsEndDate);
             Assert.Equal("ea", resultRecord.Matches[0].StateAbbr);
             Assert.Equal("Echo Alpha", resultRecord.Matches[0].StateName);
         }
@@ -129,7 +131,8 @@ namespace Piipan.Match.State.IntegrationTests
                 Last = "Farrington",
                 Dob = new DateTime(1931, 10, 13),
                 Ssn = "000-12-3456",
-                CaseId = "CaseIdExample"
+                CaseId = "CaseIdExample",
+                BenefitsEndDate = new DateTime(2021, 05, 31)
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));

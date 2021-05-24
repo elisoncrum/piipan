@@ -24,7 +24,8 @@ namespace Piipan.Match.State.Tests
                 Ssn = "000-00-0000",
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
-                ParticipantId = "ParticipantIdExample"
+                ParticipantId = "ParticipantIdExample",
+                BenefitsEndDate = new DateTime(1970, 2, 1)
             };
         }
 
@@ -46,7 +47,7 @@ namespace Piipan.Match.State.Tests
             // Arrange
             SetEnvironment();
             var record = FullRecord();
-            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\"\n}";
+            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\",\n  \"benefits_end_date\": \"1970-02-01\"\n}";
 
             // Assert
             Assert.Equal(expected, record.ToJson());
@@ -64,7 +65,7 @@ namespace Piipan.Match.State.Tests
             };
             var expected = "{\n  \"matches\": [\n    {" +
                     "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state_name\": \"Echo Alpha\",\n      \"state_abbr\": \"ea\",\n" +
-                    "      \"case_id\": \"CaseIdExample\",\n      \"participant_id\": \"ParticipantIdExample\"" +
+                    "      \"case_id\": \"CaseIdExample\",\n      \"participant_id\": \"ParticipantIdExample\",\n      \"benefits_end_date\": \"1970-02-01\"" +
                     "\n    }\n  ]\n}";
 
             // Act

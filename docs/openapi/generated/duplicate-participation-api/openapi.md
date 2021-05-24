@@ -70,7 +70,8 @@ Queries all state databases for any PII records that are an exact match to the l
       "state_abbr": "string",
       "exception": "string",
       "case_id": "string",
-      "participant_id": "string"
+      "participant_id": "string",
+      "benefits_end_date": "2019-08-24"
     }
   ]
 }
@@ -101,6 +102,7 @@ Status Code **200**
 |»» exception|string|false|none|Placeholder for value indicating special processing instructions|
 |»» case_id|string|false|none|Participant's state-specific case identifier|
 |»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
+|»» benefits_end_date|string(date)|false|none|Participant's ending benefits date|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
