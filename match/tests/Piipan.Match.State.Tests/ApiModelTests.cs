@@ -22,7 +22,9 @@ namespace Piipan.Match.State.Tests
                 Last = "Last",
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = "Exception"
+                Exception = "Exception",
+                CaseId = "CaseIdExample",
+                ParticipantId = "ParticipantIdExample"
             };
         }
 
@@ -44,7 +46,7 @@ namespace Piipan.Match.State.Tests
             // Arrange
             SetEnvironment();
             var record = FullRecord();
-            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\"\n}";
+            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\"\n}";
 
             // Assert
             Assert.Equal(expected, record.ToJson());
@@ -61,7 +63,8 @@ namespace Piipan.Match.State.Tests
                 Matches = new List<PiiRecord>()
             };
             var expected = "{\n  \"matches\": [\n    {" +
-                    "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state_name\": \"Echo Alpha\",\n      \"state_abbr\": \"ea\"" +
+                    "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state_name\": \"Echo Alpha\",\n      \"state_abbr\": \"ea\",\n" +
+                    "      \"case_id\": \"CaseIdExample\",\n      \"participant_id\": \"ParticipantIdExample\"" +
                     "\n    }\n  ]\n}";
 
             // Act
