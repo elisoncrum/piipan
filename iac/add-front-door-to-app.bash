@@ -37,7 +37,9 @@ main () {
       frontDoorName="$front_door_name" \
       resourceGroupName="$resource_group" \
       resourceTags="$RESOURCE_TAGS" \
-      wafPolicyName="$waf_name"
+      wafPolicyName="$waf_name" \
+      prefix="$PREFIX" \
+      env="$ENV"
 
   script_completed
 }
