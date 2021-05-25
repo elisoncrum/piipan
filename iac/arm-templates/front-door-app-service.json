@@ -48,11 +48,24 @@
             "metadata": {
                 "description": "Describes if it is in detection mode or prevention mode at policy level."
             }
+        },
+        "prefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Environment-specific resource naming prefix"
+            }
+        },
+        "env": {
+            "type": "string",
+            "metadata": {
+                "description": "Development environment indicator"
+            }
         }
     },
     "variables": {
         "location": "global", /* front-door location must be global */
-        "wafLocation": "global" /* waf location must be global */
+        "wafLocation": "global" /* waf location must be global */,
+        "eventhubName": "[concat(parameters('prefix'), '-evh-monitoring-', parameters('env'))]"
     },
     "resources": [
         {
@@ -227,6 +240,30 @@
                     "enforceCertificateNameCheck": "Enabled",
                     "sendRecvTimeoutSeconds": 30
                 }
+            }
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
+            "apiVersion": "2017-05-01-preview",
+            "type": "Microsoft.Network/frontdoors/providers/diagnosticSettings",
+            "name": "[concat(parameters('frontDoorName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', variables('eventhubName'), '/authorizationrules/RootManageSharedAccessKey')]",
+                "eventHubName": "logs",
+                "logs": [
+                    /* Category names from `az monitor diagnostic settings categories list` */
+                    {
+                        "category": "FrontdoorAccessLog",
+                        "enabled": true
+                    },
+                    {
+                        "category": "FrontdoorWebApplicationFirewallLog",
+                        "enabled": true
+                    }
+                ]
             }
         }
     ]
