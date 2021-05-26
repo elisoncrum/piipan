@@ -147,6 +147,7 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Single(resultRecord.Matches);
+            Assert.Equal(new DateTime(2021, 05, 01), resultRecord.Matches[0].BenefitsEndMonth);
         }
 
         [Fact]
@@ -175,6 +176,7 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Single(resultRecord.Matches);
+            Assert.Null(resultRecord.Matches[0].BenefitsEndMonth);
         }
     }
 }
