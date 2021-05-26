@@ -54,7 +54,7 @@ namespace Piipan.Match.Orchestrator
 
         [JsonProperty("benefits_end_month")]
         [JsonConverter(typeof(DateMonthConverter))]
-        public DateTime BenefitsEndMonth { get; set; }
+        public DateTime? BenefitsEndMonth { get; set; }
 
         public string ToJson()
         {
