@@ -62,7 +62,6 @@
       {
         "name": "benefits end month",
         "type": "yearmonth",
-        "format": "%m/%Y",
         "description": "month and year when participant's benefits end"
       }
     ]
