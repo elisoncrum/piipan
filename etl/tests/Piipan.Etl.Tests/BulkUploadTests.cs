@@ -17,7 +17,8 @@ namespace Piipan.Etl.Tests
             var writer = new StreamWriter(stream);
             if (includeHeader)
             {
-                writer.WriteLine("last,first,middle,dob,ssn,exception,case id,participant id");
+                writer.WriteLine("last,first,middle,dob,ssn,exception,case id,participant id,benefits end month");
+
             }
             foreach (var record in records)
             {
@@ -51,7 +52,8 @@ namespace Piipan.Etl.Tests
                 Ssn = "000-00-0000",
                 Exception = "Exception",
                 CaseId = "CaseId",
-                ParticipantId = "ParticipantId"
+                ParticipantId = "ParticipantId",
+                BenefitsEndDate = new DateTime(1970, 1, 1)
             };
         }
 
@@ -66,6 +68,8 @@ namespace Piipan.Etl.Tests
                 Ssn = "000-00-0000",
                 Exception = null,
                 CaseId = "CaseId",
+                ParticipantId = null,
+                BenefitsEndDate = null
             };
         }
 
@@ -94,7 +98,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,01/01/1970,000-00-0000,Exception,CaseId,ParticipantId"
+                "Last,First,Middle,01/01/1970,000-00-0000,Exception,CaseId,ParticipantId,01/1970"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -108,6 +112,7 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("Exception", record.Exception);
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
+                Assert.Equal(new DateTime(1970, 1, 1), record.BenefitsEndDate);
             }
         }
 
@@ -116,7 +121,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,,,01/01/1970,000-00-0000,,CaseId,,"
+                "Last,,,01/01/1970,000-00-0000,,CaseId,,,"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -126,6 +131,7 @@ namespace Piipan.Etl.Tests
                 Assert.Null(record.Middle);
                 Assert.Null(record.Exception);
                 Assert.Null(record.ParticipantId);
+                Assert.Null(record.BenefitsEndDate);
             }
         }
 
@@ -210,6 +216,20 @@ namespace Piipan.Etl.Tests
             {
                 await BulkUpload.Run(gridEvent, BadBlob(), logger.Object);
             });
+        }
+
+        [Fact]
+        public void LastDayOfMonth()
+        {
+
+          var monthWith31Days = new DateTime(1970,1,1);
+          Assert.Equal(31, BulkUpload.LastDayOfMonth(monthWith31Days).Day);
+          var monthWith30Days = new DateTime(1970,4,1);
+          Assert.Equal(30, BulkUpload.LastDayOfMonth(monthWith30Days).Day);
+          var februaryLeapYear = new DateTime(2000,2,1);
+          Assert.Equal(29, BulkUpload.LastDayOfMonth(februaryLeapYear).Day);
+          var februaryNonLeapYear = new DateTime(2001,2,1);
+          Assert.Equal(28, BulkUpload.LastDayOfMonth(februaryNonLeapYear).Day);
         }
     }
 }

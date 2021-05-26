@@ -22,7 +22,7 @@
       {
         "name": "dob",
         "type": "date",
-        "format": "%m/%d/%Y", 
+        "format": "%m/%d/%Y",
         "description": "Participant's date of birth",
         "constraints": {
             "required": true
@@ -58,6 +58,11 @@
         "name": "participant id",
         "type": "string",
         "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information."
+      },
+      {
+        "name": "benefits end month",
+        "type": "yearmonth",
+        "description": "month and year when participant's benefits end"
       }
     ]
   }
