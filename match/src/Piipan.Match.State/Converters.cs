@@ -21,6 +21,21 @@ namespace Piipan.Match.State
     }
 
     /// <summary>
+    /// JSON.NET converter for serializing/deserializing a DateTime
+    /// object using our desired YYYY-MM format.
+    /// </summary>
+    /// <remarks>
+    /// Applied to model properties as `[JsonConverter(typeof(DateMonthConverter))]`
+    /// </remarks>
+    public class DateMonthConverter : IsoDateTimeConverter
+    {
+        public DateMonthConverter()
+        {
+            base.DateTimeFormat = "yyyy-MM";
+        }
+    }
+
+    /// <summary>
     /// JSON.NET converter used for converting null, missing, or empty
     /// properties to a `null` value when deserializing JSON.
     /// </summary>

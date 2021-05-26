@@ -34,7 +34,7 @@ namespace Piipan.Match.Orchestrator.Tests
                 Ssn = "000-00-0000",
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
-                BenefitsEndDate = new DateTime(1970, 1, 1)
+                BenefitsEndMonth = new DateTime(1970, 1, 1)
             };
         }
 
@@ -166,7 +166,7 @@ namespace Piipan.Match.Orchestrator.Tests
         [Fact]
         public void PiiRecordJson()
         {
-            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_date: '2020-02-01'}";
+            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01'}";
             var record = JsonConvert.DeserializeObject<PiiRecord>(json);
 
             Assert.Contains("\"last\": \"Last\"", record.ToJson());
@@ -178,7 +178,7 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Contains("\"state_name\": null", record.ToJson());
             Assert.Contains("\"state_abbr\": null", record.ToJson());
             Assert.Contains("\"case_id\": \"foo\"", record.ToJson());
-            Assert.Contains("\"benefits_end_date\": \"2020-02-01\"", record.ToJson());
+            Assert.Contains("\"benefits_end_month\": \"2020-01\"", record.ToJson());
 
         }
 

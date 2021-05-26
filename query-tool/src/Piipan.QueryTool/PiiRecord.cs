@@ -60,10 +60,8 @@ namespace Piipan.QueryTool
         [JsonPropertyName("lookup_id")]
         public string LookupId { get; set; }
 
-        [Display(Name = "Benefits End Date")]
-        [JsonPropertyName("benefits_end_date")]
-        [DataType(DataType.Date),
-            DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        public DateTime? BenefitsEndDate { get; set; }
+        [Display(Name = "Benefits End Month")]
+        [JsonPropertyName("benefits_end_month")]
+        public string? BenefitsEndMonth { get; set; }
     }
 }

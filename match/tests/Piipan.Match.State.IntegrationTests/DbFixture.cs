@@ -175,7 +175,7 @@ namespace Piipan.Match.State.IntegrationTests
                     AddWithValue(cmd, DbType.Int64, "upload_id", lastval);
                     AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
                     AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
-                    AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndDate ?? DBNull.Value);
+                    AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndMonth ?? DBNull.Value);
 
                     cmd.ExecuteNonQuery();
                 }

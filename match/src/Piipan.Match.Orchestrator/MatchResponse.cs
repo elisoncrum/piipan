@@ -52,9 +52,9 @@ namespace Piipan.Match.Orchestrator
         [JsonProperty("participant_id")]
         public string ParticipantId { get; set; }
 
-        [JsonProperty("benefits_end_date")]
-        [JsonConverter(typeof(DateTimeConverter))]
-        public DateTime BenefitsEndDate { get; set; }
+        [JsonProperty("benefits_end_month")]
+        [JsonConverter(typeof(DateMonthConverter))]
+        public DateTime BenefitsEndMonth { get; set; }
 
         public string ToJson()
         {
