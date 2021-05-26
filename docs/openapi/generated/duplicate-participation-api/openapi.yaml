@@ -102,7 +102,7 @@ paths:
                           description: Participant's state-specific identifier. Must not be social security number or any personal identifiable information.
                         benefits_end_month:
                           type: string
-                          format: date
+                          pattern: '^\d{4}-\d{2}$'
                           example: 2021-01
                           description: Participant's ending benefits month
         '400':
