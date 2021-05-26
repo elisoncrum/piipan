@@ -121,6 +121,17 @@ main () {
       objectId="$CURRENT_USER_OBJID" \
       resourceTags="$RESOURCE_TAGS"
 
+  # Create an Event Hub namespace and hub where resource logs will be streamed
+  az deployment group create \
+    --name monitoring \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file  ./arm-templates/event-hub-monitoring.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      env="$ENV" \
+      prefix="$PREFIX"
+
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
   while IFS=, read -r abbr name ; do
@@ -304,7 +315,7 @@ main () {
     az functionapp create \
       --resource-group "$RESOURCE_GROUP" \
       --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
-      --tags Project="$PROJECT_TAG $PER_STATE_ETL_TAG" \
+      --tags Project="$PROJECT_TAG" "$PER_STATE_ETL_TAG" \
       --runtime dotnet \
       --functions-version 3 \
       --os-type Windows \
