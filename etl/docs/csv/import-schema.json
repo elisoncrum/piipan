@@ -46,7 +46,7 @@
         "description": "Placeholder for value indicating special processing instructions"
       },
       {
-        "name": "case id",
+        "name": "case_id",
         "type": "string",
         "description": "Participant's state-specific case identifier",
         "constraints": {
@@ -55,12 +55,12 @@
         }
       },
       {
-        "name": "participant id",
+        "name": "participant_id",
         "type": "string",
         "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information."
       },
       {
-        "name": "benefits end month",
+        "name": "benefits_end_month",
         "type": "yearmonth",
         "description": "month and year when participant's benefits end"
       }
