@@ -37,6 +37,12 @@
         },
         "uploadPolicyXml": {
             "type": "String"
+        },
+        "coreResourceGroup": {
+            "type": "String"
+        },
+        "eventHubName": {
+            "type": "String"
         }
     },
     "variables": {
@@ -309,6 +315,26 @@
             "copy": {
                 "name": "per-state-upload-ops",
                 "count": "[length(variables('uploadStatesList'))]"
+            }
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
+            "apiVersion": "2017-05-01-preview",
+            "type": "Microsoft.ApiManagement/service/providers/diagnosticSettings",
+            "name": "[concat(parameters('apiName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', parameters('coreResourceGroup'), '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
+                "eventHubName": "logs",
+                "logs": [
+                    /* Category names from `az monitor diagnostic settings categories list` */
+                    {
+                        "category": "GatewayLogs",
+                        "enabled": true
+                    }
+                ]
             }
         }
     ],
