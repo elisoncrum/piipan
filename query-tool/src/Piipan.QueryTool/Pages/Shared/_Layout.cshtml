@@ -12,19 +12,21 @@
     <script src="~/js/uswds.min.js" asp-append-version="true"></script>
 </head>
 <body>
-    <a class="usa-skipnav" href="#main-content">Skip to main content</a>
-    <partial name="_UsaBanner" />
-    <partial name="_CUI" />
-    <div class="usa-overlay"></div>
-    <header class="usa-header usa-header--extended"><div class="usa-navbar">
-        <div class="usa-logo" id="extended-logo">
-            <h1 class="usa-logo__text font-heading-xl"><a asp-page="/Index" title="Home" aria-label="Home">National Accuracy Clearinghouse</a></h1>
-        </div>
-    </header>
-    <div class="container margin-bottom-3">
-        <main id="main-content">
-            @RenderBody()
-        </main>
+    <div class="bottom-banner-set">
+      <a class="usa-skipnav" href="#main-content">Skip to main content</a>
+      <partial name="_UsaBanner" />
+      <partial name="_CUI" />
+      <div class="usa-overlay"></div>
+      <header class="usa-header usa-header--extended"><div class="usa-navbar">
+          <div class="usa-logo" id="extended-logo">
+              <h1 class="usa-logo__text font-heading-xl"><a asp-page="/Index" title="Home" aria-label="Home">National Accuracy Clearinghouse</a></h1>
+          </div>
+      </header>
+      <div class="container margin-bottom-3">
+          <main id="main-content">
+              @RenderBody()
+          </main>
+      </div>
     </div>
     <partial name="_CUI" />
 </body>
