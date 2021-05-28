@@ -9,7 +9,6 @@ namespace Piipan.Match.State.Tests
     {
         void SetEnvironment()
         {
-            Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
             Environment.SetEnvironmentVariable("StateAbbr", "ea");
         }
 
@@ -36,8 +35,10 @@ namespace Piipan.Match.State.Tests
             var record = FullRecord();
 
             // Assert
+            Assert.Equal("ea", record.State);
+
+            // Deprecated
             Assert.Equal("ea", record.StateAbbr);
-            Assert.Equal("Echo Alpha", record.StateName);
         }
 
         [Fact]
@@ -46,7 +47,7 @@ namespace Piipan.Match.State.Tests
             // Arrange
             SetEnvironment();
             var record = FullRecord();
-            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state_name\": \"Echo Alpha\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\"\n}";
+            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state\": \"ea\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\"\n}";
 
             // Assert
             Assert.Equal(expected, record.ToJson());
@@ -63,7 +64,7 @@ namespace Piipan.Match.State.Tests
                 Matches = new List<PiiRecord>()
             };
             var expected = "{\n  \"matches\": [\n    {" +
-                    "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state_name\": \"Echo Alpha\",\n      \"state_abbr\": \"ea\",\n" +
+                    "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state\": \"ea\",\n      \"state_abbr\": \"ea\",\n" +
                     "      \"case_id\": \"CaseIdExample\",\n      \"participant_id\": \"ParticipantIdExample\"" +
                     "\n    }\n  ]\n}";
 

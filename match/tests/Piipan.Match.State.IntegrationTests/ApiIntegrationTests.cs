@@ -79,8 +79,10 @@ namespace Piipan.Match.State.IntegrationTests
             Assert.Equal(record.Exception, resultRecord.Matches[0].Exception);
             Assert.Equal(record.CaseId, resultRecord.Matches[0].CaseId);
             Assert.Equal(record.ParticipantId, resultRecord.Matches[0].ParticipantId);
+            Assert.Equal("ea", resultRecord.Matches[0].State);
+
+            // Deprecated
             Assert.Equal("ea", resultRecord.Matches[0].StateAbbr);
-            Assert.Equal("Echo Alpha", resultRecord.Matches[0].StateName);
         }
 
         [Fact]
