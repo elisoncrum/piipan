@@ -65,6 +65,10 @@ Example using cURL:
 curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
 ```
 
+## Sample records
+
+To allow States to test the query endpoint, the Piipan test environment currently includes three sample states that are populated from the [example CSV](https://github.com/18F/piipan/blob/main/etl/docs/csv/example.csv).  Queries for any of the individuals in that sample file should result in a match.
+
 ## Record retention
 
 Save API responses received from the duplicate participation API for 3 years.
