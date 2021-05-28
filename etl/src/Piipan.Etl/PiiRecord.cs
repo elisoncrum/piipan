@@ -23,5 +23,6 @@ namespace Piipan.Etl
         public string CaseId { get; set; } = null!;
         public string? ParticipantId { get; set; }
         public string? Exception { get; set; }
+        public DateTime? BenefitsEndDate { get; set; }
     }
 }

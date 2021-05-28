@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "CsvHelper": {
         "type": "Direct",
-        "requested": "[27.0.4, )",
-        "resolved": "27.0.4",
-        "contentHash": "hw+aw8+QLKgTyI8aqhGJond44QOG/7WTAsVgLZbIN8HBJ3m5WPEEUYGQtpecJureVZvgYwk3nqPOBrVxpPrXDg==",
+        "requested": "[27.1.0, )",
+        "resolved": "27.1.0",
+        "contentHash": "nrUpgvwEOq6xcdpvAMV0bnzVz1mHcPy9LjWXVbZq9pKs5nWdVFmUMoiEBsxY9+f1mR2Rdk0fOkK91OstYjTVxA==",
         "dependencies": {
           "Microsoft.CSharp": "[4.7.0]"
         }
