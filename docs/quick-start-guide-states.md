@@ -8,7 +8,7 @@ A high-level view of the system architecture can be found [here](../README.md).
 
 ## System Status
 
-APIs are in Alpha stage and under active development. We plan on having APIs ready for state testing by the end of April 2021.
+APIs are in Alpha stage and under active development. APIs are available for state testing now.
 
 ## APIs Overview
 
@@ -64,6 +64,16 @@ Example using cURL:
 ```
 curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
 ```
+
+## Sample records
+
+To allow States to test the query endpoint, the Piipan test environment currently includes three sample states that are populated from the [example CSV](https://github.com/18F/piipan/blob/main/etl/docs/csv/example.csv).  Queries for any of the individuals in that sample file should result in a match.
+
+## Record retention
+
+Save API responses received from the duplicate participation API for 3 years.
+
+API responses that are used for SNAP eligibility determinations are subject to the requirements of 7 CFR 272.1(f).
 
 ## Feedback
 
