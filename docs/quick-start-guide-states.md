@@ -65,6 +65,12 @@ Example using cURL:
 curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
 ```
 
+## Record retention
+
+Save API responses received from the duplicate participation API for 3 years.
+
+API responses that are used for SNAP eligibility determinations are subject to the requirements of 7 CFR 272.1(f).
+
 ## Feedback
 
 Got any feedback for us? We track API issues through [Github Issues](https://github.com/18F/piipan/issues).
