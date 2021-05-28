@@ -429,7 +429,9 @@ main () {
           managedIdentityName="$identity" \
           dbConnectionString="$db_conn_str" \
           cloudName="$CLOUD_NAME" \
-          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME")
+          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+          coreResourceGroup="$RESOURCE_GROUP" \
+          eventHubName="$EVENT_HUB_NAME")
 
     # Store function names for future auth configuration
     match_func_names+=("$func_name")
@@ -474,7 +476,9 @@ main () {
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
       LookupStorageName="$LOOKUP_STORAGE_NAME" \
-      StateApiUriStrings="$match_api_uris"
+      StateApiUriStrings="$match_api_uris" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
 
   echo "Waiting to publish function app"
   sleep 60

@@ -19,6 +19,12 @@
         },
         "storageAccountName": {
             "type": "string"
+        },
+        "coreResourceGroup": {
+            "type": "String"
+        },
+        "eventHubName": {
+            "type": "String"
         }
     },
     "variables": {
@@ -192,6 +198,26 @@
             "properties": {
                 "ApplicationId": "[variables('functionAppName')]",
                 "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
+            "apiVersion": "2017-05-01-preview",
+            "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+            "name": "[concat(variables('functionAppName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', parameters('coreResourceGroup'), '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
+                "eventHubName": "logs",
+                "logs": [
+                    /* Category names from `az monitor diagnostic-settings categories list` */
+                    {
+                        "category": "FunctionAppLogs",
+                        "enabled": true
+                    }
+                ]
             }
         }
     ],
