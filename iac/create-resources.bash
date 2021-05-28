@@ -145,7 +145,9 @@ main () {
       --parameters \
         storageAccountName="$func_stor_name" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        coreResourceGroup="$RESOURCE_GROUP" \
+        eventHubName="$EVENT_HUB_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
