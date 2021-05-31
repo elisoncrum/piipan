@@ -66,7 +66,7 @@ Queries all state databases for any PII records that are an exact match to the l
       "last": "string",
       "ssn": "string",
       "dob": "2019-08-24",
-      "state_name": "string",
+      "state": "string",
       "state_abbr": "string",
       "exception": "string",
       "case_id": "string",
@@ -96,8 +96,8 @@ Status Code **200**
 |»» last|string|true|none|Last name|
 |»» ssn|string|true|none|Social Security number|
 |»» dob|string(date)|true|none|Date of birth|
-|»» state_name|string|false|none|Full state/territory name|
-|»» state_abbr|string|false|none|State/territory two-letter postal abbreviation|
+|»» state|string|false|none|State/territory two-letter postal abbreviation|
+|»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
 |»» exception|string|false|none|Placeholder for value indicating special processing instructions|
 |»» case_id|string|false|none|Participant's state-specific case identifier|
 |»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|

@@ -14,7 +14,6 @@ namespace Piipan.Match.State.Tests
     {
         void SetEnvironment()
         {
-            Environment.SetEnvironmentVariable("StateName", "Echo Alpha");
             Environment.SetEnvironmentVariable("StateAbbr", "ea");
         }
 

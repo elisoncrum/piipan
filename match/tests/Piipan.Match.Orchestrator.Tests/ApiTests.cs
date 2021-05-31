@@ -174,10 +174,11 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Contains("\"first\": \"First\"", record.ToJson());
             Assert.Contains("\"middle\": null", record.ToJson());
             Assert.Contains("\"exception\": null", record.ToJson());
-            Assert.Contains("\"state_name\": null", record.ToJson());
-            Assert.Contains("\"state_abbr\": null", record.ToJson());
+            Assert.Contains("\"state\": null", record.ToJson());
             Assert.Contains("\"case_id\": \"foo\"", record.ToJson());
 
+            // Deprecated
+            Assert.Contains("\"state_abbr\": null", record.ToJson());
         }
 
         // Malformed data results in BadRequest

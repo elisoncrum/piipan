@@ -23,12 +23,13 @@ PiiRecord:
       type: string
       format: "date"
       description: "Date of birth"
-    state_name:
-      type: string
-      description: "Full state/territory name"
-    state_abbr:
+    state:
       type: string
       description: "State/territory two-letter postal abbreviation"
+    state_abbr:
+      type: string
+      description: "State/territory two-letter postal abbreviation. Deprecated, superseded by `state`."
+      deprecated: true
     exception:
       type: string
       description: "Placeholder for value indicating special processing instructions"

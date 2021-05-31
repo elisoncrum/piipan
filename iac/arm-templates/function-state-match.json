@@ -8,9 +8,6 @@
         "stateAbbr": {
             "type": "string"
         },
-        "stateName": {
-            "type": "string"
-        },
         "location": {
             "type": "string"
         },
@@ -140,10 +137,6 @@
                             "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
                         },
                         // Custom environment variables:
-                        {
-                            "name": "StateName",
-                            "value": "[parameters('stateName')]"
-                        },
                         {
                             "name": "AzureServicesAuthConnectionString",
                             "value": "[parameters('azAuthConnectionString')]"
