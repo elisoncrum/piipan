@@ -74,8 +74,8 @@ namespace Piipan.QueryTool.Tests
                     ""last"": ""Farrington"",
                     ""ssn"": ""000-00-0000"",
                     ""dob"": ""2021-01-01"",
-                    ""state_abbr"": ""ea"",
-                    ""state_name"": ""Echo Alpha""
+                    ""state"": ""ea"",
+                    ""state_abbr"": ""ea""
                 }]
             }";
             var requestPii = new PiiRecord
