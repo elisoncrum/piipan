@@ -40,21 +40,23 @@ Queries all state databases for any PII records that are an exact match to the l
 
 > Body parameter
 
+> A request with values for all fields
+
 ```json
 {
   "query": {
     "first": "string",
     "middle": "string",
     "last": "string",
-    "ssn": "string",
-    "dob": "2019-08-24"
+    "ssn": "000-00-0000",
+    "dob": "1970-01-01"
   }
 }
 ```
 
 > Example responses
 
-> 200 Response
+> A query returning a single match
 
 ```json
 {
@@ -64,13 +66,56 @@ Queries all state databases for any PII records that are an exact match to the l
       "first": "string",
       "middle": "string",
       "last": "string",
-      "ssn": "string",
-      "dob": "2019-08-24",
-      "state": "string",
-      "state_abbr": "string",
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01",
+      "state": "ea",
+      "state_abbr": "ea",
       "exception": "string",
       "case_id": "string",
       "participant_id": "string"
+    }
+  ]
+}
+```
+
+> A query returning no matches
+
+```json
+{
+  "lookup_id": null,
+  "matches": []
+}
+```
+
+> A query returning multiple matches
+
+```json
+{
+  "lookup_id": "string",
+  "matches": [
+    {
+      "first": "string",
+      "middle": "string",
+      "last": "string",
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01",
+      "state": "eb",
+      "state_abbr": "eb",
+      "exception": "string",
+      "case_id": "string",
+      "participant_id": "string"
+    },
+    {
+      "first": null,
+      "middle": null,
+      "last": "string",
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01",
+      "state": "ec",
+      "state_abbr": "ec",
+      "exception": null,
+      "case_id": "string",
+      "participant_id": null
     }
   ]
 }
@@ -131,7 +176,7 @@ User can provide a Lookup ID and receive the match data associated with it
 
 > Example responses
 
-> 200 Response
+> A response showing a query with values for all fields
 
 ```json
 {
@@ -139,8 +184,21 @@ User can provide a Lookup ID and receive the match data associated with it
     "first": "string",
     "middle": "string",
     "last": "string",
-    "ssn": "string",
-    "dob": "2019-08-24"
+    "ssn": "000-00-0000",
+    "dob": "1970-01-01"
+  }
+}
+```
+
+> A response showing a query with values for only required fields
+
+```json
+{
+  "data": {
+    "first": "string",
+    "last": "string",
+    "ssn": "000-00-0000",
+    "dob": "1970-01-01"
   }
 }
 ```
