@@ -175,7 +175,7 @@ workflows:
             - build
           filters:
             branches:
-              only: main
+              only: dev
   nightly:
     jobs:
       - accessibility_dashboard
@@ -186,4 +186,4 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - dev

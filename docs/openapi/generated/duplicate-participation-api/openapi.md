@@ -40,21 +40,23 @@ Queries all state databases for any PII records that are an exact match to the l
 
 > Body parameter
 
+> A request with values for all fields
+
 ```json
 {
   "query": {
     "first": "string",
     "middle": "string",
     "last": "string",
-    "ssn": "string",
-    "dob": "2019-08-24"
+    "ssn": "000-00-0000",
+    "dob": "1970-01-01"
   }
 }
 ```
 
 > Example responses
 
-> 200 Response
+> A query returning a single match
 
 ```json
 {
@@ -64,11 +66,56 @@ Queries all state databases for any PII records that are an exact match to the l
       "first": "string",
       "middle": "string",
       "last": "string",
-      "ssn": "string",
-      "dob": "2019-08-24",
-      "state_name": "string",
-      "state_abbr": "string",
-      "exception": "string"
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01",
+      "state": "ea",
+      "state_abbr": "ea",
+      "exception": "string",
+      "case_id": "string",
+      "participant_id": "string"
+    }
+  ]
+}
+```
+
+> A query returning no matches
+
+```json
+{
+  "lookup_id": null,
+  "matches": []
+}
+```
+
+> A query returning multiple matches
+
+```json
+{
+  "lookup_id": "string",
+  "matches": [
+    {
+      "first": "string",
+      "middle": "string",
+      "last": "string",
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01",
+      "state": "eb",
+      "state_abbr": "eb",
+      "exception": "string",
+      "case_id": "string",
+      "participant_id": "string"
+    },
+    {
+      "first": null,
+      "middle": null,
+      "last": "string",
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01",
+      "state": "ec",
+      "state_abbr": "ec",
+      "exception": null,
+      "case_id": "string",
+      "participant_id": null
     }
   ]
 }
@@ -94,9 +141,11 @@ Status Code **200**
 |»» last|string|true|none|Last name|
 |»» ssn|string|true|none|Social Security number|
 |»» dob|string(date)|true|none|Date of birth|
-|»» state_name|string|false|none|Full state/territory name|
-|»» state_abbr|string|false|none|State/territory two-letter postal abbreviation|
+|»» state|string|false|none|State/territory two-letter postal abbreviation|
+|»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
 |»» exception|string|false|none|Placeholder for value indicating special processing instructions|
+|»» case_id|string|false|none|Participant's state-specific case identifier|
+|»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -127,7 +176,7 @@ User can provide a Lookup ID and receive the match data associated with it
 
 > Example responses
 
-> 200 Response
+> A response showing a query with values for all fields
 
 ```json
 {
@@ -135,8 +184,21 @@ User can provide a Lookup ID and receive the match data associated with it
     "first": "string",
     "middle": "string",
     "last": "string",
-    "ssn": "string",
-    "dob": "2019-08-24"
+    "ssn": "000-00-0000",
+    "dob": "1970-01-01"
+  }
+}
+```
+
+> A response showing a query with values for only required fields
+
+```json
+{
+  "data": {
+    "first": "string",
+    "last": "string",
+    "ssn": "000-00-0000",
+    "dob": "1970-01-01"
   }
 }
 ```

@@ -22,7 +22,7 @@
       {
         "name": "dob",
         "type": "date",
-        "format": "%m/%d/%Y", 
+        "format": "%m/%d/%Y",
         "description": "Participant's date of birth",
         "constraints": {
             "required": true
@@ -44,6 +44,25 @@
         "name": "exception",
         "type": "string",
         "description": "Placeholder for value indicating special processing instructions"
+      },
+      {
+        "name": "case_id",
+        "type": "string",
+        "description": "Participant's state-specific case identifier",
+        "constraints": {
+          "required": true,
+          "minLength": 1
+        }
+      },
+      {
+        "name": "participant_id",
+        "type": "string",
+        "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information."
+      },
+      {
+        "name": "benefits_end_month",
+        "type": "yearmonth",
+        "description": "month and year when participant's benefits end"
       }
     ]
   }

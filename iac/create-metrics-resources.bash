@@ -195,7 +195,7 @@ EOF
           --name "$sub_name" \
           --resource-group "$SUBS_RESOURCE_GROUP" \
           --system-topic-name "$topic_name" \
-          --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${COLLECT_APP_NAME}/functions/${COLLECT_FUNC}" \
+          --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_FUNC}" \
           --endpoint-type azurefunction \
           --included-event-types Microsoft.Storage.BlobCreated \
           --subject-begins-with /blobServices/default/containers/upload/blobs/
@@ -302,7 +302,8 @@ EOF
       appName="$DASHBOARD_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       frontDoorId="$front_door_id" \
-      metricsApiUri="$metrics_api_uri"
+      metricsApiUri="$metrics_api_uri" \
+      eventHubName="$EVENT_HUB_NAME"
 
   echo "Secure database connection"
   ./remove-external-network.bash \

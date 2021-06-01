@@ -121,6 +121,17 @@ main () {
       objectId="$CURRENT_USER_OBJID" \
       resourceTags="$RESOURCE_TAGS"
 
+  # Create an Event Hub namespace and hub where resource logs will be streamed
+  az deployment group create \
+    --name monitoring \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file  ./arm-templates/event-hub-monitoring.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      env="$ENV" \
+      prefix="$PREFIX"
+
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
   while IFS=, read -r abbr name ; do
@@ -134,7 +145,9 @@ main () {
       --parameters \
         storageAccountName="$func_stor_name" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        coreResourceGroup="$RESOURCE_GROUP" \
+        eventHubName="$EVENT_HUB_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -211,6 +224,7 @@ main () {
     --query properties.fullyQualifiedDomainName -o tsv)
   export PGHOST
   export ENV
+  export PREFIX
   # Multiple PostgreSQL databases cannot be created with an ARM template;
   # detailed database/schema/role configuration can't be done with an ARM
   # template either. Instead, we access the PostgreSQL server from a trusted
@@ -303,7 +317,7 @@ main () {
     az functionapp create \
       --resource-group "$RESOURCE_GROUP" \
       --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
-      --tags Project="$PROJECT_TAG $PER_STATE_ETL_TAG" \
+      --tags Project="$PROJECT_TAG" "$PER_STATE_ETL_TAG" \
       --runtime dotnet \
       --functions-version 3 \
       --os-type Windows \
@@ -411,13 +425,14 @@ main () {
           location="$LOCATION" \
           azAuthConnectionString="$az_serv_str" \
           stateAbbr="$abbr" \
-          stateName="$name" \
           functionAppName="$func_app_name" \
           storageAccountName="$storage_acct_name" \
           managedIdentityName="$identity" \
           dbConnectionString="$db_conn_str" \
           cloudName="$CLOUD_NAME" \
-          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME")
+          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+          coreResourceGroup="$RESOURCE_GROUP" \
+          eventHubName="$EVENT_HUB_NAME")
 
     # Store function names for future auth configuration
     match_func_names+=("$func_name")
@@ -462,7 +477,9 @@ main () {
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
       LookupStorageName="$LOOKUP_STORAGE_NAME" \
-      StateApiUriStrings="$match_api_uris"
+      StateApiUriStrings="$match_api_uris" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
 
   echo "Waiting to publish function app"
   sleep 60
@@ -513,7 +530,8 @@ main () {
       appName="$QUERY_TOOL_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       frontDoorId="$front_door_id" \
-      OrchApiUri="$orch_api_uri"
+      OrchApiUri="$orch_api_uri" \
+      eventHubName="$EVENT_HUB_NAME"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"

@@ -4,6 +4,22 @@ CSV files are used as a data exchange format for the bulk import of program part
 
 UTF-8 encoding is required for all fields.
 
+## Cleaning participant records
+
+Participant name fields should omit title (Mr. / Mrs. / etc) and suffix (Jr. / Sr. / III / etc.)
+
+## Participant records to exclude
+
+Exclude participant records that meet any of the following criteria from your uploads to Piipan:
+
+- Participants who are missing any of these required fields:
+  - First name
+  - Last name
+  - Social Security number
+  - Date of birth
+- Participants who have not yet been certified for benefits.
+- Participants who are no longer receiving benefits.  These records should be included through the last day of the participant's final benefit month and excluded from subsequent uploads.
+
 ## Validating files
 
 There are Table Schema libraries available for [multiple programming languages](https://frictionlessdata.io/tooling/table-schema-tools/). The following example will use macOS, homebrew, Python, and [tableschema-py](https://github.com/frictionlessdata/tableschema-py):

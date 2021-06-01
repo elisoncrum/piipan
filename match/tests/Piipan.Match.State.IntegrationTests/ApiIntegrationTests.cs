@@ -21,7 +21,9 @@ namespace Piipan.Match.State.IntegrationTests
                 Last = "Last",
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = "Exception"
+                Exception = "Exception",
+                CaseId = "CaseIdExample",
+                ParticipantId = "ParticipantIdExample"
             };
         }
 
@@ -59,6 +61,7 @@ namespace Piipan.Match.State.IntegrationTests
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(record.ToJson()));
 
+            ClearParticipants();
             Insert(record);
 
             // Act
@@ -74,8 +77,12 @@ namespace Piipan.Match.State.IntegrationTests
             Assert.Equal(record.Dob, resultRecord.Matches[0].Dob);
             Assert.Equal(record.Ssn, resultRecord.Matches[0].Ssn);
             Assert.Equal(record.Exception, resultRecord.Matches[0].Exception);
+            Assert.Equal(record.CaseId, resultRecord.Matches[0].CaseId);
+            Assert.Equal(record.ParticipantId, resultRecord.Matches[0].ParticipantId);
+            Assert.Equal("ea", resultRecord.Matches[0].State);
+
+            // Deprecated
             Assert.Equal("ea", resultRecord.Matches[0].StateAbbr);
-            Assert.Equal("Echo Alpha", resultRecord.Matches[0].StateName);
         }
 
         [Fact]
@@ -123,7 +130,8 @@ namespace Piipan.Match.State.IntegrationTests
                 Middle = "Carri",
                 Last = "Farrington",
                 Dob = new DateTime(1931, 10, 13),
-                Ssn = "000-12-3456"
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));
@@ -150,7 +158,8 @@ namespace Piipan.Match.State.IntegrationTests
                 Middle = "Carri",
                 Last = "Farrington",
                 Dob = new DateTime(1931, 10, 13),
-                Ssn = "000-12-3456"
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));

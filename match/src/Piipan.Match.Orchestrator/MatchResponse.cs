@@ -40,11 +40,18 @@ namespace Piipan.Match.Orchestrator
         [JsonProperty("exception")]
         public string Exception { get; set; }
 
-        [JsonProperty("state_name")]
-        public string StateName { get; set; }
+        [JsonProperty("state")]
+        public string State { get; set; }
 
+        // Deprecated, duplicates value of `State`
         [JsonProperty("state_abbr")]
         public string StateAbbr { get; set; }
+
+        [JsonProperty("case_id")]
+        public string CaseId { get; set; }
+
+        [JsonProperty("participant_id")]
+        public string ParticipantId { get; set; }
 
         public string ToJson()
         {

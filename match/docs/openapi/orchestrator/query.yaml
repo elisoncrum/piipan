@@ -13,5 +13,7 @@ post:
         application/json:
           schema:
             $ref: '../schemas/match-query.yaml#/MatchQueryResponse'
+          examples:
+            $ref: '../schemas/match-query.yaml#/MatchQueryResponseExamples'
     '400':
       description: "Bad request. Missing one of the required properties in the request body."

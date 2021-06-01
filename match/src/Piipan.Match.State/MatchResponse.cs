@@ -20,8 +20,7 @@ namespace Piipan.Match.State
     {
         public PiiRecord()
         {
-            StateName = Environment.GetEnvironmentVariable("StateName");
-            StateAbbr = Environment.GetEnvironmentVariable("StateAbbr");
+            State = Environment.GetEnvironmentVariable("StateAbbr");
         }
 
         [JsonProperty("last")]
@@ -44,12 +43,25 @@ namespace Piipan.Match.State
         public string Exception { get; set; }
 
         // Read-only
-        [JsonProperty("state_name")]
-        public string StateName { get; }
+        [JsonProperty("state")]
+        public string State { get; }
 
         // Read-only
+        // Deprecated
         [JsonProperty("state_abbr")]
-        public string StateAbbr { get; }
+        public string StateAbbr
+        {
+            get
+            {
+                return State;
+            }
+        }
+
+        [JsonProperty("case_id")]
+        public string CaseId { get; set; }
+
+        [JsonProperty("participant_id")]
+        public string ParticipantId { get; set; }
 
         public string ToJson()
         {
