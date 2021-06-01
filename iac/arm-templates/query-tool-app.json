@@ -19,6 +19,9 @@
         },
         "OrchApiUri": {
             "type": "string"
+        },
+        "eventHubName": {
+            "type": "String"
         }
     },
     "variables": {
@@ -93,6 +96,53 @@
                         "dependsOn": [
                             "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
                         ]
+                    }
+                ]
+            }
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
+            "apiVersion": "2017-05-01-preview",
+            "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+            "name": "[concat(variables('appName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
+                "eventHubName": "logs",
+                "logs": [
+                    {
+                        "category": "AppServiceAntivirusScanAuditLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServiceHTTPLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServiceConsoleLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServiceAppLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServiceFileAuditLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServiceAuditLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServiceIPSecAuditLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AppServicePlatformLogs",
+                        "enabled": true
                     }
                 ]
             }
