@@ -177,7 +177,8 @@ main () {
       vnetName="$VNET_NAME" \
       subnetName="$DB_SUBNET_NAME" \
       privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
-      privateDnsZoneName="$PRIVATE_DNS_ZONE"
+      privateDnsZoneName="$PRIVATE_DNS_ZONE" \
+      eventHubName="$EVENT_HUB_NAME"
 
 
   # The AD admin can't be specified in the PostgreSQL ARM template,
