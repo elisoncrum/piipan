@@ -89,7 +89,8 @@ main () {
       subnetName="$DB_2_SUBNET_NAME" \
       privateEndpointName="$CORE_DB_PRIVATE_ENDPOINT_NAME" \
       privateDnsZoneName="$PRIVATE_DNS_ZONE" \
-      resourceTags="$RESOURCE_TAGS"
+      resourceTags="$RESOURCE_TAGS" \
+      eventHubName="$EVENT_HUB_NAME"
 
   ### Database stuff
   # Create database within db server (command is idempotent)

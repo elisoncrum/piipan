@@ -45,6 +45,9 @@
         "privateDnsZoneName": {
             "type": "string",
             "defaultValue": "privatelink.postgres.database.azure.com"
+        },
+        "eventHubName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -91,6 +94,9 @@
                             "type": "string"
                         },
                         "privateDnsZoneName": {
+                            "type": "string"
+                        },
+                        "eventHubName": {
                             "type": "string"
                         }
                     },
@@ -241,6 +247,31 @@
                                     }
                                 ]
                             }
+                        },
+                        /*"type": "Microsoft.DBforPostgreSQL/servers",
+                            "apiVersion": "2017-12-01-preview",
+                            "kind": "",
+                            "location": "[parameters('location')]",
+                            "tags": "[parameters('resourceTags')]",
+                            "name": "[parameters('serverName')]",*/
+                        {
+                            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
+                            "apiVersion": "2017-05-01-preview",
+                            "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticSettings",
+                            "name": "[concat(parameters('serverName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
+                                "eventHubName": "logs",
+                                "logs": [
+                                    {
+                                        "category": "PostgreSQLLogs",
+                                        "enabled": true
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },
@@ -276,6 +307,9 @@
                     },
                     "privateDnsZoneName": {
                         "value": "[parameters('privateDnsZoneName')]"
+                    },
+                    "eventHubName": {
+                        "value": "[parameters('eventHubName')]"
                     }
                 }
             }
