@@ -21,6 +21,12 @@ run_deploy () {
   source "$(dirname "$0")"/../iac/iac-common.bash
   verify_cloud
   set_constants
+
+  # Don't publish at solution level as it will publish both src and tests
+  # to the same directory resulting in a failed deployment:
+  # https://github.com/dotnet/sdk/issues/7238
+  pushd "$(dirname "$0")"/src/Piipan.QueryTool
+
   echo "Publishing project"
   dotnet publish -o ./artifacts
   echo "Deploying to Azure Environment ${azure_env}"
@@ -32,6 +38,8 @@ run_deploy () {
     -g "$RESOURCE_GROUP" \
     -n "$QUERY_TOOL_APP_NAME" \
     --src ./artifacts/dashboard.zip
+
+  popd
 }
 
 main "$@"
