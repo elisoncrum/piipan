@@ -98,7 +98,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,01/01/1970,000-00-0000,Exception,CaseId,ParticipantId,01/1970"
+                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,01/1970"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -121,7 +121,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,,,01/01/1970,000-00-0000,,CaseId,,,"
+                "Last,,,1970-01-01,000-00-0000,,CaseId,,,"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -136,10 +136,10 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData(",,,01/01/1970,000-00-0000,")] // Missing last name
-        [InlineData("Last,,,01/01/1970,,")] // Missing SSN
-        [InlineData("Last,,,01/01/1970,000000000,")] // Malformed SSN
-        [InlineData("Last,,,01/01/1970,000-00-0000,,,")] // Missing CaseId
+        [InlineData(",,,1970-01-01,000-00-0000,")] // Missing last name
+        [InlineData("Last,,,1970-01-01,,")] // Missing SSN
+        [InlineData("Last,,,1970-01-01,000000000,")] // Malformed SSN
+        [InlineData("Last,,,1970-01-01,000-00-0000,,,")] // Missing CaseId
         public void ExpectFieldValidationError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -157,7 +157,7 @@ namespace Piipan.Etl.Tests
 
         [Theory]
         [InlineData("Last,,,,000-00-0000,")] // Missing DOB
-        [InlineData("Last,,,02/31/1970,000-00-0000,")] // Invalid DOB
+        [InlineData("Last,,,1970-02-31,000-00-0000,")] // Invalid DOB
         public void ExpectReadErrror(String inline)
         {
             var logger = Mock.Of<ILogger>();
