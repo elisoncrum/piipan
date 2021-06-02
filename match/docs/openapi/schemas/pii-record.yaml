@@ -57,6 +57,7 @@ PiiRecordExamples:
     exception: "string"
     case_id: "string"
     participant_id: "string"
+    benefits_end_month: "2021-01"
   AllEB:
     first: "string"
     middle: "string"
@@ -68,6 +69,7 @@ PiiRecordExamples:
     exception: "string"
     case_id: "string"
     participant_id: "string"
+    benefits_end_month: "2021-01"
   Required:
     first: null
     middle: null
@@ -79,3 +81,4 @@ PiiRecordExamples:
     exception: null
     case_id: "string"
     participant_id: null
+    benefits_end_month: null

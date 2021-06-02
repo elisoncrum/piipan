@@ -104,7 +104,8 @@ Queries all state databases for any PII records that are an exact match to the l
       "state_abbr": "eb",
       "exception": "string",
       "case_id": "string",
-      "participant_id": "string"
+      "participant_id": "string",
+      "benefits_end_month": "2021-01"
     },
     {
       "first": null,
@@ -116,7 +117,8 @@ Queries all state databases for any PII records that are an exact match to the l
       "state_abbr": "ec",
       "exception": null,
       "case_id": "string",
-      "participant_id": null
+      "participant_id": null,
+      "benefits_end_month": null
     }
   ]
 }
