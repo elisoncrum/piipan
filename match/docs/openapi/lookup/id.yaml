@@ -11,6 +11,8 @@ get:
         application/json:
           schema:
             $ref: '../schemas/lookup.yaml#/LookupIdResponse'
+          examples:
+            $ref: '../schemas/lookup.yaml#/LookupIdResponseExamples'
     '400':
       description: "Bad request"
     '404':

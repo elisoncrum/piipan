@@ -23,12 +23,13 @@ PiiRecord:
       type: string
       format: "date"
       description: "Date of birth"
-    state_name:
-      type: string
-      description: "Full state/territory name"
-    state_abbr:
+    state:
       type: string
       description: "State/territory two-letter postal abbreviation"
+    state_abbr:
+      type: string
+      description: "State/territory two-letter postal abbreviation. Deprecated, superseded by `state`."
+      deprecated: true
     exception:
       type: string
       description: "Placeholder for value indicating special processing instructions"
@@ -43,3 +44,38 @@ PiiRecord:
       pattern: '^\d{4}-\d{2}$'
       example: "2021-01"
       description: "Participant's ending benefits month"
+
+PiiRecordExamples:
+  All:
+    first: "string"
+    middle: "string"
+    last: "string"
+    ssn: "000-00-0000"
+    dob: "1970-01-01"
+    state: "ea"
+    state_abbr: "ea"
+    exception: "string"
+    case_id: "string"
+    participant_id: "string"
+  AllEB:
+    first: "string"
+    middle: "string"
+    last: "string"
+    ssn: "000-00-0000"
+    dob: "1970-01-01"
+    state: "eb"
+    state_abbr: "eb"
+    exception: "string"
+    case_id: "string"
+    participant_id: "string"
+  Required:
+    first: null
+    middle: null
+    last: "string"
+    ssn: "000-00-0000"
+    dob: "1970-01-01"
+    state: "ec"
+    state_abbr: "ec"
+    exception: null
+    case_id: "string"
+    participant_id: null

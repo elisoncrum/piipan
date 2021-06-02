@@ -145,7 +145,9 @@ main () {
       --parameters \
         storageAccountName="$func_stor_name" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        coreResourceGroup="$RESOURCE_GROUP" \
+        eventHubName="$EVENT_HUB_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -423,13 +425,14 @@ main () {
           location="$LOCATION" \
           azAuthConnectionString="$az_serv_str" \
           stateAbbr="$abbr" \
-          stateName="$name" \
           functionAppName="$func_app_name" \
           storageAccountName="$storage_acct_name" \
           managedIdentityName="$identity" \
           dbConnectionString="$db_conn_str" \
           cloudName="$CLOUD_NAME" \
-          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME")
+          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+          coreResourceGroup="$RESOURCE_GROUP" \
+          eventHubName="$EVENT_HUB_NAME")
 
     # Store function names for future auth configuration
     match_func_names+=("$func_name")
@@ -474,7 +477,9 @@ main () {
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
       LookupStorageName="$LOOKUP_STORAGE_NAME" \
-      StateApiUriStrings="$match_api_uris"
+      StateApiUriStrings="$match_api_uris" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
 
   echo "Waiting to publish function app"
   sleep 60
@@ -525,7 +530,8 @@ main () {
       appName="$QUERY_TOOL_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       frontDoorId="$front_door_id" \
-      OrchApiUri="$orch_api_uri"
+      OrchApiUri="$orch_api_uri" \
+      eventHubName="$EVENT_HUB_NAME"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"

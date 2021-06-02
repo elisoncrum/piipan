@@ -24,8 +24,8 @@ namespace Piipan.QueryTool.Tests
                         ""last"": ""Farrington"",
                         ""ssn"": ""000-00-0000"",
                         ""dob"": ""2021-01-01"",
-                        ""state_abbr"": ""ea"",
-                        ""state_name"": ""Echo Alpha""
+                        ""state"": ""ea"",
+                        ""state_abbr"": ""ea""
                     }
                 ]
             }";
@@ -60,8 +60,7 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal("Farrington", result.matches[0].LastName);
             Assert.Equal("000-00-0000", result.matches[0].SocialSecurityNum);
             Assert.Equal(new DateTime(2021, 1, 1), result.matches[0].DateOfBirth);
-            Assert.Equal("ea", result.matches[0].StateAbbr);
-            Assert.Equal("Echo Alpha", result.matches[0].StateName);
+            Assert.Equal("ea", result.matches[0].State);
         }
 
         [Fact]

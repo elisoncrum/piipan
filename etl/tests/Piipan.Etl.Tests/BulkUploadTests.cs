@@ -17,7 +17,7 @@ namespace Piipan.Etl.Tests
             var writer = new StreamWriter(stream);
             if (includeHeader)
             {
-                writer.WriteLine("last,first,middle,dob,ssn,exception,case id,participant id,benefits end month");
+                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month");
 
             }
             foreach (var record in records)

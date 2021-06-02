@@ -129,7 +129,9 @@ main () {
         uploadStates="$state_abbrs" \
         uploadPolicyXml="$upload_policy_xml" \
         location="$LOCATION" \
-        resourceTags="$RESOURCE_TAGS")
+        resourceTags="$RESOURCE_TAGS" \
+        coreResourceGroup="$RESOURCE_GROUP" \
+        eventHubName="$EVENT_HUB_NAME")
 
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))
   for account in "${upload_accounts[@]}"
