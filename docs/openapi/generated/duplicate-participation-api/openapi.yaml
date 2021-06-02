@@ -140,6 +140,7 @@ paths:
                         exception: string
                         case_id: string
                         participant_id: string
+                        benefits_end_month: 2021-01
                 None:
                   description: A query returning no matches
                   value:
@@ -160,6 +161,7 @@ paths:
                         exception: string
                         case_id: string
                         participant_id: string
+                        benefits_end_month: 2021-01
                       - first: null
                         middle: null
                         last: string
@@ -170,6 +172,7 @@ paths:
                         exception: null
                         case_id: string
                         participant_id: null
+                        benefits_end_month: null
         '400':
           description: Bad request. Missing one of the required properties in the request body.
   '/lookup_ids/{id}':
