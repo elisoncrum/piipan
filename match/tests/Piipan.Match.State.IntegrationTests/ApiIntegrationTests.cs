@@ -175,6 +175,33 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Single(resultRecord.Matches);
+        }
+
+        [Fact]
+        public async void BenefitsEndMonthCanBeNull()
+        {
+            var query = "{last: 'Farrington', first: 'Foo', middle: 'Bar', dob: '1931-10-13', ssn: '000-12-3456'}";
+            var record = new PiiRecord
+            {
+                First = "Theodore",
+                Middle = "Carri",
+                Last = "Farrington",
+                Dob = new DateTime(1931, 10, 13),
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
+            };
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(JsonBody(query));
+
+            ClearParticipants();
+            Insert(record);
+
+            // Act
+            var response = await Api.Query(mockRequest.Object, logger);
+            var result = response as JsonResult;
+            var resultRecord = result.Value as MatchQueryResponse;
+
+            // Assert
             Assert.Null(resultRecord.Matches[0].BenefitsEndMonth);
         }
     }

@@ -2,12 +2,14 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
+#nullable enable
+
 namespace Piipan.QueryTool
 {
     public class MatchRequest
     {
         [JsonPropertyName("query")]
-        public PiiRecord Query { get; set; }
+        public PiiRecord? Query { get; set; }
     }
 
     public class PiiRecord : IQueryable
@@ -15,16 +17,16 @@ namespace Piipan.QueryTool
         [Required]
         [Display(Name = "First name")]
         [JsonPropertyName("first")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [Display(Name = "Middle name")]
         [JsonPropertyName("middle")]
-        public string MiddleName { get; set; }
+        public string? MiddleName { get; set; }
 
         [Required]
         [Display(Name = "Last name")]
         [JsonPropertyName("last")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [Required]
         [Display(Name = "Date of birth")]
@@ -38,23 +40,23 @@ namespace Piipan.QueryTool
             ErrorMessage = "SSN must have the form 000-00-0000")]
         [Display(Name = "SSN")]
         [JsonPropertyName("ssn")]
-        public string SocialSecurityNum { get; set; }
+        public string? SocialSecurityNum { get; set; }
 
         [Display(Name = "State")]
         [JsonPropertyName("state")]
-        public string State { get; set; }
+        public string? State { get; set; }
 
         [Display(Name = "CaseId")]
         [JsonPropertyName("case_id")]
-        public string CaseId { get; set; }
+        public string? CaseId { get; set; }
 
         [Display(Name = "ParticipantId")]
         [JsonPropertyName("participant_id")]
-        public string ParticipantId { get; set; }
+        public string? ParticipantId { get; set; }
 
         [Display(Name = "Lookup ID")]
         [JsonPropertyName("lookup_id")]
-        public string LookupId { get; set; }
+        public string? LookupId { get; set; }
 
         [Display(Name = "Benefits End Month")]
         [JsonPropertyName("benefits_end_month")]
