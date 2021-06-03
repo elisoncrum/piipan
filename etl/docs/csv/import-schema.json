@@ -22,8 +22,8 @@
       {
         "name": "dob",
         "type": "date",
-        "format": "%m/%d/%Y",
-        "description": "Participant's date of birth",
+        "format": "%Y-%m-%d",
+        "description": "Participant's date of birth in ISO 8601 format",
         "constraints": {
             "required": true
         }
