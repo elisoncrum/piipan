@@ -263,6 +263,14 @@ main () {
       kind="$APP_SERVICE_PLAN_FUNC_KIND" \
       sku="$APP_SERVICE_PLAN_FUNC_SKU"
 
+  # Function apps need an Event Hub authorization rule ID for log streaming
+  eh_rule_id=$(\
+    az eventhubs namespace authorization-rule list \
+      --resource-group "$RESOURCE_GROUP" \
+      --namespace-name "$EVENT_HUB_NAME" \
+      --query "[?name == 'RootManageSharedAccessKey'].id" \
+      -o tsv)
+
   # Create per-state Function apps and assign corresponding managed identity for
   # access to the per-state blob-storage and database, set up system topics and
   # event subscription to bulk upload (blob creation) events
@@ -330,6 +338,25 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --subnet "$FUNC_SUBNET_NAME" \
       --vnet "$VNET_NAME"
+
+    # Stream logs to Event Hub
+    func_id=$(\
+      az functionapp show \
+        -n "$func_app" \
+        -g "$RESOURCE_GROUP" \
+        -o tsv \
+        --query id)
+    az monitor diagnostic-settings create \
+      --name "stream-logs-to-event-hub" \
+      --resource "$func_id" \
+      --event-hub "logs" \
+      --event-hub-rule "$eh_rule_id" \
+      --logs '[
+        {
+          "category": "FunctionAppLogs",
+          "enabled": true
+        }
+      ]'
 
     # XXX Assumes if any identity is set, it is the one we are specifying below
     exists=$(az functionapp identity show \
