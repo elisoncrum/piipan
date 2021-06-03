@@ -118,7 +118,7 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
                 Assert.Equal(new DateTime(1970, 1, 1), record.BenefitsEndDate);
-                Assert.Equal(new DateTime(2021, 5, 1), record.RecentBenefitMonths[0]);
+                Assert.Equal(new DateTime(2021, 5, 31), record.RecentBenefitMonths[0]);
             }
         }
 

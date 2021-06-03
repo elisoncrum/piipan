@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
@@ -13,7 +14,7 @@ namespace Piipan.Etl
       {
           if (text == "") return new List<DateTime>();
           string[] allElements = text.Split(' ');
-          DateTime[] elementsAsDateTimes = allElements.Select(s => DateTime.Parse(s)).ToArray();
+          DateTime[] elementsAsDateTimes = allElements.Select(s => MonthEndDateTime.Parse(s)).ToArray();
           return new List<DateTime>(elementsAsDateTimes);
       }
 
