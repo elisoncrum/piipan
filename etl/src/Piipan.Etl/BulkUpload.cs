@@ -170,7 +170,7 @@ namespace Piipan.Etl
                         AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
                         AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
                         AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndDate ?? DBNull.Value);
-                        AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)FormatDatesAsPgArray(record.RecentBenefitMonths) ?? DBNull.Value);
+                        AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)FormatDatesAsPgArray(record.RecentBenefitMonths));
 
                         cmd.ExecuteNonQuery();
                     }
@@ -189,16 +189,11 @@ namespace Piipan.Etl
             cmd.Parameters.Add(p);
         }
 
-        public static string FormatDatesAsPgArray(string input) {
-            if (String.IsNullOrEmpty(input)) return "{}";
-            string formatted = "";
-            string[] datestrings = input.Split(' ');
+        public static string FormatDatesAsPgArray(List<DateTime> input) {
             List<string> formattedDateStrings = new List<string>();
-            formatted += "{";
-            foreach (var datestring in datestrings)
+            string formatted = "{";
+            foreach (var date in input)
             {
-              if (String.IsNullOrEmpty(datestring)) continue;
-              DateTime date = Convert.ToDateTime(datestring);
               formattedDateStrings.Add(date.ToString("yyyy-MM-dd"));
             }
             formatted += string.Join(",", formattedDateStrings);
