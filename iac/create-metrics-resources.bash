@@ -147,6 +147,32 @@ EOF
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
 
+  # Configure log streaming for function app
+  metrics_collect_function_id=$(\
+    az functionapp show \
+      -n "$METRICS_COLLECT_APP_NAME" \
+      -g "$METRICS_RESOURCE_GROUP" \
+      -o tsv \
+      --query id)
+  hub_rule_id=$(\
+    az eventhubs namespace authorization-rule list \
+      --resource-group "$RESOURCE_GROUP" \
+      --namespace-name "$EVENT_HUB_NAME" \
+      --query "[?name == 'RootManageSharedAccessKey'].id" \
+      -o tsv)
+
+  az monitor diagnostic-settings create \
+    --name "stream-logs-to-event-hub" \
+    --resource "$metrics_collect_function_id" \
+    --event-hub "logs" \
+    --event-hub-rule "$hub_rule_id" \
+    --logs '[
+      {
+        "category": "FunctionAppLogs",
+        "enabled": true
+      }
+    ]'
+
   # Waiting before publishing the app, since publishing immediately after creation returns an   App Not Found error
   # Waiting was the best solution I could find. More info in these GH issues:
   # https://github.com/Azure/azure-functions-core-tools/issues/1616
@@ -241,6 +267,32 @@ EOF
         $VAULT_NAME_KEY="$VAULT_NAME" \
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
+
+  # Configure log streaming for function app
+  metrics_api_function_id=$(\
+    az functionapp show \
+      -n "$METRICS_API_APP_NAME" \
+      -g "$METRICS_RESOURCE_GROUP" \
+      -o tsv \
+      --query id)
+  hub_rule_id=$(\
+    az eventhubs namespace authorization-rule list \
+      --resource-group "$RESOURCE_GROUP" \
+      --namespace-name "$EVENT_HUB_NAME" \
+      --query "[?name == 'RootManageSharedAccessKey'].id" \
+      -o tsv)
+
+  az monitor diagnostic-settings create \
+    --name "stream-logs-to-event-hub" \
+    --resource "$metrics_api_function_id" \
+    --event-hub "logs" \
+    --event-hub-rule "$hub_rule_id" \
+    --logs '[
+      {
+        "category": "FunctionAppLogs",
+        "enabled": true
+      }
+    ]'
 
   # Connect creds from function app to key vault so app can connect to db
   principalId=$(az functionapp identity assign \
