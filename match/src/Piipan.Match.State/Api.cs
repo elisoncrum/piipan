@@ -97,7 +97,7 @@ namespace Piipan.Match.State
                 last = request.Query.Last,
                 first = request.Query.First,
             };
-            var sql = "SELECT upload_id, first, last, middle, dob, ssn, exception, case_id CaseId, participant_id ParticipantId FROM participants " +
+            var sql = "SELECT upload_id, first, last, middle, dob, ssn, exception, case_id CaseId, participant_id ParticipantId, to_char(benefits_end_date, 'YYYY-MM') BenefitsEndMonth FROM participants " +
                         "WHERE ssn=@ssn AND dob=@dob AND upper(last)=upper(@last) " +
                         "AND upload_id=(SELECT id FROM uploads ORDER BY id DESC LIMIT 1)";
 

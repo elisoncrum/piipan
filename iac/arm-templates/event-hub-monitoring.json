@@ -22,7 +22,7 @@
     "resources": [
         {
             "type": "Microsoft.EventHub/namespaces",
-            "apiVersion": "2021-01-01-preview",
+            "apiVersion": "2018-01-01-preview",
             "name": "[variables('namespace')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",

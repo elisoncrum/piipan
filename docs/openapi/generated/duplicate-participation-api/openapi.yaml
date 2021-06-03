@@ -119,6 +119,11 @@ paths:
                         participant_id:
                           type: string
                           description: Participant's state-specific identifier. Must not be social security number or any personal identifiable information.
+                        benefits_end_month:
+                          type: string
+                          pattern: '^\d{4}-\d{2}$'
+                          example: 2021-01
+                          description: Participant's ending benefits month
               examples:
                 Single:
                   description: A query returning a single match
@@ -135,6 +140,7 @@ paths:
                         exception: string
                         case_id: string
                         participant_id: string
+                        benefits_end_month: 2021-01
                 None:
                   description: A query returning no matches
                   value:
@@ -155,6 +161,7 @@ paths:
                         exception: string
                         case_id: string
                         participant_id: string
+                        benefits_end_month: 2021-01
                       - first: null
                         middle: null
                         last: string
@@ -165,6 +172,7 @@ paths:
                         exception: null
                         case_id: string
                         participant_id: null
+                        benefits_end_month: null
         '400':
           description: Bad request. Missing one of the required properties in the request body.
   '/lookup_ids/{id}':
