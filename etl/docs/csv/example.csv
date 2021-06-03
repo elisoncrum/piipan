@@ -1,5 +1,5 @@
-last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month
-Farrington,Theodore,Carri,1931-10-13,000-12-3456,ReasonXYZ,caseid1,,2021-05
+last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months
+Farrington,Theodore,Carri,1931-10-13,000-12-3456,ReasonXYZ,caseid1,,2021-05,2021-04 2021-03 2021-02
 Lynn,Wesley,Eura,1940-08-01,000-12-3457,,caseid2,,
 Cullen,S,,2015-01-01,000-12-3458,,caseid3,,
 Alger,Megan,Kamala,2020-01-25,000-12-3459,,caseid4,,

@@ -17,8 +17,7 @@ namespace Piipan.Etl.Tests
             var writer = new StreamWriter(stream);
             if (includeHeader)
             {
-                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month");
-
+                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months");
             }
             foreach (var record in records)
             {
@@ -53,7 +52,8 @@ namespace Piipan.Etl.Tests
                 Exception = "Exception",
                 CaseId = "CaseId",
                 ParticipantId = "ParticipantId",
-                BenefitsEndDate = new DateTime(1970, 1, 1)
+                BenefitsEndDate = new DateTime(1970, 1, 1),
+                RecentBenefitMonths = "2021-05 2021-04"
             };
         }
 
@@ -69,7 +69,8 @@ namespace Piipan.Etl.Tests
                 Exception = null,
                 CaseId = "CaseId",
                 ParticipantId = null,
-                BenefitsEndDate = null
+                BenefitsEndDate = null,
+                RecentBenefitMonths = null
             };
         }
 
@@ -98,7 +99,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,01/1970"
+                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,1970-01,2021-05 2021-04"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -113,6 +114,7 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
                 Assert.Equal(new DateTime(1970, 1, 1), record.BenefitsEndDate);
+                Assert.Equal("2021-05 2021-04", record.RecentBenefitMonths);
             }
         }
 
@@ -230,6 +232,17 @@ namespace Piipan.Etl.Tests
           Assert.Equal(29, BulkUpload.LastDayOfMonth(februaryLeapYear).Day);
           var februaryNonLeapYear = new DateTime(2001,2,1);
           Assert.Equal(28, BulkUpload.LastDayOfMonth(februaryNonLeapYear).Day);
+        }
+
+        [Fact]
+        public void FormatDatesAsPgArray()
+        {
+          var emptyString = string.Empty;
+          Assert.Equal("{}", BulkUpload.FormatDatesAsPgArray(emptyString));
+          var singleDate = "2021-05";
+          Assert.Equal("{2021-05-01}", BulkUpload.FormatDatesAsPgArray(singleDate));
+          var multiDates = "2021-05 2021-04";
+          Assert.Equal("{2021-05-01,2021-04-01}", BulkUpload.FormatDatesAsPgArray(multiDates));
         }
     }
 }
