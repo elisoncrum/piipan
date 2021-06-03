@@ -189,10 +189,11 @@ namespace Piipan.Etl
             cmd.Parameters.Add(p);
         }
 
-        public static string FormatDatesAsPgArray(List<DateTime> input) {
+        public static string FormatDatesAsPgArray(List<DateTime> dates) {
             List<string> formattedDateStrings = new List<string>();
             string formatted = "{";
-            foreach (var date in input)
+            dates.Sort((x, y) => y.CompareTo(x));
+            foreach (var date in dates)
             {
               formattedDateStrings.Add(date.ToString("yyyy-MM-dd"));
             }
