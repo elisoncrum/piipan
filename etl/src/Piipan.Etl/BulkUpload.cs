@@ -64,11 +64,6 @@ namespace Piipan.Etl
             }
         }
 
-        public static DateTime LastDayOfMonth(DateTime dateTime)
-        {
-            return new DateTime(dateTime.Year, dateTime.Month, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
-        }
-
         internal static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
         {
             var reader = new StreamReader(input);
@@ -148,12 +143,6 @@ namespace Piipan.Etl
 
                 foreach (var record in records)
                 {
-                    if (record.BenefitsEndDate.HasValue)
-                    {
-                      DateTime benefitsEndDate = record.BenefitsEndDate.Value;
-                      record.BenefitsEndDate = LastDayOfMonth(benefitsEndDate);
-                    }
-
                     using (var cmd = factory.CreateCommand())
                     {
                         cmd.Connection = conn;

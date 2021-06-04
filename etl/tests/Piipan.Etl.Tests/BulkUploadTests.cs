@@ -117,7 +117,7 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("Exception", record.Exception);
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
-                Assert.Equal(new DateTime(1970, 1, 1), record.BenefitsEndDate);
+                Assert.Equal(new DateTime(1970, 1, 31), record.BenefitsEndDate);
                 Assert.Equal(new DateTime(2021, 5, 31), record.RecentBenefitMonths[0]);
             }
         }
@@ -143,11 +143,11 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        // last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months
         [InlineData(",,,1970-01-01,000-00-0000,,,,,,")] // Missing last name
         [InlineData("Last,,,1970-01-01,,,,,,,")] // Missing SSN
         [InlineData("Last,,,1970-01-01,000000000,,,,,,")] // Malformed SSN
         [InlineData("Last,,,1970-01-01,000-00-0000,,,,,,")] // Missing CaseId
+        [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,foobar,")] // Malformed Benefits End Month
         [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,,foobar")] // Malformed Recent Benefit Months
         public void ExpectFieldValidationError(String inline)
         {
@@ -225,20 +225,6 @@ namespace Piipan.Etl.Tests
             {
                 await BulkUpload.Run(gridEvent, BadBlob(), logger.Object);
             });
-        }
-
-        [Fact]
-        public void LastDayOfMonth()
-        {
-
-          var monthWith31Days = new DateTime(1970,1,1);
-          Assert.Equal(31, BulkUpload.LastDayOfMonth(monthWith31Days).Day);
-          var monthWith30Days = new DateTime(1970,4,1);
-          Assert.Equal(30, BulkUpload.LastDayOfMonth(monthWith30Days).Day);
-          var februaryLeapYear = new DateTime(2000,2,1);
-          Assert.Equal(29, BulkUpload.LastDayOfMonth(februaryLeapYear).Day);
-          var februaryNonLeapYear = new DateTime(2001,2,1);
-          Assert.Equal(28, BulkUpload.LastDayOfMonth(februaryNonLeapYear).Day);
         }
 
         [Fact]

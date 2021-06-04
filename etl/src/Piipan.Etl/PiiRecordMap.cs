@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using CsvHelper.Configuration;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
@@ -44,8 +45,23 @@ namespace Piipan.Etl
             Map(m => m.ParticipantId).Name("participant_id")
                 .TypeConverterOption.NullValues(string.Empty);
 
-            Map(m => m.BenefitsEndDate).Name("benefits_end_month")
-                .TypeConverterOption.NullValues(string.Empty);
+            Map(m => m.BenefitsEndDate)
+                .Name("benefits_end_month")
+                .Validate(field => {
+                  if (String.IsNullOrEmpty(field.Field)) return true;
+
+                  string[] formats={"yyyy-MM", "yyyy-M"};
+                  DateTime dateValue;
+                    var result = DateTime.TryParseExact(
+                      field.Field,
+                      formats,
+                      new CultureInfo("en-US"),
+                      DateTimeStyles.None,
+                      out dateValue);
+                    if (!result) return false;
+                  return true;
+                })
+                .TypeConverter<ToDateTimeConverter>();
 
             Map(m => m.RecentBenefitMonths)
                 .Name("recent_benefit_months")
