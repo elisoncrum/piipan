@@ -53,8 +53,8 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.14.0",
-        "contentHash": "kUMUOZX4FcmfHmy7OjyP5LovO5FMXco9uUYB76l77mtqMVbZ0cLobv+XCy/j6LpStc8cZo2sI1+dMXhk0YROEQ==",
+        "resolved": "1.15.0",
+        "contentHash": "WJzKg22PtGvjAfB+yaRX/LC9ItiXYbNzgXj3DGKQYOdu2cBkijQ4ZlWi4poI0AnI61GOsATHlNS/9GgdG6w6FQ==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.0.0",
           "System.Buffers": "4.5.1",
@@ -100,8 +100,8 @@
       },
       "FluentValidation": {
         "type": "Transitive",
-        "resolved": "10.2.2",
-        "contentHash": "/3J+ToMcXV9bdnLpXJJ4q2iDYRvcKU6jcEhKpsXfgrs/1vBhAZQDdOqVgzHXh3gwgy1fYyVGEvSAvvDlfOQavw=="
+        "resolved": "10.2.3",
+        "contentHash": "R2w/E6jgg9RPSlg7JQSTHg6AWDwlOXARaV4ZUKrPJ1gi1e+oaBEcomxmo29j9BLZivkyQhOpAboJ9nKZS4/xYA=="
       },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Transitive",
@@ -337,6 +337,11 @@
           "System.Runtime.Serialization.Primitives": "4.1.1",
           "System.Security.SecureString": "4.0.0"
         }
+      },
+      "Microsoft.Azure.Functions.Analyzers": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
       },
       "Microsoft.Azure.Functions.Extensions": {
         "type": "Transitive",
@@ -655,9 +660,10 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.12",
-        "contentHash": "qaiduifDWEFYxnzO7yvbCLvH7brGi0mO+rjJfEEQY+bPMkUWz8uEecBwSfaCsxQKHn2dcpLbIT4Ru2PNZWAPgg==",
+        "resolved": "3.0.13",
+        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
         "dependencies": {
+          "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
           "Microsoft.Azure.WebJobs.Extensions": "3.0.6",
           "Microsoft.Azure.WebJobs.Extensions.Http": "[3.0.2, 3.1.0)",
@@ -2109,11 +2115,11 @@
       "piipan.match.orchestrator": {
         "type": "Project",
         "dependencies": {
-          "FluentValidation": "10.2.2",
+          "FluentValidation": "10.2.3",
           "Microsoft.Azure.Cosmos.Table": "1.0.8",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Extensions.Http": "3.1.15",
-          "Microsoft.NET.Sdk.Functions": "3.0.12",
+          "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Piipan.Shared": "1.0.0"
@@ -2122,7 +2128,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.14.0",
+          "Azure.Core": "1.15.0",
           "Azure.Identity": "1.4.0"
         }
       }

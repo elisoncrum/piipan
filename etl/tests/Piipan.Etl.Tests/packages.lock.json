@@ -327,6 +327,11 @@
           "System.Net.Http": "4.3.0"
         }
       },
+      "Microsoft.Azure.Functions.Analyzers": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
+      },
       "Microsoft.Azure.KeyVault.Core": {
         "type": "Transitive",
         "resolved": "2.0.4",
@@ -695,9 +700,10 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.12",
-        "contentHash": "qaiduifDWEFYxnzO7yvbCLvH7brGi0mO+rjJfEEQY+bPMkUWz8uEecBwSfaCsxQKHn2dcpLbIT4Ru2PNZWAPgg==",
+        "resolved": "3.0.13",
+        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
         "dependencies": {
+          "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
           "Microsoft.Azure.WebJobs.Extensions": "3.0.6",
           "Microsoft.Azure.WebJobs.Extensions.Http": "[3.0.2, 3.1.0)",
@@ -2154,7 +2160,7 @@
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.4",
-          "Microsoft.NET.Sdk.Functions": "3.0.12",
+          "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.5"
         }
       }

@@ -13,9 +13,9 @@
       },
       "FluentValidation": {
         "type": "Direct",
-        "requested": "[10.2.2, )",
-        "resolved": "10.2.2",
-        "contentHash": "/3J+ToMcXV9bdnLpXJJ4q2iDYRvcKU6jcEhKpsXfgrs/1vBhAZQDdOqVgzHXh3gwgy1fYyVGEvSAvvDlfOQavw=="
+        "requested": "[10.2.3, )",
+        "resolved": "10.2.3",
+        "contentHash": "R2w/E6jgg9RPSlg7JQSTHg6AWDwlOXARaV4ZUKrPJ1gi1e+oaBEcomxmo29j9BLZivkyQhOpAboJ9nKZS4/xYA=="
       },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Direct",
@@ -29,10 +29,11 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Direct",
-        "requested": "[3.0.12, )",
-        "resolved": "3.0.12",
-        "contentHash": "qaiduifDWEFYxnzO7yvbCLvH7brGi0mO+rjJfEEQY+bPMkUWz8uEecBwSfaCsxQKHn2dcpLbIT4Ru2PNZWAPgg==",
+        "requested": "[3.0.13, )",
+        "resolved": "3.0.13",
+        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
         "dependencies": {
+          "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
           "Microsoft.Azure.WebJobs.Extensions": "3.0.6",
           "Microsoft.Azure.WebJobs.Extensions.Http": "[3.0.2, 3.1.0)",
@@ -259,6 +260,11 @@
           "Microsoft.Net.Http.Headers": "2.1.0",
           "System.Text.Encodings.Web": "4.5.0"
         }
+      },
+      "Microsoft.Azure.Functions.Analyzers": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
       },
       "Microsoft.Azure.WebJobs": {
         "type": "Transitive",
