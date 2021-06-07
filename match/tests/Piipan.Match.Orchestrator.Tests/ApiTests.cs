@@ -34,7 +34,12 @@ namespace Piipan.Match.Orchestrator.Tests
                 Ssn = "000-00-0000",
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
-                BenefitsEndMonth = new DateTime(1970, 1, 1)
+                BenefitsEndMonth = new DateTime(1970, 1, 1),
+                RecentBenefitMonths = new List<DateTime>() {
+                  new DateTime(2021, 5, 31),
+                  new DateTime(2021, 4, 30),
+                  new DateTime(2021, 3, 31)
+                }
             };
         }
 
@@ -166,18 +171,24 @@ namespace Piipan.Match.Orchestrator.Tests
         [Fact]
         public void PiiRecordJson()
         {
-            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01'}";
+            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10']}";
             var record = JsonConvert.DeserializeObject<PiiRecord>(json);
 
-            Assert.Contains("\"last\": \"Last\"", record.ToJson());
-            Assert.Contains("\"dob\": \"2020-01-01\"", record.ToJson());
-            Assert.Contains("\"ssn\": \"000000000\"", record.ToJson());
-            Assert.Contains("\"first\": \"First\"", record.ToJson());
-            Assert.Contains("\"middle\": null", record.ToJson());
-            Assert.Contains("\"exception\": null", record.ToJson());
-            Assert.Contains("\"state\": null", record.ToJson());
-            Assert.Contains("\"case_id\": \"foo\"", record.ToJson());
-            Assert.Contains("\"benefits_end_month\": \"2020-01\"", record.ToJson());
+            string jsonRecord = record.ToJson();
+
+            Assert.Contains("\"last\": \"Last\"", jsonRecord);
+            Assert.Contains("\"dob\": \"2020-01-01\"", jsonRecord);
+            Assert.Contains("\"ssn\": \"000000000\"", jsonRecord);
+            Assert.Contains("\"first\": \"First\"", jsonRecord);
+            Assert.Contains("\"middle\": null", jsonRecord);
+            Assert.Contains("\"exception\": null", jsonRecord);
+            Assert.Contains("\"state\": null", jsonRecord);
+            Assert.Contains("\"case_id\": \"foo\"", jsonRecord);
+            Assert.Contains("\"benefits_end_month\": \"2020-01\"", jsonRecord);
+            Assert.Contains("\"recent_benefit_months\": [", jsonRecord);
+            Assert.Contains("\"2019-12\",", jsonRecord);
+            Assert.Contains("\"2019-11\",", jsonRecord);
+            Assert.Contains("\"2019-10\"", jsonRecord);
 
             // Deprecated
             Assert.Contains("\"state_abbr\": null", record.ToJson());

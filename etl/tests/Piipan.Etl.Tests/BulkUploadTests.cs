@@ -54,9 +54,9 @@ namespace Piipan.Etl.Tests
                 ParticipantId = "ParticipantId",
                 BenefitsEndDate = new DateTime(1970, 1, 1),
                 RecentBenefitMonths = new List<DateTime>() {
-                  new DateTime(2021, 5, 1),
-                  new DateTime(2021, 4, 1),
-                  new DateTime(2021, 3, 1)
+                  new DateTime(2021, 5, 31),
+                  new DateTime(2021, 4, 30),
+                  new DateTime(2021, 3, 31)
                 }
             };
         }
@@ -225,20 +225,6 @@ namespace Piipan.Etl.Tests
             {
                 await BulkUpload.Run(gridEvent, BadBlob(), logger.Object);
             });
-        }
-
-        [Fact]
-        public void FormatDatesAsPgArray()
-        {
-          var empty = new List<DateTime>();
-          Assert.Equal("{}", BulkUpload.FormatDatesAsPgArray(empty));
-          var singleDate = new List<DateTime>(){ new DateTime(2021, 5, 1) };
-          Assert.Equal("{2021-05-01}", BulkUpload.FormatDatesAsPgArray(singleDate));
-          var multiDates = new List<DateTime>(){
-            new DateTime(2021, 4, 1),
-            new DateTime(2021, 5, 1)
-          };
-          Assert.Equal("{2021-05-01,2021-04-01}", BulkUpload.FormatDatesAsPgArray(multiDates));
         }
     }
 }

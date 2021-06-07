@@ -30,4 +30,7 @@
       <_Parameter1>Piipan.Match.State.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+  </ItemGroup>
 </Project>

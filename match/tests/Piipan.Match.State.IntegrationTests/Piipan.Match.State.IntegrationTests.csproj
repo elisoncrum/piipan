@@ -26,5 +26,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Match.State\Piipan.Match.State.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -15,6 +15,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
@@ -159,7 +160,7 @@ namespace Piipan.Etl
                         AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
                         AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
                         AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndDate ?? DBNull.Value);
-                        AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)FormatDatesAsPgArray(record.RecentBenefitMonths));
+                        AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)DateFormatters.FormatDatesAsPgArray(record.RecentBenefitMonths));
 
                         cmd.ExecuteNonQuery();
                     }
@@ -176,19 +177,6 @@ namespace Piipan.Etl
             p.ParameterName = name;
             p.Value = value;
             cmd.Parameters.Add(p);
-        }
-
-        public static string FormatDatesAsPgArray(List<DateTime> dates) {
-            List<string> formattedDateStrings = new List<string>();
-            string formatted = "{";
-            dates.Sort((x, y) => y.CompareTo(x));
-            foreach (var date in dates)
-            {
-              formattedDateStrings.Add(date.ToString("yyyy-MM-dd"));
-            }
-            formatted += string.Join(",", formattedDateStrings);
-            formatted += "}";
-            return formatted;
         }
     }
 }

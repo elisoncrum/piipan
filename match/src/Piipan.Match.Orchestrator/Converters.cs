@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Match.Orchestrator
 {
@@ -21,17 +23,37 @@ namespace Piipan.Match.Orchestrator
     }
 
     /// <summary>
-    /// JSON.NET converter for serializing/deserializing a DateTime
-    /// object using our desired YYYY-MM format.
+    /// JSON.NET converter for deserializing month-only string to a DateTime
+    /// to last day of the month
+    /// and serializing a DateTime into a month-only string
+    /// using our desired ISO 8601 YYYY-MM format.
     /// </summary>
     /// <remarks>
     /// Applied to model properties as `[JsonConverter(typeof(DateMonthConverter))]`
     /// </remarks>
-    public class DateMonthConverter : IsoDateTimeConverter
+    public class DateMonthConverter : JsonConverter
     {
-        public DateMonthConverter()
-        {
-            base.DateTimeFormat = "yyyy-MM";
+        public override bool CanRead => true;
+        public override bool CanWrite => true;
+
+        public override bool CanConvert(Type objectType) => objectType == typeof(DateTime);
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer
+        ){
+            if (String.IsNullOrEmpty((string)reader.Value)) return null;
+            return MonthEndDateTime.Parse((string)reader.Value);
+        }
+
+        public override void WriteJson(
+            JsonWriter writer,
+            object value,
+            JsonSerializer serializer
+        ){
+            writer.WriteValue(((DateTime)value).ToString("yyyy-MM"));
         }
     }
 
@@ -56,16 +78,57 @@ namespace Piipan.Match.Orchestrator
 
         public override bool CanConvert(Type objectType) => objectType == typeof(string);
 
-        public override object ReadJson(JsonReader reader, Type objectType,
-                                    object existingValue, JsonSerializer serializer)
-        {
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer
+        ){
             return String.IsNullOrWhiteSpace((string)reader.Value) ? null : (string)reader.Value;
         }
 
-        public override void WriteJson(JsonWriter writer, object value,
-                                   JsonSerializer serializer)
-        {
+        public override void WriteJson(
+            JsonWriter writer,
+            object value,
+            JsonSerializer serializer
+        ){
             throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// JSON.NET converter used for converting an array of DateTimes
+    /// into an array of strings, each formatted as an ISO 8601 year and month
+    /// </summary>
+    public class DateMonthArrayConverter: JsonConverter
+    {
+        public override bool CanRead => false;
+            public override bool CanWrite => true;
+
+        public override bool CanConvert(Type objectType) => objectType == typeof(List<DateTime>);
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue, JsonSerializer serializer
+        ){
+            throw new NotImplementedException();
+        }
+
+        public override void WriteJson(
+            JsonWriter writer,
+            object value,
+            JsonSerializer serializer
+        ){
+            var results = new List<string>();
+            var dateList = (List<DateTime>)value;
+            dateList.Sort((x, y) => y.CompareTo(x));
+            writer.WriteStartArray();
+            foreach (var date in dateList)
+            {
+                writer.WriteValue(date.ToString("yyyy-MM"));
+            }
+            writer.WriteEndArray();
         }
     }
 }

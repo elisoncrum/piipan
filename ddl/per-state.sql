@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS participants(
   	case_id text NOT NULL,
   	participant_id text,
 	benefits_end_date date,
-    	recent_benefit_months date[]
+  	recent_benefit_months date[]
 );
 
 COMMENT ON TABLE participants IS 'Program participant Personally Identifiable Information (PII)';

@@ -57,6 +57,10 @@ namespace Piipan.Match.Orchestrator
         [JsonConverter(typeof(DateMonthConverter))]
         public DateTime? BenefitsEndMonth { get; set; }
 
+        [JsonProperty("recent_benefit_months")]
+        [JsonConverter(typeof(DateMonthArrayConverter))]
+        public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
+
         public string ToJson()
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
