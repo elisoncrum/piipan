@@ -17,8 +17,7 @@ namespace Piipan.Etl.Tests
             var writer = new StreamWriter(stream);
             if (includeHeader)
             {
-                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month");
-
+                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months");
             }
             foreach (var record in records)
             {
@@ -53,7 +52,12 @@ namespace Piipan.Etl.Tests
                 Exception = "Exception",
                 CaseId = "CaseId",
                 ParticipantId = "ParticipantId",
-                BenefitsEndDate = new DateTime(1970, 1, 1)
+                BenefitsEndDate = new DateTime(1970, 1, 1),
+                RecentBenefitMonths = new List<DateTime>() {
+                  new DateTime(2021, 5, 1),
+                  new DateTime(2021, 4, 1),
+                  new DateTime(2021, 3, 1)
+                }
             };
         }
 
@@ -69,7 +73,8 @@ namespace Piipan.Etl.Tests
                 Exception = null,
                 CaseId = "CaseId",
                 ParticipantId = null,
-                BenefitsEndDate = null
+                BenefitsEndDate = null,
+                RecentBenefitMonths = new List<DateTime>()
             };
         }
 
@@ -98,7 +103,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,01/1970"
+                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -112,7 +117,8 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("Exception", record.Exception);
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
-                Assert.Equal(new DateTime(1970, 1, 1), record.BenefitsEndDate);
+                Assert.Equal(new DateTime(1970, 1, 31), record.BenefitsEndDate);
+                Assert.Equal(new DateTime(2021, 5, 31), record.RecentBenefitMonths[0]);
             }
         }
 
@@ -121,7 +127,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,,,1970-01-01,000-00-0000,,CaseId,,,"
+                "Last,,,1970-01-01,000-00-0000,,CaseId,,,,,"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -132,14 +138,17 @@ namespace Piipan.Etl.Tests
                 Assert.Null(record.Exception);
                 Assert.Null(record.ParticipantId);
                 Assert.Null(record.BenefitsEndDate);
+                Assert.Empty(record.RecentBenefitMonths);
             }
         }
 
         [Theory]
-        [InlineData(",,,1970-01-01,000-00-0000,")] // Missing last name
-        [InlineData("Last,,,1970-01-01,,")] // Missing SSN
-        [InlineData("Last,,,1970-01-01,000000000,")] // Malformed SSN
-        [InlineData("Last,,,1970-01-01,000-00-0000,,,")] // Missing CaseId
+        [InlineData(",,,1970-01-01,000-00-0000,,,,,,")] // Missing last name
+        [InlineData("Last,,,1970-01-01,,,,,,,")] // Missing SSN
+        [InlineData("Last,,,1970-01-01,000000000,,,,,,")] // Malformed SSN
+        [InlineData("Last,,,1970-01-01,000-00-0000,,,,,,")] // Missing CaseId
+        [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,foobar,")] // Malformed Benefits End Month
+        [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,,foobar")] // Malformed Recent Benefit Months
         public void ExpectFieldValidationError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -219,17 +228,17 @@ namespace Piipan.Etl.Tests
         }
 
         [Fact]
-        public void LastDayOfMonth()
+        public void FormatDatesAsPgArray()
         {
-
-          var monthWith31Days = new DateTime(1970,1,1);
-          Assert.Equal(31, BulkUpload.LastDayOfMonth(monthWith31Days).Day);
-          var monthWith30Days = new DateTime(1970,4,1);
-          Assert.Equal(30, BulkUpload.LastDayOfMonth(monthWith30Days).Day);
-          var februaryLeapYear = new DateTime(2000,2,1);
-          Assert.Equal(29, BulkUpload.LastDayOfMonth(februaryLeapYear).Day);
-          var februaryNonLeapYear = new DateTime(2001,2,1);
-          Assert.Equal(28, BulkUpload.LastDayOfMonth(februaryNonLeapYear).Day);
+          var empty = new List<DateTime>();
+          Assert.Equal("{}", BulkUpload.FormatDatesAsPgArray(empty));
+          var singleDate = new List<DateTime>(){ new DateTime(2021, 5, 1) };
+          Assert.Equal("{2021-05-01}", BulkUpload.FormatDatesAsPgArray(singleDate));
+          var multiDates = new List<DateTime>(){
+            new DateTime(2021, 4, 1),
+            new DateTime(2021, 5, 1)
+          };
+          Assert.Equal("{2021-05-01,2021-04-01}", BulkUpload.FormatDatesAsPgArray(multiDates));
         }
     }
 }

@@ -64,11 +64,6 @@ namespace Piipan.Etl
             }
         }
 
-        public static DateTime LastDayOfMonth(DateTime dateTime)
-        {
-            return new DateTime(dateTime.Year, dateTime.Month, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
-        }
-
         internal static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
         {
             var reader = new StreamReader(input);
@@ -148,17 +143,11 @@ namespace Piipan.Etl
 
                 foreach (var record in records)
                 {
-                    if (record.BenefitsEndDate.HasValue)
-                    {
-                      DateTime benefitsEndDate = record.BenefitsEndDate.Value;
-                      record.BenefitsEndDate = LastDayOfMonth(benefitsEndDate);
-                    }
-
                     using (var cmd = factory.CreateCommand())
                     {
                         cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id, benefits_end_date) " +
-                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id, @benefits_end_date)";
+                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months) " +
+                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id, @benefits_end_date, @recent_benefit_months::date[])";
 
                         AddWithValue(cmd, DbType.String, "last", record.Last);
                         AddWithValue(cmd, DbType.String, "first", (object)record.First ?? DBNull.Value);
@@ -170,6 +159,7 @@ namespace Piipan.Etl
                         AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
                         AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
                         AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndDate ?? DBNull.Value);
+                        AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)FormatDatesAsPgArray(record.RecentBenefitMonths));
 
                         cmd.ExecuteNonQuery();
                     }
@@ -186,6 +176,19 @@ namespace Piipan.Etl
             p.ParameterName = name;
             p.Value = value;
             cmd.Parameters.Add(p);
+        }
+
+        public static string FormatDatesAsPgArray(List<DateTime> dates) {
+            List<string> formattedDateStrings = new List<string>();
+            string formatted = "{";
+            dates.Sort((x, y) => y.CompareTo(x));
+            foreach (var date in dates)
+            {
+              formattedDateStrings.Add(date.ToString("yyyy-MM-dd"));
+            }
+            formatted += string.Join(",", formattedDateStrings);
+            formatted += "}";
+            return formatted;
         }
     }
 }

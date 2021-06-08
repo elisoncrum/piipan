@@ -63,6 +63,14 @@
         "name": "benefits_end_month",
         "type": "yearmonth",
         "description": "The final month when a participant will receive benefits. Leave this field blank if the participant will continue receiving benefits until the next recertification period."
+      },
+      {
+        "name": "recent_benefit_months",
+        "type": "string",
+        "description": "List of up to the last 3 months that participant received benefits, formatted as yearmonths separated by spaces. Does not include current benefit month. Months need to be consecutive. Fewer than 3 months can be entered for newer participants.",
+        "constraints": {
+          "pattern": "([0-9]{4}-[0-9]{1,2} ?){0,3}"
+        }
       }
     ]
   }
