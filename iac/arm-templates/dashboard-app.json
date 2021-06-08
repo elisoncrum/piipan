@@ -22,6 +22,12 @@
         },
         "eventHubName": {
             "type": "String"
+        },
+        "aadIssuerUri": {
+            "type": "string"
+        },
+        "aadClientId": {
+            "type": "string"
         }
     },
     "variables": {
@@ -142,6 +148,32 @@
                         "enabled": true
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2020-12-01",
+            "name": "[concat(parameters('appName'), '/authsettingsV2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+            ],
+            "properties": {
+                "platform": {
+                    "enabled": true
+                },
+                "globalValidation": {
+                    "requireAuthentication": true,
+                    "unauthenticatedClientAction": "RedirectToLoginPage"
+                },
+                "identityProviders": {
+                    "azureActiveDirectory": {
+                        "enabled": true,
+                        "registration": {
+                            "openIdIssuer": "[parameters('aadIssuerUri')]",
+                            "clientId": "[parameters('aadClientId')]"
+                        }
+                    }
+                }
             }
         }
     ],
