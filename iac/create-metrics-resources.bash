@@ -303,7 +303,9 @@ EOF
       servicePlan="$APP_SERVICE_PLAN" \
       frontDoorId="$front_door_id" \
       metricsApiUri="$metrics_api_uri" \
-      eventHubName="$EVENT_HUB_NAME"
+      eventHubName="$EVENT_HUB_NAME" \
+      aadIssuerUri="$OIDC_ISSUER_URI" \
+      aadClientId="$DASHBOARD_APP_CLIENT_ID"
 
   echo "Secure database connection"
   ./remove-external-network.bash \
