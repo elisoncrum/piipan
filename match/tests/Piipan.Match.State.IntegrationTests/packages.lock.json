@@ -1995,6 +1995,13 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
+      "piipan.match.shared": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json.Schema": "3.0.14",
+          "Piipan.Shared": "1.0.0"
+        }
+      },
       "piipan.match.state": {
         "type": "Project",
         "dependencies": {
@@ -2004,6 +2011,7 @@
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.5",
+          "Piipan.Match.Shared": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
       },

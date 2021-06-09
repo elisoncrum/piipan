@@ -2122,6 +2122,14 @@
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
+          "Piipan.Match.Shared": "1.0.0",
+          "Piipan.Shared": "1.0.0"
+        }
+      },
+      "piipan.match.shared": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json.Schema": "3.0.14",
           "Piipan.Shared": "1.0.0"
         }
       },
