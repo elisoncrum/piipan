@@ -55,11 +55,11 @@ namespace Piipan.Match.Orchestrator
         public string ParticipantId { get; set; }
 
         [JsonProperty("benefits_end_month")]
-        [JsonConverter(typeof(JsonConverters.DateMonthConverter))]
+        [JsonConverter(typeof(JsonConverters.MonthEndConverter))]
         public DateTime? BenefitsEndMonth { get; set; }
 
         [JsonProperty("recent_benefit_months")]
-        [JsonConverter(typeof(JsonConverters.DateMonthArrayConverter))]
+        [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
         public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
 
         public string ToJson()

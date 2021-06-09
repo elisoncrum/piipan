@@ -25,7 +25,7 @@ namespace Piipan.Match.State.IntegrationTests
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
-                BenefitsEndMonth = new DateTime(1970, 2, 1),
+                BenefitsEndMonth = new DateTime(1970, 1, 31),
                 RecentBenefitMonths = new List<DateTime>() {
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),

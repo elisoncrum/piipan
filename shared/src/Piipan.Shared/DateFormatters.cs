@@ -6,7 +6,7 @@ namespace Piipan.Shared.Helpers
     public class DateFormatters
     {
         /// <summary>
-        /// Format a list of DateTimes as a Ppstgresql Array of Dates
+        /// Format a C# List of DateTimes as a string of psql array of datetimes
         /// </summary>
         public static string FormatDatesAsPgArray(List<DateTime> dates) {
             List<string> formattedDateStrings = new List<string>();

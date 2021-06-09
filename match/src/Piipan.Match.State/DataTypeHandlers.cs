@@ -6,6 +6,13 @@ using Dapper;
 
 namespace Piipan.Match.State.DataTypeHandlers
 {
+    /// <summary>
+    /// Custom handlers for converting sql columns to C# properties
+    /// Converts sql arrays of datetimes into C# Lists of DateTimes
+    /// </summary>
+    /// <remarks>
+    /// Used when configuring Dapper as SqlMapper.AddTypeHandler(new DateTimeListHandler());
+    /// </remarks>
     public class DateTimeListHandler : SqlMapper.TypeHandler<List<DateTime>>
     {
         public override List<DateTime> Parse(object value)

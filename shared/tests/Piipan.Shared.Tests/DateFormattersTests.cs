@@ -5,9 +5,9 @@ using Piipan.Shared.Helpers;
 
 namespace Piipan.Shared.Tests
 {
-	public class DateFormattersTests
+    public class DateFormattersTests
     {
-		[Fact]
+        [Fact]
         public void FormatDatesAsPgArrayReturnsString()
         {
             var empty = new List<DateTime>();
@@ -20,5 +20,5 @@ namespace Piipan.Shared.Tests
             };
             Assert.Equal("{2021-05-01,2021-04-01}", DateFormatters.FormatDatesAsPgArray(multiDates));
         }
-	}
+    }
 }

@@ -26,13 +26,13 @@ namespace Piipan.Match.Shared
         /// <summary>
         /// JSON.NET converter for deserializing month-only string to a DateTime
         /// to last day of the month
-        /// and serializing a DateTime into a month-only string
+        /// and serializing a DateTime into a year-month string
         /// using our desired ISO 8601 YYYY-MM format.
         /// </summary>
         /// <remarks>
-        /// Applied to model properties as `[JsonConverter(typeof(DateMonthConverter))]`
+        /// Applied to model properties as `[JsonConverter(typeof(MonthEndConverter))]`
         /// </remarks>
-        public class DateMonthConverter : JsonConverter
+        public class MonthEndConverter : JsonConverter
         {
             public override bool CanRead => true;
             public override bool CanWrite => true;
@@ -98,10 +98,16 @@ namespace Piipan.Match.Shared
         }
 
         /// <summary>
-        /// JSON.NET converter used for converting an array of DateTimes
-        /// into an array of strings, each formatted as an ISO 8601 year and month
+        /// JSON.NET converter
+        /// Deserializes an array of month-only strings to
+        /// an array of DateTimes, each set to last day of given month.
+        /// Serializes an array of DateTimes into an array of a yearh-month strings
+        /// using our desired ISO 8601 YYYY-MM format.
         /// </summary>
-        public class DateMonthArrayConverter: JsonConverter
+        /// <remarks>
+        /// Applied to model properties as `[JsonConverter(typeof(MonthEndArrayConverter))]`
+        /// </remarks>
+        public class MonthEndArrayConverter: JsonConverter
         {
             public override bool CanRead => false;
             public override bool CanWrite => true;
