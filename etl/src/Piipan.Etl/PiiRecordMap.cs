@@ -61,7 +61,7 @@ namespace Piipan.Etl
                     if (!result) return false;
                   return true;
                 })
-                .TypeConverter<ToDateTimeConverter>();
+                .TypeConverter<ToMonthEndConverter>();
 
             Map(m => m.RecentBenefitMonths)
                 .Name("recent_benefit_months")
@@ -83,7 +83,7 @@ namespace Piipan.Etl
                   }
                   return true;
                 })
-                .TypeConverter<ToDateTimeArrayConverter>();
+                .TypeConverter<ToMonthEndArrayConverter>();
 
         }
     }

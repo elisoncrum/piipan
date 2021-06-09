@@ -8,7 +8,7 @@ using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
-	public class ToDateTimeConverter : DefaultTypeConverter
+	public class ToMonthEndConverter : DefaultTypeConverter
 	{
 		public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
 		{
@@ -23,7 +23,7 @@ namespace Piipan.Etl
       	}
 	}
 
-  	public class ToDateTimeArrayConverter : DefaultTypeConverter
+  	public class ToMonthEndArrayConverter : DefaultTypeConverter
   	{
       	public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
       	{
