@@ -301,7 +301,6 @@ EOF
       resourceTags="$RESOURCE_TAGS" \
       appName="$DASHBOARD_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
-      frontDoorId="$front_door_id" \
       metricsApiUri="$metrics_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
       aadIssuerUri="$OIDC_ISSUER_URI" \

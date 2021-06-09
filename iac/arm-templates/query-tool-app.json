@@ -5,9 +5,6 @@
         "appName": {
             "type": "string"
         },
-        "frontDoorId": {
-            "type": "string"
-        },
         "location": {
             "type": "string"
         },
@@ -22,6 +19,12 @@
         },
         "eventHubName": {
             "type": "String"
+        },
+        "aadIssuerUri": {
+            "type": "string"
+        },
+        "aadClientId": {
+            "type": "string"
         }
     },
     "variables": {
@@ -29,22 +32,6 @@
         "sku": "S1",
         "baseSiteConfig": {
             "linuxFxVersion": "DOTNETCORE|3.1",
-            "ipSecurityRestrictions": [
-                /* Restricts access to Front Door resource only */
-                /* https://docs.microsoft.com/en-us/azure/app-service/app-service-ip-restrictions#manage-access-restriction-rules-programmatically */
-                {
-                    "ipAddress": "AzureFrontDoor.Backend",
-                    "tag": "ServiceTag",
-                    "action": "Allow",
-                    "priority": 100,
-                    "name": "Allow Azure Front Door access",
-                    "headers": {
-                        "x-azure-fdid": [
-                            "[concat(parameters('frontDoorId'))]"
-                        ]
-                    }
-                }
-            ],
             "ftpsState": "Disabled",
             "appSettings": [
                 // Environment Variables
@@ -145,6 +132,33 @@
                         "enabled": true
                     }
                 ]
+            }
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/templates/microsoft.web/sites/config-authsettingsv2?tabs=json */
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2020-12-01",
+            "name": "[concat(parameters('appName'), '/authsettingsV2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+            ],
+            "properties": {
+                "platform": {
+                    "enabled": true
+                },
+                "globalValidation": {
+                    "requireAuthentication": true,
+                    "unauthenticatedClientAction": "RedirectToLoginPage"
+                },
+                "identityProviders": {
+                    "azureActiveDirectory": {
+                        "enabled": true,
+                        "registration": {
+                            "openIdIssuer": "[parameters('aadIssuerUri')]",
+                            "clientId": "[parameters('aadClientId')]"
+                        }
+                    }
+                }
             }
         }
     ],
