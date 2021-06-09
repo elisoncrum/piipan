@@ -1924,6 +1924,13 @@
           "Newtonsoft.Json": "10.0.2"
         }
       },
+      "piipan.match.shared": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json.Schema": "3.0.14",
+          "Piipan.Shared": "1.0.0"
+        }
+      },
       "piipan.shared": {
         "type": "Project",
         "dependencies": {

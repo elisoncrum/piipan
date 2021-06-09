@@ -124,6 +124,15 @@ paths:
                           pattern: '^\d{4}-\d{2}$'
                           example: 2021-01
                           description: Participant's ending benefits month
+                        recent_benefit_months:
+                          type: array
+                          items:
+                            type: string
+                            pattern: '^\d{4}-\d{2}$'
+                            example: 2021-01
+                          minItems: 0
+                          maxItems: 3
+                          description: 'List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.'
               examples:
                 Single:
                   description: A query returning a single match
@@ -141,6 +150,10 @@ paths:
                         case_id: string
                         participant_id: string
                         benefits_end_month: 2021-01
+                        recent_benefit_months:
+                          - 2021-05
+                          - 2021-04
+                          - 2021-03
                 None:
                   description: A query returning no matches
                   value:
@@ -162,6 +175,10 @@ paths:
                         case_id: string
                         participant_id: string
                         benefits_end_month: 2021-01
+                        recent_benefit_months:
+                          - 2021-05
+                          - 2021-04
+                          - 2021-03
                       - first: null
                         middle: null
                         last: string

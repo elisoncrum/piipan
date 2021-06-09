@@ -33,5 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\Piipan.Match.Shared\Piipan.Match.Shared.csproj" />
   </ItemGroup>
 </Project>

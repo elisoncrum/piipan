@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,12 @@ namespace Piipan.Match.State.IntegrationTests
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
-                BenefitsEndMonth = new DateTime(1970, 2, 1)
+                BenefitsEndMonth = new DateTime(1970, 1, 31),
+                RecentBenefitMonths = new List<DateTime>() {
+                  new DateTime(2021, 5, 31),
+                  new DateTime(2021, 4, 30),
+                  new DateTime(2021, 3, 31)
+                }
             };
         }
 
@@ -82,6 +88,7 @@ namespace Piipan.Match.State.IntegrationTests
             Assert.Equal(record.ParticipantId, resultRecord.Matches[0].ParticipantId);
             Assert.Equal("ea", resultRecord.Matches[0].State);
             Assert.Equal(record.BenefitsEndMonth, resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Equal(record.RecentBenefitMonths, resultRecord.Matches[0].RecentBenefitMonths);
         }
 
         [Fact]
@@ -131,7 +138,12 @@ namespace Piipan.Match.State.IntegrationTests
                 Dob = new DateTime(1931, 10, 13),
                 Ssn = "000-12-3456",
                 CaseId = "CaseIdExample",
-                BenefitsEndMonth = new DateTime(2021, 05, 31)
+                BenefitsEndMonth = new DateTime(2021, 06, 30),
+                RecentBenefitMonths = new List<DateTime>() {
+                  new DateTime(2021, 5, 31),
+                  new DateTime(2021, 4, 30),
+                  new DateTime(2021, 3, 31)
+                }
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));
@@ -146,7 +158,8 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Single(resultRecord.Matches);
-            Assert.Equal(new DateTime(2021, 05, 01), resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Equal(new DateTime(2021, 06, 30), resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Equal(new DateTime(2021, 05, 31), resultRecord.Matches[0].RecentBenefitMonths[0]);
         }
 
         [Fact]
@@ -203,6 +216,34 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Null(resultRecord.Matches[0].BenefitsEndMonth);
+        }
+
+        [Fact]
+        public async void RecentBenefitMonthsCanBeEmpty()
+        {
+            var query = "{last: 'Farrington', first: 'Foo', middle: 'Bar', dob: '1931-10-13', ssn: '000-12-3456'}";
+            var record = new PiiRecord
+            {
+                First = "Theodore",
+                Middle = "Carri",
+                Last = "Farrington",
+                Dob = new DateTime(1931, 10, 13),
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
+            };
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(JsonBody(query));
+
+            ClearParticipants();
+            Insert(record);
+
+            // Act
+            var response = await Api.Query(mockRequest.Object, logger);
+            var result = response as JsonResult;
+            var resultRecord = result.Value as MatchQueryResponse;
+
+            // Assert
+            Assert.Empty(resultRecord.Matches[0].RecentBenefitMonths);
         }
     }
 }

@@ -8,7 +8,11 @@ using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
-	public class ToDateTimeConverter : DefaultTypeConverter
+    /// <summary>
+    /// Converts month-only date to last day of month when as a DateTime
+    /// and to ISO 8601 year-months when as a string
+    /// </summary>
+	public class ToMonthEndConverter : DefaultTypeConverter
 	{
 		public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
 		{
@@ -22,8 +26,11 @@ namespace Piipan.Etl
 				: string.Empty;
       	}
 	}
-
-  	public class ToDateTimeArrayConverter : DefaultTypeConverter
+    /// <summary>
+    /// Converts list of month-only dates to last day of month when as DateTimes
+    /// and to ISO 8601 year-months when as a string
+    /// </summary>
+  	public class ToMonthEndArrayConverter : DefaultTypeConverter
   	{
       	public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
       	{
