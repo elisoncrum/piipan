@@ -531,8 +531,8 @@ main () {
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
-      aadIssuerUri="$OIDC_ISSUER_URI" \
-      aadClientId="$QUERY_TOOL_APP_CLIENT_ID"
+      idpOidcConfigUri="$IDP_OIDC_CONFIG_URI" \
+      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"

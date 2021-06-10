@@ -20,10 +20,10 @@
         "eventHubName": {
             "type": "String"
         },
-        "aadIssuerUri": {
+        "idpOidcConfigUri": {
             "type": "string"
         },
-        "aadClientId": {
+        "idpClientId": {
             "type": "string"
         }
     },
@@ -148,14 +148,28 @@
                 },
                 "globalValidation": {
                     "requireAuthentication": true,
-                    "unauthenticatedClientAction": "RedirectToLoginPage"
+                    "unauthenticatedClientAction": "RedirectToLoginPage",
+                    "redirectToProvider": "oidcProvider"
                 },
                 "identityProviders": {
-                    "azureActiveDirectory": {
-                        "enabled": true,
-                        "registration": {
-                            "openIdIssuer": "[parameters('aadIssuerUri')]",
-                            "clientId": "[parameters('aadClientId')]"
+                    "customOpenIdConnectProviders": {
+                        "oidcProvider": {
+                            "enabled": true,
+                            "registration": {
+                                "clientId": "[parameters('idpClientId')]",
+                                "clientCredential": {
+                                    "clientSecretSettingName": "IDP_CLIENT_SECRET"
+                                },
+                                "openIdConnectConfiguration": {
+                                    "wellKnownOpenIdConfiguration": "[parameters('idpOidcConfigUri')]"
+                                }
+                            },
+                            "login": {
+                                "nameClaimType": "name",
+                                "scopes": [
+                                    "openid"
+                                ]
+                            }
                         }
                     }
                 }

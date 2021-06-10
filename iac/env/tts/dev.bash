@@ -24,7 +24,7 @@ CLOUD_NAME=AzureCloud
 # used to create API Management resources
 APIM_EMAIL=noreply@tts.test
 
-OIDC_ISSUER_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
+IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
 
-DASHBOARD_APP_CLIENT_ID=e7e769ad-e9bc-4c5f-8c3e-ebaf6cf9cacb
-QUERY_TOOL_APP_CLIENT_ID=0c3baef3-c2f5-41b8-b62a-eb0083e8771f
+DASHBOARD_APP_IDP_CLIENT_ID=e7e769ad-e9bc-4c5f-8c3e-ebaf6cf9cacb
+QUERY_TOOL_APP_IDP_CLIENT_ID=0c3baef3-c2f5-41b8-b62a-eb0083e8771f
