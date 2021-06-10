@@ -133,6 +133,11 @@ paths:
                           minItems: 0
                           maxItems: 3
                           description: 'List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.'
+                        protect_location:
+                          type: boolean
+                          nullable: true
+                          example: true
+                          description: Indicates location protection for vulnerable individuals. Null values provided to the system are treated as true.
               examples:
                 Single:
                   description: A query returning a single match
@@ -154,6 +159,7 @@ paths:
                           - 2021-05
                           - 2021-04
                           - 2021-03
+                        protect_location: true
                 None:
                   description: A query returning no matches
                   value:
@@ -179,6 +185,7 @@ paths:
                           - 2021-05
                           - 2021-04
                           - 2021-03
+                        protect_location: true
                       - first: null
                         middle: null
                         last: string
@@ -190,6 +197,7 @@ paths:
                         case_id: string
                         participant_id: null
                         benefits_end_month: null
+                        protect_location: null
         '400':
           description: Bad request. Missing one of the required properties in the request body.
   '/lookup_ids/{id}':

@@ -78,7 +78,8 @@ Queries all state databases for any PII records that are an exact match to the l
         "2021-05",
         "2021-04",
         "2021-03"
-      ]
+      ],
+      "protect_location": true
     }
   ]
 }
@@ -115,7 +116,8 @@ Queries all state databases for any PII records that are an exact match to the l
         "2021-05",
         "2021-04",
         "2021-03"
-      ]
+      ],
+      "protect_location": true
     },
     {
       "first": null,
@@ -128,7 +130,8 @@ Queries all state databases for any PII records that are an exact match to the l
       "exception": null,
       "case_id": "string",
       "participant_id": null,
-      "benefits_end_month": null
+      "benefits_end_month": null,
+      "protect_location": null
     }
   ]
 }
@@ -161,6 +164,7 @@ Status Code **200**
 |»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
 |»» benefits_end_month|string|false|none|Participant's ending benefits month|
 |»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
+|»» protect_location|boolean¦null|false|none|Indicates location protection for vulnerable individuals. Null values provided to the system are treated as true.|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:

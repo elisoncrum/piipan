@@ -39,7 +39,8 @@ namespace Piipan.Match.Orchestrator.Tests
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
                   new DateTime(2021, 3, 31)
-                }
+                },
+                ProtectLocation = true
             };
         }
 
@@ -171,7 +172,7 @@ namespace Piipan.Match.Orchestrator.Tests
         [Fact]
         public void PiiRecordJson()
         {
-            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10']}";
+            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
             var record = JsonConvert.DeserializeObject<PiiRecord>(json);
 
             string jsonRecord = record.ToJson();
@@ -189,6 +190,7 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Contains("\"2019-12\",", jsonRecord);
             Assert.Contains("\"2019-11\",", jsonRecord);
             Assert.Contains("\"2019-10\"", jsonRecord);
+            Assert.Contains("\"protect_location\": true", jsonRecord);
 
             // Deprecated
             Assert.Contains("\"state_abbr\": null", record.ToJson());

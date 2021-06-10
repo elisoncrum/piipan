@@ -30,7 +30,8 @@ namespace Piipan.Match.State.IntegrationTests
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
                   new DateTime(2021, 3, 31)
-                }
+                },
+                ProtectLocation = true
             };
         }
 
@@ -89,6 +90,7 @@ namespace Piipan.Match.State.IntegrationTests
             Assert.Equal("ea", resultRecord.Matches[0].State);
             Assert.Equal(record.BenefitsEndMonth, resultRecord.Matches[0].BenefitsEndMonth);
             Assert.Equal(record.RecentBenefitMonths, resultRecord.Matches[0].RecentBenefitMonths);
+            Assert.Equal(record.ProtectLocation, resultRecord.Matches[0].ProtectLocation);
         }
 
         [Fact]
@@ -143,7 +145,8 @@ namespace Piipan.Match.State.IntegrationTests
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
                   new DateTime(2021, 3, 31)
-                }
+                },
+                ProtectLocation = true
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));
@@ -191,7 +194,7 @@ namespace Piipan.Match.State.IntegrationTests
         }
 
         [Fact]
-        public async void BenefitsEndMonthCanBeNull()
+        public async void NullPropertiesCanBeNull()
         {
             var query = "{last: 'Farrington', first: 'Foo', middle: 'Bar', dob: '1931-10-13', ssn: '000-12-3456'}";
             var record = new PiiRecord
@@ -215,11 +218,13 @@ namespace Piipan.Match.State.IntegrationTests
             var resultRecord = result.Value as MatchQueryResponse;
 
             // Assert
+            Assert.Null(resultRecord.Matches[0].ParticipantId);
             Assert.Null(resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Null(resultRecord.Matches[0].ProtectLocation);
         }
 
         [Fact]
-        public async void RecentBenefitMonthsCanBeEmpty()
+        public async void EmptyValuesCanBeEmpty()
         {
             var query = "{last: 'Farrington', first: 'Foo', middle: 'Bar', dob: '1931-10-13', ssn: '000-12-3456'}";
             var record = new PiiRecord

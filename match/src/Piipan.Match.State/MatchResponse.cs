@@ -72,6 +72,9 @@ namespace Piipan.Match.State
         [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
         public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
 
+        [JsonProperty("protect_location")]
+        public bool? ProtectLocation { get; set; }
+
         public string ToJson()
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
