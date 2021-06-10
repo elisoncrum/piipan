@@ -147,8 +147,8 @@ namespace Piipan.Etl
                     using (var cmd = factory.CreateCommand())
                     {
                         cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months) " +
-                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id, @benefits_end_date, @recent_benefit_months::date[])";
+                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location) " +
+                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id, @benefits_end_date, @recent_benefit_months::date[], @protect_location)";
 
                         AddWithValue(cmd, DbType.String, "last", record.Last);
                         AddWithValue(cmd, DbType.String, "first", (object)record.First ?? DBNull.Value);
@@ -161,6 +161,7 @@ namespace Piipan.Etl
                         AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
                         AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndDate ?? DBNull.Value);
                         AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)DateFormatters.FormatDatesAsPgArray(record.RecentBenefitMonths));
+                        AddWithValue(cmd, DbType.Boolean, "protect_location", (object)record.ProtectLocation ?? DBNull.Value);
 
                         cmd.ExecuteNonQuery();
                     }

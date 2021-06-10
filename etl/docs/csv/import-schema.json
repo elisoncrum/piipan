@@ -71,6 +71,23 @@
         "constraints": {
           "pattern": "([0-9]{4}-[0-9]{1,2} ?){0,3}"
         }
+      },
+      {
+        "name": "protect_location",
+        "type": "boolean",
+        "description": "Set true to indicate location protection for vulnerable individuals. Null or empty values will be treated as true throughout the system.",
+        "trueValues": [
+          "true",
+          "True",
+          "TRUE",
+          "1"
+        ],
+        "falseValues": [
+          "false",
+          "False",
+          "FALSE",
+          "0"
+        ]
       }
     ]
   }
