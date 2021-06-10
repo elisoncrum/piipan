@@ -202,6 +202,23 @@ namespace Piipan.Etl.Tests
             });
         }
 
+        [Theory]
+        [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,,")] // Missing last column
+        public void ExpectMissingFieldError(String inline)
+        {
+            var logger = Mock.Of<ILogger>();
+            var stream = CsvFixture(new string[] { inline });
+
+            var records = BulkUpload.Read(stream, logger);
+            Assert.Throws<CsvHelper.MissingFieldException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+        }
+
         [Fact]
         public async void CountInserts()
         {

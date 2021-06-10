@@ -77,16 +77,10 @@
         "type": "boolean",
         "description": "Set true to indicate location protection for vulnerable individuals. Null or empty values will be treated as true throughout the system.",
         "trueValues": [
-          "true",
-          "True",
-          "TRUE",
-          "1"
+          "true"
         ],
         "falseValues": [
-          "false",
-          "False",
-          "FALSE",
-          "0"
+          "false"
         ]
       }
     ]
