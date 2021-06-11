@@ -17,7 +17,7 @@ namespace Piipan.Etl.Tests
             var writer = new StreamWriter(stream);
             if (includeHeader)
             {
-                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months");
+                writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
             }
             foreach (var record in records)
             {
@@ -57,7 +57,8 @@ namespace Piipan.Etl.Tests
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
                   new DateTime(2021, 3, 31)
-                }
+                },
+                ProtectLocation = true
             };
         }
 
@@ -103,7 +104,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03"
+                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03,true"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -119,6 +120,7 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("ParticipantId", record.ParticipantId);
                 Assert.Equal(new DateTime(1970, 1, 31), record.BenefitsEndDate);
                 Assert.Equal(new DateTime(2021, 5, 31), record.RecentBenefitMonths[0]);
+                Assert.Equal(true, record.ProtectLocation);
             }
         }
 
@@ -139,6 +141,7 @@ namespace Piipan.Etl.Tests
                 Assert.Null(record.ParticipantId);
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Empty(record.RecentBenefitMonths);
+                Assert.Null(record.ProtectLocation);
             }
         }
 
@@ -165,6 +168,23 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
+        [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,,,foobar")] // Malformed Protect Location
+        public void ExpectTypeConverterError(String inline)
+        {
+            var logger = Mock.Of<ILogger>();
+            var stream = CsvFixture(new string[] { inline });
+
+            var records = BulkUpload.Read(stream, logger);
+            Assert.Throws<CsvHelper.TypeConversion.TypeConverterException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+        }
+
+        [Theory]
         [InlineData("Last,,,,000-00-0000,")] // Missing DOB
         [InlineData("Last,,,1970-02-31,000-00-0000,")] // Invalid DOB
         public void ExpectReadErrror(String inline)
@@ -174,6 +194,23 @@ namespace Piipan.Etl.Tests
 
             var records = BulkUpload.Read(stream, logger);
             Assert.Throws<CsvHelper.ReaderException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+        }
+
+        [Theory]
+        [InlineData("Last,,,1970-01-01,000-00-0000,,caseId,,,")] // Missing last column
+        public void ExpectMissingFieldError(String inline)
+        {
+            var logger = Mock.Of<ILogger>();
+            var stream = CsvFixture(new string[] { inline });
+
+            var records = BulkUpload.Read(stream, logger);
+            Assert.Throws<CsvHelper.MissingFieldException>(() =>
             {
                 foreach (var record in records)
                 {

@@ -85,6 +85,9 @@ namespace Piipan.Etl
                 })
                 .TypeConverter<ToMonthEndArrayConverter>();
 
+            Map(m => m.ProtectLocation).Name("protect_location")
+                .TypeConverterOption.NullValues(string.Empty);
+
         }
     }
 
