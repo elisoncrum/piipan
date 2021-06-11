@@ -137,7 +137,7 @@ paths:
                           type: boolean
                           nullable: true
                           example: true
-                          description: 'Location protection flag for vulnerable individuals. Null values are treated as true, and individual''s location info will not be shared with matching state.'
+                          description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
               examples:
                 Single:
                   description: A query returning a single match
