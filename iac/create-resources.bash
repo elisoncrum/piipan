@@ -555,9 +555,10 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       appName="$QUERY_TOOL_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
-      frontDoorId="$front_door_id" \
       OrchApiUri="$orch_api_uri" \
-      eventHubName="$EVENT_HUB_NAME"
+      eventHubName="$EVENT_HUB_NAME" \
+      idpOidcConfigUri="$IDP_OIDC_CONFIG_URI" \
+      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"
