@@ -75,7 +75,7 @@
       {
         "name": "protect_location",
         "type": "boolean",
-        "description": "Set true to indicate location protection for vulnerable individuals. Null or empty values will be treated as true throughout the system.",
+        "description": "Location protection flag for vulnerable individuals. Null values are treated as true, and individual's location info will not be shared with matching state.",
         "trueValues": [
           "true",
           "True",

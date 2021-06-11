@@ -57,7 +57,7 @@ PiiRecord:
       type: boolean
       nullable: true
       example: true
-      description: "Indicates location protection for vulnerable individuals. Null values provided to the system are treated as true."
+      description: "Location protection flag for vulnerable individuals. Null values are treated as true, and individual's location info will not be shared with matching state."
 
 PiiRecordExamples:
   All:
