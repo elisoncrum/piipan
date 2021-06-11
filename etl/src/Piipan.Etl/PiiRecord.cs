@@ -30,8 +30,8 @@ namespace Piipan.Etl
         // Set Boolean values here, based on:
         // https://joshclose.github.io/CsvHelper/examples/configuration/attributes/
         // Values should mimic what is set in the Bulk Upload import schema
-        [BooleanTrueValues("true","True","TRUE","1")]
-        [BooleanFalseValues("false","False","FALSE","0")]
+        [BooleanTrueValues("true")]
+        [BooleanFalseValues("false")]
         public bool? ProtectLocation { get; set; }
     }
 }

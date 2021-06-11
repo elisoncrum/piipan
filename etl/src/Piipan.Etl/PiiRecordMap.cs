@@ -21,10 +21,10 @@ namespace Piipan.Etl
             });
 
             Map(m => m.First).Name("first")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.Middle).Name("middle")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.Dob).Name("dob");
 
@@ -35,7 +35,7 @@ namespace Piipan.Etl
             });
 
             Map(m => m.Exception).Name("exception")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.CaseId).Name("case_id").Validate(field =>
             {
@@ -43,7 +43,7 @@ namespace Piipan.Etl
             });
 
             Map(m => m.ParticipantId).Name("participant_id")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.BenefitsEndDate)
                 .Name("benefits_end_month")
@@ -61,7 +61,7 @@ namespace Piipan.Etl
                     if (!result) return false;
                   return true;
                 })
-                .TypeConverter<ToMonthEndConverter>();
+                .TypeConverter<ToMonthEndConverter>().Optional();
 
             Map(m => m.RecentBenefitMonths)
                 .Name("recent_benefit_months")
@@ -83,10 +83,10 @@ namespace Piipan.Etl
                   }
                   return true;
                 })
-                .TypeConverter<ToMonthEndArrayConverter>();
+                .TypeConverter<ToMonthEndArrayConverter>().Optional();
 
             Map(m => m.ProtectLocation).Name("protect_location")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
         }
     }
