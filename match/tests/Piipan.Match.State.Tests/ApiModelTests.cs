@@ -29,7 +29,8 @@ namespace Piipan.Match.State.Tests
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
                   new DateTime(2021, 3, 31)
-                }
+                },
+                ProtectLocation = true
             };
         }
 
@@ -53,7 +54,7 @@ namespace Piipan.Match.State.Tests
             // Arrange
             SetEnvironment();
             var record = FullRecord();
-            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state\": \"ea\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\",\n  \"benefits_end_month\": \"1970-01\",\n  \"recent_benefit_months\": [\n    \"2021-05\",\n    \"2021-04\",\n    \"2021-03\"\n  ]\n}";
+            var expected = "{\n  \"last\": \"Last\",\n  \"first\": \"First\",\n  \"middle\": \"Middle\",\n  \"ssn\": \"000-00-0000\",\n  \"dob\": \"1970-01-01\",\n  \"exception\": \"Exception\",\n  \"state\": \"ea\",\n  \"state_abbr\": \"ea\",\n  \"case_id\": \"CaseIdExample\",\n  \"participant_id\": \"ParticipantIdExample\",\n  \"benefits_end_month\": \"1970-01\",\n  \"recent_benefit_months\": [\n    \"2021-05\",\n    \"2021-04\",\n    \"2021-03\"\n  ],\n  \"protect_location\": true\n}";
 
             // Assert
             Assert.Equal(expected, record.ToJson());
@@ -71,7 +72,7 @@ namespace Piipan.Match.State.Tests
             };
             var expected = "{\n  \"matches\": [\n    {" +
                     "\n      \"last\": \"Last\",\n      \"first\": \"First\",\n      \"middle\": \"Middle\",\n      \"ssn\": \"000-00-0000\",\n      \"dob\": \"1970-01-01\",\n      \"exception\": \"Exception\",\n      \"state\": \"ea\",\n      \"state_abbr\": \"ea\",\n" +
-                    "      \"case_id\": \"CaseIdExample\",\n      \"participant_id\": \"ParticipantIdExample\",\n      \"benefits_end_month\": \"1970-01\",\n      \"recent_benefit_months\": [\n        \"2021-05\",\n        \"2021-04\",\n        \"2021-03\"\n      ]" +
+                    "      \"case_id\": \"CaseIdExample\",\n      \"participant_id\": \"ParticipantIdExample\",\n      \"benefits_end_month\": \"1970-01\",\n      \"recent_benefit_months\": [\n        \"2021-05\",\n        \"2021-04\",\n        \"2021-03\"\n      ],\n      \"protect_location\": true" +
                     "\n    }\n  ]\n}";
 
             // Act

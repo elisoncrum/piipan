@@ -53,6 +53,11 @@ PiiRecord:
       minItems: 0
       maxItems: 3
       description: "List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month."
+    protect_location:
+      type: boolean
+      nullable: true
+      example: true
+      description: "Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values."
 
 PiiRecordExamples:
   All:
@@ -71,6 +76,7 @@ PiiRecordExamples:
       - "2021-05"
       - "2021-04"
       - "2021-03"
+    protect_location: true
   AllEB:
     first: "string"
     middle: "string"
@@ -87,6 +93,7 @@ PiiRecordExamples:
       - "2021-05"
       - "2021-04"
       - "2021-03"
+    protect_location: true
   Required:
     first: null
     middle: null
@@ -99,3 +106,4 @@ PiiRecordExamples:
     case_id: "string"
     participant_id: null
     benefits_end_month: null
+    protect_location: null
