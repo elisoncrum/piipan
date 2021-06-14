@@ -36,6 +36,8 @@ namespace Piipan.Match.State
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
+            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
 
             var incoming = await new StreamReader(req.Body).ReadToEndAsync();

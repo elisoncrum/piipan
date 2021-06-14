@@ -42,6 +42,8 @@ namespace Piipan.Match.Orchestrator
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
+            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+
             var incoming = await new StreamReader(req.Body).ReadToEndAsync();
             var request = Parse(incoming, log);
             if (request.Query == null)
@@ -91,6 +93,8 @@ namespace Piipan.Match.Orchestrator
             string lookupId,
             ILogger log)
         {
+            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+
             LookupResponse response = new LookupResponse { Data = null };
             response.Data = await Lookup.Retrieve(lookupId, _lookupStorage, log);
 
