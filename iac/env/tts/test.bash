@@ -13,7 +13,7 @@ RESOURCE_GROUP=rg-core-$ENV
 MATCH_RESOURCE_GROUP=rg-match-$ENV
 
 # Resource group for metrics
-METRICS_RESOURCE_GROUP=rg-metrics-$ENV
+METRICS_RESOURCE_GROUP=$RESOURCE_GROUP
 
 # Prefix for resource identifiers
 PREFIX=tts
@@ -23,3 +23,8 @@ CLOUD_NAME=AzureCloud
 
 # used to create API Management resources
 APIM_EMAIL=noreply@tts.test
+
+IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
+
+DASHBOARD_APP_IDP_CLIENT_ID=d7281a84-817d-4a76-8005-b29f67594340
+QUERY_TOOL_APP_IDP_CLIENT_ID=71286b1e-5f5a-4757-ab5f-714802f33277

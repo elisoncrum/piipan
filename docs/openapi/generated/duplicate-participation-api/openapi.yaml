@@ -119,6 +119,25 @@ paths:
                         participant_id:
                           type: string
                           description: Participant's state-specific identifier. Must not be social security number or any personal identifiable information.
+                        benefits_end_month:
+                          type: string
+                          pattern: '^\d{4}-\d{2}$'
+                          example: 2021-01
+                          description: Participant's ending benefits month
+                        recent_benefit_months:
+                          type: array
+                          items:
+                            type: string
+                            pattern: '^\d{4}-\d{2}$'
+                            example: 2021-01
+                          minItems: 0
+                          maxItems: 3
+                          description: 'List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.'
+                        protect_location:
+                          type: boolean
+                          nullable: true
+                          example: true
+                          description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
               examples:
                 Single:
                   description: A query returning a single match
@@ -135,6 +154,12 @@ paths:
                         exception: string
                         case_id: string
                         participant_id: string
+                        benefits_end_month: 2021-01
+                        recent_benefit_months:
+                          - 2021-05
+                          - 2021-04
+                          - 2021-03
+                        protect_location: true
                 None:
                   description: A query returning no matches
                   value:
@@ -155,6 +180,12 @@ paths:
                         exception: string
                         case_id: string
                         participant_id: string
+                        benefits_end_month: 2021-01
+                        recent_benefit_months:
+                          - 2021-05
+                          - 2021-04
+                          - 2021-03
+                        protect_location: true
                       - first: null
                         middle: null
                         last: string
@@ -165,6 +196,8 @@ paths:
                         exception: null
                         case_id: string
                         participant_id: null
+                        benefits_end_month: null
+                        protect_location: null
         '400':
           description: Bad request. Missing one of the required properties in the request body.
   '/lookup_ids/{id}':

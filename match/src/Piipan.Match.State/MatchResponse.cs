@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Piipan.Match.Shared;
 
 namespace Piipan.Match.State
 {
@@ -36,7 +37,7 @@ namespace Piipan.Match.State
         public string Ssn { get; set; }
 
         [JsonProperty("dob")]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
         public DateTime Dob { get; set; }
 
         [JsonProperty("exception")]
@@ -62,6 +63,17 @@ namespace Piipan.Match.State
 
         [JsonProperty("participant_id")]
         public string ParticipantId { get; set; }
+
+        [JsonProperty("benefits_end_month")]
+        [JsonConverter(typeof(JsonConverters.MonthEndConverter))]
+        public DateTime? BenefitsEndMonth { get; set; }
+
+        [JsonProperty("recent_benefit_months")]
+        [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
+        public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
+
+        [JsonProperty("protect_location")]
+        public bool? ProtectLocation { get; set; }
 
         public string ToJson()
         {

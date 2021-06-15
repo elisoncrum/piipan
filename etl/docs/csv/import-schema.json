@@ -22,8 +22,8 @@
       {
         "name": "dob",
         "type": "date",
-        "format": "%m/%d/%Y",
-        "description": "Participant's date of birth",
+        "format": "%Y-%m-%d",
+        "description": "Participant's date of birth in ISO 8601 format",
         "constraints": {
             "required": true
         }
@@ -62,7 +62,26 @@
       {
         "name": "benefits_end_month",
         "type": "yearmonth",
-        "description": "month and year when participant's benefits end"
+        "description": "The final month when a participant will receive benefits. Leave this field blank if the participant will continue receiving benefits until the next recertification period."
+      },
+      {
+        "name": "recent_benefit_months",
+        "type": "string",
+        "description": "List of up to the last 3 months that participant received benefits, formatted as yearmonths separated by spaces. Does not include current benefit month. Months need to be consecutive. Fewer than 3 months can be entered for newer participants.",
+        "constraints": {
+          "pattern": "([0-9]{4}-[0-9]{1,2} ?){0,3}"
+        }
+      },
+      {
+        "name": "protect_location",
+        "type": "boolean",
+        "description": "Location protection flag for vulnerable individuals. True values indicate that the individual's location must be protected from disclosure to avoid harm to the individual. The field value can be omitted if the risk of harm has not been assessed.",
+        "trueValues": [
+          "true"
+        ],
+        "falseValues": [
+          "false"
+        ]
       }
     ]
   }

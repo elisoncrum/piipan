@@ -1,0 +1,36 @@
+# Create Azure AD B2C IDP
+
+## Background
+We use an [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/overview) tenant as our Open ID Connect identity provider in the TTS sandbox environment.
+
+## Setup
+
+#### Create the tenant
+1. From the Azure Portal (primary tenant), select `Create a resource`
+2. Search for and select `Azure Active Directory B2C`
+   1. Click `Create`
+   2. Click `Create a new Azure AD B2C Tenant`
+   3. Fill in tenant naming details and click `Create`
+
+#### Create a user flow
+1. From the top navigation bar, open the `Directory + subscription` pane and select the newly created tenant
+2. From within the B2C tenant, search for and select `Azure AD B2C`
+3. Under `Policies`, select the `User flows` blade
+   1. Click `New user flow`
+   2. Select `Sign in` and click `Create`
+   3. Enter a name for the flow (e.g., "B2C-1_SI")
+   4. Select `Email signin` under `Local accounts`
+   5. Under `Application claims`, select:
+      - `Display name`
+      - `Identity provider`
+      - `User's Object ID`
+   1. Click `Create`
+   
+#### Register an application
+1. From within the B2C tenant, search for and select `Azure AD B2C`
+2. Open the `App registrations` blade
+    1. Click `New registration`
+    2. Enter the name to match that of the application object in the main tenant (e.g. “tts-app-dashboard-dev”)
+    3. Under `Supported account types`, select the third option (“any identity provider”)
+    4. Set the redirect URI to the base URI of the application, suffixed with `/.auth/login/aad/callback`
+    4. Click `Register`

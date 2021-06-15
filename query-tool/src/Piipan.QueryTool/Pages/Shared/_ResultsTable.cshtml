@@ -10,8 +10,11 @@
             <th scope="col">DOB</th>
             <th scope="col">SSN</th>
             <th scope="col">State</th>
-            <th scope="col">Case Id</th>
-            <th scope="col">Participant Id</th>
+            <th scope="col">Case ID</th>
+            <th scope="col">Participant ID</th>
+            <th scope="col">Benefits end month</th>
+            <th scope="col">Recent benefits months</th>
+            <th scope="col">Protected location for vulnerable individuals</th>
         </tr>
     </thead>
     <tbody>
@@ -24,6 +27,9 @@
                     <td>@record.State</td>
                     <td>@record.CaseId</td>
                     <td>@record.ParticipantId</td>
+                    <td>@record.BenefitsEndMonth</td>
+                    <td>@record.RecentBenefitMonthsDisplay</td>
+                    <td>@record.ProtectLocationDisplay</td>
                 </tr>
             }
         </tbody>

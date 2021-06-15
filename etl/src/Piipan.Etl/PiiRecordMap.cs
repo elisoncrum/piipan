@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using CsvHelper.Configuration;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
@@ -17,10 +21,10 @@ namespace Piipan.Etl
             });
 
             Map(m => m.First).Name("first")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.Middle).Name("middle")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.Dob).Name("dob");
 
@@ -31,7 +35,7 @@ namespace Piipan.Etl
             });
 
             Map(m => m.Exception).Name("exception")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
             Map(m => m.CaseId).Name("case_id").Validate(field =>
             {
@@ -39,10 +43,52 @@ namespace Piipan.Etl
             });
 
             Map(m => m.ParticipantId).Name("participant_id")
-                .TypeConverterOption.NullValues(string.Empty);
+                .TypeConverterOption.NullValues(string.Empty).Optional();
 
-            Map(m => m.BenefitsEndDate).Name("benefits_end_month")
-                .TypeConverterOption.NullValues(string.Empty);
+            Map(m => m.BenefitsEndDate)
+                .Name("benefits_end_month")
+                .Validate(field => {
+                  if (String.IsNullOrEmpty(field.Field)) return true;
+
+                  string[] formats={"yyyy-MM", "yyyy-M"};
+                  DateTime dateValue;
+                    var result = DateTime.TryParseExact(
+                      field.Field,
+                      formats,
+                      new CultureInfo("en-US"),
+                      DateTimeStyles.None,
+                      out dateValue);
+                    if (!result) return false;
+                  return true;
+                })
+                .TypeConverter<ToMonthEndConverter>().Optional();
+
+            Map(m => m.RecentBenefitMonths)
+                .Name("recent_benefit_months")
+                .Validate(field => {
+                  if (String.IsNullOrEmpty(field.Field)) return true;
+
+                  string[] formats={"yyyy-MM", "yyyy-M"};
+                  string[] dates = field.Field.Split(' ');
+                  foreach (string date in dates)
+                  {
+                    DateTime dateValue;
+                    var result = DateTime.TryParseExact(
+                      date,
+                      formats,
+                      new CultureInfo("en-US"),
+                      DateTimeStyles.None,
+                      out dateValue);
+                    if (!result) return false;
+                  }
+                  return true;
+                })
+                .TypeConverter<ToMonthEndArrayConverter>().Optional();
+
+            Map(m => m.ProtectLocation).Name("protect_location")
+                .TypeConverterOption.NullValues(string.Empty).Optional();
+
         }
     }
+
 }

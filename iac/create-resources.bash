@@ -145,9 +145,7 @@ main () {
       --parameters \
         storageAccountName="$func_stor_name" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION" \
-        coreResourceGroup="$RESOURCE_GROUP" \
-        eventHubName="$EVENT_HUB_NAME"
+        location="$LOCATION"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -177,7 +175,8 @@ main () {
       vnetName="$VNET_NAME" \
       subnetName="$DB_SUBNET_NAME" \
       privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
-      privateDnsZoneName="$PRIVATE_DNS_ZONE"
+      privateDnsZoneName="$PRIVATE_DNS_ZONE" \
+      eventHubName="$EVENT_HUB_NAME"
 
 
   # The AD admin can't be specified in the PostgreSQL ARM template,
@@ -264,6 +263,14 @@ main () {
       kind="$APP_SERVICE_PLAN_FUNC_KIND" \
       sku="$APP_SERVICE_PLAN_FUNC_SKU"
 
+  # Function apps need an Event Hub authorization rule ID for log streaming
+  eh_rule_id=$(\
+    az eventhubs namespace authorization-rule list \
+      --resource-group "$RESOURCE_GROUP" \
+      --namespace-name "$EVENT_HUB_NAME" \
+      --query "[?name == 'RootManageSharedAccessKey'].id" \
+      -o tsv)
+
   # Create per-state Function apps and assign corresponding managed identity for
   # access to the per-state blob-storage and database, set up system topics and
   # event subscription to bulk upload (blob creation) events
@@ -331,6 +338,25 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --subnet "$FUNC_SUBNET_NAME" \
       --vnet "$VNET_NAME"
+
+    # Stream logs to Event Hub
+    func_id=$(\
+      az functionapp show \
+        -n "$func_app" \
+        -g "$RESOURCE_GROUP" \
+        -o tsv \
+        --query id)
+    az monitor diagnostic-settings create \
+      --name "stream-logs-to-event-hub" \
+      --resource "$func_id" \
+      --event-hub "logs" \
+      --event-hub-rule "$eh_rule_id" \
+      --logs '[
+        {
+          "category": "FunctionAppLogs",
+          "enabled": true
+        }
+      ]'
 
     # XXX Assumes if any identity is set, it is the one we are specifying below
     exists=$(az functionapp identity show \
@@ -529,9 +555,10 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       appName="$QUERY_TOOL_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
-      frontDoorId="$front_door_id" \
       OrchApiUri="$orch_api_uri" \
-      eventHubName="$EVENT_HUB_NAME"
+      eventHubName="$EVENT_HUB_NAME" \
+      idpOidcConfigUri="$IDP_OIDC_CONFIG_URI" \
+      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"

@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Piipan.Match.Shared;
 
 namespace Piipan.Match.Orchestrator
 {
@@ -23,11 +24,11 @@ namespace Piipan.Match.Orchestrator
         public string First { get; set; }
 
         [JsonProperty("middle", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonConverter(typeof(NullConverter))]
+        [JsonConverter(typeof(JsonConverters.NullConverter))]
         public string Middle { get; set; }
 
         [JsonProperty("dob", Required = Required.Always)]
-        [JsonConverter(typeof(DateTimeConverter))]
+        [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
         public DateTime Dob { get; set; }
 
         [JsonProperty("ssn", Required = Required.Always)]

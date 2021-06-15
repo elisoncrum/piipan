@@ -31,7 +31,7 @@ namespace Piipan.QueryTool
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         [JsonPropertyName("dob")]
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         [Required]
         [RegularExpression(@"^\d{3}-\d{2}-\d{4}$",
@@ -55,5 +55,31 @@ namespace Piipan.QueryTool
         [Display(Name = "Lookup ID")]
         [JsonPropertyName("lookup_id")]
         public string LookupId { get; set; }
+
+        [Display(Name = "Benefits End Month")]
+        [JsonPropertyName("benefits_end_month")]
+        public string BenefitsEndMonth { get; set; }
+
+        [Display(Name = "Recent Benefit Months")]
+        [JsonPropertyName("recent_benefit_months")]
+        public string[] RecentBenefitMonths { get; set; } = new string[0];
+
+        public string RecentBenefitMonthsDisplay
+        {
+            get { return String.Join(", ", this.RecentBenefitMonths); }
+        }
+
+        [Display(Name = "Protect Location")]
+        [JsonPropertyName("protect_location")]
+        public bool? ProtectLocation { get; set; }
+
+        public string ProtectLocationDisplay
+        {
+            get
+            {
+                if (this.ProtectLocation == null) return "Yes";
+                return (bool)this.ProtectLocation ? "Yes" : "No";
+            }
+        }
     }
 }

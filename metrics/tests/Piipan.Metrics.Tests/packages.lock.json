@@ -30,9 +30,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[5.0.5, )",
-        "resolved": "5.0.5",
-        "contentHash": "cvqU1o/gTeX9ynzCEa1NkBEAtGFxLwROw1KweG/giNEYSSw/6W3G7hvYIFIyrdgTorEbLu/AaI2Lxs5TRB4goQ==",
+        "requested": "[5.0.7, )",
+        "resolved": "5.0.7",
+        "contentHash": "EQWwxb2lN9w78YG4f6Fxhw5lFEx4LuaNGasXzw86kTOJxiPsUORSh/BTencNZJO4uVqGZx3EO9Z8JXTAvRjgeg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
@@ -326,6 +326,11 @@
           "Newtonsoft.Json": "9.0.1",
           "System.Net.Http": "4.3.0"
         }
+      },
+      "Microsoft.Azure.Functions.Analyzers": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
       },
       "Microsoft.Azure.WebJobs": {
         "type": "Transitive",
@@ -638,9 +643,10 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.12",
-        "contentHash": "qaiduifDWEFYxnzO7yvbCLvH7brGi0mO+rjJfEEQY+bPMkUWz8uEecBwSfaCsxQKHn2dcpLbIT4Ru2PNZWAPgg==",
+        "resolved": "3.0.13",
+        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
         "dependencies": {
+          "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
           "Microsoft.Azure.WebJobs.Extensions": "3.0.6",
           "Microsoft.Azure.WebJobs.Extensions.Http": "[3.0.2, 3.1.0)",
@@ -1840,8 +1846,8 @@
         "dependencies": {
           "Azure.Identity": "1.4.0",
           "Azure.Security.KeyVault.Secrets": "4.1.1",
-          "Microsoft.NET.Sdk.Functions": "3.0.12",
-          "Npgsql": "5.0.5",
+          "Microsoft.NET.Sdk.Functions": "3.0.13",
+          "Npgsql": "5.0.7",
           "Piipan.Metrics.Models": "1.0.0"
         }
       },
@@ -1851,8 +1857,8 @@
           "Azure.Identity": "1.4.0",
           "Azure.Security.KeyVault.Secrets": "4.1.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
-          "Microsoft.NET.Sdk.Functions": "3.0.12",
-          "Npgsql": "5.0.5"
+          "Microsoft.NET.Sdk.Functions": "3.0.13",
+          "Npgsql": "5.0.7"
         }
       },
       "piipan.metrics.models": {

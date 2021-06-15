@@ -6,11 +6,11 @@
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="10.2.2" />
+    <PackageReference Include="FluentValidation" Version="10.2.3" />
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.15" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.16" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
     <PackageReference Include="Nanoid" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
   </ItemGroup>
@@ -33,5 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\Piipan.Match.Shared\Piipan.Match.Shared.csproj" />
   </ItemGroup>
 </Project>

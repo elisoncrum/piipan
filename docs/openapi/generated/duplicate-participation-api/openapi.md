@@ -72,7 +72,14 @@ Queries all state databases for any PII records that are an exact match to the l
       "state_abbr": "ea",
       "exception": "string",
       "case_id": "string",
-      "participant_id": "string"
+      "participant_id": "string",
+      "benefits_end_month": "2021-01",
+      "recent_benefit_months": [
+        "2021-05",
+        "2021-04",
+        "2021-03"
+      ],
+      "protect_location": true
     }
   ]
 }
@@ -103,7 +110,14 @@ Queries all state databases for any PII records that are an exact match to the l
       "state_abbr": "eb",
       "exception": "string",
       "case_id": "string",
-      "participant_id": "string"
+      "participant_id": "string",
+      "benefits_end_month": "2021-01",
+      "recent_benefit_months": [
+        "2021-05",
+        "2021-04",
+        "2021-03"
+      ],
+      "protect_location": true
     },
     {
       "first": null,
@@ -115,7 +129,9 @@ Queries all state databases for any PII records that are an exact match to the l
       "state_abbr": "ec",
       "exception": null,
       "case_id": "string",
-      "participant_id": null
+      "participant_id": null,
+      "benefits_end_month": null,
+      "protect_location": null
     }
   ]
 }
@@ -146,6 +162,9 @@ Status Code **200**
 |»» exception|string|false|none|Placeholder for value indicating special processing instructions|
 |»» case_id|string|false|none|Participant's state-specific case identifier|
 |»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
+|»» benefits_end_month|string|false|none|Participant's ending benefits month|
+|»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
+|»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:

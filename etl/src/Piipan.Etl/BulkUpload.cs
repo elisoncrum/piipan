@@ -15,6 +15,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl
 {
@@ -62,11 +63,6 @@ namespace Piipan.Etl
                 log.LogError(ex.Message);
                 throw;
             }
-        }
-
-        public static DateTime LastDayOfMonth(DateTime dateTime)
-        {
-            return new DateTime(dateTime.Year, dateTime.Month, DateTime.DaysInMonth(dateTime.Year, dateTime.Month));
         }
 
         internal static IEnumerable<PiiRecord> Read(Stream input, ILogger log)
@@ -148,17 +144,11 @@ namespace Piipan.Etl
 
                 foreach (var record in records)
                 {
-                    if (record.BenefitsEndDate.HasValue)
-                    {
-                      DateTime benefitsEndDate = record.BenefitsEndDate.Value;
-                      record.BenefitsEndDate = LastDayOfMonth(benefitsEndDate);
-                    }
-
                     using (var cmd = factory.CreateCommand())
                     {
                         cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id, benefits_end_date) " +
-                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id, @benefits_end_date)";
+                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, exception, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location) " +
+                            "VALUES (@last, @first, @middle, @dob, @ssn, @exception, @upload_id, @case_id, @participant_id, @benefits_end_date, @recent_benefit_months::date[], @protect_location)";
 
                         AddWithValue(cmd, DbType.String, "last", record.Last);
                         AddWithValue(cmd, DbType.String, "first", (object)record.First ?? DBNull.Value);
@@ -170,6 +160,8 @@ namespace Piipan.Etl
                         AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
                         AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);
                         AddWithValue(cmd, DbType.DateTime, "benefits_end_date", (object)record.BenefitsEndDate ?? DBNull.Value);
+                        AddWithValue(cmd, DbType.Object, "recent_benefit_months", (object)DateFormatters.FormatDatesAsPgArray(record.RecentBenefitMonths));
+                        AddWithValue(cmd, DbType.Boolean, "protect_location", (object)record.ProtectLocation ?? DBNull.Value);
 
                         cmd.ExecuteNonQuery();
                     }

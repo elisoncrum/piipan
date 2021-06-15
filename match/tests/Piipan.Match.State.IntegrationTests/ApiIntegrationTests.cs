@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,14 @@ namespace Piipan.Match.State.IntegrationTests
                 Ssn = "000-00-0000",
                 Exception = "Exception",
                 CaseId = "CaseIdExample",
-                ParticipantId = "ParticipantIdExample"
+                ParticipantId = "ParticipantIdExample",
+                BenefitsEndMonth = new DateTime(1970, 1, 31),
+                RecentBenefitMonths = new List<DateTime>() {
+                  new DateTime(2021, 5, 31),
+                  new DateTime(2021, 4, 30),
+                  new DateTime(2021, 3, 31)
+                },
+                ProtectLocation = true
             };
         }
 
@@ -80,9 +88,9 @@ namespace Piipan.Match.State.IntegrationTests
             Assert.Equal(record.CaseId, resultRecord.Matches[0].CaseId);
             Assert.Equal(record.ParticipantId, resultRecord.Matches[0].ParticipantId);
             Assert.Equal("ea", resultRecord.Matches[0].State);
-
-            // Deprecated
-            Assert.Equal("ea", resultRecord.Matches[0].StateAbbr);
+            Assert.Equal(record.BenefitsEndMonth, resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Equal(record.RecentBenefitMonths, resultRecord.Matches[0].RecentBenefitMonths);
+            Assert.Equal(record.ProtectLocation, resultRecord.Matches[0].ProtectLocation);
         }
 
         [Fact]
@@ -131,7 +139,14 @@ namespace Piipan.Match.State.IntegrationTests
                 Last = "Farrington",
                 Dob = new DateTime(1931, 10, 13),
                 Ssn = "000-12-3456",
-                CaseId = "CaseIdExample"
+                CaseId = "CaseIdExample",
+                BenefitsEndMonth = new DateTime(2021, 06, 30),
+                RecentBenefitMonths = new List<DateTime>() {
+                  new DateTime(2021, 5, 31),
+                  new DateTime(2021, 4, 30),
+                  new DateTime(2021, 3, 31)
+                },
+                ProtectLocation = true
             };
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(JsonBody(query));
@@ -146,6 +161,8 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Single(resultRecord.Matches);
+            Assert.Equal(new DateTime(2021, 06, 30), resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Equal(new DateTime(2021, 05, 31), resultRecord.Matches[0].RecentBenefitMonths[0]);
         }
 
         [Fact]
@@ -174,6 +191,64 @@ namespace Piipan.Match.State.IntegrationTests
 
             // Assert
             Assert.Single(resultRecord.Matches);
+        }
+
+        [Fact]
+        public async void NullPropertiesCanBeNull()
+        {
+            var query = "{last: 'Farrington', first: 'Foo', middle: 'Bar', dob: '1931-10-13', ssn: '000-12-3456'}";
+            var record = new PiiRecord
+            {
+                First = "Theodore",
+                Middle = "Carri",
+                Last = "Farrington",
+                Dob = new DateTime(1931, 10, 13),
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
+            };
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(JsonBody(query));
+
+            ClearParticipants();
+            Insert(record);
+
+            // Act
+            var response = await Api.Query(mockRequest.Object, logger);
+            var result = response as JsonResult;
+            var resultRecord = result.Value as MatchQueryResponse;
+
+            // Assert
+            Assert.Null(resultRecord.Matches[0].ParticipantId);
+            Assert.Null(resultRecord.Matches[0].BenefitsEndMonth);
+            Assert.Null(resultRecord.Matches[0].ProtectLocation);
+        }
+
+        [Fact]
+        public async void EmptyValuesCanBeEmpty()
+        {
+            var query = "{last: 'Farrington', first: 'Foo', middle: 'Bar', dob: '1931-10-13', ssn: '000-12-3456'}";
+            var record = new PiiRecord
+            {
+                First = "Theodore",
+                Middle = "Carri",
+                Last = "Farrington",
+                Dob = new DateTime(1931, 10, 13),
+                Ssn = "000-12-3456",
+                CaseId = "CaseIdExample"
+            };
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(JsonBody(query));
+
+            ClearParticipants();
+            Insert(record);
+
+            // Act
+            var response = await Api.Query(mockRequest.Object, logger);
+            var result = response as JsonResult;
+            var resultRecord = result.Value as MatchQueryResponse;
+
+            // Assert
+            Assert.Empty(resultRecord.Matches[0].RecentBenefitMonths);
         }
     }
 }
