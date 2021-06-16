@@ -1,6 +1,6 @@
 # Log streaming
 
-In keeping with [NIST SP 800-53 control AU-3](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#!/control?version=4.0&number=AU-3), resource logs are streamed to a central location where they can be accessed by a SIEM tool such as Splunk. This is accomplished in Azure using a combination of [Event Hub](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-about), resource [diagnostic settings](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD), and an [application registration](https://docs.microsoft.com/en-us/azure/event-hubs/authenticate-application) for accessing and reading logs.
+In keeping with [NIST SP 800-53 control AU-6](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#!/control?version=4.0&number=AU-6), resource logs are streamed to a central location where they can be [accessed by an external Security Information and Event Management (SIEM) tool](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/stream-monitoring-data-event-hubs#partner-tools-with-azure-monitor-integration). This is accomplished in Azure using a combination of [Event Hub](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-about), resource [diagnostic settings](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD), and an [application registration](https://docs.microsoft.com/en-us/azure/event-hubs/authenticate-application) for accessing and reading logs.
 
 ## Event Hub configuration
 
