@@ -32,6 +32,7 @@
         "sku": "S1",
         "baseSiteConfig": {
             "linuxFxVersion": "DOTNETCORE|3.1",
+            "ipSecurityRestrictions": [],
             "ftpsState": "Disabled",
             "appSettings": [
                 // Environment Variables
