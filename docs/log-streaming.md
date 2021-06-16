@@ -31,4 +31,4 @@ log.LogInformation("Executing request from user {User}", req.HttpContext?.User.I
 
 ## Accessing and reading logs
 
-The IaC creates an application registration that can be used by an external SIEM tool to access and read logs. The application registration is explicitly granted the `Azure Event Hubs Data Receive` role on the `logs` event hub.
+The IaC creates an application registration that can be used by an external SIEM tool to access and read logs. The application registration is explicitly granted the [`Azure Event Hubs Data Receiver` role](https://docs.microsoft.com/en-us/azure/event-hubs/authenticate-application#built-in-roles-for-azure-event-hubs) on the `logs` event hub.
