@@ -7,7 +7,7 @@
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
 #
-# usage: create-resources.bash <azure-env>
+# usage: configure-easy-auth.bash <azure-env>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit
