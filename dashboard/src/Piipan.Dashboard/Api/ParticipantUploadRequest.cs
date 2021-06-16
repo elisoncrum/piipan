@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Piipan.Shared.Authentication;
 
 namespace Piipan.Dashboard
 {
@@ -14,18 +15,19 @@ namespace Piipan.Dashboard
         }
         public class ParticipantUploadRequest : IParticipantUploadRequest
         {
-            private readonly HttpClient _httpClient;
+            private readonly IAuthorizedApiClient _apiClient;
 
-            public ParticipantUploadRequest(HttpClient client)
+            public ParticipantUploadRequest(IAuthorizedApiClient apiClient)
             {
-                _httpClient = client;
+                _apiClient = apiClient;
             }
             public async Task<ParticipantUploadResponse> Get(string url)
             {
                 try
                 {
-                    var response = await _httpClient.GetAsync(url);
+                    var response = await _apiClient.GetAsync(new Uri(url));
                     var body = await response.Content.ReadAsStringAsync();
+
                     return JsonConvert.DeserializeObject<ParticipantUploadResponse>(body);
                 }
                 catch (HttpRequestException e)
