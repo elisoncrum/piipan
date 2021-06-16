@@ -17,7 +17,7 @@ Each resource (Function App, database cluster, etc) is configured with a diagnos
 - Stream logs to the `logs` event hub within the `evh-monitoring` namespace
 - Use the default `RootManageSharedAccessKey` as the event hub policy
 
-Resources have two categories of logging: "logs" and "metrics". Our default practice is to stream all logs categories and no metrics categories. Categories can be enabled/disabled as required — i.e., if ISO determines a certain log category to produce too much noise and be unnecessary.
+Resources have two categories of logging: "logs" and "metrics". Our default practice is to stream all logs categories and no metrics categories. Categories can be enabled/disabled as required — i.e., if the team analyzing audit logs determines a certain log category to produce too much noise and be unnecessary.
 
 ## Application logging
 
