@@ -44,15 +44,23 @@ Queries all state databases for any PII records that are an exact match to the l
 
 ```json
 {
-  "query": {
-    "first": "string",
-    "middle": "string",
-    "last": "string",
-    "ssn": "000-00-0000",
-    "dob": "1970-01-01"
-  }
+  "query": [
+    {
+      "first": "string",
+      "middle": "string",
+      "last": "string",
+      "ssn": "000-00-0000",
+      "dob": "1970-01-01"
+    }
+  ]
 }
 ```
+
+<h3 id="query-for-matches-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|query|body|[[#/paths/~1query/post/requestBody/content/application~1json/schema/properties/query/items](#schema#/paths/~1query/post/requestbody/content/application~1json/schema/properties/query/items)]|true|none|
 
 > Example responses
 
@@ -60,26 +68,30 @@ Queries all state databases for any PII records that are an exact match to the l
 
 ```json
 {
-  "lookup_id": "string",
-  "matches": [
+  "data": [
     {
-      "first": "string",
-      "middle": "string",
-      "last": "string",
-      "ssn": "000-00-0000",
-      "dob": "1970-01-01",
-      "state": "ea",
-      "state_abbr": "ea",
-      "exception": "string",
-      "case_id": "string",
-      "participant_id": "string",
-      "benefits_end_month": "2021-01",
-      "recent_benefit_months": [
-        "2021-05",
-        "2021-04",
-        "2021-03"
-      ],
-      "protect_location": true
+      "lookup_id": "string",
+      "matches": [
+        {
+          "first": "string",
+          "middle": "string",
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "ea",
+          "state_abbr": "ea",
+          "exception": "string",
+          "case_id": "string",
+          "participant_id": "string",
+          "benefits_end_month": "2021-01",
+          "recent_benefit_months": [
+            "2021-05",
+            "2021-04",
+            "2021-03"
+          ],
+          "protect_location": true
+        }
+      ]
     }
   ]
 }
@@ -89,49 +101,104 @@ Queries all state databases for any PII records that are an exact match to the l
 
 ```json
 {
-  "lookup_id": null,
-  "matches": []
+  "data": [
+    {
+      "lookup_id": null,
+      "matches": []
+    }
+  ]
 }
 ```
 
-> A query returning multiple matches
+> A query returning multiple matches for one record
 
 ```json
 {
-  "lookup_id": "string",
-  "matches": [
+  "data": [
     {
-      "first": "string",
-      "middle": "string",
-      "last": "string",
-      "ssn": "000-00-0000",
-      "dob": "1970-01-01",
-      "state": "eb",
-      "state_abbr": "eb",
-      "exception": "string",
-      "case_id": "string",
-      "participant_id": "string",
-      "benefits_end_month": "2021-01",
-      "recent_benefit_months": [
-        "2021-05",
-        "2021-04",
-        "2021-03"
-      ],
-      "protect_location": true
+      "lookup_id": "string",
+      "matches": [
+        {
+          "first": "string",
+          "middle": "string",
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "eb",
+          "state_abbr": "eb",
+          "exception": "string",
+          "case_id": "string",
+          "participant_id": "string",
+          "benefits_end_month": "2021-01",
+          "recent_benefit_months": [
+            "2021-05",
+            "2021-04",
+            "2021-03"
+          ],
+          "protect_location": true
+        },
+        {
+          "first": null,
+          "middle": null,
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "ec",
+          "state_abbr": "ec",
+          "exception": null,
+          "case_id": "string",
+          "participant_id": null,
+          "benefits_end_month": null,
+          "protect_location": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+> A query returning one match for multiple records
+
+```json
+{
+  "data": [
+    {
+      "lookup_id": "string",
+      "matches": [
+        {
+          "first": null,
+          "middle": null,
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "ec",
+          "state_abbr": "ec",
+          "exception": null,
+          "case_id": "string",
+          "participant_id": null,
+          "benefits_end_month": null,
+          "protect_location": null
+        }
+      ]
     },
     {
-      "first": null,
-      "middle": null,
-      "last": "string",
-      "ssn": "000-00-0000",
-      "dob": "1970-01-01",
-      "state": "ec",
-      "state_abbr": "ec",
-      "exception": null,
-      "case_id": "string",
-      "participant_id": null,
-      "benefits_end_month": null,
-      "protect_location": null
+      "lookup_id": "string",
+      "matches": [
+        {
+          "first": null,
+          "middle": null,
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "ec",
+          "state_abbr": "ec",
+          "exception": null,
+          "case_id": "string",
+          "participant_id": null,
+          "benefits_end_month": null,
+          "protect_location": null
+        }
+      ]
     }
   ]
 }
@@ -150,21 +217,22 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» lookup_id|string¦null|false|none|the identifier of the match request|
-|» matches|[object]|false|none|none|
-|»» first|string|false|none|First name|
-|»» middle|string|false|none|Middle name|
-|»» last|string|true|none|Last name|
-|»» ssn|string|true|none|Social Security number|
-|»» dob|string(date)|true|none|Date of birth|
-|»» state|string|false|none|State/territory two-letter postal abbreviation|
-|»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
-|»» exception|string|false|none|Placeholder for value indicating special processing instructions|
-|»» case_id|string|false|none|Participant's state-specific case identifier|
-|»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
-|»» benefits_end_month|string|false|none|Participant's ending benefits month|
-|»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
-|»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
+|» data|array|false|none|none|
+|»» lookup_id|string¦null|false|none|the identifier of the match request|
+|»» matches|[object]|false|none|none|
+|»»» first|string|false|none|First name|
+|»»» middle|string|false|none|Middle name|
+|»»» last|string|true|none|Last name|
+|»»» ssn|string|true|none|Social Security number|
+|»»» dob|string(date)|true|none|Date of birth|
+|»»» state|string|false|none|State/territory two-letter postal abbreviation|
+|»»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
+|»»» exception|string|false|none|Placeholder for value indicating special processing instructions|
+|»»» case_id|string|false|none|Participant's state-specific case identifier|
+|»»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
+|»»» benefits_end_month|string|false|none|Participant's ending benefits month|
+|»»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
+|»»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:

@@ -9,10 +9,12 @@ MatchQueryRequest:
             - query
         properties:
           query:
-            $ref: '#/MatchQuery'
+            type: array
+            items:
+              $ref: '#/MatchQueryRequestItem'
       examples:
         $ref: '#/MatchQueryRequestExamples'
-MatchQuery:
+MatchQueryRequestItem:
   type: object
   required:
     - first
@@ -42,22 +44,41 @@ MatchQueryRequestExamples:
     description: "A request with values for all fields"
     value:
       query:
-        first: "string"
-        middle: "string"
-        last: "string"
-        ssn: "000-00-0000"
-        dob: "1970-01-01"
+        - first: "string"
+          middle: "string"
+          last: "string"
+          ssn: "000-00-0000"
+          dob: "1970-01-01"
   "Only requried fields":
     description: "A request with values only for required fields"
     value:
       query:
-        first: "string"
-        last: "string"
-        ssn: "000-00-0000"
-        dob: "1970-01-01"
+        - first: "string"
+          last: "string"
+          ssn: "000-00-0000"
+          dob: "1970-01-01"
+  "Multiple Records":
+    description: "A request with multiple records"
+    value:
+      query:
+        - first: "string"
+          last: "string"
+          ssn: "000-00-0000"
+          dob: "1970-01-01"
+        - first: "string"
+          last: "string"
+          ssn: "000-00-0001"
+          dob: "1970-01-02"
 
 #/components/schemas/MatchQueryResponse
 MatchQueryResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      $ref: '#/MatchQueryResponseItem'
+
+MatchQueryResponseItem:
   type: object
   properties:
     lookup_id:
@@ -73,18 +94,31 @@ MatchQueryResponseExamples:
   Single:
     description: "A query returning a single match"
     value:
-      lookup_id: "string"
-      matches:
-        - $ref: './pii-record.yaml#/PiiRecordExamples/All'
+      data:
+        - lookup_id: "string"
+          matches:
+            - $ref: './pii-record.yaml#/PiiRecordExamples/All'
   None:
     description: "A query returning no matches"
     value:
-      lookup_id: null
-      matches: []
+      data:
+        - lookup_id: null
+          matches: []
   Multiple:
-    description: "A query returning multiple matches"
+    description: "A query returning multiple matches for one record"
     value:
-      lookup_id: "string"
-      matches:
-        - $ref: './pii-record.yaml#/PiiRecordExamples/AllEB'
-        - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
+      data:
+        - lookup_id: "string"
+          matches:
+            - $ref: './pii-record.yaml#/PiiRecordExamples/AllEB'
+            - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
+  MultipleRecords:
+    description: "A query returning one match for multiple records"
+    value:
+      data:
+        - lookup_id: "string"
+          matches:
+            - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
+        - lookup_id: "string"
+          matches:
+            - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
