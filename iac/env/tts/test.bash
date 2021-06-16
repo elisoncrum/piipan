@@ -24,6 +24,9 @@ CLOUD_NAME=AzureCloud
 # used to create API Management resources
 APIM_EMAIL=noreply@tts.test
 
+# SIEM tool app registration name
+SIEM_RECEIVER=$PREFIX-siem-tool-$ENV
+
 IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
 
 DASHBOARD_APP_IDP_CLIENT_ID=d7281a84-817d-4a76-8005-b29f67594340
