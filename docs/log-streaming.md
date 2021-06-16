@@ -2,6 +2,8 @@
 
 In keeping with [NIST SP 800-53 control AU-6](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#!/control?version=4.0&number=AU-6), resource logs are streamed to a central location where they can be [accessed by an external Security Information and Event Management (SIEM) tool](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/stream-monitoring-data-event-hubs#partner-tools-with-azure-monitor-integration). This is accomplished in Azure using a combination of [Event Hub](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-about), resource [diagnostic settings](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD), and an [application registration](https://docs.microsoft.com/en-us/azure/event-hubs/authenticate-application) for accessing and reading logs.
 
+While this document focuses on providing log access to external monitoring tools, logs can also be accessed and analyzed within Azure using [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/monitor-azure-resource) and pointing diagnostic settings to a [Log Analytics workspace](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-logs#send-to-log-analytics-workspace) in addition to (or in lieu of) Event Hub.
+
 ## Event Hub configuration
 
 All resource logs are streamed to a central Event Hub. The IaC establishes the following configuration in each deployment environment:
