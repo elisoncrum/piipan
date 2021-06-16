@@ -23,7 +23,7 @@
         "namespace": "[concat(parameters('prefix'), '-evh-', variables('basename'), '-', parameters('env'))]",
         // Azure Event Hubs Data Receiver
         "receiverRoleId": "a638d3c7-ab3a-418d-83e6-5f17a39d4fde",
-        "receiverRoleName": "[guid(parameters('receiverId'), variables('roleId'), resourceGroup().id)]"
+        "receiverRoleName": "[guid(parameters('receiverId'), variables('receiverRoleId'), resourceGroup().id)]"
     },
     "resources": [
         {

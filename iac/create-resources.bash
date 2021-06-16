@@ -149,7 +149,7 @@ main () {
       location="$LOCATION" \
       env="$ENV" \
       prefix="$PREFIX" \
-      readerId="$siem_app_id"
+      receiverId="$siem_app_id"
 
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
