@@ -25,7 +25,7 @@ CLOUD_NAME=AzureCloud
 APIM_EMAIL=noreply@tts.test
 
 # SIEM tool app registration name
-SIEM_RECEIVER=$PREFIX-iso-splunk-$ENV
+SIEM_RECEIVER=$PREFIX-siem-tool-$ENV
 
 IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
 
