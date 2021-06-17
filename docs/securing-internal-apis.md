@@ -18,6 +18,7 @@ This document details how the internal APIs are utilized, how to secure them, ho
 - [Configuring the server](#configuring-the-server)
 - [Configuring the client](#configuring-the-client)
 - [Making authenticated API calls](#making-authenticated-api-calls)
+- [Working locally](#working-locally)
 - [Definitions](#definitions)
 - [Miscellaneous notes](#miscellaneous-notes)
 - [Virtual Network Integration](#virtual-network-integration)
@@ -80,6 +81,38 @@ An illustrated version of this flow:
   <a href="./piipan-internal-authentication.png"><img src="./piipan-internal-authentication.png" alt="Authenticated API diagram"></a>
   <!-- Google Drawing: https://docs.google.com/drawings/d/1PlAZwHBbf1QkRC4LDkce7FmnUq25veJGj2Vafyj9-FY/edit?usp=sharing -->
 </p>
+
+## Working locally
+
+Developers occasionally need to connect locally running applications to remote APIs to perform testing. With App Service Authentication enabled, API requests that originate locally must follow the same authentication approach outlined above. However, instead of using a service principal, developers can use their locally authenticated CLI user:
+
+1. Log in to the AZ CLI:
+```
+az login
+```
+
+2. Use `assign-app-role` to assign your user account the necessary [application role](#application-roles):
+```
+./tools/assign-app-role.bash <azure-env> <function-app-name> <app-role-name>
+```
+
+3. Use `authorize-cli` to add the Azure CLI as an authorized client application for the Function's application registration:
+```
+./tools/authorize-cli.bash <azure-env> <function-app-name>
+```
+
+4. Modify the application to conditionally use the CLI to obtain access tokens when running locally. The specific approach will vary application to application, but may resemble (assuming the use of `Piipan.Shared.Authentication`):
+```
+ITokenProvider tokenProvider;
+if (_env.IsDevelopment())
+{
+    tokenProvider = new CliTokenProvider();
+}
+else
+{
+    tokenProvider = new EasyAuthTokenProvider();
+}
+```
 
 ## Definitions
 
