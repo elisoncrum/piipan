@@ -11,7 +11,14 @@ To run the app locally:
     dotnet dev-certs https --trust
 ```
 
-2. Run the app using the `dotnet run` CLI command:
+2. Set the `OrchApiUri` environment variable to a local or remote instance of `Piipan.Match.Orchestrator`:
+```
+export OrchApiUri=https://tts-func-orchestrator-dev.azurewebsites.net/api/v1/
+```
+
+3. If using a remote orchestrator URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `OrchestratorApi.Query` role for the remote orchestrator Function App and authorize the Azure CLI.
+
+4. Run the app using the `dotnet run` CLI command:
 ```
     cd query-tool/src/Piipan.QueryTool
     dotnet run
@@ -22,7 +29,8 @@ Alternatively, use the `watch` command to update the app upon file changes:
     dotnet watch run
 ```
 
-3. Visit https://localhost:5001
+5. Visit https://localhost:5001
+
 
 ### Building Assets
 

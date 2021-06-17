@@ -75,7 +75,6 @@ Each Function App is configured to use Azure App Service Authentication (aka "Ea
 ## Remote testing
 
 To test a deployed state API from your local environment:
-1. Assign your Azure user account the `StateApi.Query` role for the remote state Function App. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script. E.g., `./assign-app-role.bash tts/dev <remote state name> StateApi.Query`.
-1. Add the Azure CLI as an authorized client application to the remote state Function App's application object. This can be done using [`tools/authorize-cli.bash`](../../tools/authorize-cli.bash). E.g., `./authorize-cli.bash tts/dev <application ID URI>`, where [`application ID URI`](../../docs/securing-internal-apis.md#application-id-uri) is the base URL of the Function App *without a trailing slash*.
+1. Follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `StateApi.Query` role for the remote state Function App and authorize the Azure CLI.
 1. Retrieve a token for your user using the Azure CLI: `az account get-access-token --resource <application ID URI>`.
 1. Send a request to the remote endpoint—perhaps using a tool like Postman or `curl`—and include the access token in the Authorization header: `Authorization: Bearer {token}`.
