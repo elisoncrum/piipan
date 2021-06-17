@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Npgsql;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Piipan.Metrics.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.Logging;
+using Npgsql;
 using Piipan.Metrics.Api.Serializers;
+using Piipan.Metrics.Models;
 
 #nullable enable
 
@@ -23,7 +22,7 @@ namespace Piipan.Metrics.Api
     public static class GetParticipantUploads
     {
         [FunctionName("GetParticipantUploads")]
-        public static async Task<OkObjectResult> Run(
+        public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -58,9 +57,8 @@ namespace Piipan.Metrics.Api
                     data,
                     meta
                 );
-                return new OkObjectResult(
-                    JsonConvert.SerializeObject(response, Formatting.Indented)
-                );
+
+                return (ActionResult)new JsonResult(response);
             }
             catch (Exception ex)
             {
@@ -128,7 +126,7 @@ namespace Piipan.Metrics.Api
                         text += $" WHERE lower(state) LIKE @state";
                     cmd.CommandText = text;
                     if (!String.IsNullOrEmpty(state))
-                      AddWithValue(cmd, DbType.String, "state", state.ToLower());
+                        AddWithValue(cmd, DbType.String, "state", state.ToLower());
                     count = (Int64)cmd.ExecuteScalar();
                 }
                 conn.Close();
@@ -175,7 +173,7 @@ namespace Piipan.Metrics.Api
                     cmd.CommandText = ResultsQueryString(query);
                     string? state = query["state"];
                     if (!String.IsNullOrEmpty(state))
-                      AddWithValue(cmd, DbType.String, "state", state.ToLower());
+                        AddWithValue(cmd, DbType.String, "state", state.ToLower());
                     int limit = StrToIntWithDefault(query["perPage"], 50);
                     int page = StrToIntWithDefault(query["page"], 1);
                     int offset = limit * (page - 1);
@@ -209,11 +207,12 @@ namespace Piipan.Metrics.Api
             const string secretName = "metrics-pg-admin";
             const string vaultNameKey = "KeyVaultName";
 
-            string? vaultName = Environment.GetEnvironmentVariable(vaultNameKey); 
+            string? vaultName = Environment.GetEnvironmentVariable(vaultNameKey);
             var kvUri = $"https://{vaultName}.vault.azure.net";
 
             var cn = Environment.GetEnvironmentVariable(CloudName);
-            if (cn == GovernmentCloud) {
+            if (cn == GovernmentCloud)
+            {
                 kvUri = $"https://{vaultName}.vault.usgovcloudapi.net";
             }
 
