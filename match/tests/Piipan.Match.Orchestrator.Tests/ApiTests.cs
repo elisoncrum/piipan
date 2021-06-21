@@ -48,23 +48,26 @@ namespace Piipan.Match.Orchestrator.Tests
         {
             return new MatchQueryRequest
             {
-                Query = new MatchQuery
-                {
-                    First = "First",
-                    Middle = "Middle",
-                    Last = "Last",
-                    Dob = new DateTime(1970, 1, 1),
-                    Ssn = "000-00-0000"
+                Query = new List<MatchQuery>() {
+                    new MatchQuery
+                    {
+                        First = "First",
+                        Middle = "Middle",
+                        Last = "Last",
+                        Dob = new DateTime(1970, 1, 1),
+                        Ssn = "000-00-0000"
+                    }
                 }
             };
         }
 
-        static MatchQueryResponse FullResponse()
+        static StateMatchQueryResponse StateResponse()
         {
-            return new MatchQueryResponse
+            var stateResponse = new StateMatchQueryResponse
             {
                 Matches = new List<PiiRecord> { FullRecord() }
             };
+            return stateResponse;
         }
 
         static String JsonBody(string json)
@@ -135,7 +138,7 @@ namespace Piipan.Match.Orchestrator.Tests
                 .Returns<string, string>((pk, rk) =>
                 {
                     var qe = new QueryEntity(pk, rk);
-                    qe.Body = mockQuery.Query.ToJson();
+                    qe.Body = mockQuery.Query[0].ToJson();
                     return Task.FromResult(qe);
                 });
 
@@ -218,12 +221,12 @@ namespace Piipan.Match.Orchestrator.Tests
 
         // Invalid data results in BadRequest
         [Theory]
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Invalid Ssn format
-        [InlineData(@"{last: '', dob: '2020-01-01', ssn: '000-00-0000'}")] // Empty last
-        [InlineData(@"{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}")] // Whitespace last
-        [InlineData(@"{last: 'Last', first: '', dob: '2020-01-01', ssn: '000-00-000'}")] // Empty first
-        [InlineData(@"{last: 'Last', first: '       ', dob: '2020-01-01', ssn: '000-00-000'}")] // Whitespace first
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000000000'}")] // Invalid Ssn format
+        [InlineData(@"[{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}]")] // Invalid Ssn format
+        [InlineData(@"[{last: '', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Empty last
+        [InlineData(@"[{last: '        ', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Whitespace last
+        [InlineData(@"[{last: 'Last', first: '', dob: '2020-01-01', ssn: '000-00-000'}]")] // Empty first
+        [InlineData(@"[{last: 'Last', first: '       ', dob: '2020-01-01', ssn: '000-00-000'}]")] // Whitespace first
+        [InlineData(@"[{last: 'Last', dob: '2020-01-01', ssn: '000000000'}]")] // Invalid Ssn format
         public async void ExpectBadResultFromInvalidData(string query)
         {
             // Arrange
@@ -243,12 +246,12 @@ namespace Piipan.Match.Orchestrator.Tests
         // Incomplete data results in BadRequest
         [Theory]
         [InlineData("")]
-        [InlineData(@"{first: 'First'}")] // Missing Last, Dob, and Ssn
-        [InlineData(@"{last: 'Last'}")] // Missing Dob and Ssn
-        [InlineData(@"{last: 'Last', dob: '2020-01-01'}")] // Missing Ssn
-        [InlineData(@"{last: 'Last', dob: '2020-01-1', ssn: '000-00-000'}")] // Invalid Dob DateTime
-        [InlineData(@"{last: 'Last', dob: '', ssn: '000-00-000'}")] // Empty Dob DateTime
-        [InlineData(@"{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}")] // Missing First
+        [InlineData(@"[{first: 'First'}]")] // Missing Last, Dob, and Ssn
+        [InlineData(@"[{last: 'Last'}]")] // Missing Dob and Ssn
+        [InlineData(@"[{last: 'Last', dob: '2020-01-01'}]")] // Missing Ssn
+        [InlineData(@"[{last: 'Last', dob: '2020-01-1', ssn: '000-00-000'}]")] // Invalid Dob DateTime
+        [InlineData(@"[{last: 'Last', dob: '', ssn: '000-00-000'}]")] // Empty Dob DateTime
+        [InlineData(@"[{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}]")] // Missing First
         public async void ExpectBadResultFromIncompleteData(string query)
         {
             // Arrange
@@ -272,7 +275,7 @@ namespace Piipan.Match.Orchestrator.Tests
             // Arrange Mocks
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(FullRequest().ToJson());
-            var mockHandler = MockMessageHandler(HttpStatusCode.OK, FullResponse().ToJson());
+            var mockHandler = MockMessageHandler(HttpStatusCode.OK, StateResponse().ToJson());
 
             // Arrage Environment
             var uriString = "[\"https://localhost/\"]";

@@ -6,9 +6,17 @@ namespace Piipan.Match.Orchestrator
     {
         public MatchQueryRequestValidator()
         {
-            RuleFor(m => m.Query.First).NotEmpty();
-            RuleFor(m => m.Query.Last).NotEmpty();
-            RuleFor(m => m.Query.Ssn).Matches(@"^[0-9]{3}-[0-9]{2}-[0-9]{4}$");
+            RuleForEach(m => m.Query).SetValidator(new MatchQueryValidator());
+        }
+    }
+
+    public class MatchQueryValidator : AbstractValidator<MatchQuery>
+    {
+        public MatchQueryValidator()
+        {
+            RuleFor(q => q.First).NotEmpty();
+            RuleFor(q => q.Last).NotEmpty();
+            RuleFor(q => q.Ssn).Matches(@"^[0-9]{3}-[0-9]{2}-[0-9]{4}$");
         }
     }
 }

@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Piipan.Match.Shared;
 
 namespace Piipan.Match.Orchestrator
 {
-    public class MatchQueryRequest
+    public class StateMatchQueryRequest
     {
         [JsonProperty("query", Required = Required.Always)]
-        public List<MatchQuery> Query { get; set; } = new List<MatchQuery>();
+        public StateMatchQuery Query { get; set; }
 
         public string ToJson()
         {
@@ -16,7 +15,7 @@ namespace Piipan.Match.Orchestrator
         }
     }
 
-    public class MatchQuery
+    public class StateMatchQuery
     {
         [JsonProperty("last", Required = Required.Always)]
         public string Last { get; set; }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -46,7 +47,7 @@ namespace Piipan.Match.Orchestrator
 
             var incoming = await new StreamReader(req.Body).ReadToEndAsync();
             var request = Parse(incoming, log);
-            if (request.Query == null)
+            if (!request.Query.Any())
             {
                 // Incoming request could not be deserialized into MatchQueryResponse
                 // XXX return validation messages
@@ -60,25 +61,38 @@ namespace Piipan.Match.Orchestrator
                 return (ActionResult)new BadRequestResult();
             }
 
-            var response = new MatchQueryResponse();
-            try
+            var orchResponse = new MatchQueryResponse();
+            foreach (var query in request.Query)
             {
-                response.Matches = await Match(request, log);
-
-                if (response.Matches.Count > 0)
+                var stateResponse = new StateMatchQueryResponse();
+                try
                 {
-                    response.LookupId = await Lookup.Save(request.Query, _lookupStorage, log);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Exception when attempting state-level matches, fail with 500
-                // XXX fine-grained, per-state handling
-                log.LogError(ex.Message);
-                return (ActionResult)new InternalServerErrorResult();
-            }
+                    StateMatchQueryRequest stateRequest = new StateMatchQueryRequest();
+                    stateRequest.Query = new StateMatchQuery {
+                        Last = query.Last,
+                        First = query.First,
+                        Middle = query.Middle,
+                        Dob = query.Dob,
+                        Ssn = query.Ssn
+                    };
+                    stateResponse.Matches = await Match(stateRequest, log);
 
-            return (ActionResult)new JsonResult(response);
+                    if (stateResponse.Matches.Count > 0)
+                    {
+                        stateResponse.LookupId = await Lookup.Save(query, _lookupStorage, log);
+                    }
+                    orchResponse.Data.Add(stateResponse);
+                }
+                catch (Exception ex)
+                {
+                    // Exception when attempting state-level matches, fail with 500
+                    // XXX fine-grained, per-state handling
+                    log.LogError(ex.Message);
+                    return (ActionResult)new InternalServerErrorResult();
+                }
+
+            }
+            return (ActionResult)new JsonResult(orchResponse);
         }
 
         /// <summary>
@@ -104,7 +118,7 @@ namespace Piipan.Match.Orchestrator
         private MatchQueryRequest Parse(string requestBody, ILogger log)
         {
             // Assume failure
-            MatchQueryRequest request = new MatchQueryRequest { Query = null };
+            MatchQueryRequest request = new MatchQueryRequest();
 
             try
             {
@@ -142,22 +156,22 @@ namespace Piipan.Match.Orchestrator
             return uris;
         }
 
-        private async Task<MatchQueryResponse> MatchState(Uri uri, MatchQueryRequest request, ILogger log)
+        private async Task<StateMatchQueryResponse> MatchState(Uri uri, StateMatchQueryRequest request, ILogger log)
         {
             var content = new StringContent(JsonConvert.SerializeObject(request));
             var response = await _apiClient.PostAsync(uri, content);
 
             response.EnsureSuccessStatusCode();
 
-            var matchResponse = await response.Content.ReadAsAsync<MatchQueryResponse>();
+            var matchResponse = await response.Content.ReadAsAsync<StateMatchQueryResponse>();
 
             return matchResponse;
         }
 
-        private async Task<List<PiiRecord>> Match(MatchQueryRequest request, ILogger log)
+        private async Task<List<PiiRecord>> Match(StateMatchQueryRequest request, ILogger log)
         {
             var matches = new List<PiiRecord>();
-            var stateRequests = new List<Task<MatchQueryResponse>>();
+            var stateRequests = new List<Task<StateMatchQueryResponse>>();
             var stateApiUris = StateApiUris();
 
             foreach (var uri in stateApiUris)
