@@ -268,8 +268,8 @@ Status Code **200**
 |»»» state|string|false|none|State/territory two-letter postal abbreviation|
 |»»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
 |»»» exception|string|false|none|Placeholder for value indicating special processing instructions|
-|»»» case_id|string|false|none|Participant's state-specific case identifier|
-|»»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
+|»»» case_id|string|false|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
+|»»» participant_id|string|false|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
 |»»» benefits_end_month|string|false|none|Participant's ending benefits month|
 |»»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
 |»»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
