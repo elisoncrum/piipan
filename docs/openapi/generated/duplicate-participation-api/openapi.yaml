@@ -51,7 +51,7 @@ paths:
                         description: PII record's date of birth
             examples:
               All fields:
-                description: A request with values for all fields
+                description: 'An example request to query a single individual, with values for all fields'
                 value:
                   query:
                     - first: string
@@ -165,7 +165,7 @@ paths:
                               description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
               examples:
                 Single:
-                  description: A query returning a single match
+                  description: A query for a single individual returning a single match
                   value:
                     data:
                       - index: 0
@@ -188,14 +188,14 @@ paths:
                               - 2021-03
                             protect_location: true
                 None:
-                  description: A query returning no matches
+                  description: A query for a single individual returning no matches
                   value:
                     data:
                       - index: 0
                         lookup_id: null
                         matches: []
                 Multiple:
-                  description: A query returning multiple matches for one record
+                  description: A query for one individual returning multiple matches
                   value:
                     data:
                       - index: 0
@@ -230,13 +230,24 @@ paths:
                             benefits_end_month: null
                             protect_location: null
                 MultipleRecords:
-                  description: A query returning one match for multiple records
+                  description: A query for two individuals returning one match for each individual
                   value:
                     data:
                       - index: 0
                         lookup_id: string
                         matches:
                           - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/0/matches/1'
+                      - index: 1
+                        lookup_id: string
+                        matches:
+                          - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/0/matches/1'
+                MultipleRecordsOneMatch:
+                  description: A query for two individuals returning no matches for one individual and a match for the other
+                  value:
+                    data:
+                      - index: 0
+                        lookup_id: null
+                        matches: []
                       - index: 1
                         lookup_id: string
                         matches:

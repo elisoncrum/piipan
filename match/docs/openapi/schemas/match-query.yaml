@@ -41,7 +41,7 @@ MatchQueryRequestItem:
       description: "PII record's date of birth"
 MatchQueryRequestExamples:
   "All fields":
-    description: "A request with values for all fields"
+    description: "An example request to query a single individual, with values for all fields"
     value:
       query:
         - first: "string"
@@ -100,7 +100,7 @@ MatchQueryResponseItem:
 
 MatchQueryResponseExamples:
   Single:
-    description: "A query returning a single match"
+    description: "A query for a single individual returning a single match"
     value:
       data:
         - index: 0
@@ -108,14 +108,14 @@ MatchQueryResponseExamples:
           matches:
             - $ref: './pii-record.yaml#/PiiRecordExamples/All'
   None:
-    description: "A query returning no matches"
+    description: "A query for a single individual returning no matches"
     value:
       data:
         - index: 0
           lookup_id: null
           matches: []
   Multiple:
-    description: "A query returning multiple matches for one record"
+    description: "A query for one individual returning multiple matches"
     value:
       data:
         - index: 0
@@ -124,13 +124,24 @@ MatchQueryResponseExamples:
             - $ref: './pii-record.yaml#/PiiRecordExamples/AllEB'
             - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
   MultipleRecords:
-    description: "A query returning one match for multiple records"
+    description: "A query for two individuals returning one match for each individual"
     value:
       data:
         - index: 0
           lookup_id: "string"
           matches:
             - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
+        - index: 1
+          lookup_id: "string"
+          matches:
+            - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
+  MultipleRecordsOneMatch:
+    description: "A query for two individuals returning no matches for one individual and a match for the other"
+    value:
+      data:
+        - index: 0
+          lookup_id: null
+          matches: []
         - index: 1
           lookup_id: "string"
           matches:

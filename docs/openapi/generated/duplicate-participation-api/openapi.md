@@ -40,7 +40,7 @@ Queries all state databases for any PII records that are an exact match to the l
 
 > Body parameter
 
-> A request with values for all fields
+> An example request to query a single individual, with values for all fields
 
 ```json
 {
@@ -64,7 +64,7 @@ Queries all state databases for any PII records that are an exact match to the l
 
 > Example responses
 
-> A query returning a single match
+> A query for a single individual returning a single match
 
 ```json
 {
@@ -98,7 +98,7 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-> A query returning no matches
+> A query for a single individual returning no matches
 
 ```json
 {
@@ -112,7 +112,7 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-> A query returning multiple matches for one record
+> A query for one individual returning multiple matches
 
 ```json
 {
@@ -160,7 +160,7 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-> A query returning one match for multiple records
+> A query for two individuals returning one match for each individual
 
 ```json
 {
@@ -184,6 +184,40 @@ Queries all state databases for any PII records that are an exact match to the l
           "protect_location": null
         }
       ]
+    },
+    {
+      "index": 1,
+      "lookup_id": "string",
+      "matches": [
+        {
+          "first": null,
+          "middle": null,
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "ec",
+          "state_abbr": "ec",
+          "exception": null,
+          "case_id": "string",
+          "participant_id": null,
+          "benefits_end_month": null,
+          "protect_location": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+> A query for two individuals returning no matches for one individual and a match for the other
+
+```json
+{
+  "data": [
+    {
+      "index": 0,
+      "lookup_id": null,
+      "matches": []
     },
     {
       "index": 1,
