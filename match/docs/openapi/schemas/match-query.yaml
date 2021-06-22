@@ -73,10 +73,13 @@ MatchQueryRequestExamples:
 #/components/schemas/MatchQueryResponse
 MatchQueryResponse:
   type: object
+  required:
+    - data
   properties:
     data:
       type: array
       $ref: '#/MatchQueryResponseItem'
+      description: Array of match query response items. For every match query item provided in the request, a match response item is returned, even if no matches are found.
 
 MatchQueryResponseItem:
   type: object
@@ -85,7 +88,7 @@ MatchQueryResponseItem:
   properties:
     index:
       type: integer
-      description: Index of match query request item that match query response item corresponds to, starting from 0. For every match query item provided in the request, a match response item is returned, even if no matches are found. Index is derived from the implicit order of match query request items provided in the request.
+      description: Index of match query request item that match query response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.
     lookup_id:
       type: string
       nullable: true

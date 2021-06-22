@@ -222,8 +222,8 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|array|false|none|none|
-|»» index|integer|true|none|Index of match query request item that match query response item corresponds to, starting from 0. For every match query item provided in the request, a match response item is returned, even if no matches are found. Index is derived from the implicit order of match query request items provided in the request.|
+|» data|array|true|none|Array of match query response items. For every match query item provided in the request, a match response item is returned, even if no matches are found.|
+|»» index|integer|true|none|Index of match query request item that match query response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.|
 |»» lookup_id|string¦null|false|none|the identifier of the match request|
 |»» matches|[object]|false|none|none|
 |»»» first|string|false|none|First name|
