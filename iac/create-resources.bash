@@ -582,6 +582,9 @@ main () {
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"
 
+  # Core database server and schemas
+  ./create-core-databases.bash "$azure_env"
+
   # API Management instances need to be created before configuring Easy Auth.
   ./create-apim.bash "$azure_env" "$APIM_EMAIL"
 
