@@ -5,14 +5,14 @@ using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Npgsql;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 
 namespace Piipan.Metrics.Collect
 {
@@ -27,7 +27,7 @@ namespace Piipan.Metrics.Collect
 
         [FunctionName("BulkUploadMetrics")]
         public async static Task Run(
-            [EventGridTrigger]EventGridEvent eventGridEvent,
+            [EventGridTrigger] EventGridEvent eventGridEvent,
             ILogger log)
         {
             log.LogInformation(eventGridEvent.Data.ToString());
@@ -78,14 +78,15 @@ namespace Piipan.Metrics.Collect
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
             const string GovernmentCloud = "AzureUSGovernment";
-            const string secretName = "metrics-pg-admin";
+            const string secretName = "core-pg-admin";
             const string vaultNameKey = "KeyVaultName";
 
             string vaultName = Environment.GetEnvironmentVariable(vaultNameKey);
             var kvUri = $"https://{vaultName}.vault.azure.net";
 
             var cn = Environment.GetEnvironmentVariable(CloudName);
-            if (cn == GovernmentCloud) {
+            if (cn == GovernmentCloud)
+            {
                 kvUri = $"https://{vaultName}.vault.usgovcloudapi.net";
             }
 

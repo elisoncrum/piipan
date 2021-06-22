@@ -204,7 +204,7 @@ namespace Piipan.Metrics.Api
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
             const string GovernmentCloud = "AzureUSGovernment";
-            const string secretName = "metrics-pg-admin";
+            const string secretName = "core-pg-admin";
             const string vaultNameKey = "KeyVaultName";
 
             string? vaultName = Environment.GetEnvironmentVariable(vaultNameKey);
