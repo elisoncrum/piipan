@@ -88,11 +88,11 @@ MatchQueryResponseItem:
   properties:
     index:
       type: integer
-      description: Index of match query request item that match query response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.
+      description: The index of the request item that the response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.
     lookup_id:
       type: string
       nullable: true
-      description: "the identifier of the match request"
+      description: "The identifier of the match request item, if a match is present. This ID can be used for looking up the PII of the original match request item."
     matches:
       type: array
       items:

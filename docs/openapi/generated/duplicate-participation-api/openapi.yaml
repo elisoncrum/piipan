@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Duplicate Participation API
   version: 1.0.0
-  description: The API for the Duplicate Participation system where matching and lookups will occur
+  description: The API where matching and lookups will occur
 servers:
   - url: /v1
 paths:
@@ -81,7 +81,7 @@ paths:
                       dob: '1970-01-02'
       responses:
         '200':
-          description: 'Matching PII records, if any exist'
+          description: Successful response. Returns match response items.
           content:
             application/json:
               schema:
@@ -97,11 +97,11 @@ paths:
                     properties:
                       index:
                         type: integer
-                        description: 'Index of match query request item that match query response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.'
+                        description: 'The index of the request item that the response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.'
                       lookup_id:
                         type: string
                         nullable: true
-                        description: the identifier of the match request
+                        description: 'The identifier of the match request item, if a match is present. This ID can be used for looking up the PII of the original match request item.'
                       matches:
                         type: array
                         items:
@@ -248,11 +248,11 @@ paths:
       operationId: Get Lookups by ID
       tags:
         - Lookup
-      summary: get the original match data related to a Lookup ID
+      summary: Get the original match data related to a Lookup ID
       description: User can provide a Lookup ID and receive the match data associated with it
       responses:
         '200':
-          description: original active match data
+          description: Successful response. Returns original match query request item.
           content:
             application/json:
               schema:
@@ -283,7 +283,7 @@ paths:
         '400':
           description: Bad request
         '404':
-          description: Not Found
+          description: Not found
 security:
   - ApiKeyAuth: []
 components:

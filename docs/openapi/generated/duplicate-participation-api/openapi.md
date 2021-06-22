@@ -4,7 +4,7 @@
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
-The API for the Duplicate Participation system where matching and lookups will occur
+The API where matching and lookups will occur
 
 Base URLs:
 
@@ -213,7 +213,7 @@ Queries all state databases for any PII records that are an exact match to the l
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Matching PII records, if any exist|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns match response items.|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request. Missing one of the required properties in the request body.|None|
 
 <h3 id="query-for-matches-responseschema">Response Schema</h3>
@@ -223,8 +223,8 @@ Status Code **200**
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |» data|array|true|none|Array of match query response items. For every match query item provided in the request, a match response item is returned, even if no matches are found.|
-|»» index|integer|true|none|Index of match query request item that match query response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.|
-|»» lookup_id|string¦null|false|none|the identifier of the match request|
+|»» index|integer|true|none|The index of the request item that the response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.|
+|»» lookup_id|string¦null|false|none|The identifier of the match request item, if a match is present. This ID can be used for looking up the PII of the original match request item.|
 |»» matches|[object]|false|none|none|
 |»»» first|string|false|none|First name|
 |»»» middle|string|false|none|Middle name|
@@ -263,7 +263,7 @@ curl -X GET /v1/lookup_ids/{id} \
 
 `GET /lookup_ids/{id}`
 
-*get the original match data related to a Lookup ID*
+*Get the original match data related to a Lookup ID*
 
 User can provide a Lookup ID and receive the match data associated with it
 
@@ -300,9 +300,9 @@ User can provide a Lookup ID and receive the match data associated with it
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|original active match data|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns original match query request item.|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not Found|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not found|None|
 
 <h3 id="get-lookups-by-id-responseschema">Response Schema</h3>
 
