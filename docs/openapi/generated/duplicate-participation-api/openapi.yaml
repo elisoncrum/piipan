@@ -89,7 +89,12 @@ paths:
                 properties:
                   data:
                     type: array
+                    required:
+                      - index
                     properties:
+                      index:
+                        type: integer
+                        description: 'Index of match query request item that match query response item corresponds to, starting from 0. For every match query item provided in the request, a match response item is returned, even if no matches are found. Index is derived from the implicit order of match query request items provided in the request.'
                       lookup_id:
                         type: string
                         nullable: true
@@ -160,7 +165,8 @@ paths:
                   description: A query returning a single match
                   value:
                     data:
-                      - lookup_id: string
+                      - index: 0
+                        lookup_id: string
                         matches:
                           - first: string
                             middle: string
@@ -182,13 +188,15 @@ paths:
                   description: A query returning no matches
                   value:
                     data:
-                      - lookup_id: null
+                      - index: 0
+                        lookup_id: null
                         matches: []
                 Multiple:
                   description: A query returning multiple matches for one record
                   value:
                     data:
-                      - lookup_id: string
+                      - index: 0
+                        lookup_id: string
                         matches:
                           - first: string
                             middle: string
@@ -222,10 +230,12 @@ paths:
                   description: A query returning one match for multiple records
                   value:
                     data:
-                      - lookup_id: string
+                      - index: 0
+                        lookup_id: string
                         matches:
                           - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/0/matches/1'
-                      - lookup_id: string
+                      - index: 1
+                        lookup_id: string
                         matches:
                           - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/0/matches/1'
         '400':
