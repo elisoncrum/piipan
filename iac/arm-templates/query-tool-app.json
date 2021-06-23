@@ -40,6 +40,7 @@
                     "value": "dotnetcore"
                 }
             ],
+            // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments
             "use32BitWorkerProcess": false,
             "ipSecurityRestrictions": [],
             "ftpsState": "Disabled",
@@ -67,6 +68,7 @@
             },
             "kind": "windows",
             "properties": {
+                // Must be false for Windows deployments
                 "reserved": false
             }
         },
