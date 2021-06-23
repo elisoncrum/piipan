@@ -1847,7 +1847,8 @@
           "Azure.Security.KeyVault.Secrets": "4.2.0",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.7",
-          "Piipan.Metrics.Models": "1.0.0"
+          "Piipan.Metrics.Models": "1.0.0",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.metrics.collect": {
@@ -1857,11 +1858,19 @@
           "Azure.Security.KeyVault.Secrets": "4.2.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
-          "Npgsql": "5.0.7"
+          "Npgsql": "5.0.7",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.metrics.models": {
         "type": "Project"
+      },
+      "piipan.shared": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Core": "1.15.0",
+          "Azure.Identity": "1.4.0"
+        }
       }
     }
   }

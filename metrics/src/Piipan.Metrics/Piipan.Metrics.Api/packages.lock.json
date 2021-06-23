@@ -1584,6 +1584,13 @@
       },
       "piipan.metrics.models": {
         "type": "Project"
+      },
+      "piipan.shared": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Core": "1.15.0",
+          "Azure.Identity": "1.4.0"
+        }
       }
     }
   }

@@ -5,14 +5,13 @@ using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Npgsql;
+using Piipan.Shared.Authentication;
 
 namespace Piipan.Metrics.Collect
 {
@@ -78,27 +77,28 @@ namespace Piipan.Metrics.Collect
             const string DatabaseConnectionString = "DatabaseConnectionString";
             const string PasswordPlaceholder = "{password}";
             const string GovernmentCloud = "AzureUSGovernment";
-            const string secretName = "core-pg-admin";
-            const string vaultNameKey = "KeyVaultName";
 
-            string vaultName = Environment.GetEnvironmentVariable(vaultNameKey);
-            var kvUri = $"https://{vaultName}.vault.azure.net";
+            // Resource ids for open source software databases in the public and
+            // US government clouds. Set the desired active cloud, then see:
+            // `az cloud show --query endpoints.ossrdbmsResourceId`
+            const string CommercialId = "https://ossrdbms-aad.database.windows.net";
+            const string GovermentId = "https://ossrdbms-aad.database.usgovcloudapi.net";
 
+            var resourceId = CommercialId;
             var cn = Environment.GetEnvironmentVariable(CloudName);
             if (cn == GovernmentCloud)
             {
-                kvUri = $"https://{vaultName}.vault.usgovcloudapi.net";
+                resourceId = GovermentId;
             }
 
             var builder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable(DatabaseConnectionString));
 
-            var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());
-
             if (builder.Password == PasswordPlaceholder)
             {
-                var secret = await client.GetSecretAsync(secretName);
-                builder.Password = $"{secret.Value.Value}";
+                var provider = new EasyAuthTokenProvider();
+                var token = await provider.RetrieveAsync(resourceId);
+                builder.Password = token.Token;
             }
 
             return builder.ConnectionString;
