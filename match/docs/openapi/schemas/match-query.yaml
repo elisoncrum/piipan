@@ -41,7 +41,7 @@ MatchQueryRequestItem:
       description: "PII record's date of birth"
 MatchQueryRequestExamples:
   "All fields":
-    description: "A request with values for all fields"
+    description: "An example request to query a single individual, with values for all fields"
     value:
       query:
         - first: "string"
@@ -73,18 +73,26 @@ MatchQueryRequestExamples:
 #/components/schemas/MatchQueryResponse
 MatchQueryResponse:
   type: object
+  required:
+    - data
   properties:
     data:
       type: array
       $ref: '#/MatchQueryResponseItem'
+      description: Array of match query response items. For every match query item provided in the request, a match response item is returned, even if no matches are found.
 
 MatchQueryResponseItem:
   type: object
+  required:
+    - index
   properties:
+    index:
+      type: integer
+      description: The index of the request item that the response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.
     lookup_id:
       type: string
       nullable: true
-      description: "the identifier of the match request"
+      description: "The identifier of the match request item, if a match is present. This ID can be used for looking up the PII of the original match request item."
     matches:
       type: array
       items:
@@ -92,33 +100,49 @@ MatchQueryResponseItem:
 
 MatchQueryResponseExamples:
   Single:
-    description: "A query returning a single match"
+    description: "A query for a single individual returning a single match"
     value:
       data:
-        - lookup_id: "string"
+        - index: 0
+          lookup_id: "string"
           matches:
             - $ref: './pii-record.yaml#/PiiRecordExamples/All'
   None:
-    description: "A query returning no matches"
+    description: "A query for a single individual returning no matches"
     value:
       data:
-        - lookup_id: null
+        - index: 0
+          lookup_id: null
           matches: []
   Multiple:
-    description: "A query returning multiple matches for one record"
+    description: "A query for one individual returning multiple matches"
     value:
       data:
-        - lookup_id: "string"
+        - index: 0
+          lookup_id: "string"
           matches:
             - $ref: './pii-record.yaml#/PiiRecordExamples/AllEB'
             - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
   MultipleRecords:
-    description: "A query returning one match for multiple records"
+    description: "A query for two individuals returning one match for each individual"
     value:
       data:
-        - lookup_id: "string"
+        - index: 0
+          lookup_id: "string"
           matches:
             - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
-        - lookup_id: "string"
+        - index: 1
+          lookup_id: "string"
+          matches:
+            - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
+  MultipleRecordsOneMatch:
+    description: "A query for two individuals returning no matches for one individual and a match for the other"
+    value:
+      data:
+        - index: 0
+          lookup_id: null
+          matches: []
+        - index: 1
+          lookup_id: "string"
           matches:
             - $ref: './pii-record.yaml#/PiiRecordExamples/Required'

@@ -4,7 +4,7 @@
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
-The API for the Duplicate Participation system where matching and lookups will occur
+The API where matching and lookups will occur
 
 Base URLs:
 
@@ -40,7 +40,7 @@ Queries all state databases for any PII records that are an exact match to the l
 
 > Body parameter
 
-> A request with values for all fields
+> An example request to query a single individual, with values for all fields
 
 ```json
 {
@@ -64,12 +64,13 @@ Queries all state databases for any PII records that are an exact match to the l
 
 > Example responses
 
-> A query returning a single match
+> A query for a single individual returning a single match
 
 ```json
 {
   "data": [
     {
+      "index": 0,
       "lookup_id": "string",
       "matches": [
         {
@@ -97,12 +98,13 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-> A query returning no matches
+> A query for a single individual returning no matches
 
 ```json
 {
   "data": [
     {
+      "index": 0,
       "lookup_id": null,
       "matches": []
     }
@@ -110,12 +112,13 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-> A query returning multiple matches for one record
+> A query for one individual returning multiple matches
 
 ```json
 {
   "data": [
     {
+      "index": 0,
       "lookup_id": "string",
       "matches": [
         {
@@ -157,12 +160,13 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-> A query returning one match for multiple records
+> A query for two individuals returning one match for each individual
 
 ```json
 {
   "data": [
     {
+      "index": 0,
       "lookup_id": "string",
       "matches": [
         {
@@ -182,6 +186,41 @@ Queries all state databases for any PII records that are an exact match to the l
       ]
     },
     {
+      "index": 1,
+      "lookup_id": "string",
+      "matches": [
+        {
+          "first": null,
+          "middle": null,
+          "last": "string",
+          "ssn": "000-00-0000",
+          "dob": "1970-01-01",
+          "state": "ec",
+          "state_abbr": "ec",
+          "exception": null,
+          "case_id": "string",
+          "participant_id": null,
+          "benefits_end_month": null,
+          "protect_location": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+> A query for two individuals returning no matches for one individual and a match for the other
+
+```json
+{
+  "data": [
+    {
+      "index": 0,
+      "lookup_id": null,
+      "matches": []
+    },
+    {
+      "index": 1,
       "lookup_id": "string",
       "matches": [
         {
@@ -208,7 +247,7 @@ Queries all state databases for any PII records that are an exact match to the l
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Matching PII records, if any exist|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns match response items.|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request. Missing one of the required properties in the request body.|None|
 
 <h3 id="query-for-matches-responseschema">Response Schema</h3>
@@ -217,8 +256,9 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|array|false|none|none|
-|»» lookup_id|string¦null|false|none|the identifier of the match request|
+|» data|array|true|none|Array of match query response items. For every match query item provided in the request, a match response item is returned, even if no matches are found.|
+|»» index|integer|true|none|The index of the request item that the response item corresponds to, starting from 0. Index is derived from the implicit order of match query request items provided in the request.|
+|»» lookup_id|string¦null|false|none|The identifier of the match request item, if a match is present. This ID can be used for looking up the PII of the original match request item.|
 |»» matches|[object]|false|none|none|
 |»»» first|string|false|none|First name|
 |»»» middle|string|false|none|Middle name|
@@ -228,8 +268,8 @@ Status Code **200**
 |»»» state|string|false|none|State/territory two-letter postal abbreviation|
 |»»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
 |»»» exception|string|false|none|Placeholder for value indicating special processing instructions|
-|»»» case_id|string|false|none|Participant's state-specific case identifier|
-|»»» participant_id|string|false|none|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
+|»»» case_id|string|false|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
+|»»» participant_id|string|false|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
 |»»» benefits_end_month|string|false|none|Participant's ending benefits month|
 |»»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
 |»»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
@@ -257,7 +297,7 @@ curl -X GET /v1/lookup_ids/{id} \
 
 `GET /lookup_ids/{id}`
 
-*get the original match data related to a Lookup ID*
+*Get the original match data related to a Lookup ID*
 
 User can provide a Lookup ID and receive the match data associated with it
 
@@ -294,9 +334,9 @@ User can provide a Lookup ID and receive the match data associated with it
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|original active match data|Inline|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns original match query request item.|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not Found|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not found|None|
 
 <h3 id="get-lookups-by-id-responseschema">Response Schema</h3>
 

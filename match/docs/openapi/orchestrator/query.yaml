@@ -8,7 +8,7 @@ post:
     $ref: '../schemas/match-query.yaml#/MatchQueryRequest'
   responses:
     '200':
-      description: "Matching PII records, if any exist"
+      description: "Successful response. Returns match response items."
       content:
         application/json:
           schema:
