@@ -61,10 +61,36 @@ namespace Piipan.Match.Orchestrator.Tests
             };
         }
 
+        static MatchQueryRequest FullRequestMultiple()
+        {
+            return new MatchQueryRequest
+            {
+                Query = new List<MatchQuery>() {
+                    new MatchQuery
+                    {
+                        First = "First",
+                        Middle = "Middle",
+                        Last = "Last",
+                        Dob = new DateTime(1970, 1, 1),
+                        Ssn = "000-00-0000"
+                    },
+                    new MatchQuery
+                    {
+                        First = "FirstTwo",
+                        Middle = "MiddleTwo",
+                        Last = "LastTwo",
+                        Dob = new DateTime(1970, 1, 2),
+                        Ssn = "000-00-0001"
+                    }
+                }
+            };
+        }
+
         static StateMatchQueryResponse StateResponse()
         {
             var stateResponse = new StateMatchQueryResponse
             {
+                Index = 0,
                 Matches = new List<PiiRecord> { FullRecord() }
             };
             return stateResponse;
@@ -328,6 +354,35 @@ namespace Piipan.Match.Orchestrator.Tests
 
             Assert.NotNull(host);
             Assert.NotNull(host.Services.GetRequiredService<IAuthorizedApiClient>());
+        }
+
+        // Multiple Queries tests
+        // Successful API call
+        [Fact]
+        public async void SuccessfulApiCallMultipleQueries()
+        {
+            // Arrange Mocks
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(FullRequestMultiple().ToJson());
+            var mockHandler = MockMessageHandler(HttpStatusCode.OK, StateResponse().ToJson());
+
+            // Arrage Environment
+            var uriString = "[\"https://localhost/\"]";
+            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
+
+            // Act
+            var api = ConstructMocked(mockHandler);
+            var response = await api.Query(mockRequest.Object, logger);
+
+            // Assert
+            Assert.IsType<JsonResult>(response);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            );
         }
     }
 }

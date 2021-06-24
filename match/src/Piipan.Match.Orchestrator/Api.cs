@@ -75,6 +75,7 @@ namespace Piipan.Match.Orchestrator
                         Dob = query.Dob,
                         Ssn = query.Ssn
                     };
+                    stateResponse.Index = request.Query.IndexOf(query);
                     stateResponse.Matches = await Match(stateRequest, log);
 
                     if (stateResponse.Matches.Count > 0)

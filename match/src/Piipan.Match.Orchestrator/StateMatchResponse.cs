@@ -8,6 +8,9 @@ namespace Piipan.Match.Orchestrator
 
     public class StateMatchQueryResponse
     {
+        [JsonProperty("index")]
+        public int Index { get; set; }
+
         [JsonProperty("lookup_id")]
         public string LookupId { get; set; }
 
