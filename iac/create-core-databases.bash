@@ -145,6 +145,7 @@ grant_read_write_access () {
 
   psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
     GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO $role;
+    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $role;
 EOF
 }
 
