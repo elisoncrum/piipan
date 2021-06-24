@@ -169,6 +169,12 @@
                             }
                         }
                     }
+                },
+                "login": {
+                    "cookieExpiration": {
+                        "convention": "FixedTime",
+                        "timeToExpiration": "0.00:15:00"
+                    }
                 }
             }
         }
