@@ -16,13 +16,7 @@ source "$(dirname "$0")"/../tools/common.bash || exit
 
 set_constants () {
   DB_SERVER_NAME=$PREFIX-psql-core-$ENV
-  DB_ADMIN_NAME=piipanadmin
   DB_NAME=metrics
-  # Needed for both function apps
-  DB_CONN_STR=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "$DB_ADMIN_NAME")
-  # Name of Key Vault
-  VAULT_NAME_KEY=KeyVaultName
-  VAULT_NAME=$PREFIX-kv-core-$ENV
   # Dashboard App Info
   DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV
   DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
@@ -67,6 +61,7 @@ main () {
     --functions-version 3 \
     --name "$METRICS_COLLECT_APP_NAME" \
     --storage-account "$COLLECT_STORAGE_NAME" \
+    --assign-identity "[system]" \
     --tags Project=$PROJECT_TAG
 
   # Integrate function app into Virtual Network
@@ -111,26 +106,14 @@ main () {
   sleep 60
 
   echo "configure settings"
+  db_conn_str=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "${METRICS_COLLECT_APP_NAME//-/_}")
   az functionapp config appsettings set \
     --resource-group "$METRICS_RESOURCE_GROUP" \
     --name "$METRICS_COLLECT_APP_NAME" \
     --settings \
-      $DB_CONN_STR_KEY="$DB_CONN_STR" \
-      $VAULT_NAME_KEY="$VAULT_NAME" \
+      $DB_CONN_STR_KEY="$db_conn_str" \
       $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
     --output none
-
-  # Connect creds from function app to key vault so app can connect to db
-  principalId=$(az functionapp identity assign \
-    --resource-group "$METRICS_RESOURCE_GROUP" \
-    --name "$METRICS_COLLECT_APP_NAME" \
-    --query principalId \
-    --output tsv)
-
-  az keyvault set-policy \
-    --name "$VAULT_NAME" \
-    --object-id "$principalId" \
-    --secret-permissions get list
 
   # publish the function app
   echo "Publishing function app $METRICS_COLLECT_APP_NAME"
@@ -179,6 +162,7 @@ main () {
     --functions-version 3 \
     --name "$METRICS_API_APP_NAME" \
     --storage-account "$API_APP_STORAGE_NAME" \
+    --assign-identity "[system]" \
     --tags Project=$PROJECT_TAG
 
   # Integrate function app into Virtual Network
@@ -189,12 +173,12 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
 
+  db_conn_str=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "${METRICS_API_APP_NAME//-/_}")
   az functionapp config appsettings set \
       --resource-group "$METRICS_RESOURCE_GROUP" \
       --name "$METRICS_API_APP_NAME" \
       --settings \
-        $DB_CONN_STR_KEY="$DB_CONN_STR" \
-        $VAULT_NAME_KEY="$VAULT_NAME" \
+        $DB_CONN_STR_KEY="$db_conn_str" \
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
 
@@ -223,18 +207,6 @@ main () {
         "enabled": true
       }
     ]'
-
-  # Connect creds from function app to key vault so app can connect to db
-  principalId=$(az functionapp identity assign \
-    --resource-group "$METRICS_RESOURCE_GROUP" \
-    --name "$METRICS_API_APP_NAME" \
-    --query principalId \
-    --output tsv)
-
-  az keyvault set-policy \
-    --name "$VAULT_NAME" \
-    --object-id "$principalId" \
-    --secret-permissions get list
 
   echo "Waiting to publish function app"
   sleep 60
