@@ -179,7 +179,9 @@
                             "login": {
                                 "nameClaimType": "name",
                                 "scopes": [
-                                    "openid"
+                                    "openid",
+                                    "email",
+                                    "profile"
                                 ]
                             }
                         }
