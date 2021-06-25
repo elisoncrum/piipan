@@ -62,11 +62,12 @@ namespace Piipan.Match.Orchestrator
             }
 
             var orchResponse = new MatchQueryResponse();
-            foreach (var query in request.Query)
+            for (int i = 0; i < request.Query.Count; i++)
             {
                 var stateResponse = new StateMatchQueryResponse();
                 try
                 {
+                    var query = request.Query[i];
                     StateMatchQueryRequest stateRequest = new StateMatchQueryRequest();
                     stateRequest.Query = new StateMatchQuery {
                         Last = query.Last,
@@ -75,7 +76,7 @@ namespace Piipan.Match.Orchestrator
                         Dob = query.Dob,
                         Ssn = query.Ssn
                     };
-                    stateResponse.Index = request.Query.IndexOf(query);
+                    stateResponse.Index = i;
                     stateResponse.Matches = await Match(stateRequest, log);
 
                     if (stateResponse.Matches.Count > 0)
