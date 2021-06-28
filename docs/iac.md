@@ -4,7 +4,7 @@
 
 All prerequisites are available in [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview).
 
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.23.0
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell, `/dev/urandom` – included in macOS, Linux, Git for Windows

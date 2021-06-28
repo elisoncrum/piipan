@@ -72,6 +72,22 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
 
+  # Allow only incoming traffic from Event Grid
+  # Only set rule if it does not exist, to avoid error
+  exists=$(\
+    az functionapp config access-restriction show \
+      -n "$METRICS_COLLECT_APP_NAME" \
+      -g "$METRICS_RESOURCE_GROUP" \
+      --query "ipSecurityRestrictions[?ip_address == 'AzureEventGrid'].ip_address" \
+      -o tsv)
+  if [ -z "$exists" ]; then
+    az functionapp config access-restriction add \
+      -n "$METRICS_COLLECT_APP_NAME" \
+      -g "$METRICS_RESOURCE_GROUP" \
+      --priority 100 \
+      --service-tag AzureEventGrid
+  fi
+
   # Configure log streaming for function app
   metrics_collect_function_id=$(\
     az functionapp show \
