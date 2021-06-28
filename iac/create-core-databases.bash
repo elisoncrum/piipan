@@ -37,7 +37,7 @@ init_db () {
 
 create_db () {
   db=$1
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
+  psql "${PSQL_OPTS[@]}" -d "$TEMPLATE_DB" -f - <<EOF
     SELECT 'CREATE DATABASE $db TEMPLATE $TEMPLATE_DB'
       WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$db')\gexec
 EOF
