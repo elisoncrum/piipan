@@ -9,6 +9,7 @@ set_constants () {
   SUPERUSER=$DB_ADMIN_NAME
 
   METRICS_DB_NAME=metrics
+  LOOKUP_DB_NAME=lookup
 
   VAULT_NAME=$PREFIX-kv-core-$ENV
   PG_SECRET_NAME=core-pg-admin
@@ -87,12 +88,13 @@ EOF
 create_managed_role () {
   db=$1
   func=$2
+  group=$3
   role=${func//-/_}
 
   principal_id=$(\
     az webapp identity show \
       -n "$func" \
-      -g "$RESOURCE_GROUP" \
+      -g "$group" \
       --query principalId \
       -o tsv)
   app_id=$(\
@@ -213,6 +215,26 @@ main () {
       );
 EOF
 
+  # Create and configure lookup DB
+  init_db $LOOKUP_DB_NAME
+
+  echo "Create lookup table"
+  psql "${PSQL_OPTS[@]}" -d $LOOKUP_DB_NAME -f - <<EOF
+    BEGIN;
+      -- Creates lookup API tables records table and access controls.
+      CREATE TABLE IF NOT EXISTS lookups(
+	      id text PRIMARY KEY,
+        pii jsonb NOT NULL,
+	      created_at timestamp NOT NULL DEFAULT NOW()
+      );
+
+      COMMENT ON TABLE lookups IS 'Lookup records initiated by match requests';
+      COMMENT ON COLUMN lookups.id IS 'Lookup record''s alpha-numeric identifier';
+      COMMENT ON COLUMN lookups.pii IS 'Personally identifiable information (PII) from the initiating match request';
+      COMMENT ON COLUMN lookups.created_at IS 'Date/time the lookup record was inserted';
+    COMMIT;
+EOF
+
   # AAD / managed identity
   az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
   PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
@@ -245,14 +267,20 @@ EOF
   export PGUSER=${PG_AAD_ADMIN}@$DB_SERVER_NAME
 
   echo "Configuring database access for $METRICS_API_APP_NAME"
-  create_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
+  create_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME" "$RESOURCE_GROUP"
   config_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
   grant_read_access "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
 
   echo "Configuring database access for $METRICS_COLLECT_APP_NAME"
-  create_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+  create_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME" "$RESOURCE_GROUP"
   config_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
   grant_read_write_access "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+
+  orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
+  echo "Configuring database access for $orch_name"
+  create_managed_role "$LOOKUP_DB_NAME" "$orch_name" "$MATCH_RESOURCE_GROUP"
+  config_managed_role "$LOOKUP_DB_NAME" "$orch_name"
+  grant_read_write_access "$LOOKUP_DB_NAME" "$orch_name"
 
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
