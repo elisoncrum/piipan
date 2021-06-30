@@ -277,6 +277,8 @@ main () {
       idpOidcConfigUri="$IDP_OIDC_CONFIG_URI" \
       idpClientId="$DASHBOARD_APP_IDP_CLIENT_ID"
 
+  ./configure-oidc.bash "$azure_env" "$DASHBOARD_APP_NAME"
+
   script_completed
 }
 main "$@"
