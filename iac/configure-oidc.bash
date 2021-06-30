@@ -32,9 +32,9 @@ main () {
   echo "Setting IDP_CLIENT_SECRET for $APP_NAME"
   # capture the output to prevent secret from being written to terminal
   res=$(az webapp config appsettings set \
-    --name $APP_NAME \
-    --resource-group $RESOURCE_GROUP \
-    --settings IDP_CLIENT_SECRET=$secret)
+    --name "$APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --settings IDP_CLIENT_SECRET="$secret")
 
   script_completed
 }
