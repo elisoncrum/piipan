@@ -576,7 +576,7 @@ main () {
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
-      idpOidcConfigUri="$IDP_OIDC_CONFIG_URI" \
+      idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
 
   # Establish metrics sub-system
