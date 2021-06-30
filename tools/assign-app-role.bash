@@ -1,13 +1,15 @@
 #!/bin/bash
 #
-# Assigns the current CLI user to the specified application role of the
+# Assigns the current CLI user the specified application role of the
 # specified Azure Function. Used to enable the use of Azure CLI credentials
 # (i.e., `Azure.Identity.AzureCliCredential`) when connecting to remote APIs
 # which have been secured using App Service Authentication. Only intended
 # for development environments.
 #
-# azure-env is the name of the deployment environment (e.g., "tts/dev").
+# <azure-env> is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
+# <func-app-name> is the name of the Function app resource.
+# <role-name> is the name of a valid application role
 #
 # usage: assign-app-role.bash <azure-env> <func-app-name> <role-name>
 
@@ -69,6 +71,8 @@ main () {
     --uri "https://graph${domain}/v1.0/users/${user}/appRoleAssignments" \
     --headers 'Content-Type=application/json' \
     --body "$json"
+
+  script_completed
 }
 
 main "$@"

@@ -4,7 +4,7 @@
 
 All prerequisites are available in [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview).
 
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.23.0
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell, `/dev/urandom` – included in macOS, Linux, Git for Windows
@@ -44,6 +44,7 @@ Configuration for each environment is in `iac/env` in a corresponding, `source`-
 
 ## Environment variables
 
+#### Automatically configured
 The following environment variables are pre-configured by the Infrastructure-as-Code for Functions or Apps that require them. Most often they are used to [bind backing services to application code](https://12factor.net/backing-services) via connection strings.
 
 | Name | Value | Used by |
@@ -60,6 +61,12 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.State, Piipan.Metrics.Api, Piipan.Metrics.Collect |
 | `LookupConnectionString` | Azure Storage Account connection string for accessing Table Storage service used for storing lookup IDs. | Piipan.Match.Orchestrator |
 | `LookupTableName` | Name of the Table Storage table where lookup IDs are stored.  | Piipan.Match.Orchestrator |
+
+#### Manually configured
+The following environment variables are not configured by the Infrastructure-as-Code scripts, and thus need to be manually configured after each run.
+| Name | Value | Used by |
+|---|---|---|
+| `IDP_CLIENT_SECRET` | Client Secret for OIDC identity provider. | Piipan.Dashboard, Piipan.QueryTool |
 
 
 ## `SysType` resource tag

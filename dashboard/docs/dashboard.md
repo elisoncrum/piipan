@@ -10,7 +10,14 @@ To run the app locally:
     dotnet dev-certs https --trust
 ```
 
-2. Run the app using the `dotnet run` CLI command:
+2. Set the `MetricsApiUri` environment variable to a local or remote instance of `Piipan.Metrics.Api`:
+```
+export MetricsApiUri=https://tts-func-metricsapi-dev.azurewebsites.net/api/getparticipantuploads
+```
+
+3. If using a remote metrics API URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `Metrics.Read` role for the remote metrics API Function App and authorize the Azure CLI.
+
+4. Run the app using the `dotnet run` CLI command:
 ```
     cd dashboard/src/Piipan.Dashboard
     dotnet run
@@ -21,7 +28,7 @@ Alternatively, use the `watch` command to update the app upon file changes:
     dotnet watch run
 ```
 
-3. Visit https://localhost:5001
+5. Visit https://localhost:5001
 
 ## Building Assets
 

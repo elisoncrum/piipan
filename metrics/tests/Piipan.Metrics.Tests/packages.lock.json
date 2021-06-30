@@ -56,8 +56,8 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.14.0",
-        "contentHash": "kUMUOZX4FcmfHmy7OjyP5LovO5FMXco9uUYB76l77mtqMVbZ0cLobv+XCy/j6LpStc8cZo2sI1+dMXhk0YROEQ==",
+        "resolved": "1.15.0",
+        "contentHash": "WJzKg22PtGvjAfB+yaRX/LC9ItiXYbNzgXj3DGKQYOdu2cBkijQ4ZlWi4poI0AnI61GOsATHlNS/9GgdG6w6FQ==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.0.0",
           "System.Buffers": "4.5.1",
@@ -86,12 +86,11 @@
       },
       "Azure.Security.KeyVault.Secrets": {
         "type": "Transitive",
-        "resolved": "4.1.1",
-        "contentHash": "D1V5Twne5mxvX+m3TjjEvfYcruKuWobh2N3uug3T5bLy23crkLCt/+LwHMtr4/my5M3zBDeFg0iIWCDR3uvdqQ==",
+        "resolved": "4.2.0",
+        "contentHash": "ujVMKVzEtVNQom5A0iEXSDovNGoSidV0RO5QlOBFfcIZlXwFnBmO5OhOfS4D/F1gbMNCCFS3re39qd/Bgh6+QQ==",
         "dependencies": {
-          "Azure.Core": "1.0.2",
+          "Azure.Core": "1.15.0",
           "System.Memory": "4.5.4",
-          "System.Text.Encodings.Web": "4.7.2",
           "System.Text.Json": "4.6.0",
           "System.Threading.Tasks.Extensions": "4.5.2"
         }
@@ -1845,24 +1844,33 @@
         "type": "Project",
         "dependencies": {
           "Azure.Identity": "1.4.0",
-          "Azure.Security.KeyVault.Secrets": "4.1.1",
+          "Azure.Security.KeyVault.Secrets": "4.2.0",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.7",
-          "Piipan.Metrics.Models": "1.0.0"
+          "Piipan.Metrics.Models": "1.0.0",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.metrics.collect": {
         "type": "Project",
         "dependencies": {
           "Azure.Identity": "1.4.0",
-          "Azure.Security.KeyVault.Secrets": "4.1.1",
+          "Azure.Security.KeyVault.Secrets": "4.2.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
-          "Npgsql": "5.0.7"
+          "Npgsql": "5.0.7",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.metrics.models": {
         "type": "Project"
+      },
+      "piipan.shared": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Core": "1.15.0",
+          "Azure.Identity": "1.4.0"
+        }
       }
     }
   }

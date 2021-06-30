@@ -121,7 +121,25 @@ main () {
       objectId="$CURRENT_USER_OBJID" \
       resourceTags="$RESOURCE_TAGS"
 
-  # Create an Event Hub namespace and hub where resource logs will be streamed
+  # Create an Event Hub namespace and hub where resource logs will be streamed,
+  # as well as an application registration that can be used to read logs
+  siem_app_id=$(\
+    az ad sp list \
+      --display-name "$SIEM_RECEIVER" \
+      --filter "displayname eq '$SIEM_RECEIVER'" \
+      --query "[0].objectId" \
+      --output tsv)
+  # Avoid resetting password by only creating app registration if it does not exist
+  if [ -z "$siem_app_id" ]; then
+    siem_app_id=$(\
+      az ad sp create-for-rbac \
+        --name "$SIEM_RECEIVER" \
+        --role Reader \
+        --query objectId \
+        --output tsv)
+  fi
+
+  # Create event hub and assign role to app registration
   az deployment group create \
     --name monitoring \
     --resource-group "$RESOURCE_GROUP" \
@@ -130,7 +148,8 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       location="$LOCATION" \
       env="$ENV" \
-      prefix="$PREFIX"
+      prefix="$PREFIX" \
+      receiverId="$siem_app_id"
 
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
@@ -562,6 +581,9 @@ main () {
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"
+
+  # Core database server and schemas
+  ./create-core-databases.bash "$azure_env"
 
   # API Management instances need to be created before configuring Easy Auth.
   ./create-apim.bash "$azure_env" "$APIM_EMAIL"

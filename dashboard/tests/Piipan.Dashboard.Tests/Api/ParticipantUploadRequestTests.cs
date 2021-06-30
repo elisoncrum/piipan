@@ -4,11 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit;
+using Azure.Core;
 using Moq;
 using Moq.Protected;
 using Piipan.Dashboard.Api;
-
+using Piipan.Shared.Authentication;
+using Xunit;
 
 namespace Piipan.Dashboard.Tests
 {
@@ -34,6 +35,17 @@ namespace Piipan.Dashboard.Tests
             return handlerMock;
         }
 
+        static Mock<ITokenProvider> TokenProviderMock(string value)
+        {
+            var token = new AccessToken(value, DateTimeOffset.Now);
+            var mockTokenProvider = new Mock<ITokenProvider>();
+            mockTokenProvider
+                .Setup(t => t.RetrieveAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult(token));
+
+            return mockTokenProvider;
+        }
+
         [Fact]
         public async void GetSuccess()
         {
@@ -54,7 +66,9 @@ namespace Piipan.Dashboard.Tests
             }";
             var handlerMock = MessageHandlerMock(mockResponse);
             var httpClient = new HttpClient(handlerMock.Object);
-            var api = new ParticipantUploadRequest(httpClient);
+            var tokenProvider = TokenProviderMock("|token|");
+            var apiClient = new AuthorizedJsonApiClient(httpClient, tokenProvider.Object);
+            var api = new ParticipantUploadRequest(apiClient);
             var resultResponse = await api.Get("http://example.com");
 
             Assert.NotNull(resultResponse);
