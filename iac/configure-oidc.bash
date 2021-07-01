@@ -23,18 +23,21 @@ main () {
   APP_NAME=$2
 
   echo "Getting secret from keyvault"
-  secret=$(az keyvault secret show \
-    --vault-name "$PREFIX-kv-oidc-$ENV" \
-    --name "$APP_NAME-oidc-secret" \
-    --query value \
-    --output tsv)
-
-  echo "Setting IDP_CLIENT_SECRET for $APP_NAME"
-  # capture the output to prevent secret from being written to terminal
-  res=$(az webapp config appsettings set \
-    --name "$APP_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --settings IDP_CLIENT_SECRET="$secret")
+  if secret=$(az keyvault secret show \
+      --vault-name "$PREFIX-kv-oidc-$ENV" \
+      --name "$APP_NAME-oidc-secret" \
+      --query value \
+      --output tsv)
+  then
+    echo "Setting IDP_CLIENT_SECRET for $APP_NAME"
+    # capture the output to prevent secret from being written to terminal
+    res=$(az webapp config appsettings set \
+      --name "$APP_NAME" \
+      --resource-group "$RESOURCE_GROUP" \
+      --settings IDP_CLIENT_SECRET="$secret")
+  else
+    echo "ERROR getting secret from keyvault"
+  fi
 
   script_completed
 }
