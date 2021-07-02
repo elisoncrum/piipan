@@ -579,6 +579,8 @@ main () {
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
 
+  ./configure-oidc.bash "$azure_env" "$QUERY_TOOL_APP_NAME"
+
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"
 
