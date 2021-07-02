@@ -26,7 +26,7 @@ main () {
     --policy-set-definition "$cis_policy_set_definition_name" \
     --resource-group "$RESOURCE_GROUP" \
     --name "cis-1_3-$RESOURCE_GROUP" \
-    --location $LOCATION \
+    --location "$LOCATION" \
     --assign-identity
 
   echo "Assigning $cis_policy_set_definition_name to $MATCH_RESOURCE_GROUP"
@@ -34,7 +34,7 @@ main () {
     --policy-set-definition "$cis_policy_set_definition_name" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --name "cis-1_3-$MATCH_RESOURCE_GROUP" \
-    --location $LOCATION \
+    --location "$LOCATION" \
     --assign-identity
 
   echo "Assigning $cis_policy_set_definition_name to $METRICS_RESOURCE_GROUP"
@@ -42,7 +42,7 @@ main () {
     --policy-set-definition "$cis_policy_set_definition_name" \
     --resource-group "$METRICS_RESOURCE_GROUP" \
     --name "cis-1_3-$METRICS_RESOURCE_GROUP" \
-    --location $LOCATION \
+    --location "$LOCATION" \
     --assign-identity
 }
 
