@@ -601,6 +601,8 @@ main () {
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
 
+  ./configure-cis-policy.bash "$azure_env"
+
   script_completed
 }
 
