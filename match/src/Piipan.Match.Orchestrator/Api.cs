@@ -54,6 +54,12 @@ namespace Piipan.Match.Orchestrator
                 return (ActionResult)new BadRequestResult();
             }
 
+            if (request.Query.Count > 50)
+            {
+                // Incoming request list is longer than the max allowed
+                return (ActionResult)new BadRequestResult();
+            }
+
             if (!Validate(request, log))
             {
                 // Request successfully deserialized but contains invalid properties

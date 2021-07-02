@@ -86,6 +86,22 @@ namespace Piipan.Match.Orchestrator.Tests
             };
         }
 
+        static MatchQueryRequest OverMaxRequest() {
+            var list = new List<MatchQuery>();
+            for (int i = 0; i < 51; i++)
+            {
+                list.Add(new MatchQuery
+                {
+                    First = "First",
+                    Middle = "Middle",
+                    Last = "Last",
+                    Dob = new DateTime(1970, 1, 1),
+                    Ssn = "000-00-0000"
+                });
+            }
+            return new MatchQueryRequest { Query = list };
+        }
+
         static StateMatchQueryResponse StateResponse()
         {
             var stateResponse = new StateMatchQueryResponse
@@ -383,6 +399,32 @@ namespace Piipan.Match.Orchestrator.Tests
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             );
+        }
+
+        // Over the max number pf persons in a request
+        [Fact]
+        public async void OverMaxInRequestReturnsError()
+        {
+            // setup query of 51 persons
+            // var query = @"[{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}]";
+
+            // Arrange Mocks
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(OverMaxRequest().ToJson());
+            var mockHandler = MockMessageHandler(HttpStatusCode.OK, StateResponse().ToJson());
+
+            // Arrage Environment
+            var uriString = "[\"https://localhost/\"]";
+            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
+
+            // Act
+            var api = ConstructMocked(mockHandler);
+            var response = await api.Query(mockRequest.Object, logger);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(response);
+            var result = response as BadRequestResult;
+            Assert.Equal(400, result.StatusCode);
         }
     }
 }
