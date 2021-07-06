@@ -36,14 +36,6 @@ main () {
     --name "cis-1_3-$MATCH_RESOURCE_GROUP" \
     --location "$LOCATION" \
     --assign-identity
-
-  echo "Assigning $cis_policy_set_definition_name to $METRICS_RESOURCE_GROUP"
-  az policy assignment create \
-    --policy-set-definition "$cis_policy_set_definition_name" \
-    --resource-group "$METRICS_RESOURCE_GROUP" \
-    --name "cis-1_3-$METRICS_RESOURCE_GROUP" \
-    --location "$LOCATION" \
-    --assign-identity
 }
 
 main "$@"
