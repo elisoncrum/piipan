@@ -12,9 +12,6 @@ RESOURCE_GROUP=rg-core-$ENV
 # Resource group for matching API
 MATCH_RESOURCE_GROUP=rg-match-$ENV
 
-# Resource group for metrics
-METRICS_RESOURCE_GROUP=$RESOURCE_GROUP
-
 # Prefix for resource identifiers
 PREFIX=tts
 
