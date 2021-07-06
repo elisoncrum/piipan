@@ -1,4 +1,10 @@
 #!/bin/bash
+#
+# Assigns the CIS Microsoft Azure Foundations Benchmark policy set
+# to the core and match resource groups. Assumes an Azure user with
+# the Global Administrator role has signed in with the Azure CLI.
+#
+# usage: configure-cis-policy.bash <azure-env>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit
