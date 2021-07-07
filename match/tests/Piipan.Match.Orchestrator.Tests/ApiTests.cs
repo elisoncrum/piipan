@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
 using Xunit;
 
@@ -138,16 +139,26 @@ namespace Piipan.Match.Orchestrator.Tests
             return mockRequest;
         }
 
-        static Mock<HttpMessageHandler> MockMessageHandler(HttpStatusCode status, string response)
+        static HttpResponseMessage MockResponse(System.Net.HttpStatusCode statusCode, string body)
         {
+            return new HttpResponseMessage
+            {
+              StatusCode = statusCode,
+              Content = new StringContent(body, Encoding.UTF8, "application/json")
+            };
+        }
+
+        static Mock<HttpMessageHandler> MockMessageHandler(List<HttpResponseMessage> responses)
+        {
+            var responseQueue = new Queue<HttpResponseMessage>();
+            foreach (HttpResponseMessage response in responses)
+            {
+                responseQueue.Enqueue(response);
+            }
             var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
             mockHttpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = status,
-                    Content = new StringContent(response, Encoding.UTF8, "application/json")
-                })
+                .ReturnsAsync(responseQueue.Dequeue)
                 .Verifiable();
 
             return mockHttpMessageHandler;
@@ -256,9 +267,14 @@ namespace Piipan.Match.Orchestrator.Tests
             var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            Assert.IsType<BadRequestResult>(response);
-            var result = response as BadRequestResult;
+            var result = response as BadRequestObjectResult;
             Assert.Equal(400, result.StatusCode);
+
+            var errorResponse = result.Value as ApiErrorResponse;
+            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.NotEmpty(errorResponse.Errors[0].Title);
+            Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
 
         // Invalid data results in BadRequest
@@ -280,9 +296,14 @@ namespace Piipan.Match.Orchestrator.Tests
             var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            Assert.IsType<BadRequestResult>(response);
-            var result = response as BadRequestResult;
+            var result = response as BadRequestObjectResult;
             Assert.Equal(400, result.StatusCode);
+
+            var errorResponse = result.Value as ApiErrorResponse;
+            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.NotEmpty(errorResponse.Errors[0].Title);
+            Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
 
         // Incomplete data results in BadRequest
@@ -305,9 +326,14 @@ namespace Piipan.Match.Orchestrator.Tests
             var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            Assert.IsType<BadRequestResult>(response);
-            var result = response as BadRequestResult;
+            var result = response as BadRequestObjectResult;
             Assert.Equal(400, result.StatusCode);
+
+            var errorResponse = result.Value as ApiErrorResponse;
+            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.NotEmpty(errorResponse.Errors[0].Title);
+            Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
 
         // Successful API call
@@ -317,7 +343,9 @@ namespace Piipan.Match.Orchestrator.Tests
             // Arrange Mocks
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(FullRequest().ToJson());
-            var mockHandler = MockMessageHandler(HttpStatusCode.OK, StateResponse().ToJson());
+            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
+                MockResponse(HttpStatusCode.OK, StateResponse().ToJson())
+            });
 
             // Arrage Environment
             var uriString = "[\"https://localhost/\"]";
@@ -345,7 +373,9 @@ namespace Piipan.Match.Orchestrator.Tests
             // Arrange Mocks
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(FullRequest().ToJson());
-            var mockHandler = MockMessageHandler(HttpStatusCode.InternalServerError, "");
+            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
+                MockResponse(HttpStatusCode.InternalServerError, "")
+            });
 
             // Arrage Environment
             var uriString = "[\"https://localhost/\"]";
@@ -380,7 +410,10 @@ namespace Piipan.Match.Orchestrator.Tests
             // Arrange Mocks
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(FullRequestMultiple().ToJson());
-            var mockHandler = MockMessageHandler(HttpStatusCode.OK, StateResponse().ToJson());
+            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
+                MockResponse(HttpStatusCode.OK, StateResponse().ToJson()),
+                MockResponse(HttpStatusCode.OK, StateResponse().ToJson())
+            });
 
             // Arrage Environment
             var uriString = "[\"https://localhost/\"]";
@@ -390,8 +423,16 @@ namespace Piipan.Match.Orchestrator.Tests
             var api = ConstructMocked(mockHandler);
             var response = await api.Query(mockRequest.Object, logger);
 
-            // Assert
-            Assert.IsType<JsonResult>(response);
+            // Assert - top-level data
+            var res = response as JsonResult;
+            var resBody = res.Value as MatchResponse;
+            Assert.Equal(2, resBody.Data.Results.Count);
+            Assert.Equal(0, resBody.Data.Errors.Count);
+
+            // Assert results data
+            var result = resBody.Data.Results[0];
+            Assert.NotEmpty(result.Matches);
+            Assert.Equal(0, result.Index);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
@@ -405,13 +446,12 @@ namespace Piipan.Match.Orchestrator.Tests
         [Fact]
         public async void OverMaxInRequestReturnsError()
         {
-            // setup query of 51 persons
-            // var query = @"[{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}]";
-
             // Arrange Mocks
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest(OverMaxRequest().ToJson());
-            var mockHandler = MockMessageHandler(HttpStatusCode.OK, StateResponse().ToJson());
+            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
+                MockResponse(HttpStatusCode.OK, StateResponse().ToJson())
+            });
 
             // Arrage Environment
             var uriString = "[\"https://localhost/\"]";
@@ -422,9 +462,14 @@ namespace Piipan.Match.Orchestrator.Tests
             var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            Assert.IsType<BadRequestResult>(response);
-            var result = response as BadRequestResult;
+            var result = response as BadRequestObjectResult;
             Assert.Equal(400, result.StatusCode);
+
+            var errorResponse = result.Value as ApiErrorResponse;
+            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.NotEmpty(errorResponse.Errors[0].Title);
+            Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
     }
 }

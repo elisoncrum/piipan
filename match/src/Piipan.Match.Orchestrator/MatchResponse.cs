@@ -5,14 +5,28 @@ using Piipan.Match.Shared;
 
 namespace Piipan.Match.Orchestrator
 {
-    public class MatchQueryResponse
+    public class MatchResponse
     {
         [JsonProperty("data")]
-        public List<StateMatchQueryResponse> Data { get; set; } = new List<StateMatchQueryResponse>();
-
+        public MatchResponseData Data { get; set; } = new MatchResponseData();
         public string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+        return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
         }
+    }
+
+    public class MatchResponseData
+    {
+        [JsonProperty("results")]
+        public List<StateMatchQueryResponse> Results { get; set; } = new List<StateMatchQueryResponse>();
+
+        [JsonProperty("errors")]
+        public List<MatchDataError> Errors { get; set; } = new List<MatchDataError>();
+    }
+
+    public class MatchDataError
+    {
+        [JsonProperty("index")]
+        public int Index { get; set; }
     }
 }

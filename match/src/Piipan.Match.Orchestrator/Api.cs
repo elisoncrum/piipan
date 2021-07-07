@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -11,6 +12,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
 
 namespace Piipan.Match.Orchestrator
@@ -22,6 +24,8 @@ namespace Piipan.Match.Orchestrator
     {
         private readonly IAuthorizedApiClient _apiClient;
         private readonly ITableStorage<QueryEntity> _lookupStorage;
+
+        private readonly int MaxPersonsLimit = 50;
 
         public Api(IAuthorizedApiClient apiClient, ITableStorage<QueryEntity> lookupStorage)
         {
@@ -51,23 +55,43 @@ namespace Piipan.Match.Orchestrator
             {
                 // Incoming request could not be deserialized into MatchQueryResponse
                 // XXX return validation messages
-                return (ActionResult)new BadRequestResult();
+                var errResponse = new ApiErrorResponse();
+                errResponse.Errors.Add(new ApiHttpError()
+                {
+                StatusCode = HttpStatusCode.BadRequest,
+                Title = "Invalid Request",
+                Detail = "Request body contains no query property"
+                });
+                return (ActionResult)new BadRequestObjectResult(errResponse);
             }
 
-            if (request.Query.Count > 50)
+            if (request.Query.Count > MaxPersonsLimit)
             {
                 // Incoming request list is longer than the max allowed
-                return (ActionResult)new BadRequestResult();
+                var errResponse = new ApiErrorResponse();
+                errResponse.Errors.Add(new ApiHttpError() {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Title = "Persons Limit Exceeded",
+                    Detail = $"Persons in request cannot exceed {MaxPersonsLimit}"
+                });
+                return (ActionResult)new BadRequestObjectResult(errResponse);
             }
 
             if (!Validate(request, log))
             {
                 // Request successfully deserialized but contains invalid properties
                 // XXX return validation messages
-                return (ActionResult)new BadRequestResult();
+                var errResponse = new ApiErrorResponse();
+                errResponse.Errors.Add(new ApiHttpError()
+                {
+                StatusCode = HttpStatusCode.BadRequest,
+                Title = "Invalid Request",
+                Detail = "Request data contains invalid properties"
+                });
+                return (ActionResult)new BadRequestObjectResult(errResponse);
             }
 
-            var orchResponse = new MatchQueryResponse();
+            var orchResponse = new MatchResponse();
             for (int i = 0; i < request.Query.Count; i++)
             {
                 var stateResponse = new StateMatchQueryResponse();
@@ -89,7 +113,7 @@ namespace Piipan.Match.Orchestrator
                     {
                         stateResponse.LookupId = await Lookup.Save(query, _lookupStorage, log);
                     }
-                    orchResponse.Data.Add(stateResponse);
+                    orchResponse.Data.Results.Add(stateResponse);
                 }
                 catch (Exception ex)
                 {
