@@ -606,6 +606,9 @@ main () {
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
 
+  # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
+  ./configure-cis-policy.bash "$azure_env"
+
   script_completed
 }
 
