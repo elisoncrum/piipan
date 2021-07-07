@@ -520,6 +520,7 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       location="$LOCATION" \
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
       LookupStorageName="$LOOKUP_STORAGE_NAME" \
       StateApiUriStrings="$match_api_uris" \
@@ -533,6 +534,20 @@ main () {
   pushd ../match/src/Piipan.Match.Orchestrator
     func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet
   popd
+
+  # Resource ID required when vnet is in a separate resource group
+  vnet_id=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$vnet_id"
 
   # Create App Service resources for query tool app.
   # This needs to happen after the orchestrator is created in order for

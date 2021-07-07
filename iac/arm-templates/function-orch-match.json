@@ -17,6 +17,9 @@
         "functionAppName": {
             "type": "string"
         },
+        "appServicePlanName": {
+            "type": "string"
+        },
         "storageAccountName": {
             "type": "string"
         },
@@ -29,7 +32,6 @@
     },
     "variables": {
         "functionAppName": "[parameters('functionAppName')]",
-        "hostingPlanName": "matchapi",
         "storageAccountName": "[parameters('storageAccountName')]",
         "lookupTableName": "lookup",
         "functionWorkerRuntime": "dotnet",
@@ -90,21 +92,6 @@
             "kind": "Storage"
         },
         {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2020-06-01",
-            "name": "[variables('hostingPlanName')]",
-            "tags": "[parameters('resourceTags')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
-            },
-            "properties": {
-                "name": "[variables('hostingPlanName')]",
-                "computeMode": "Dynamic"
-            }
-        },
-        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2020-06-01",
             "name": "[variables('functionAppName')]",
@@ -115,12 +102,11 @@
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('LookupStorageName'))]"
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "serverFarmId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "httpsOnly": true,
                 "siteConfig": {
                     "ftpsState": "Disabled",
