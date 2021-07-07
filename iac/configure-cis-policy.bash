@@ -10,7 +10,9 @@
 source "$(dirname "$0")"/../tools/common.bash || exit
 
 set_constants () {
-  CIS_POLICY_DISPLAY_NAME="[Preview]: CIS Microsoft Azure Foundations Benchmark v1.3.0"
+  # https://docs.microsoft.com/en-us/azure/governance/policy/samples/cis-azure-1-3-0
+  # The policy "name" is the UUID of the set-definition
+  CIS_POLICY_SET_DEFINITION_NAME="612b5213-9160-4969-8578-1518bd2a000c"
 }
 
 main () {
@@ -23,25 +25,23 @@ main () {
 
   set_constants
 
-  cis_policy_set_definition_name=$(az policy set-definition list \
-    --query "[?displayName=='$CIS_POLICY_DISPLAY_NAME'] | [0] | name" \
-    --output tsv)
-
-  echo "Assigning $cis_policy_set_definition_name to $RESOURCE_GROUP"
+  echo "Assigning $CIS_POLICY_SET_DEFINITION_NAME to $RESOURCE_GROUP"
   az policy assignment create \
-    --policy-set-definition "$cis_policy_set_definition_name" \
+    --policy-set-definition "$CIS_POLICY_SET_DEFINITION_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --name "cis-1_3-$RESOURCE_GROUP" \
     --location "$LOCATION" \
     --assign-identity
 
-  echo "Assigning $cis_policy_set_definition_name to $MATCH_RESOURCE_GROUP"
+  echo "Assigning $CIS_POLICY_SET_DEFINITION_NAME to $MATCH_RESOURCE_GROUP"
   az policy assignment create \
-    --policy-set-definition "$cis_policy_set_definition_name" \
+    --policy-set-definition "$CIS_POLICY_SET_DEFINITION_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --name "cis-1_3-$MATCH_RESOURCE_GROUP" \
     --location "$LOCATION" \
     --assign-identity
+
+  script_completed
 }
 
 main "$@"
