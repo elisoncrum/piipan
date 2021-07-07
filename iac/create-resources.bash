@@ -579,6 +579,7 @@ main () {
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
 
+  # Sets the OIDC client secrets for web applications
   ./configure-oidc.bash "$azure_env" "$QUERY_TOOL_APP_NAME"
 
   # Establish metrics sub-system
@@ -594,6 +595,10 @@ main () {
   #   - PerStateMatchApi and OrchestratorApi
   #   - OrchestratorApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
+
+  # Configures Azure Defender at the subscription level for:
+  #   - Storage accounts
+  ./configure-defender.bash "$azure_env"
 
   echo "Secure database connection"
   ./remove-external-network.bash \
