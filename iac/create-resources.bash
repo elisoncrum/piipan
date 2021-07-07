@@ -280,7 +280,8 @@ main () {
       name="$APP_SERVICE_PLAN_FUNC_NAME" \
       location="$LOCATION" \
       kind="$APP_SERVICE_PLAN_FUNC_KIND" \
-      sku="$APP_SERVICE_PLAN_FUNC_SKU"
+      sku="$APP_SERVICE_PLAN_FUNC_SKU" \
+      resourceTags="$RESOURCE_TAGS"
 
   # Function apps need an Event Hub authorization rule ID for log streaming
   eh_rule_id=$(\
