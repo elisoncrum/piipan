@@ -47,84 +47,106 @@ namespace Piipan.Match.Orchestrator
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
-
-            var incoming = await new StreamReader(req.Body).ReadToEndAsync();
-            var request = Parse(incoming, log);
-            if (!request.Query.Any())
+            try
             {
-                // Incoming request could not be deserialized into MatchQueryResponse
-                // XXX return validation messages
-                var errResponse = new ApiErrorResponse();
-                errResponse.Errors.Add(new ApiHttpError()
+                log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+
+                var incoming = await new StreamReader(req.Body).ReadToEndAsync();
+                var request = Parse(incoming, log);
+                if (!request.Query.Any())
                 {
-                StatusCode = HttpStatusCode.BadRequest,
-                Title = "Invalid Request",
-                Detail = "Request body contains no query property"
-                });
-                return (ActionResult)new BadRequestObjectResult(errResponse);
-            }
-
-            if (request.Query.Count > MaxPersonsLimit)
-            {
-                // Incoming request list is longer than the max allowed
-                var errResponse = new ApiErrorResponse();
-                errResponse.Errors.Add(new ApiHttpError() {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Title = "Persons Limit Exceeded",
-                    Detail = $"Persons in request cannot exceed {MaxPersonsLimit}"
-                });
-                return (ActionResult)new BadRequestObjectResult(errResponse);
-            }
-
-            if (!Validate(request, log))
-            {
-                // Request successfully deserialized but contains invalid properties
-                // XXX return validation messages
-                var errResponse = new ApiErrorResponse();
-                errResponse.Errors.Add(new ApiHttpError()
-                {
-                StatusCode = HttpStatusCode.BadRequest,
-                Title = "Invalid Request",
-                Detail = "Request data contains invalid properties"
-                });
-                return (ActionResult)new BadRequestObjectResult(errResponse);
-            }
-
-            var orchResponse = new MatchResponse();
-            for (int i = 0; i < request.Query.Count; i++)
-            {
-                var stateResponse = new StateMatchQueryResponse();
-                try
-                {
-                    var query = request.Query[i];
-                    StateMatchQueryRequest stateRequest = new StateMatchQueryRequest();
-                    stateRequest.Query = new StateMatchQuery {
-                        Last = query.Last,
-                        First = query.First,
-                        Middle = query.Middle,
-                        Dob = query.Dob,
-                        Ssn = query.Ssn
-                    };
-                    stateResponse.Index = i;
-                    stateResponse.Matches = await Match(stateRequest, log);
-
-                    if (stateResponse.Matches.Count > 0)
+                    // Incoming request could not be deserialized into MatchQueryResponse
+                    // XXX return validation messages
+                    var errResponse = new ApiErrorResponse();
+                    errResponse.Errors.Add(new ApiHttpError()
                     {
-                        stateResponse.LookupId = await Lookup.Save(query, _lookupStorage, log);
-                    }
-                    orchResponse.Data.Results.Add(stateResponse);
-                }
-                catch (Exception ex)
-                {
-                    // Exception when attempting state-level matches, fail with 500
-                    // XXX fine-grained, per-state handling
-                    log.LogError(ex.Message);
-                    return (ActionResult)new InternalServerErrorResult();
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Title = "Invalid Request",
+                        Detail = "Request body contains no query property"
+                    });
+                    return (ActionResult)new BadRequestObjectResult(errResponse);
                 }
 
+                if (request.Query.Count > MaxPersonsLimit)
+                {
+                    // Incoming request list is longer than the max allowed
+                    var errResponse = new ApiErrorResponse();
+                    errResponse.Errors.Add(new ApiHttpError() {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Title = "Persons Limit Exceeded",
+                        Detail = $"Persons in request cannot exceed {MaxPersonsLimit}"
+                    });
+                    return (ActionResult)new BadRequestObjectResult(errResponse);
+                }
+
+                if (!Validate(request, log))
+                {
+                    // Request successfully deserialized but contains invalid properties
+                    // XXX return validation messages
+                    var errResponse = new ApiErrorResponse();
+                    errResponse.Errors.Add(new ApiHttpError()
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Title = "Invalid Request",
+                        Detail = "Request data contains invalid properties"
+                    });
+                    return (ActionResult)new BadRequestObjectResult(errResponse);
+                }
+
+                var orchResponse = new MatchResponse();
+                for (int i = 0; i < request.Query.Count; i++)
+                {
+                    var stateResponse = new StateMatchQueryResponse();
+                    try
+                    {
+                        var query = request.Query[i];
+                        StateMatchQueryRequest stateRequest = new StateMatchQueryRequest();
+                        stateRequest.Query = new StateMatchQuery {
+                            Last = query.Last,
+                            First = query.First,
+                            Middle = query.Middle,
+                            Dob = query.Dob,
+                            Ssn = query.Ssn
+                        };
+                        stateResponse.Index = i;
+                        stateResponse.Matches = await Match(stateRequest, log);
+
+                        if (stateResponse.Matches.Count > 0)
+                        {
+                            stateResponse.LookupId = await Lookup.Save(query, _lookupStorage, log);
+                        }
+                        orchResponse.Data.Results.Add(stateResponse);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Exception when attempting state-level matches
+                        log.LogError(ex.Message);
+
+                        orchResponse.Data.Errors.Add(new MatchDataError() {
+                            Index = i,
+                            Code = ex.GetType().Name,
+                            Detail = ex.Message
+                        });
+                    }
+
+                }
+                return (ActionResult)new JsonResult(orchResponse);
             }
-            return (ActionResult)new JsonResult(orchResponse);
+            catch (Exception topLevelEx)
+            {
+                log.LogError(topLevelEx.Message);
+                var errResponse = new ApiErrorResponse();
+                errResponse.Errors.Add(new ApiHttpError()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Title = topLevelEx.GetType().Name,
+                    Detail = topLevelEx.Message
+                });
+                return (ActionResult)new JsonResult(errResponse)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
         }
 
         /// <summary>

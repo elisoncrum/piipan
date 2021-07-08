@@ -28,5 +28,14 @@ namespace Piipan.Match.Orchestrator
     {
         [JsonProperty("index")]
         public int Index { get; set; }
+
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("detail")]
+        public string Detail { get; set; }
     }
 }

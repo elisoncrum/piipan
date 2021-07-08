@@ -271,7 +271,7 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Equal(400, result.StatusCode);
 
             var errorResponse = result.Value as ApiErrorResponse;
-            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
@@ -300,7 +300,7 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Equal(400, result.StatusCode);
 
             var errorResponse = result.Value as ApiErrorResponse;
-            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
@@ -330,7 +330,7 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Equal(400, result.StatusCode);
 
             var errorResponse = result.Value as ApiErrorResponse;
-            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
@@ -384,9 +384,17 @@ namespace Piipan.Match.Orchestrator.Tests
             // Act
             var api = ConstructMocked(mockHandler);
             var response = await api.Query(mockRequest.Object, logger);
+            var result = response as JsonResult;
+            var resBody = result.Value as MatchResponse;
+            var error = resBody.Data.Errors[0];
 
             // Assert
-            Assert.IsType<InternalServerErrorResult>(response);
+            Assert.Equal(0, (int)resBody.Data.Results.Count);
+            Assert.Equal(1, (int)resBody.Data.Errors.Count);
+            Assert.NotNull(error.Index);
+            Assert.NotNull(error.Code);
+            Assert.NotNull(error.Detail);
+
         }
 
         // Required services are passed to Api on startup
@@ -426,8 +434,8 @@ namespace Piipan.Match.Orchestrator.Tests
             // Assert - top-level data
             var res = response as JsonResult;
             var resBody = res.Value as MatchResponse;
-            Assert.Equal(2, resBody.Data.Results.Count);
-            Assert.Equal(0, resBody.Data.Errors.Count);
+            Assert.Equal(2, (int)resBody.Data.Results.Count);
+            Assert.Equal(0, (int)resBody.Data.Errors.Count);
 
             // Assert results data
             var result = resBody.Data.Results[0];
@@ -466,10 +474,74 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Equal(400, result.StatusCode);
 
             var errorResponse = result.Value as ApiErrorResponse;
-            Assert.Equal(1, errorResponse.Errors.Count);
+            Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
+        }
+
+        // Multiple persons in request——returns error for one and success for another
+        [Fact]
+        public async void ItemLevelErrorIsPresent()
+        {
+            // Arrange Mocks
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest(FullRequestMultiple().ToJson());
+            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
+                MockResponse(HttpStatusCode.OK, StateResponse().ToJson()),
+                MockResponse(HttpStatusCode.InternalServerError, "")
+            });
+
+            // Arrage Environment
+            var uriString = "[\"https://localhost/\"]";
+            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
+
+            // Act
+            var api = ConstructMocked(mockHandler);
+            var response = await api.Query(mockRequest.Object, logger);
+            var res = response as JsonResult;
+            var resBody = res.Value as MatchResponse;
+            var error = resBody.Data.Errors[0];
+
+            // Assert
+            Assert.Equal(1, (int)resBody.Data.Results.Count);
+            Assert.Equal(1, (int)resBody.Data.Errors.Count);
+            Assert.NotNull(error.Index);
+            Assert.NotNull(error.Code);
+            Assert.NotNull(error.Detail);
+        }
+
+        // Whole thing blows up and returns a top-level error
+        [Fact]
+        public async void ReturnsInternalServerError()
+        {
+            // Arrange
+            var api = Construct();
+            Mock<HttpRequest> mockRequest = MockRequest("foobar");
+            var logger = new Mock<ILogger>();
+
+            // Set up first log to throw an exception
+            // How to mock LogInformation: https://stackoverflow.com/a/58413842
+            logger.SetupSequence(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+            .Throws(new Exception("example message"));
+
+            // Act
+            var response = await api.Query(mockRequest.Object, logger.Object);
+            var result = response as JsonResult;
+            var resBody = result.Value as ApiErrorResponse;
+            var error = resBody.Errors[0];
+
+            // Assert
+            Assert.Equal(500, result.StatusCode);
+            Assert.NotEmpty(resBody.Errors);
+            Assert.Equal(500,(int)error.StatusCode);
+            Assert.NotNull(error.Title);
+            Assert.NotNull(error.Detail);
         }
     }
 }
