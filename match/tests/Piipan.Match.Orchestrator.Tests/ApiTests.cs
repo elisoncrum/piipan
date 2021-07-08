@@ -45,12 +45,12 @@ namespace Piipan.Match.Orchestrator.Tests
             };
         }
 
-        static MatchQueryRequest FullRequest()
+        static OrchMatchRequest FullRequest()
         {
-            return new MatchQueryRequest
+            return new OrchMatchRequest
             {
-                Query = new List<MatchQuery>() {
-                    new MatchQuery
+                Persons = new List<RequestPerson>() {
+                    new RequestPerson
                     {
                         First = "First",
                         Middle = "Middle",
@@ -62,12 +62,12 @@ namespace Piipan.Match.Orchestrator.Tests
             };
         }
 
-        static MatchQueryRequest FullRequestMultiple()
+        static OrchMatchRequest FullRequestMultiple()
         {
-            return new MatchQueryRequest
+            return new OrchMatchRequest
             {
-                Query = new List<MatchQuery>() {
-                    new MatchQuery
+                Persons = new List<RequestPerson>() {
+                    new RequestPerson
                     {
                         First = "First",
                         Middle = "Middle",
@@ -75,7 +75,7 @@ namespace Piipan.Match.Orchestrator.Tests
                         Dob = new DateTime(1970, 1, 1),
                         Ssn = "000-00-0000"
                     },
-                    new MatchQuery
+                    new RequestPerson
                     {
                         First = "FirstTwo",
                         Middle = "MiddleTwo",
@@ -87,11 +87,11 @@ namespace Piipan.Match.Orchestrator.Tests
             };
         }
 
-        static MatchQueryRequest OverMaxRequest() {
-            var list = new List<MatchQuery>();
+        static OrchMatchRequest OverMaxRequest() {
+            var list = new List<RequestPerson>();
             for (int i = 0; i < 51; i++)
             {
-                list.Add(new MatchQuery
+                list.Add(new RequestPerson
                 {
                     First = "First",
                     Middle = "Middle",
@@ -100,12 +100,12 @@ namespace Piipan.Match.Orchestrator.Tests
                     Ssn = "000-00-0000"
                 });
             }
-            return new MatchQueryRequest { Query = list };
+            return new OrchMatchRequest { Persons = list };
         }
 
-        static StateMatchQueryResponse StateResponse()
+        static OrchMatchResult StateResponse()
         {
-            var stateResponse = new StateMatchQueryResponse
+            var stateResponse = new OrchMatchResult
             {
                 Index = 0,
                 Matches = new List<PiiRecord> { FullRecord() }
@@ -191,7 +191,7 @@ namespace Piipan.Match.Orchestrator.Tests
                 .Returns<string, string>((pk, rk) =>
                 {
                     var qe = new QueryEntity(pk, rk);
-                    qe.Body = mockQuery.Query[0].ToJson();
+                    qe.Body = mockQuery.Persons[0].ToJson();
                     return Task.FromResult(qe);
                 });
 
@@ -385,13 +385,13 @@ namespace Piipan.Match.Orchestrator.Tests
             var api = ConstructMocked(mockHandler);
             var response = await api.Query(mockRequest.Object, logger);
             var result = response as JsonResult;
-            var resBody = result.Value as MatchResponse;
+            var resBody = result.Value as OrchMatchResponse;
             var error = resBody.Data.Errors[0];
 
             // Assert
             Assert.Equal(0, (int)resBody.Data.Results.Count);
             Assert.Equal(1, (int)resBody.Data.Errors.Count);
-            Assert.NotNull(error.Index);
+            Assert.Equal(0, error.Index);
             Assert.NotNull(error.Code);
             Assert.NotNull(error.Detail);
 
@@ -433,7 +433,7 @@ namespace Piipan.Match.Orchestrator.Tests
 
             // Assert - top-level data
             var res = response as JsonResult;
-            var resBody = res.Value as MatchResponse;
+            var resBody = res.Value as OrchMatchResponse;
             Assert.Equal(2, (int)resBody.Data.Results.Count);
             Assert.Equal(0, (int)resBody.Data.Errors.Count);
 
@@ -500,13 +500,13 @@ namespace Piipan.Match.Orchestrator.Tests
             var api = ConstructMocked(mockHandler);
             var response = await api.Query(mockRequest.Object, logger);
             var res = response as JsonResult;
-            var resBody = res.Value as MatchResponse;
+            var resBody = res.Value as OrchMatchResponse;
             var error = resBody.Data.Errors[0];
 
             // Assert
             Assert.Equal(1, (int)resBody.Data.Results.Count);
             Assert.Equal(1, (int)resBody.Data.Errors.Count);
-            Assert.NotNull(error.Index);
+            Assert.Equal(1, error.Index);
             Assert.NotNull(error.Code);
             Assert.NotNull(error.Detail);
         }

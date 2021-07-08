@@ -53,7 +53,7 @@ namespace Piipan.Match.Orchestrator
 
                 var incoming = await new StreamReader(req.Body).ReadToEndAsync();
                 var request = Parse(incoming, log);
-                if (!request.Query.Any())
+                if (!request.Persons.Any())
                 {
                     // Incoming request could not be deserialized into MatchQueryResponse
                     // XXX return validation messages
@@ -62,12 +62,12 @@ namespace Piipan.Match.Orchestrator
                     {
                         StatusCode = HttpStatusCode.BadRequest,
                         Title = "Invalid Request",
-                        Detail = "Request body contains no query property"
+                        Detail = "Request body contains no persons property"
                     });
                     return (ActionResult)new BadRequestObjectResult(errResponse);
                 }
 
-                if (request.Query.Count > MaxPersonsLimit)
+                if (request.Persons.Count > MaxPersonsLimit)
                 {
                     // Incoming request list is longer than the max allowed
                     var errResponse = new ApiErrorResponse();
@@ -93,36 +93,36 @@ namespace Piipan.Match.Orchestrator
                     return (ActionResult)new BadRequestObjectResult(errResponse);
                 }
 
-                var orchResponse = new MatchResponse();
-                for (int i = 0; i < request.Query.Count; i++)
+                var orchResponse = new OrchMatchResponse();
+                for (int i = 0; i < request.Persons.Count; i++)
                 {
-                    var stateResponse = new StateMatchQueryResponse();
+                    var result = new OrchMatchResult();
                     try
                     {
-                        var query = request.Query[i];
-                        StateMatchQueryRequest stateRequest = new StateMatchQueryRequest();
-                        stateRequest.Query = new StateMatchQuery {
-                            Last = query.Last,
-                            First = query.First,
-                            Middle = query.Middle,
-                            Dob = query.Dob,
-                            Ssn = query.Ssn
+                        var person = request.Persons[i];
+                        PersonMatchRequest personRequest = new PersonMatchRequest();
+                        personRequest.Query = new PersonMatchQuery {
+                            Last = person.Last,
+                            First = person.First,
+                            Middle = person.Middle,
+                            Dob = person.Dob,
+                            Ssn = person.Ssn
                         };
-                        stateResponse.Index = i;
-                        stateResponse.Matches = await Match(stateRequest, log);
+                        result.Index = i;
+                        result.Matches = await PersonMatch(personRequest, log);
 
-                        if (stateResponse.Matches.Count > 0)
+                        if (result.Matches.Count > 0)
                         {
-                            stateResponse.LookupId = await Lookup.Save(query, _lookupStorage, log);
+                            result.LookupId = await Lookup.Save(person, _lookupStorage, log);
                         }
-                        orchResponse.Data.Results.Add(stateResponse);
+                        orchResponse.Data.Results.Add(result);
                     }
                     catch (Exception ex)
                     {
                         // Exception when attempting state-level matches
                         log.LogError(ex.Message);
 
-                        orchResponse.Data.Errors.Add(new MatchDataError() {
+                        orchResponse.Data.Errors.Add(new OrchMatchError() {
                             Index = i,
                             Code = ex.GetType().Name,
                             Detail = ex.Message
@@ -169,14 +169,14 @@ namespace Piipan.Match.Orchestrator
             return (ActionResult)new JsonResult(response);
         }
 
-        private MatchQueryRequest Parse(string requestBody, ILogger log)
+        private OrchMatchRequest Parse(string requestBody, ILogger log)
         {
             // Assume failure
-            MatchQueryRequest request = new MatchQueryRequest();
+            OrchMatchRequest request = new OrchMatchRequest();
 
             try
             {
-                request = JsonConvert.DeserializeObject<MatchQueryRequest>(requestBody);
+                request = JsonConvert.DeserializeObject<OrchMatchRequest>(requestBody);
             }
             catch (Exception ex)
             {
@@ -186,9 +186,9 @@ namespace Piipan.Match.Orchestrator
             return request;
         }
 
-        private bool Validate(MatchQueryRequest request, ILogger log)
+        private bool Validate(OrchMatchRequest request, ILogger log)
         {
-            MatchQueryRequestValidator validator = new MatchQueryRequestValidator();
+            OrchMatchRequestValidator validator = new OrchMatchRequestValidator();
             var result = validator.Validate(request);
 
             if (!result.IsValid)
@@ -210,27 +210,27 @@ namespace Piipan.Match.Orchestrator
             return uris;
         }
 
-        private async Task<StateMatchQueryResponse> MatchState(Uri uri, StateMatchQueryRequest request, ILogger log)
+        private async Task<MatchResponse> PerStateMatch(Uri uri, PersonMatchRequest request, ILogger log)
         {
             var content = new StringContent(JsonConvert.SerializeObject(request));
             var response = await _apiClient.PostAsync(uri, content);
 
             response.EnsureSuccessStatusCode();
 
-            var matchResponse = await response.Content.ReadAsAsync<StateMatchQueryResponse>();
+            var matchResponse = await response.Content.ReadAsAsync<MatchResponse>();
 
             return matchResponse;
         }
 
-        private async Task<List<PiiRecord>> Match(StateMatchQueryRequest request, ILogger log)
+        private async Task<List<PiiRecord>> PersonMatch(PersonMatchRequest request, ILogger log)
         {
             var matches = new List<PiiRecord>();
-            var stateRequests = new List<Task<StateMatchQueryResponse>>();
+            var stateRequests = new List<Task<MatchResponse>>();
             var stateApiUris = StateApiUris();
 
             foreach (var uri in stateApiUris)
             {
-                stateRequests.Add(MatchState(uri, request, log));
+                stateRequests.Add(PerStateMatch(uri, request, log));
             }
 
             await Task.WhenAll(stateRequests.ToArray());

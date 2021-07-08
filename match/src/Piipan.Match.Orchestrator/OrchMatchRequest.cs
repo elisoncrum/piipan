@@ -5,10 +5,13 @@ using Piipan.Match.Shared;
 
 namespace Piipan.Match.Orchestrator
 {
-    public class MatchQueryRequest
+    /// <summary>
+    /// Represents the full API request from a client
+    /// </summary>
+    public class OrchMatchRequest
     {
-        [JsonProperty("query", Required = Required.Always)]
-        public List<MatchQuery> Query { get; set; } = new List<MatchQuery>();
+        [JsonProperty("persons", Required = Required.Always)]
+        public List<RequestPerson> Persons { get; set; } = new List<RequestPerson>();
 
         public string ToJson()
         {
@@ -16,7 +19,10 @@ namespace Piipan.Match.Orchestrator
         }
     }
 
-    public class MatchQuery
+    /// <summary>
+    /// Represents each person in an API request
+    /// </summary>
+    public class RequestPerson
     {
         [JsonProperty("last", Required = Required.Always)]
         public string Last { get; set; }

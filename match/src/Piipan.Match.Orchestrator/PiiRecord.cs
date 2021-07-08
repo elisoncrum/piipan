@@ -5,24 +5,6 @@ using Piipan.Match.Shared;
 
 namespace Piipan.Match.Orchestrator
 {
-
-    public class StateMatchQueryResponse
-    {
-        [JsonProperty("index")]
-        public int Index { get; set; }
-
-        [JsonProperty("lookup_id")]
-        public string LookupId { get; set; }
-
-        [JsonProperty("matches")]
-        public List<PiiRecord> Matches { get; set; }
-
-        public string ToJson()
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-        }
-    }
-
     public class PiiRecord
     {
         [JsonProperty("last")]
