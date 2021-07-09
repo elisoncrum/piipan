@@ -16,7 +16,7 @@ namespace Piipan.Match.Shared
 
     /// <summary>
     /// Represents http-level and other top-level errors for an API request
-    /// <para> Use for items in the Errors list in the top-level API response
+    /// <para> Use for items in the Errors list in the top-level API response</para>
     /// </summary>
     public class ApiHttpError
     {
