@@ -25,8 +25,6 @@ namespace Piipan.Match.Orchestrator
         private readonly IAuthorizedApiClient _apiClient;
         private readonly ITableStorage<QueryEntity> _lookupStorage;
 
-        private readonly int MaxPersonsLimit = 50;
-
         public Api(IAuthorizedApiClient apiClient, ITableStorage<QueryEntity> lookupStorage)
         {
             _apiClient = apiClient;
@@ -53,53 +51,51 @@ namespace Piipan.Match.Orchestrator
 
                 var incoming = await new StreamReader(req.Body).ReadToEndAsync();
                 var request = Parse(incoming, log);
-                if (!request.Persons.Any())
+                // Top-level request validation
+                var requestvalidateResult = (new OrchMatchRequestValidator()).Validate(request);
+                if (!requestvalidateResult.IsValid)
                 {
-                    // Incoming request could not be deserialized into MatchQueryResponse
-                    // XXX return validation messages
+                    // Incoming request could not be deserialized
                     var errResponse = new ApiErrorResponse();
-                    errResponse.Errors.Add(new ApiHttpError()
+                    foreach (var failure in requestvalidateResult.Errors)
                     {
-                        Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                        Title = "Invalid Request",
-                        Detail = "Request body contains no persons property"
-                    });
-                    return (ActionResult)new BadRequestObjectResult(errResponse);
-                }
-
-                if (request.Persons.Count > MaxPersonsLimit)
-                {
-                    // Incoming request list is longer than the max allowed
-                    var errResponse = new ApiErrorResponse();
-                    errResponse.Errors.Add(new ApiHttpError() {
-                        Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                        Title = "Persons Limit Exceeded",
-                        Detail = $"Persons in request cannot exceed {MaxPersonsLimit}"
-                    });
-                    return (ActionResult)new BadRequestObjectResult(errResponse);
-                }
-
-                if (!Validate(request, log))
-                {
-                    // Request successfully deserialized but contains invalid properties
-                    // XXX return validation messages
-                    var errResponse = new ApiErrorResponse();
-                    errResponse.Errors.Add(new ApiHttpError()
-                    {
-                        Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                        Title = "Invalid Request",
-                        Detail = "Request data contains invalid properties"
-                    });
+                        errResponse.Errors.Add(new ApiHttpError()
+                        {
+                            Status = Convert.ToString((int)HttpStatusCode.BadRequest),
+                            Title = failure.ErrorCode,
+                            Detail = failure.ErrorMessage
+                        });
+                    }
                     return (ActionResult)new BadRequestObjectResult(errResponse);
                 }
 
                 var orchResponse = new OrchMatchResponse();
+                var personsValidator = new PersonValidator();
                 for (int i = 0; i < request.Persons.Count; i++)
                 {
                     var result = new OrchMatchResult();
                     try
                     {
                         var person = request.Persons[i];
+                        // person-level validation
+                        var personValidatResult = personsValidator.Validate(person);
+                        if (!personValidatResult.IsValid)
+                        {
+                            // person-level validation error
+                            foreach (var failure in personValidatResult.Errors)
+                            {
+                                log.LogError($"Property: {failure.PropertyName}, Error Code: {failure.ErrorCode}");
+                                // this can result in multiple error objects for one person
+                                orchResponse.Data.Errors.Add(new OrchMatchError()
+                                {
+                                    Index = i,
+                                    Code = failure.ErrorCode,
+                                    Detail = failure.ErrorMessage
+                                });
+                            }
+                            continue;
+                        }
+
                         PersonMatchRequest personRequest = new PersonMatchRequest();
                         personRequest.Query = new PersonMatchQuery {
                             Last = person.Last,

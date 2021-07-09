@@ -7,9 +7,14 @@ namespace Piipan.Match.Orchestrator
     /// </summary>
     public class OrchMatchRequestValidator : AbstractValidator<OrchMatchRequest>
     {
+        private readonly int MaxPersonsInRequest = 50;
         public OrchMatchRequestValidator()
         {
-            RuleForEach(m => m.Persons).SetValidator(new PersonValidator());
+            RuleFor(r => r.Persons)
+                .NotNull()
+                .NotEmpty()
+                .Must(persons => persons.Count <= MaxPersonsInRequest)
+                .WithMessage($"Persons count cannot exceed {MaxPersonsInRequest}");
         }
     }
 
