@@ -6,8 +6,8 @@ namespace Piipan.Match.Orchestrator
 
     /// <summary>
     /// Represents the entire result for each person from an API request
-    /// <para> Collects all matches from all states.
-    /// <para> Adds more properties than the generic responses from the per-state API's.
+    /// <para> Collects all matches from all states.</para>
+    /// <para> Adds more properties than the generic responses from the per-state API's.</para>
     /// </summary>
     public class OrchMatchResult
     {
