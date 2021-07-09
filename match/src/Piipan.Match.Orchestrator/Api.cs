@@ -60,7 +60,7 @@ namespace Piipan.Match.Orchestrator
                     var errResponse = new ApiErrorResponse();
                     errResponse.Errors.Add(new ApiHttpError()
                     {
-                        Status = HttpStatusCode.BadRequest,
+                        Status = Convert.ToString((int)HttpStatusCode.BadRequest),
                         Title = "Invalid Request",
                         Detail = "Request body contains no persons property"
                     });
@@ -72,7 +72,7 @@ namespace Piipan.Match.Orchestrator
                     // Incoming request list is longer than the max allowed
                     var errResponse = new ApiErrorResponse();
                     errResponse.Errors.Add(new ApiHttpError() {
-                        Status = HttpStatusCode.BadRequest,
+                        Status = Convert.ToString((int)HttpStatusCode.BadRequest),
                         Title = "Persons Limit Exceeded",
                         Detail = $"Persons in request cannot exceed {MaxPersonsLimit}"
                     });
@@ -86,7 +86,7 @@ namespace Piipan.Match.Orchestrator
                     var errResponse = new ApiErrorResponse();
                     errResponse.Errors.Add(new ApiHttpError()
                     {
-                        Status = HttpStatusCode.BadRequest,
+                        Status = Convert.ToString((int)HttpStatusCode.BadRequest),
                         Title = "Invalid Request",
                         Detail = "Request data contains invalid properties"
                     });
@@ -138,7 +138,7 @@ namespace Piipan.Match.Orchestrator
                 var errResponse = new ApiErrorResponse();
                 errResponse.Errors.Add(new ApiHttpError()
                 {
-                    Status = HttpStatusCode.InternalServerError,
+                    Status = Convert.ToString((int)HttpStatusCode.InternalServerError),
                     Title = topLevelEx.GetType().Name,
                     Detail = topLevelEx.Message
                 });

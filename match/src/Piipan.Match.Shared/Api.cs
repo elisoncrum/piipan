@@ -21,7 +21,7 @@ namespace Piipan.Match.Shared
     public class ApiHttpError
     {
         [JsonProperty("status")]
-        public System.Net.HttpStatusCode Status { get; set; }
+        public string Status { get; set; }
 
         [JsonProperty("title")]
         public string Title { get; set; }
