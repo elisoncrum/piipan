@@ -272,7 +272,7 @@ namespace Piipan.Match.Orchestrator.Tests
 
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.Equal(400, (int)errorResponse.Errors[0].Status);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
@@ -301,7 +301,7 @@ namespace Piipan.Match.Orchestrator.Tests
 
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.Equal(400, (int)errorResponse.Errors[0].Status);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
@@ -331,7 +331,7 @@ namespace Piipan.Match.Orchestrator.Tests
 
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.Equal(400, (int)errorResponse.Errors[0].Status);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
@@ -475,7 +475,7 @@ namespace Piipan.Match.Orchestrator.Tests
 
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal(400, (int)errorResponse.Errors[0].StatusCode);
+            Assert.Equal(400, (int)errorResponse.Errors[0].Status);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
@@ -539,7 +539,7 @@ namespace Piipan.Match.Orchestrator.Tests
             // Assert
             Assert.Equal(500, result.StatusCode);
             Assert.NotEmpty(resBody.Errors);
-            Assert.Equal(500,(int)error.StatusCode);
+            Assert.Equal(500,(int)error.Status);
             Assert.NotNull(error.Title);
             Assert.NotNull(error.Detail);
         }
