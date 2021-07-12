@@ -30,6 +30,9 @@
             "metadata": {
                 "description": "The type of App Service Plan."
             }
+        },
+        "resourceTags": {
+            "type": "object"
         }
     },
     "variables": {},
@@ -39,6 +42,7 @@
             "apiVersion": "2020-06-01",
             "name": "[parameters('name')]",
             "location": "[parameters('location')]",
+            "tags": "[parameters('resourceTags')]",
             "sku": {
                 "name": "[parameters('sku')]"
             },

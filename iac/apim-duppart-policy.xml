@@ -6,6 +6,10 @@
         <authentication-managed-identity resource="{applicationUri}" />
         <!-- APIM has used this header to authenticate the request, drop it as we forward the request to our internal endpoint, as it has no use for the client's private API key -->
         <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+        <!-- Forward APIM subscription key name to our internal endpoint so it can identify the user who initiated the API call -->
+        <set-header name="Ocp-Apim-Subscription-Name" exists-action="override">
+            <value>@(context.Subscription.Name)</value>
+        </set-header>
     </inbound>
     <backend>
         <base />

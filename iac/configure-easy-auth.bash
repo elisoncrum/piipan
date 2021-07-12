@@ -7,7 +7,7 @@
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
 #
-# usage: create-resources.bash <azure-env>
+# usage: configure-easy-auth.bash <azure-env>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit
@@ -255,6 +255,7 @@ main () {
   # Name of application roles authorized to call match APIs
   STATE_API_APP_ROLE='StateApi.Query'
   ORCH_API_APP_ROLE='OrchestratorApi.Query'
+  METRICS_API_APP_ROLE='Metrics.Read'
 
   match_func_names=($(\
     get_resources "$PER_STATE_MATCH_API_TAG" "$RESOURCE_GROUP"))
@@ -264,6 +265,10 @@ main () {
   query_tool_name=$(get_resources "$QUERY_APP_TAG" "$RESOURCE_GROUP")
 
   dp_api_name=$(get_resources "$DUP_PART_API_TAG" "$MATCH_RESOURCE_GROUP")
+
+  dashboard_name=$(get_resources "$DASHBOARD_APP_TAG" "$RESOURCE_GROUP")
+
+  metrics_api_name=$METRICS_API_APP_NAME
 
   orch_identity=$(\
     az webapp identity show \
@@ -286,6 +291,13 @@ main () {
       --query identity.principalId \
       --output tsv)
 
+  dashboard_identity=$(\
+    az webapp identity show \
+      --name "$dashboard_name" \
+      --resource-group "$RESOURCE_GROUP" \
+      --query principalId \
+      --output tsv)
+
   for func in "${match_func_names[@]}"
   do
     echo "Configure Easy Auth for PerStateMatchApi:${func} and OrchestratorApi"
@@ -306,6 +318,12 @@ main () {
     "$orch_name" "$MATCH_RESOURCE_GROUP" \
     "$ORCH_API_APP_ROLE" \
     "$dp_api_identity"
+
+  echo "Configure Easy Auth for Dashboard and MetricsApi"
+  configure_easy_auth_pair \
+    "$metrics_api_name" "$RESOURCE_GROUP" \
+    "$METRICS_API_APP_ROLE" \
+    "$dashboard_identity"
 
   script_completed
 }
