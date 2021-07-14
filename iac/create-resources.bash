@@ -151,6 +151,15 @@ main () {
       prefix="$PREFIX" \
       receiverId="$siem_app_id"
 
+  # Send Policy events from subscription's activity log to event hub
+  az deployment sub create \
+    --name activity-log-diagnostics \
+    --location "$LOCATION" \
+    --template-file ./arm-templates/activity-log.json \
+    --parameters \
+      eventHubName="$EVENT_HUB_NAME" \
+      coreResourceGroup="$RESOURCE_GROUP"
+
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
   while IFS=, read -r abbr name ; do
