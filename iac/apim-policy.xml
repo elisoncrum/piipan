@@ -2,6 +2,7 @@
 
 <policies>
     <inbound>
+        <!-- APIM issues a "master" key that is scoped to the entire instance, can be used as a valid API key for any API, and cannot be disabled. Prevent this key from being used. As a consequence, the "test" feature in the Azure portal, which relies on this key, is no longer usable. -->
         <choose>
             <when condition="@(context.Subscription != null &amp;&amp; context.Subscription.Id == &quot;master&quot;)">
                 <return-response>
