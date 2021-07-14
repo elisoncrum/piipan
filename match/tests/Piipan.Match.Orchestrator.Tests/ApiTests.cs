@@ -49,7 +49,7 @@ namespace Piipan.Match.Orchestrator.Tests
         {
             return new OrchMatchRequest
             {
-                Persons = new List<RequestPerson>() {
+                Data = new List<RequestPerson>() {
                     new RequestPerson
                     {
                         First = "First",
@@ -66,7 +66,7 @@ namespace Piipan.Match.Orchestrator.Tests
         {
             return new OrchMatchRequest
             {
-                Persons = new List<RequestPerson>() {
+                Data = new List<RequestPerson>() {
                     new RequestPerson
                     {
                         First = "First",
@@ -100,7 +100,7 @@ namespace Piipan.Match.Orchestrator.Tests
                     Ssn = "000-00-0000"
                 });
             }
-            return new OrchMatchRequest { Persons = list };
+            return new OrchMatchRequest { Data = list };
         }
 
         static OrchMatchResult StateResponse()
@@ -191,7 +191,7 @@ namespace Piipan.Match.Orchestrator.Tests
                 .Returns<string, string>((pk, rk) =>
                 {
                     var qe = new QueryEntity(pk, rk);
-                    qe.Body = mockQuery.Persons[0].ToJson();
+                    qe.Body = mockQuery.Data[0].ToJson();
                     return Task.FromResult(qe);
                 });
 

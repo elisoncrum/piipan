@@ -10,11 +10,11 @@ namespace Piipan.Match.Orchestrator
         private readonly int MaxPersonsInRequest = 50;
         public OrchMatchRequestValidator()
         {
-            RuleFor(r => r.Persons)
+            RuleFor(r => r.Data)
                 .NotNull()
                 .NotEmpty()
-                .Must(persons => persons.Count <= MaxPersonsInRequest)
-                .WithMessage($"Persons count cannot exceed {MaxPersonsInRequest}");
+                .Must(data => data.Count <= MaxPersonsInRequest)
+                .WithMessage($"Data count cannot exceed {MaxPersonsInRequest}");
         }
     }
 

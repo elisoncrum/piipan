@@ -71,12 +71,12 @@ namespace Piipan.Match.Orchestrator
 
                 var orchResponse = new OrchMatchResponse();
                 var personsValidator = new PersonValidator();
-                for (int i = 0; i < request.Persons.Count; i++)
+                for (int i = 0; i < request.Data.Count; i++)
                 {
                     var result = new OrchMatchResult();
                     try
                     {
-                        var person = request.Persons[i];
+                        var person = request.Data[i];
                         // person-level validation
                         var personValidatResult = personsValidator.Validate(person);
                         if (!personValidatResult.IsValid)

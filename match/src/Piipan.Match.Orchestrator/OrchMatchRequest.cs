@@ -10,8 +10,8 @@ namespace Piipan.Match.Orchestrator
     /// </summary>
     public class OrchMatchRequest
     {
-        [JsonProperty("persons", Required = Required.Always)]
-        public List<RequestPerson> Persons { get; set; } = new List<RequestPerson>();
+        [JsonProperty("data", Required = Required.Always)]
+        public List<RequestPerson> Data { get; set; } = new List<RequestPerson>();
 
         public string ToJson()
         {

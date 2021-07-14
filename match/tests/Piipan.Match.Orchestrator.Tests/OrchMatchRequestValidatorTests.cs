@@ -12,20 +12,20 @@ public class OrchMatchRequestValidatorTests
     }
 
     [Fact]
-    public void ReturnsErrorWhenPersonsEmpty()
+    public void ReturnsErrorWhenDataEmpty()
     {
         // Setup
         var model = new OrchMatchRequest() {
-            Persons = new List<RequestPerson>()
+            Data = new List<RequestPerson>()
         };
         // Act
         var result = Validator().TestValidate(model);
         // Assert
-        result.ShouldHaveValidationErrorFor(result => result.Persons);
+        result.ShouldHaveValidationErrorFor(result => result.Data);
     }
 
     [Fact]
-    public void ReturnsErrorWhenPersonsOverMax()
+    public void ReturnsErrorWhenDataOverMax()
     {
         // Setup
         var list = new List<RequestPerson>();
@@ -40,11 +40,11 @@ public class OrchMatchRequestValidatorTests
             Ssn = "000-00-0000"
         });
         }
-        var model = new OrchMatchRequest { Persons = list };
+        var model = new OrchMatchRequest { Data = list };
         // Act
         var result = Validator().TestValidate(model);
         // Assert
-        result.ShouldHaveValidationErrorFor(result => result.Persons);
+        result.ShouldHaveValidationErrorFor(result => result.Data);
     }
 }
 
