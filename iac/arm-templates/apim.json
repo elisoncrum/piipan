@@ -43,6 +43,9 @@
         },
         "eventHubName": {
             "type": "String"
+        },
+        "apimPolicyXml": {
+            "type": "String"
         }
     },
     "variables": {
@@ -117,6 +120,18 @@
             "properties": {
                 "displayName": "[variables('matchDisplayName')]",
                 "versioningScheme": "Segment"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/policies",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[concat(parameters('apiName'), '/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "value": "[parameters('apimPolicyXml')]",
+                "format": "xml"
             }
         },
         {
