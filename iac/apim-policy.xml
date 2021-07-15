@@ -1,0 +1,23 @@
+<!-- Generated via IaC -->
+
+<policies>
+    <inbound>
+        <!-- APIM issues a "master" key that is scoped to the entire instance, can be used as a valid API key for any API, and cannot be disabled. Prevent this key from being used. As a consequence, the "test" feature in the Azure portal, which relies on this key, is no longer usable. -->
+        <choose>
+            <when condition="@(context.Subscription != null &amp;&amp; context.Subscription.Id == &quot;master&quot;)">
+                <return-response>
+                    <set-status code="401" reason="Access Denied" />
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>application/json; charset=UTF-8</value>
+                    </set-header>
+                    <set-body>{"statusCode": 401, "message": "Access denied due to invalid subscription key. Make sure to provide a valid key for an active subscription."}</set-body>
+                </return-response>
+            </when>
+        </choose>
+    </inbound>
+    <backend>
+        <forward-request />
+    </backend>
+    <outbound />
+    <on-error />
+</policies>
