@@ -56,17 +56,7 @@ namespace Piipan.Match.Orchestrator
                 if (!requestvalidateResult.IsValid)
                 {
                     // Incoming request could not be deserialized
-                    var errResponse = new ApiErrorResponse();
-                    foreach (var failure in requestvalidateResult.Errors)
-                    {
-                        errResponse.Errors.Add(new ApiHttpError()
-                        {
-                            Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                            Title = failure.ErrorCode,
-                            Detail = failure.ErrorMessage
-                        });
-                    }
-                    return (ActionResult)new BadRequestObjectResult(errResponse);
+                    return ValidationErrorResponse(requestvalidateResult);
                 }
 
                 var orchResponse = new OrchMatchResponse();
@@ -131,17 +121,7 @@ namespace Piipan.Match.Orchestrator
             catch (Exception topLevelEx)
             {
                 log.LogError(topLevelEx.Message);
-                var errResponse = new ApiErrorResponse();
-                errResponse.Errors.Add(new ApiHttpError()
-                {
-                    Status = Convert.ToString((int)HttpStatusCode.InternalServerError),
-                    Title = topLevelEx.GetType().Name,
-                    Detail = topLevelEx.Message
-                });
-                return (ActionResult)new JsonResult(errResponse)
-                {
-                    StatusCode = (int)HttpStatusCode.InternalServerError
-                };
+                return InternalServerErrorResponse(topLevelEx);
             }
         }
 
@@ -237,6 +217,38 @@ namespace Piipan.Match.Orchestrator
             }
 
             return matches;
+        }
+
+        private ActionResult ValidationErrorResponse(
+            FluentValidation.Results.ValidationResult result
+        )
+        {
+            var errResponse = new ApiErrorResponse();
+            foreach (var failure in result.Errors)
+            {
+                errResponse.Errors.Add(new ApiHttpError()
+                {
+                    Status = Convert.ToString((int)HttpStatusCode.BadRequest),
+                    Title = failure.ErrorCode,
+                    Detail = failure.ErrorMessage
+                });
+            }
+            return (ActionResult)new BadRequestObjectResult(errResponse);
+        }
+
+        private ActionResult InternalServerErrorResponse(Exception ex)
+        {
+            var errResponse = new ApiErrorResponse();
+            errResponse.Errors.Add(new ApiHttpError()
+            {
+                Status = Convert.ToString((int)HttpStatusCode.InternalServerError),
+                Title = ex.GetType().Name,
+                Detail = ex.Message
+            });
+            return (ActionResult)new JsonResult(errResponse)
+            {
+                StatusCode = (int)HttpStatusCode.InternalServerError
+            };
         }
     }
 }
