@@ -6,6 +6,7 @@
 }
 <div class="grid-container">
     <h2>@Model.Title</h2>
+    <h2>@Model.Email</h2>
     <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
             @if (!string.IsNullOrEmpty(Model.RequestError))

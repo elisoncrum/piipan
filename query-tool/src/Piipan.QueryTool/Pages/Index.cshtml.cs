@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -7,6 +9,7 @@ using Piipan.Shared.Authentication;
 
 namespace Piipan.QueryTool.Pages
 {
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
@@ -53,10 +56,12 @@ namespace Piipan.QueryTool.Pages
         }
 
         public string Title { get; private set; } = "";
+        public string Email { get; private set; } = "";
 
         public void OnGet()
         {
             Title = "NAC Query Tool";
+            Email = User.Claims.Single(c => c.Type == "extension_EmailAddress").Value;
         }
     }
 }

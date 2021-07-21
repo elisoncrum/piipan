@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NEasyAuthMiddleware;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
 
@@ -42,6 +43,15 @@ namespace Piipan.QueryTool
 
                 return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
             });
+
+            services.AddHttpContextAccessor();
+            services.AddEasyAuth();
+
+            if (_env.IsDevelopment())
+            {
+                var mockFile = $"{_env.ContentRootPath}/mock_user.json";
+                services.UseJsonFileToMockEasyAuth(mockFile);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +71,7 @@ namespace Piipan.QueryTool
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseAuthentication();
             app.UseRouting();
 
             app.UseAuthorization();

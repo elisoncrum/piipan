@@ -1,0 +1,15 @@
+[
+  {
+    "id_token": "token",
+    "user_claims": [
+      {
+        "typ": "aud",
+        "val": "iaushdfiasuhdfhui"
+      },
+      {
+        "typ": "email",
+        "val": "noreply@tts.test"
+      }
+    ]
+  }
+]
