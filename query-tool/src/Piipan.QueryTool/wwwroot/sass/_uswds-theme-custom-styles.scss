@@ -36,3 +36,11 @@ and pushes it down when main content is longer than screen height.
 .sticky-footer__fill {
   flex: 1;
 }
+
+.usa-nav {
+  border-top: 0px !important;
+
+  .usa-nav__submenu {
+    width: 10rem;
+  }
+}

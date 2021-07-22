@@ -7,7 +7,7 @@
         "val": "iaushdfiasuhdfhui"
       },
       {
-        "typ": "email",
+        "typ": "extension_EmailAddress",
         "val": "noreply@tts.test"
       }
     ]
