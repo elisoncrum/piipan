@@ -183,6 +183,11 @@
           "System.Runtime": "4.3.0"
         }
       },
+      "NEasyAuthMiddleware": {
+        "type": "Transitive",
+        "resolved": "2.0.0",
+        "contentHash": "u4N/DK8RNoE3iJ5alBZCOFgj4ARNANfVxqYGAWX632oEnMN8rKPvAEPkK4R1eVttGb3CzFd+bEuDfX1im5hxng=="
+      },
       "NETStandard.Library": {
         "type": "Transitive",
         "resolved": "1.6.1",
@@ -1302,6 +1307,7 @@
       "piipan.querytool": {
         "type": "Project",
         "dependencies": {
+          "NEasyAuthMiddleware": "2.0.0",
           "Piipan.Shared": "1.0.0",
           "System.Text.Json": "5.0.2"
         }

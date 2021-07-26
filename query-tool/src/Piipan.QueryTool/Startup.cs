@@ -24,6 +24,8 @@ namespace Piipan.QueryTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
+
             services.AddRazorPages().AddMvcOptions(options =>
             {
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
@@ -43,6 +45,8 @@ namespace Piipan.QueryTool
 
                 return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
             });
+
+            services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
             services.AddHttpContextAccessor();
             services.AddEasyAuth();
@@ -75,6 +79,8 @@ namespace Piipan.QueryTool
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<RequestLoggingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
