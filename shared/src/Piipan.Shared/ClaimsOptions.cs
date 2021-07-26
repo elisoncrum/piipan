@@ -1,4 +1,4 @@
-namespace Piipan.QueryTool
+namespace Piipan.Shared.Claims
 {
     public class ClaimsOptions
     {

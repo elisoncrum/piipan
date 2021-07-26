@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Piipan.QueryTool
+namespace Piipan.Shared.Claims
 {
     public interface IClaimsProvider
     {

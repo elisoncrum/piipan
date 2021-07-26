@@ -2,7 +2,7 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 
-namespace Piipan.QueryTool
+namespace Piipan.Shared.Claims
 {
     public class ClaimsProvider : IClaimsProvider
     {
