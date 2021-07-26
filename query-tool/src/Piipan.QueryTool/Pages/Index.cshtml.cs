@@ -14,13 +14,16 @@ namespace Piipan.QueryTool.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IAuthorizedApiClient _apiClient;
+        private readonly IClaimsProvider _claimsProvider;
         private readonly OrchestratorApiRequest _apiRequest;
 
         public IndexModel(ILogger<IndexModel> logger,
-                          IAuthorizedApiClient apiClient)
+                          IAuthorizedApiClient apiClient,
+                          IClaimsProvider claimsProvider)
         {
             _logger = logger;
             _apiClient = apiClient;
+            _claimsProvider = claimsProvider;
             var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
             _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
         }
@@ -61,7 +64,7 @@ namespace Piipan.QueryTool.Pages
         public void OnGet()
         {
             Title = "NAC Query Tool";
-            Email = User.Claims.Single(c => c.Type == "extension_EmailAddress").Value;
+            Email = _claimsProvider.GetEmail(User);
         }
     }
 }
