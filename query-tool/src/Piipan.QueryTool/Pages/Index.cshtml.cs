@@ -24,6 +24,7 @@ namespace Piipan.QueryTool.Pages
             _logger = logger;
             _apiClient = apiClient;
             _claimsProvider = claimsProvider;
+
             var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
             _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
         }
@@ -36,6 +37,8 @@ namespace Piipan.QueryTool.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
+            Email = _claimsProvider.GetEmail(User);
+            
             if (ModelState.IsValid)
             {
                 try
