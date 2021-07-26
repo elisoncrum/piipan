@@ -8,6 +8,7 @@ using NEasyAuthMiddleware;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Logging;
 
 namespace Piipan.QueryTool
 {

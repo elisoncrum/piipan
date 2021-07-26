@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
-using Moq;
-using Moq.Protected;
 using Xunit;
 
 namespace Piipan.Shared.Claims.Tests
