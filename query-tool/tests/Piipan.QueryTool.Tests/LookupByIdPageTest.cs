@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Claims;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests

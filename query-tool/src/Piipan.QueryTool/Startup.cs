@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Claims;
 
 namespace Piipan.QueryTool
 {

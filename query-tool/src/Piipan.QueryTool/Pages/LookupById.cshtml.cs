@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Claims;
 
 namespace Piipan.QueryTool.Pages
 {

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Piipan.Shared.Claims;
 using System.Linq;
 using System.Threading.Tasks;
 
