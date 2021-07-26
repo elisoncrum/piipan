@@ -113,6 +113,7 @@ namespace Piipan.QueryTool.Tests
             Assert.NotNull(pageModel.QueryResult);
             Assert.NotNull(pageModel.QueryResult.matches);
             Assert.False(pageModel.NoResults);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -143,6 +144,7 @@ namespace Piipan.QueryTool.Tests
             Assert.Null(pageModel.QueryResult.lookupId);
             Assert.Empty(pageModel.QueryResult.matches);
             Assert.True(pageModel.NoResults);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -166,6 +168,7 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.NotNull(pageModel.RequestError);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
     }
 }

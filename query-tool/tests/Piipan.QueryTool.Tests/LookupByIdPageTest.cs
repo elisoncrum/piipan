@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -31,18 +32,30 @@ namespace Piipan.QueryTool.Tests
             return clientMock.Object;
         }
 
+        public static IClaimsProvider claimsProviderMock(string email)
+        {
+            var claimsProviderMock = new Mock<IClaimsProvider>();
+            claimsProviderMock
+                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
+                .Returns(email);
+            return claimsProviderMock.Object;
+        }
+
         [Fact]
         public void TestBeforeOnGet()
         {
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new LookupByIdModel(
                 new NullLogger<LookupByIdModel>(),
-                mockApiClient
+                mockApiClient,
+                mockClaimsProvider
                 );
             // act
             // assert
             Assert.Equal("", pageModel.Title);
+            Assert.Equal("", pageModel.Email);
         }
 
         [Fact]
@@ -50,13 +63,15 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
-            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockApiClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockApiClient, mockClaimsProvider);
 
             // act
             pageModel.OnGet();
 
             // assert
             Assert.Equal("NAC Query Tool", pageModel.Title);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -73,7 +88,8 @@ namespace Piipan.QueryTool.Tests
                 }
             }";
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = new Lookup { LookupId = "BCD2345" };
 
             // act
@@ -84,6 +100,7 @@ namespace Piipan.QueryTool.Tests
             Assert.NotNull(pageModel.Record);
             Assert.NotNull(pageModel.Record.data);
             Assert.False(pageModel.NoResults);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -94,7 +111,8 @@ namespace Piipan.QueryTool.Tests
                 ""data"": null
             }";
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = new Lookup { LookupId = "BCD2345" };
 
             // act
@@ -104,6 +122,7 @@ namespace Piipan.QueryTool.Tests
             Assert.IsType<LookupResponse>(pageModel.Record);
             Assert.Null(pageModel.Record.data);
             Assert.True(pageModel.NoResults);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -111,7 +130,8 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var mockClient = clientMock(HttpStatusCode.BadRequest, "");
-            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new LookupByIdModel(new NullLogger<LookupByIdModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = new Lookup { LookupId = "BCD2345" };
 
             // act
@@ -119,6 +139,7 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.NotNull(pageModel.RequestError);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
     }
 }
