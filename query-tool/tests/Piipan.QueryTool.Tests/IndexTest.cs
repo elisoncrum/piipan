@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -34,32 +35,46 @@ namespace Piipan.QueryTool.Tests
             return clientMock.Object;
         }
 
+        public static IClaimsProvider claimsProviderMock(string email)
+        {
+            var claimsProviderMock = new Mock<IClaimsProvider>();
+            claimsProviderMock
+                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
+                .Returns(email);
+            return claimsProviderMock.Object;
+        }
+
         [Fact]
         public void TestBeforeOnGet()
         {
             // arrange
 
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
-                mockApiClient
+                mockApiClient,
+                mockClaimsProvider
                 );
             // act
             // assert
             Assert.Equal("", pageModel.Title);
+            Assert.Equal("", pageModel.Email);
         }
         [Fact]
         public void TestAfterOnGet()
         {
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient, mockClaimsProvider);
 
             // act
             pageModel.OnGet();
 
             // assert
             Assert.Equal("NAC Query Tool", pageModel.Title);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -86,7 +101,8 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
 
             // act
@@ -115,7 +131,8 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
 
             // act
@@ -140,7 +157,8 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClient = clientMock(HttpStatusCode.BadRequest, "");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
 
             // act
