@@ -1482,7 +1482,8 @@
         "type": "Project",
         "dependencies": {
           "Azure.Core": "1.16.0",
-          "Azure.Identity": "1.4.0"
+          "Azure.Identity": "1.4.0",
+          "Microsoft.Extensions.Options": "5.0.0"
         }
       }
     }
