@@ -64,9 +64,8 @@ jobs:
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
       - run:
-          working_directory: tools
           name: Run All Unit Tests
-          command: ./unit-test-all.bash -c
+          command: ./build.bash test -c
       - run:
           working_directory: match/tests/Piipan.Match.State.IntegrationTests
           name: Test State Match integration
