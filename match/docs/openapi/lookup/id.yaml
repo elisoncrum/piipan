@@ -2,11 +2,11 @@ get:
   operationId: "Get Lookups by ID"
   tags:
     - "Lookup"
-  summary: "get the original match data related to a Lookup ID"
+  summary: "Get the original match data related to a Lookup ID"
   description: "User can provide a Lookup ID and receive the match data associated with it"
   responses:
     '200':
-      description: "original active match data"
+      description: "Successful response. Returns original match query request item."
       content:
         application/json:
           schema:
@@ -16,4 +16,4 @@ get:
     '400':
       description: "Bad request"
     '404':
-      description: "Not Found"
+      description: "Not found"
