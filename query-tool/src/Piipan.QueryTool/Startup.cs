@@ -55,6 +55,9 @@ namespace Piipan.QueryTool
             services.AddHttpContextAccessor();
             services.AddEasyAuth();
 
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+
             if (_env.IsDevelopment())
             {
                 var mockFile = $"{_env.ContentRootPath}/mock_user.json";
@@ -82,9 +85,12 @@ namespace Piipan.QueryTool
             app.UseAuthentication();
             app.UseRouting();
 
+            app.UseSession();
+
             app.UseAuthorization();
 
             app.UseMiddleware<RequestLoggingMiddleware>();
+            app.UseMiddleware<AuthenticationLoggingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
