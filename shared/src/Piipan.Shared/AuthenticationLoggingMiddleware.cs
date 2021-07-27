@@ -21,7 +21,7 @@ namespace Piipan.Shared.Logging
             {
                 foreach (var claim in context.User.Claims)
                 {
-                    logger.LogInformation($"[CLAIM] {claim.Type}: {claim.Value}");
+                    logger.LogInformation($"[Session: {context.Session.Id}][CLAIM] {claim.Type}: {claim.Value}");
                 }
             }
 

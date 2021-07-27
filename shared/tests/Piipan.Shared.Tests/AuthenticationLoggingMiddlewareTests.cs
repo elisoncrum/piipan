@@ -35,6 +35,11 @@ namespace Piipan.Shared.Logging.Tests
             
             byte[] val = null;
             var session = new Mock<ISession>();
+
+            session
+                .Setup(m => m.Id)
+                .Returns("ABCD1234");
+
             session
                 .Setup(m => m.TryGetValue(AuthenticationLoggingMiddleware.CLAIMS_LOGGED_KEY, out val))
                 .Returns(true);
@@ -58,7 +63,7 @@ namespace Piipan.Shared.Logging.Tests
                 logger.Verify(m => m.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Information),
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains($"[CLAIM] {claim.Type}: {claim.Value}")),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains($"[Session: ABCD1234][CLAIM] {claim.Type}: {claim.Value}")),
                     It.IsAny<Exception>(),
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once());
             }
