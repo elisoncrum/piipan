@@ -110,6 +110,7 @@
                 "httpsOnly": true,
                 "siteConfig": {
                     "ftpsState": "Disabled",
+                    "alwaysOn": true,
                     "appSettings": [
                         /*
                             The following settings are required for Function apps per the MS documentation:
