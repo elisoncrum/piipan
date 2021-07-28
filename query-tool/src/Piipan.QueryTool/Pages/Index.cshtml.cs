@@ -10,7 +10,6 @@ using Piipan.Shared.Claims;
 
 namespace Piipan.QueryTool.Pages
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
