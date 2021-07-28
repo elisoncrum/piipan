@@ -161,7 +161,8 @@
                 "globalValidation": {
                     "requireAuthentication": true,
                     "unauthenticatedClientAction": "RedirectToLoginPage",
-                    "redirectToProvider": "oidcProvider"
+                    "redirectToProvider": "oidcProvider",
+                    "excludedPaths": ["/health-probe.html"]
                 },
                 "identityProviders": {
                     "customOpenIdConnectProviders": {
