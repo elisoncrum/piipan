@@ -71,7 +71,6 @@ MatchRequestExamples:
           last: "string"
           ssn: "000-00-0001"
           dob: "1970-01-02"
-
 #/components/schemas/MatchResponse
 MatchResponse:
   type: object
@@ -87,10 +86,10 @@ MatchResponse:
         results:
           type: array
           $ref: '#/Result'
-          description: "Array of query results. For every person provided in the request, a result is returned for every successful query, even if no matches are found. If a query fails, the failure data will be in the errors array."
+          description: "Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array."
         errors:
           type: array
-          description: "Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here."
+          description: "Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items."
           $ref: '#/DataError'
     errors:
       type: array
