@@ -1,14 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NEasyAuthMiddleware;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Claims;
+using Piipan.Shared.Logging;
 
 namespace Piipan.QueryTool
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
@@ -23,6 +28,8 @@ namespace Piipan.QueryTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
+
             services.AddRazorPages().AddMvcOptions(options =>
             {
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
@@ -42,6 +49,20 @@ namespace Piipan.QueryTool
 
                 return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
             });
+
+            services.AddTransient<IClaimsProvider, ClaimsProvider>();
+
+            services.AddHttpContextAccessor();
+            services.AddEasyAuth();
+
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+
+            if (_env.IsDevelopment())
+            {
+                var mockFile = $"{_env.ContentRootPath}/mock_user.json";
+                services.UseJsonFileToMockEasyAuth(mockFile);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,9 +82,15 @@ namespace Piipan.QueryTool
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseAuthentication();
             app.UseRouting();
 
+            app.UseSession();
+
             app.UseAuthorization();
+
+            app.UseMiddleware<RequestLoggingMiddleware>();
+            app.UseMiddleware<AuthenticationLoggingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
