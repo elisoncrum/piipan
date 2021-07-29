@@ -19,7 +19,6 @@ namespace Piipan.Dashboard.Tests
             // act
 
             // assert
-            Assert.Equal("Hello", pageModel.Message);
             Assert.Equal("", pageModel.Email);
         }
 
@@ -34,7 +33,6 @@ namespace Piipan.Dashboard.Tests
             pageModel.OnGet();
 
             // assert
-            Assert.Equal("Hello, world.", pageModel.Message);
             Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
