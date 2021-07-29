@@ -20,7 +20,6 @@ namespace Piipan.Dashboard.Pages
             _logger = logger;
             _claimsProvider = claimsProvider;
         }
-
         public string Message { get; private set; } = "Hello";
         public string Email { get; private set; } = "";
 
