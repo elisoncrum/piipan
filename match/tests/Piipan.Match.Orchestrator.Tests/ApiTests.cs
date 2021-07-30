@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -135,6 +136,11 @@ namespace Piipan.Match.Orchestrator.Tests
 
             var mockRequest = new Mock<HttpRequest>();
             mockRequest.Setup(x => x.Body).Returns(ms);
+            var headers = new HeaderDictionary(new Dictionary<String, StringValues>
+            {
+                { "From", "foobar"}
+            }) as IHeaderDictionary;
+            mockRequest.Setup(x => x.Headers).Returns(headers);
 
             return mockRequest;
         }
@@ -303,7 +309,6 @@ namespace Piipan.Match.Orchestrator.Tests
 
         // Invalid person-level results in item-level validation errors
         [Theory]
-
         [InlineData(@"[{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '0000000000'}]")] // Invalid Ssn format
         [InlineData(@"[{last: '', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Empty last
         [InlineData(@"[{last: '        ', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Whitespace last
