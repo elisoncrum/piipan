@@ -10,7 +10,7 @@ namespace Piipan.Dashboard.Tests
     public class IndexPageTests
     {
         [Fact]
-        public void BeforeOnGet_MessageIsCorrect()
+        public void BeforeOnGet_EmailIsCorrect()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
@@ -23,7 +23,7 @@ namespace Piipan.Dashboard.Tests
         }
 
         [Fact]
-        public void AfterOnGet_MessageIsCorrect()
+        public void AfterOnGet_EmailIsCorrect()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
