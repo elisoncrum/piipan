@@ -16,13 +16,11 @@ In order to participate, states will need to:
 
 1. Upload participant data to the system
 1. Conduct matches against the system
-1. Take appropriate action on those matches
 
-These three elements translate to three main API calls that states will integrate into their existing eligibility systems and workflows:
+These three elements translate to two main API calls that states will integrate into their existing eligibility systems and workflows:
 
 1. States will upload participant data through a scheduled [CSV upload](./openapi/generated/bulk-api/openapi.md#bulk-api-upload) (CSV formatting instructions can be found [here](https://github.com/18F/piipan/blob/main/etl/docs/bulk-import.md))
 2. States will conduct matches through [Active Matching](./openapi/generated/duplicate-participation-api/openapi.md#duplicate-participation-api-match)
-3. States will be able to take action by referencing previous matches through [a Lookup ID](./openapi/generated/duplicate-participation-api/openapi.md#duplicate-participation-api-lookup)
 
 ### Environments
 
@@ -53,7 +51,6 @@ Endpoints are separated into two logical APIs:
 | Endpoint | Description | Request Type |
 |---|---|---|
 | `/query` | query for active matches | POST |
-| `/lookup_ids/:id` | Returns PII for a Lookup ID | GET |
 
 ## Authentication
 

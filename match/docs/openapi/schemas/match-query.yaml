@@ -107,10 +107,6 @@ Result:
     index:
       type: integer
       description: "The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request."
-    lookup_id:
-      type: string
-      nullable: true
-      description: "The identifier of the person data, if a match is present. This ID can be used for looking up the PII of the person provided in the original request."
     matches:
       type: array
       items:
@@ -123,7 +119,6 @@ MatchResponseExamples:
       data:
         results:
           - index: 0
-            lookup_id: "string"
             matches:
               - $ref: './pii-record.yaml#/PiiRecordExamples/All'
         errors: []
@@ -133,7 +128,6 @@ MatchResponseExamples:
       data:
         results:
           - index: 0
-            lookup_id: null
             matches: []
         errors: []
   Multiple:
@@ -142,7 +136,6 @@ MatchResponseExamples:
       data:
         results:
           - index: 0
-            lookup_id: "string"
             matches:
               - $ref: './pii-record.yaml#/PiiRecordExamples/AllEB'
               - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
@@ -153,11 +146,9 @@ MatchResponseExamples:
       data:
         results:
           - index: 0
-            lookup_id: "string"
             matches:
               - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
           - index: 1
-            lookup_id: "string"
             matches:
               - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
         errors: []
@@ -167,10 +158,8 @@ MatchResponseExamples:
       data:
         results:
           - index: 0
-            lookup_id: null
             matches: []
           - index: 1
-            lookup_id: "string"
             matches:
               - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
         errors: []
@@ -180,7 +169,6 @@ MatchResponseExamples:
       data:
         results:
           - index: 1
-            lookup_id: "string"
             matches:
               - $ref: './pii-record.yaml#/PiiRecordExamples/Required'
         errors:

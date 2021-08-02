@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,12 +23,10 @@ namespace Piipan.Match.Orchestrator
     public class Api
     {
         private readonly IAuthorizedApiClient _apiClient;
-        private readonly ITableStorage<QueryEntity> _lookupStorage;
 
-        public Api(IAuthorizedApiClient apiClient, ITableStorage<QueryEntity> lookupStorage)
+        public Api(IAuthorizedApiClient apiClient)
         {
             _apiClient = apiClient;
-            _lookupStorage = lookupStorage;
         }
 
         /// <summary>
@@ -104,10 +101,6 @@ namespace Piipan.Match.Orchestrator
                         result.Index = i;
                         result.Matches = await PersonMatch(personRequest, log);
 
-                        if (result.Matches.Count > 0)
-                        {
-                            result.LookupId = await Lookup.Save(person, _lookupStorage, log);
-                        }
                         orchResponse.Data.Results.Add(result);
                     }
                     catch (Exception ex)
@@ -139,32 +132,6 @@ namespace Piipan.Match.Orchestrator
                 }
                 return InternalServerErrorResponse(topLevelEx);
             }
-        }
-
-        /// <summary>
-        /// API endpoint for retrieving a MatchQuery using a lookup ID
-        /// </summary>
-        /// <param name="req">incoming HTTP request</param>
-        /// <param name="lookupId">lookup ID string (pulled from route)</param>
-        /// <param name="log">handle to the function log</param>
-        [FunctionName("lookup_ids")]
-        public async Task<IActionResult> LookupIds(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "lookup_ids/{lookupId}")] HttpRequest req,
-            string lookupId,
-            ILogger log)
-        {
-            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
-
-            string? username = req.Headers["From"];
-            if(username is string)
-            {
-                log.LogInformation("on behalf of {Username}", username);
-            }
-
-            LookupResponse response = new LookupResponse { Data = null };
-            response.Data = await Lookup.Retrieve(lookupId, _lookupStorage, log);
-
-            return (ActionResult)new JsonResult(response);
         }
 
         private OrchMatchRequest Parse(string requestBody, ILogger log)

@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Duplicate Participation API
   version: 1.0.0
-  description: The API where matching and lookups will occur
+  description: The API where matching will occur
 servers:
   - url: /v1
 paths:
@@ -113,10 +113,6 @@ paths:
                           index:
                             type: integer
                             description: 'The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.'
-                          lookup_id:
-                            type: string
-                            nullable: true
-                            description: 'The identifier of the person data, if a match is present. This ID can be used for looking up the PII of the person provided in the original request.'
                           matches:
                             type: array
                             items:
@@ -222,7 +218,6 @@ paths:
                     data:
                       results:
                         - index: 0
-                          lookup_id: string
                           matches:
                             - first: string
                               middle: string
@@ -247,7 +242,6 @@ paths:
                     data:
                       results:
                         - index: 0
-                          lookup_id: null
                           matches: []
                       errors: []
                 Multiple:
@@ -256,7 +250,6 @@ paths:
                     data:
                       results:
                         - index: 0
-                          lookup_id: string
                           matches:
                             - first: string
                               middle: string
@@ -293,11 +286,9 @@ paths:
                     data:
                       results:
                         - index: 0
-                          lookup_id: string
                           matches:
                             - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/results/0/matches/1'
                         - index: 1
-                          lookup_id: string
                           matches:
                             - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/results/0/matches/1'
                       errors: []
@@ -307,10 +298,8 @@ paths:
                     data:
                       results:
                         - index: 0
-                          lookup_id: null
                           matches: []
                         - index: 1
-                          lookup_id: string
                           matches:
                             - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/results/0/matches/1'
                       errors: []
@@ -320,7 +309,6 @@ paths:
                     data:
                       results:
                         - index: 1
-                          lookup_id: string
                           matches:
                             - $ref: '#/paths/~1query/post/responses/200/content/application~1json/examples/Multiple/value/data/results/0/matches/1'
                       errors:
@@ -338,53 +326,6 @@ paths:
                         detail: Request payload exceeds maxiumum count
         '400':
           description: Bad request. Missing one of the required properties in the request body.
-  '/lookup_ids/{id}':
-    get:
-      operationId: Get Lookups by ID
-      tags:
-        - Lookup
-      summary: Get the original match data related to a Lookup ID
-      description: User can provide a Lookup ID and receive the match data associated with it
-      parameters:
-        - in: header
-          name: From
-          schema:
-            type: string
-          description: 'As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.'
-      responses:
-        '200':
-          description: Successful response. Returns original match query request item.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - data
-                properties:
-                  data:
-                    $ref: '#/paths/~1query/post/requestBody/content/application~1json/schema/properties/data/items'
-              examples:
-                All:
-                  description: A response showing a query with values for all fields
-                  value:
-                    data:
-                      first: string
-                      middle: string
-                      last: string
-                      ssn: 000-00-0000
-                      dob: '1970-01-01'
-                Required:
-                  description: A response showing a query with values for only required fields
-                  value:
-                    data:
-                      first: string
-                      last: string
-                      ssn: 000-00-0000
-                      dob: '1970-01-01'
-        '400':
-          description: Bad request
-        '404':
-          description: Not found
 security:
   - ApiKeyAuth: []
 components:

@@ -14,9 +14,6 @@ namespace Piipan.Match.Orchestrator
         [JsonProperty("index")]
         public int Index { get; set; }
 
-        [JsonProperty("lookup_id")]
-        public string LookupId { get; set; }
-
         [JsonProperty("matches")]
         public List<PiiRecord> Matches { get; set; }
 

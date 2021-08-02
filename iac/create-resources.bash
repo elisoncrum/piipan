@@ -34,9 +34,6 @@ set_constants () {
   QUERY_TOOL_FRONTDOOR_NAME=$PREFIX-fd-querytool-$ENV
   QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
 
-  # Base name of lookup API storage account
-  LOOKUP_STORAGE_NAME=${PREFIX}stlookupapi${ENV}
-
   # Orchestrator Function app and its blob storage
   ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
@@ -532,7 +529,6 @@ main () {
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
       appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-      LookupStorageName="$LOOKUP_STORAGE_NAME" \
       StateApiUriStrings="$match_api_uris" \
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"

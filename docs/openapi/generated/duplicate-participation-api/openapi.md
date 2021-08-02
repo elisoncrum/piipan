@@ -4,7 +4,7 @@
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
-The API where matching and lookups will occur
+The API where matching will occur
 
 Base URLs:
 
@@ -62,7 +62,12 @@ Queries all state databases for any PII records that are an exact match to the l
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
-|data|body|[[#/paths/~1query/post/requestBody/content/application~1json/schema/properties/data/items](#schema#/paths/~1query/post/requestbody/content/application~1json/schema/properties/data/items)]|true|none|
+|data|body|[object]|true|none|
+|» first|body|string|true|PII record's first name|
+|» middle|body|string|false|PII record's middle name|
+|» last|body|string|true|PII record's last name|
+|» ssn|body|string|true|PII record's social security number|
+|» dob|body|string(date)|true|PII record's date of birth|
 
 > Example responses
 
@@ -74,7 +79,6 @@ Queries all state databases for any PII records that are an exact match to the l
     "results": [
       {
         "index": 0,
-        "lookup_id": "string",
         "matches": [
           {
             "first": "string",
@@ -111,7 +115,6 @@ Queries all state databases for any PII records that are an exact match to the l
     "results": [
       {
         "index": 0,
-        "lookup_id": null,
         "matches": []
       }
     ],
@@ -128,7 +131,6 @@ Queries all state databases for any PII records that are an exact match to the l
     "results": [
       {
         "index": 0,
-        "lookup_id": "string",
         "matches": [
           {
             "first": "string",
@@ -179,7 +181,6 @@ Queries all state databases for any PII records that are an exact match to the l
     "results": [
       {
         "index": 0,
-        "lookup_id": "string",
         "matches": [
           {
             "first": null,
@@ -199,7 +200,6 @@ Queries all state databases for any PII records that are an exact match to the l
       },
       {
         "index": 1,
-        "lookup_id": "string",
         "matches": [
           {
             "first": null,
@@ -231,12 +231,10 @@ Queries all state databases for any PII records that are an exact match to the l
     "results": [
       {
         "index": 0,
-        "lookup_id": null,
         "matches": []
       },
       {
         "index": 1,
-        "lookup_id": "string",
         "matches": [
           {
             "first": null,
@@ -268,7 +266,6 @@ Queries all state databases for any PII records that are an exact match to the l
     "results": [
       {
         "index": 1,
-        "lookup_id": "string",
         "matches": [
           {
             "first": null,
@@ -330,7 +327,6 @@ Status Code **200**
 |» data|object¦null|false|none|The response payload. Either an errors or data property will be present in the response, but not both.|
 |»» results|array|true|none|Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
-|»»» lookup_id|string¦null|false|none|The identifier of the person data, if a match is present. This ID can be used for looking up the PII of the person provided in the original request.|
 |»»» matches|[object]|true|none|none|
 |»»»» first|string|false|none|First name|
 |»»»» middle|string|false|none|Middle name|
@@ -355,79 +351,6 @@ Status Code **200**
 |»» code|string|false|none|The application-specific error code|
 |»» title|string|false|none|The short, human-readable summary of the error, consistent across all occurrences of the error|
 |»» detail|string|false|none|The human-readable explanation specific to this occurrence of the error|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth
-</aside>
-
-<h1 id="duplicate-participation-api-lookup">Lookup</h1>
-
-## Get Lookups by ID
-
-<a id="opIdGet Lookups by ID"></a>
-
-> Code samples
-
-```shell
-# You can also use wget
-curl -X GET /v1/lookup_ids/{id} \
-  -H 'Accept: application/json' \
-  -H 'From: string' \
-  -H 'Ocp-Apim-Subscription-Key: API_KEY'
-
-```
-
-`GET /lookup_ids/{id}`
-
-*Get the original match data related to a Lookup ID*
-
-User can provide a Lookup ID and receive the match data associated with it
-
-<h3 id="get-lookups-by-id-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
-
-> Example responses
-
-> A response showing a query with values for all fields
-
-```json
-{
-  "data": {
-    "first": "string",
-    "middle": "string",
-    "last": "string",
-    "ssn": "000-00-0000",
-    "dob": "1970-01-01"
-  }
-}
-```
-
-> A response showing a query with values for only required fields
-
-```json
-{
-  "data": {
-    "first": "string",
-    "last": "string",
-    "ssn": "000-00-0000",
-    "dob": "1970-01-01"
-  }
-}
-```
-
-<h3 id="get-lookups-by-id-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns original match query request item.|Inline|
-|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not found|None|
-
-<h3 id="get-lookups-by-id-responseschema">Response Schema</h3>
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
