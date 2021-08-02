@@ -13,6 +13,12 @@ paths:
         - Match
       summary: Search for all matching PII records
       description: 'Queries all state databases for any PII records that are an exact match to the last name, date of birth, and social security number of persons provided in the request.'
+      parameters:
+        - in: header
+          name: From
+          schema:
+            type: string
+          description: 'As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.'
       requestBody:
         required: true
         content:
@@ -99,7 +105,7 @@ paths:
                     properties:
                       results:
                         type: array
-                        description: 'Array of query results. For every person provided in the request, a result is returned for every successful query, even if no matches are found. If a query fails, the failure data will be in the errors array.'
+                        description: 'Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array.'
                         required:
                           - index
                           - matches
@@ -174,7 +180,7 @@ paths:
                                   description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
                       errors:
                         type: array
-                        description: 'Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here.'
+                        description: 'Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.'
                         required:
                           - index
                         properties:
@@ -339,6 +345,12 @@ paths:
         - Lookup
       summary: Get the original match data related to a Lookup ID
       description: User can provide a Lookup ID and receive the match data associated with it
+      parameters:
+        - in: header
+          name: From
+          schema:
+            type: string
+          description: 'As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.'
       responses:
         '200':
           description: Successful response. Returns original match query request item.

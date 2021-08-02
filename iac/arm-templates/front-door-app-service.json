@@ -148,7 +148,7 @@
                     {
                         "name": "healthProbeSettings1",
                         "properties": {
-                            "path": "/",
+                            "path": "/health-probe.html",
                             "protocol": "Https",
                             "intervalInSeconds": 30,
                             "healthProbeMethod": "Head",

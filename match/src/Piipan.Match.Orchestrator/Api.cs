@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
+
+#nullable enable
 
 namespace Piipan.Match.Orchestrator
 {
@@ -46,6 +49,12 @@ namespace Piipan.Match.Orchestrator
             try
             {
                 log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+
+                string? username = req.Headers["From"];
+                if (username is string)
+                {
+                    log.LogInformation("on behalf of {Username}", username);
+                }
 
                 var incoming = await new StreamReader(req.Body).ReadToEndAsync();
                 var request = Parse(incoming, log);
@@ -145,6 +154,12 @@ namespace Piipan.Match.Orchestrator
             ILogger log)
         {
             log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+
+            string? username = req.Headers["From"];
+            if(username is string)
+            {
+                log.LogInformation("on behalf of {Username}", username);
+            }
 
             LookupResponse response = new LookupResponse { Data = null };
             response.Data = await Lookup.Retrieve(lookupId, _lookupStorage, log);

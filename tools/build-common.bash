@@ -25,8 +25,7 @@ run_tests_ci () {
   dotnet test \
     -p:ContinuousIntegrationBuild=true \
     --collect:"XPlat Code Coverage" \
-    -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov \
-    DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile="**/*.cshtml"
+    -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
 }
 
 # Builds project with optional testing and app deployment

@@ -28,6 +28,7 @@ Base URLs:
 curl -X POST /v1/query \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
+  -H 'From: string' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
@@ -60,6 +61,7 @@ Queries all state databases for any PII records that are an exact match to the l
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
+|From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
 |data|body|[[#/paths/~1query/post/requestBody/content/application~1json/schema/properties/data/items](#schema#/paths/~1query/post/requestbody/content/application~1json/schema/properties/data/items)]|true|none|
 
 > Example responses
@@ -326,7 +328,7 @@ Status Code **200**
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |» data|object¦null|false|none|The response payload. Either an errors or data property will be present in the response, but not both.|
-|»» results|array|true|none|Array of query results. For every person provided in the request, a result is returned for every successful query, even if no matches are found. If a query fails, the failure data will be in the errors array.|
+|»» results|array|true|none|Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» lookup_id|string¦null|false|none|The identifier of the person data, if a match is present. This ID can be used for looking up the PII of the person provided in the original request.|
 |»»» matches|[object]|true|none|none|
@@ -343,7 +345,7 @@ Status Code **200**
 |»»»» benefits_end_month|string|false|none|Participant's ending benefits month|
 |»»»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
 |»»»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
-|»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here.|
+|»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» code|string|false|none|The application-specific error code|
 |»»» title|string|false|none|The short, human-readable summary of the error, consistent across all occurrences of the error|
@@ -371,6 +373,7 @@ ApiKeyAuth
 # You can also use wget
 curl -X GET /v1/lookup_ids/{id} \
   -H 'Accept: application/json' \
+  -H 'From: string' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
@@ -380,6 +383,12 @@ curl -X GET /v1/lookup_ids/{id} \
 *Get the original match data related to a Lookup ID*
 
 User can provide a Lookup ID and receive the match data associated with it
+
+<h3 id="get-lookups-by-id-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
 
 > Example responses
 
