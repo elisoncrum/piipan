@@ -5,6 +5,7 @@
     <RootNamespace>Piipan.QueryTool</RootNamespace>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    <DefaultItemExcludes>mock_user.json;$(DefaultItemExcludes)</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
