@@ -275,7 +275,8 @@ main () {
       metricsApiUri="$metrics_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$DASHBOARD_APP_IDP_OIDC_CONFIG_URI" \
-      idpClientId="$DASHBOARD_APP_IDP_CLIENT_ID"
+      idpClientId="$DASHBOARD_APP_IDP_CLIENT_ID" \
+      aspNetCoreEnvironment="$PREFIX"
 
   ./configure-oidc.bash "$azure_env" "$DASHBOARD_APP_NAME"
 
