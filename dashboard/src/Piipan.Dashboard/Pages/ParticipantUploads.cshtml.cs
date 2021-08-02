@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Piipan.Dashboard.Api;
+using Piipan.Shared.Claims;
 
 #nullable enable
 
@@ -16,13 +17,18 @@ namespace Piipan.Dashboard.Pages
     {
         private readonly IParticipantUploadRequest _participantUploadRequest;
         private readonly ILogger<ParticipantUploadsModel> _logger;
+        private readonly IClaimsProvider _claimsProvider;
 
-        public ParticipantUploadsModel(IParticipantUploadRequest participantUploadRequest, ILogger<ParticipantUploadsModel> logger)
+        public ParticipantUploadsModel(IParticipantUploadRequest participantUploadRequest, 
+            ILogger<ParticipantUploadsModel> logger,
+            IClaimsProvider claimsProvider)
         {
             _participantUploadRequest = participantUploadRequest;
             _logger = logger;
+            _claimsProvider = claimsProvider;
         }
         public string Title = "Participant Uploads";
+        public string Email { get; private set; } = "";
         public List<ParticipantUpload> ParticipantUploadResults { get; private set; } = new List<ParticipantUpload>();
         public string? NextPageParams { get; private set; }
         public string? PrevPageParams { get; private set; }
@@ -37,6 +43,8 @@ namespace Piipan.Dashboard.Pages
         {
             try
             {
+                Email = _claimsProvider.GetEmail(User);
+
                 _logger.LogInformation("Loading initial results");
                 var url = FormatUrl();
                 var response = await _participantUploadRequest.Get(url);
@@ -53,6 +61,8 @@ namespace Piipan.Dashboard.Pages
         {
             try
             {
+                Email = _claimsProvider.GetEmail(User);
+                
                 _logger.LogInformation("Querying uploads via search form");
 
                 if (BaseUrl == null)
