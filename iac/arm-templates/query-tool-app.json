@@ -25,6 +25,9 @@
         },
         "idpClientId": {
             "type": "string"
+        },
+        "aspNetCoreEnvironment": {
+            "type": "string"
         }
     },
     "variables": {
@@ -49,6 +52,10 @@
                 {
                     "name": "OrchApiUri",
                     "value": "[parameters('OrchApiUri')]"
+                },
+                {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "[parameters('aspNetCoreEnvironment')]"
                 }
             ]
         },

@@ -602,7 +602,8 @@ main () {
       OrchApiUri="$orch_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
-      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
+      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
+      aspNetCoreEnvironment="$PREFIX"
 
   # Sets the OIDC client secrets for web applications
   ./configure-oidc.bash "$azure_env" "$QUERY_TOOL_APP_NAME"
