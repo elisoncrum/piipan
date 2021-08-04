@@ -10,19 +10,25 @@
 source "$(dirname "$0")"/common.bash || exit
 
 restore () {
-  options=${1:-}
-  dotnet restore "$options" > /dev/null
+  local options=(-v q)
+  if [ -n "${1:-}" ]; then
+    options+=("$1")
+  fi
+
+  dotnet restore "${options[@]}" > /dev/null
 }
 
 update () {
-  options=$1
+  local options=(--outdated)
   if [ "$1" = "--highest-major" ]; then
-      options=""
+    : # noop as this is default behavior for `dotnet list package`
+  else
+    options+=("$1")
   fi
 
-  # Don't want grep to result in error code for whole pipeline if no
-  # new packages found; see https://unix.stackexchange.com/a/581991
-  list=$(dotnet list package --outdated "$options" | tr -s ' ' | { grep '>' || test $? = 1; } | cut -f 3,6 -d ' ')
+  # We've set pipefail, but don't want grep to result in error code for this
+  # whole pipeline if no new packages are found; see https://unix.stackexchange.com/a/581991
+  list=$(dotnet list package "${options[@]}" | tr -s ' ' | { grep '>' || test $? = 1; } | cut -f 3,6 -d ' ')
   while IFS=, read -r line; do
     trimmed=$(echo "$line" | tr -d '[:space:]')
     if [ "$trimmed" != "" ]; then
@@ -36,9 +42,9 @@ update () {
 
 main () {
   start_path="$1"
-  options="--highest-minor"
+  local options=("--highest-minor")
   if [ "$#" = "2" ]; then
-    options="$2"
+    options=("$2")
   fi
 
   # Sort so `src` projects are updated before `tests` projects
@@ -48,7 +54,7 @@ main () {
   # individual projects are restored, updated, and force-restored one by
   # one. Avoid this issue by running each operation against all projects
   # before proceeding to the next.
-  operations=("restore" "update ${options}" "restore --force-evaluate")
+  operations=("restore" "update ${options[@]}" "restore --force-evaluate")
 
   for op in "${operations[@]}"
   do
