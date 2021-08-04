@@ -86,7 +86,6 @@ namespace Piipan.QueryTool.Tests
                 ""data"": {
                     ""results"": [
                         {
-                            ""lookup_id"": ""BBB2222"",
                             ""matches"": [{
                                 ""first"": ""Theodore"",
                                 ""middle"": ""Carri"",
@@ -132,7 +131,6 @@ namespace Piipan.QueryTool.Tests
                 ""data"": {
                     ""results"": [
                         {
-                            ""lookup_id"": null,
                             ""matches"": []
                         }
                     ],
@@ -156,7 +154,6 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.IsType<MatchResponse>(pageModel.QueryResult);
-            Assert.Null(pageModel.QueryResult.Data.Results[0].LookupId);
             Assert.Empty(pageModel.QueryResult.Data.Results[0].Matches);
             Assert.True(pageModel.NoResults);
             Assert.Equal("noreply@tts.test", pageModel.Email);

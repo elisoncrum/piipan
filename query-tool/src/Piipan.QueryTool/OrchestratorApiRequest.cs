@@ -40,21 +40,6 @@ namespace Piipan.QueryTool
 
             return matchResponse;
         }
-
-        public async Task<LookupResponse> Lookup(string lookupId)
-        {
-            const string Endpoint = "lookup_ids";
-
-            var uri = new Uri(_baseUri, $"{Endpoint}/{lookupId}");
-            var response = await _apiClient.GetAsync(uri);
-
-            response.EnsureSuccessStatusCode();
-
-            var lookupJson = await response.Content.ReadAsStringAsync();
-            var lookupResponse = JsonSerializer.Deserialize<LookupResponse>(lookupJson);
-
-            return lookupResponse;
-        }
     }
 
     public class MatchResponse
@@ -77,9 +62,6 @@ namespace Piipan.QueryTool
         [JsonPropertyName("index")]
         public int Index { get; set; }
 
-        [JsonPropertyName("lookup_id")]
-        public virtual string LookupId { get; set; }
-
         [JsonPropertyName("matches")]
         public virtual List<PiiRecord> Matches { get; set; }
     }
@@ -97,11 +79,5 @@ namespace Piipan.QueryTool
 
         [JsonPropertyName("detail")]
         public string Detail { get; set; }
-    }
-
-    public class LookupResponse
-    {
-        [JsonPropertyName("data")]
-        public virtual PiiRecord data { get; set; }
     }
 }
