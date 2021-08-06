@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.Dashboard.Api;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
 
@@ -55,6 +57,13 @@ namespace Piipan.Dashboard
             
             services.AddDistributedMemoryCache();
             services.AddSession();
+
+            services.AddAuthorization(options => {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                    .AddRequirements(new MinimumIdentityAssuranceLevelRequirement(2))
+                    .Build();
+            });
+            services.AddSingleton<IAuthorizationHandler, MinimumIdentityAssuranceLevelHandler>();
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
