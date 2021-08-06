@@ -62,10 +62,11 @@ namespace Piipan.Dashboard
 
             services.AddAuthorization(options => {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                    .AddRequirements(new MinimumIdentityAssuranceLevelRequirement(2))
+                    .AddRequirements(new MinimumClaimValueRequirement("ial", 2))
+                    .AddRequirements(new MinimumClaimValueRequirement("aal", 3))
                     .Build();
             });
-            services.AddSingleton<IAuthorizationHandler, MinimumIdentityAssuranceLevelHandler>();
+            services.AddSingleton<IAuthorizationHandler, MinimumClaimValueHandler>();
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 

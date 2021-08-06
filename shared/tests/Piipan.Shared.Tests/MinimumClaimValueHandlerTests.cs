@@ -9,9 +9,8 @@ using Xunit;
 
 namespace Piipan.Shared.Authorization.Tests
 {
-    public class MinimumIdentityAssuranceLevelHandlerTests
+    public class MinimumClaimValueHandlerTests
     {
-
         [Fact]
         public async void HandleRequirement_Succeeds()
         {
@@ -19,13 +18,13 @@ namespace Piipan.Shared.Authorization.Tests
             var user = UserWithClaim("ial", "2");
 
             // build authorization handler
-            var logger = new Mock<ILogger<MinimumIdentityAssuranceLevelHandler>>();
+            var logger = new Mock<ILogger<MinimumClaimValueHandler>>();
             var claimsProvider = new Mock<IClaimsProvider>();
-            var handler = new MinimumIdentityAssuranceLevelHandler(logger.Object, claimsProvider.Object);
+            var handler = new MinimumClaimValueHandler(logger.Object, claimsProvider.Object);
 
             // build authorization context
             var requirements = new List<IAuthorizationRequirement> {
-                new MinimumIdentityAssuranceLevelRequirement(2)
+                new MinimumClaimValueRequirement("ial", 2)
             };
             var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -43,13 +42,13 @@ namespace Piipan.Shared.Authorization.Tests
             var user = UserWithClaim("ial", "1");
 
             // build authorization handler
-            var logger = new Mock<ILogger<MinimumIdentityAssuranceLevelHandler>>();
+            var logger = new Mock<ILogger<MinimumClaimValueHandler>>();
             var claimsProvider = new Mock<IClaimsProvider>();
-            var handler = new MinimumIdentityAssuranceLevelHandler(logger.Object, claimsProvider.Object);
+            var handler = new MinimumClaimValueHandler(logger.Object, claimsProvider.Object);
 
             // build authorization context
             var requirements = new List<IAuthorizationRequirement> {
-                new MinimumIdentityAssuranceLevelRequirement(2)
+                new MinimumClaimValueRequirement("ial", 2)
             };
             var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -73,13 +72,13 @@ namespace Piipan.Shared.Authorization.Tests
             var user = UserWithClaim("not-ial", "value");
 
             // build authorization handler
-            var logger = new Mock<ILogger<MinimumIdentityAssuranceLevelHandler>>();
+            var logger = new Mock<ILogger<MinimumClaimValueHandler>>();
             var claimsProvider = new Mock<IClaimsProvider>();
-            var handler = new MinimumIdentityAssuranceLevelHandler(logger.Object, claimsProvider.Object);
+            var handler = new MinimumClaimValueHandler(logger.Object, claimsProvider.Object);
 
             // build authorization context
             var requirements = new List<IAuthorizationRequirement> {
-                new MinimumIdentityAssuranceLevelRequirement(2)
+                new MinimumClaimValueRequirement("ial", 2)
             };
             var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -97,19 +96,19 @@ namespace Piipan.Shared.Authorization.Tests
         }
 
         [Fact]
-        public async void HandleRequirement_FailsWhenIALNotNumeric()
+        public async void HandleRequirement_FailsWhenValueNotNumeric()
         {
             // Arrange
             var user = UserWithClaim("ial", "notanumber");
 
             // build authorization handler
-            var logger = new Mock<ILogger<MinimumIdentityAssuranceLevelHandler>>();
+            var logger = new Mock<ILogger<MinimumClaimValueHandler>>();
             var claimsProvider = new Mock<IClaimsProvider>();
-            var handler = new MinimumIdentityAssuranceLevelHandler(logger.Object, claimsProvider.Object);
+            var handler = new MinimumClaimValueHandler(logger.Object, claimsProvider.Object);
 
             // build authorization context
             var requirements = new List<IAuthorizationRequirement> {
-                new MinimumIdentityAssuranceLevelRequirement(2)
+                new MinimumClaimValueRequirement("ial", 2)
             };
             var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -121,7 +120,7 @@ namespace Piipan.Shared.Authorization.Tests
             logger.Verify(m => m.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Information),
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains($"Unable to convert IAL value")),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains($"Unable to convert ial value")),
                     It.IsAny<Exception>(),
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once());
         }
@@ -133,13 +132,13 @@ namespace Piipan.Shared.Authorization.Tests
             var user = UserWithClaim("ial", "9999999999999999999999");
 
             // build authorization handler
-            var logger = new Mock<ILogger<MinimumIdentityAssuranceLevelHandler>>();
+            var logger = new Mock<ILogger<MinimumClaimValueHandler>>();
             var claimsProvider = new Mock<IClaimsProvider>();
-            var handler = new MinimumIdentityAssuranceLevelHandler(logger.Object, claimsProvider.Object);
+            var handler = new MinimumClaimValueHandler(logger.Object, claimsProvider.Object);
 
             // build authorization context
             var requirements = new List<IAuthorizationRequirement> {
-                new MinimumIdentityAssuranceLevelRequirement(2)
+                new MinimumClaimValueRequirement("ial", 2)
             };
             var context = new AuthorizationHandlerContext(requirements, user, null);
 
@@ -151,7 +150,7 @@ namespace Piipan.Shared.Authorization.Tests
             logger.Verify(m => m.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Information),
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains($"Unable to convert IAL value")),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains($"Unable to convert ial value")),
                     It.IsAny<Exception>(),
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once());
         }
