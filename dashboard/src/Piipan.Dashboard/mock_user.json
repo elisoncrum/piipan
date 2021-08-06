@@ -31,8 +31,12 @@
         "val": "2"
       },
       {
-        "typ": "aal",
-        "val": "3"
+        "typ": "role",
+        "val": "role_1"
+      },
+      {
+        "typ": "role",
+        "val": "role_2"
       }
     ]
   }

@@ -30,8 +30,7 @@ namespace Piipan.Dashboard
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
-
+            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
             services.AddRazorPages(options => {
                 options.Conventions.AuthorizeFolder("/");
             });
@@ -61,12 +60,18 @@ namespace Piipan.Dashboard
             services.AddSession();
 
             services.AddAuthorization(options => {
-                options.DefaultPolicy = new AuthorizationPolicyBuilder()
-                    .AddRequirements(new MinimumClaimValueRequirement("ial", 2))
-                    .AddRequirements(new MinimumClaimValueRequirement("aal", 3))
-                    .Build();
+                var builder = new AuthorizationPolicyBuilder();
+                var authzPolicyOptions = Configuration
+                    .GetSection(AuthorizationPolicyOptions.SectionName)
+                    .Get<AuthorizationPolicyOptions>();
+                
+                foreach (var rcv in authzPolicyOptions.RequiredClaims)
+                {
+                    builder.RequireClaim(rcv.Type, rcv.Values);
+                }
+
+                options.DefaultPolicy = builder.Build();
             });
-            services.AddSingleton<IAuthorizationHandler, MinimumClaimValueHandler>();
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
