@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.Dashboard.Api;
 using Piipan.Shared.Authentication;
-using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
 
