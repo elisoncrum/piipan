@@ -32,7 +32,9 @@ namespace Piipan.Dashboard
         {
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
 
-            services.AddRazorPages();
+            services.AddRazorPages(options => {
+                options.Conventions.AuthorizeFolder("/");
+            });
             services.AddSingleton<IParticipantUploadRequest>((s) =>
             {
                 ITokenProvider tokenProvider;

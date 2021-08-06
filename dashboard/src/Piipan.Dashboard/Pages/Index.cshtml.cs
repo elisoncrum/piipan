@@ -5,7 +5,6 @@ using Piipan.Shared.Claims;
 
 namespace Piipan.Dashboard.Pages
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
