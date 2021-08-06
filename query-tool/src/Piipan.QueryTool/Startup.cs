@@ -28,7 +28,7 @@ namespace Piipan.QueryTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
+            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
             services.AddRazorPages().AddMvcOptions(options =>
             {
