@@ -13,8 +13,6 @@ using Newtonsoft.Json;
 using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
 
-#nullable enable
-
 namespace Piipan.Match.Orchestrator
 {
     /// <summary>
@@ -47,8 +45,14 @@ namespace Piipan.Match.Orchestrator
             {
                 log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
 
-                string? username = req.Headers["From"];
-                if (username is string)
+                string subscription = req.Headers["Ocp-Apim-Subscription-Name"];
+                if (subscription != null)
+                {
+                    log.LogInformation("Using APIM subscription {Subscription}", subscription);
+                }
+
+                string username = req.Headers["From"];
+                if (username != null)
                 {
                     log.LogInformation("on behalf of {Username}", username);
                 }
@@ -91,7 +95,8 @@ namespace Piipan.Match.Orchestrator
                         }
 
                         PersonMatchRequest personRequest = new PersonMatchRequest();
-                        personRequest.Query = new PersonMatchQuery {
+                        personRequest.Query = new PersonMatchQuery
+                        {
                             Last = person.Last,
                             First = person.First,
                             Middle = person.Middle,
@@ -108,7 +113,8 @@ namespace Piipan.Match.Orchestrator
                         // Exception when attempting state-level matches
                         log.LogError(ex.Message);
 
-                        orchResponse.Data.Errors.Add(new OrchMatchError() {
+                        orchResponse.Data.Errors.Add(new OrchMatchError()
+                        {
                             Index = i,
                             Code = ex.GetType().Name,
                             Detail = ex.Message
@@ -116,7 +122,8 @@ namespace Piipan.Match.Orchestrator
                     }
 
                 }
-                return (ActionResult)new JsonResult(orchResponse) {
+                return (ActionResult)new JsonResult(orchResponse)
+                {
                     StatusCode = 200
                 };
             }
@@ -127,7 +134,8 @@ namespace Piipan.Match.Orchestrator
                     "System.FormatException",
                     "Newtonsoft.Json.JsonSerializationException"
                 };
-                if (errTypeList.Contains(topLevelEx.GetType().FullName)) {
+                if (errTypeList.Contains(topLevelEx.GetType().FullName))
+                {
                     return DeserializationErrorResponse(topLevelEx);
                 }
                 return InternalServerErrorResponse(topLevelEx);
