@@ -59,21 +59,7 @@ namespace Piipan.Dashboard
             services.AddDistributedMemoryCache();
             services.AddSession();
 
-            services.AddAuthorization(options => {
-                var authzPolicyOptions = Configuration
-                    .GetSection(AuthorizationPolicyOptions.SectionName)
-                    .Get<AuthorizationPolicyOptions>();
-
-                if (!(authzPolicyOptions is null))
-                {
-                    var builder = new AuthorizationPolicyBuilder();
-                    foreach (var rcv in authzPolicyOptions.RequiredClaims)
-                    {
-                        builder.RequireClaim(rcv.Type, rcv.Values);
-                    }
-                    options.DefaultPolicy = builder.Build();
-                }
-            });
+            services.ConfigureAuthorizationPolicy(Configuration);
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
