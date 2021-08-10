@@ -26,7 +26,7 @@ namespace Piipan.QueryTool
         {
             const string Endpoint = "query";
 
-            var request = new MatchRequest { Query = query };
+            var request = new MatchRequest { Data = new List<PiiRecord> { query } };
             var json = JsonSerializer.Serialize(request);
             var response = await _apiClient.PostAsync(
                 new Uri(_baseUri, Endpoint),
@@ -40,33 +40,44 @@ namespace Piipan.QueryTool
 
             return matchResponse;
         }
-
-        public async Task<LookupResponse> Lookup(string lookupId)
-        {
-            const string Endpoint = "lookup_ids";
-
-            var uri = new Uri(_baseUri, $"{Endpoint}/{lookupId}");
-            var response = await _apiClient.GetAsync(uri);
-
-            response.EnsureSuccessStatusCode();
-
-            var lookupJson = await response.Content.ReadAsStringAsync();
-            var lookupResponse = JsonSerializer.Deserialize<LookupResponse>(lookupJson);
-
-            return lookupResponse;
-        }
     }
 
     public class MatchResponse
     {
-        [JsonPropertyName("lookup_id")]
-        public virtual string lookupId { get; set; }
-        public virtual List<PiiRecord> matches { get; set; }
+        [JsonPropertyName("data")]
+        public MatchResponseData Data { get; set; } = new MatchResponseData();
     }
 
-    public class LookupResponse
+    public class MatchResponseData
     {
-        [JsonPropertyName("data")]
-        public virtual PiiRecord data { get; set; }
+        [JsonPropertyName("results")]
+        public List<MatchResult> Results { get; set; } = new List<MatchResult>();
+
+        [JsonPropertyName("errors")]
+        public List<MatchError> Errors { get; set; } = new List<MatchError>();
+    }
+
+    public class MatchResult
+    {
+        [JsonPropertyName("index")]
+        public int Index { get; set; }
+
+        [JsonPropertyName("matches")]
+        public virtual List<PiiRecord> Matches { get; set; }
+    }
+
+    public class MatchError
+    {
+        [JsonPropertyName("index")]
+        public int Index { get; set; }
+
+        [JsonPropertyName("code")]
+        public string Code { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("detail")]
+        public string Detail { get; set; }
     }
 }

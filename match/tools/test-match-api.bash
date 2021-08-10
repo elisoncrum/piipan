@@ -11,7 +11,7 @@
 #
 # function-name is the function app name in Azure.
 #
-# usage: test-lookup-api.bash <azure-env> <function-name>
+# usage: test-match-api.bash <azure-env> <function-name>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit

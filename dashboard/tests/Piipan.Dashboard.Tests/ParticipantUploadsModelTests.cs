@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.Dashboard.Api;
 using Piipan.Dashboard.Pages;
+using Piipan.Shared.Claims;
 using Xunit;
 
 namespace Piipan.Dashboard.Tests
@@ -22,11 +23,14 @@ namespace Piipan.Dashboard.Tests
         public void BeforeOnGetAsync_TitleIsCorrect()
         {
             var mockApi = new Mock<IParticipantUploadRequest>();
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>()
+                new NullLogger<ParticipantUploadsModel>(),
+                mockClaimsProvider
             );
             Assert.Equal("Participant Uploads", pageModel.Title);
+            Assert.Equal("", pageModel.Email);
         }
 
         [Fact]
@@ -46,9 +50,11 @@ namespace Piipan.Dashboard.Tests
         {
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
             var mockApi = new Mock<IParticipantUploadRequest>();
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>()
+                new NullLogger<ParticipantUploadsModel>(),
+                mockClaimsProvider
             );
             Assert.Matches("http://example.com", pageModel.BaseUrl);
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
@@ -58,9 +64,11 @@ namespace Piipan.Dashboard.Tests
         public void BeforeOnGetAsync_initializesParticipantUploadResults()
         {
             var mockApi = new Mock<IParticipantUploadRequest>();
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>()
+                new NullLogger<ParticipantUploadsModel>(),
+                mockClaimsProvider
             );
             Assert.IsType<List<ParticipantUpload>>(pageModel.ParticipantUploadResults);
         }
@@ -77,11 +85,13 @@ namespace Piipan.Dashboard.Tests
             data.Add(participantUpload);
             var meta = new ParticipantUploadResponseMeta();
             var mockApi = mockApiWithResponse(data, meta);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageContext = MockPageContext(new DefaultHttpContext());
             // setup page model with mocks
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>()
+                new NullLogger<ParticipantUploadsModel>(),
+                mockClaimsProvider
             )
             {
                 PageContext = pageContext
@@ -90,6 +100,7 @@ namespace Piipan.Dashboard.Tests
             await pageModel.OnGetAsync();
             // assert
             Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
             // teardown
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
@@ -105,6 +116,7 @@ namespace Piipan.Dashboard.Tests
             data.Add(participantUpload);
             var meta = new ParticipantUploadResponseMeta();
             var mockApi = mockApiWithResponse(data, meta);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             // setup mock page context with form data
             var httpContext = new DefaultHttpContext();
             var form = new FormCollection(new Dictionary<string,
@@ -117,7 +129,8 @@ namespace Piipan.Dashboard.Tests
             // setup page model with mocks
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>()
+                new NullLogger<ParticipantUploadsModel>(),
+                mockClaimsProvider
             )
             {
                 PageContext = pageContext
@@ -126,6 +139,7 @@ namespace Piipan.Dashboard.Tests
             await pageModel.OnPostAsync();
             // assert
             Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
             // teardown
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
@@ -155,6 +169,15 @@ namespace Piipan.Dashboard.Tests
                 ViewData = viewData
             };
             return pageContext;
+        }
+
+        private IClaimsProvider claimsProviderMock(string email)
+        {
+            var claimsProviderMock = new Mock<IClaimsProvider>();
+            claimsProviderMock
+                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
+                .Returns(email);
+            return claimsProviderMock.Object;
         }
     }
 }

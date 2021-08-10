@@ -1,11 +1,13 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Claims;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -34,32 +36,46 @@ namespace Piipan.QueryTool.Tests
             return clientMock.Object;
         }
 
+        public static IClaimsProvider claimsProviderMock(string email)
+        {
+            var claimsProviderMock = new Mock<IClaimsProvider>();
+            claimsProviderMock
+                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
+                .Returns(email);
+            return claimsProviderMock.Object;
+        }
+
         [Fact]
         public void TestBeforeOnGet()
         {
             // arrange
 
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
-                mockApiClient
+                mockApiClient,
+                mockClaimsProvider
                 );
             // act
             // assert
             Assert.Equal("", pageModel.Title);
+            Assert.Equal("", pageModel.Email);
         }
         [Fact]
         public void TestAfterOnGet()
         {
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient, mockClaimsProvider);
 
             // act
             pageModel.OnGet();
 
             // assert
             Assert.Equal("NAC Query Tool", pageModel.Title);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -67,16 +83,22 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var returnValue = @"{
-                ""lookup_id"": ""BBB2222"",
-                ""matches"": [{
-                    ""first"": ""Theodore"",
-                    ""middle"": ""Carri"",
-                    ""last"": ""Farrington"",
-                    ""ssn"": ""000-00-0000"",
-                    ""dob"": ""2021-01-01"",
-                    ""state"": ""ea"",
-                    ""state_abbr"": ""ea""
-                }]
+                ""data"": {
+                    ""results"": [
+                        {
+                            ""matches"": [{
+                                ""first"": ""Theodore"",
+                                ""middle"": ""Carri"",
+                                ""last"": ""Farrington"",
+                                ""ssn"": ""000-00-0000"",
+                                ""dob"": ""2021-01-01"",
+                                ""state"": ""ea"",
+                                ""state_abbr"": ""ea""
+                            }]
+                        }
+                    ],
+                    ""errors"": []
+                }
             }";
             var requestPii = new PiiRecord
             {
@@ -86,7 +108,8 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
 
             // act
@@ -95,8 +118,9 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.IsType<MatchResponse>(pageModel.QueryResult);
             Assert.NotNull(pageModel.QueryResult);
-            Assert.NotNull(pageModel.QueryResult.matches);
+            Assert.NotNull(pageModel.QueryResult.Data.Results[0].Matches);
             Assert.False(pageModel.NoResults);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -104,8 +128,14 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var returnValue = @"{
-                ""lookup_id"": null,
-                ""matches"": []
+                ""data"": {
+                    ""results"": [
+                        {
+                            ""matches"": []
+                        }
+                    ],
+                    ""errors"": []
+                }
             }";
             var requestPii = new PiiRecord
             {
@@ -115,7 +145,8 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
 
             // act
@@ -123,9 +154,9 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.IsType<MatchResponse>(pageModel.QueryResult);
-            Assert.Null(pageModel.QueryResult.lookupId);
-            Assert.Empty(pageModel.QueryResult.matches);
+            Assert.Empty(pageModel.QueryResult.Data.Results[0].Matches);
             Assert.True(pageModel.NoResults);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -140,7 +171,8 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClient = clientMock(HttpStatusCode.BadRequest, "");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient);
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
 
             // act
@@ -148,6 +180,7 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.NotNull(pageModel.RequestError);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
     }
 }

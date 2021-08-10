@@ -15,9 +15,26 @@
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
     <partial name="_UsaBanner" />
     <div class="usa-overlay"></div>
-    <header class="usa-header usa-header--extended"><div class="usa-navbar">
-        <div class="usa-logo" id="extended-logo">
-            <h1 class="usa-logo__text font-heading-xl"><a asp-page="/Index" title="Home" aria-label="Home">NAC Metrics Dashboard</a></h1>
+    <header class="usa-header usa-header--extended">
+        <div class="usa-navbar">
+            <div class="usa-logo" id="extended-logo">
+                <h1 class="usa-logo__text font-heading-xl"><a asp-page="/Index" title="Home" aria-label="Home">NAC Metrics Dashboard</a></h1>
+            </div>
+            <button class="usa-menu-btn">Menu</button>
+            <div class="usa-nav" style="">
+                <ul class="usa-nav__primary usa-accordion flex-justify-end">
+                    <li class="usa-nav__primary-item">
+                        <button class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="nav-user">
+                            <span>@Model.Email</span>
+                        </button>
+                        <ul id="nav-user" class="usa-nav__submenu" hidden>
+                            <li class="usa-nav__submenu-item">
+                                <a href="/.auth/logout">Sign out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </header>
     <div class="container">

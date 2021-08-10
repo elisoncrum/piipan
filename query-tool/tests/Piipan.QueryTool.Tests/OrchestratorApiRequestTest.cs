@@ -16,18 +16,24 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var mockResponse = @"{
-                ""lookup_id"": ""BBB2222"",
-                ""matches"": [
-                    {
-                        ""first"": ""Theodore"",
-                        ""middle"": ""Carri"",
-                        ""last"": ""Farrington"",
-                        ""ssn"": ""000-00-0000"",
-                        ""dob"": ""2021-01-01"",
-                        ""state"": ""ea"",
-                        ""state_abbr"": ""ea""
-                    }
-                ]
+                ""data"": {
+                    ""results"": [
+                        {
+                            ""matches"": [
+                                {
+                                    ""first"": ""Theodore"",
+                                    ""middle"": ""Carri"",
+                                    ""last"": ""Farrington"",
+                                    ""ssn"": ""000-00-0000"",
+                                    ""dob"": ""2021-01-01"",
+                                    ""state"": ""ea"",
+                                    ""state_abbr"": ""ea""
+                                }
+                            ]
+                        }
+                    ],
+                    ""errors"": []
+                }
             }";
             var query = new PiiRecord
             {
@@ -50,54 +56,17 @@ namespace Piipan.QueryTool.Tests
 
             // act
             var result = await api.Match(query);
+            var match = result.Data.Results[0].Matches[0];
 
             // assert
             Assert.IsType<MatchResponse>(result);
-            Assert.Single(result.matches);
-            Assert.Equal("BBB2222", result.lookupId);
-            Assert.Equal("Theodore", result.matches[0].FirstName);
-            Assert.Equal("Carri", result.matches[0].MiddleName);
-            Assert.Equal("Farrington", result.matches[0].LastName);
-            Assert.Equal("000-00-0000", result.matches[0].SocialSecurityNum);
-            Assert.Equal(new DateTime(2021, 1, 1), result.matches[0].DateOfBirth);
-            Assert.Equal("ea", result.matches[0].State);
-        }
-
-        [Fact]
-        public async void TestLookup()
-        {
-            var mockResponse = @"{
-                ""data"": {
-                    ""first"": ""Theodore"",
-                    ""middle"": ""Carri"",
-                    ""last"": ""Farrington"",
-                    ""ssn"": ""000-00-0000"",
-                    ""dob"": ""2021-01-01""
-                }
-            }";
-            var clientMock = new Mock<IAuthorizedApiClient>();
-            clientMock
-                .Setup(c => c.GetAsync(It.IsAny<Uri>()).Result)
-                .Returns(new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(mockResponse)
-                });
-            var api = new OrchestratorApiRequest(
-                clientMock.Object,
-                new Uri("https://localhost/"),
-                new NullLogger<IndexModel>());
-
-            // act
-            var result = await api.Lookup("BCD2345");
-
-            // assert
-            Assert.IsType<LookupResponse>(result);
-            Assert.Equal("Theodore", result.data.FirstName);
-            Assert.Equal("Carri", result.data.MiddleName);
-            Assert.Equal("Farrington", result.data.LastName);
-            Assert.Equal("000-00-0000", result.data.SocialSecurityNum);
-            Assert.Equal(new DateTime(2021, 1, 1), result.data.DateOfBirth);
+            Assert.Single(result.Data.Results[0].Matches);
+            Assert.Equal("Theodore", match.FirstName);
+            Assert.Equal("Carri", match.MiddleName);
+            Assert.Equal("Farrington", match.LastName);
+            Assert.Equal("000-00-0000", match.SocialSecurityNum);
+            Assert.Equal(new DateTime(2021, 1, 1), match.DateOfBirth);
+            Assert.Equal("ea", match.State);
         }
     }
 }

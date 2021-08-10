@@ -8,13 +8,13 @@
         "location": {
             "type": "string"
         },
-        "LookupStorageName": {
-            "type": "string"
-        },
         "StateApiUriStrings": {
             "type": "string"
         },
         "functionAppName": {
+            "type": "string"
+        },
+        "appServicePlanName": {
             "type": "string"
         },
         "storageAccountName": {
@@ -29,9 +29,7 @@
     },
     "variables": {
         "functionAppName": "[parameters('functionAppName')]",
-        "hostingPlanName": "matchapi",
         "storageAccountName": "[parameters('storageAccountName')]",
-        "lookupTableName": "lookup",
         "functionWorkerRuntime": "dotnet",
         "storageAccountType": "Standard_LRS",
         "systemTypeTag": {
@@ -42,41 +40,6 @@
         }
     },
     "resources": [
-        // Lookup table resources
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
-            "name": "[parameters('LookupStorageName')]",
-            "tags": "[parameters('resourceTags')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "[variables('storageAccountType')]"
-            },
-            "kind": "Storage"
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/tableServices",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('LookupStorageName'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('LookupStorageName'))]"
-            ],
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('LookupStorageName'), '/default/', variables('lookupTableName'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('LookupStorageName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('LookupStorageName'), 'default')]"
-            ]
-        },
-
         // Orchestrator function app resources
         {
             "type": "Microsoft.Storage/storageAccounts",
@@ -90,21 +53,6 @@
             "kind": "Storage"
         },
         {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2020-06-01",
-            "name": "[variables('hostingPlanName')]",
-            "tags": "[parameters('resourceTags')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "Y1",
-                "tier": "Dynamic"
-            },
-            "properties": {
-                "name": "[variables('hostingPlanName')]",
-                "computeMode": "Dynamic"
-            }
-        },
-        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2020-06-01",
             "name": "[variables('functionAppName')]",
@@ -115,15 +63,14 @@
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('LookupStorageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "serverFarmId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "httpsOnly": true,
                 "siteConfig": {
                     "ftpsState": "Disabled",
+                    "alwaysOn": true,
                     "appSettings": [
                         /*
                             The following settings are required for Function apps per the MS documentation:
@@ -175,15 +122,6 @@
                         {
                             "name": "StateApiUriStrings",
                             "value": "[parameters('StateApiUriStrings')]"
-                        },
-                        // Bind lookup table storage
-                        {
-                            "name": "LookupConnectionString",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('LookupStorageName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('LookupStorageName')), '2019-06-01').keys[0].value)]"
-                        },
-                        {
-                            "name": "LookupTableName",
-                            "value": "[variables('lookupTableName')]"
                         }
                     ]
                 }

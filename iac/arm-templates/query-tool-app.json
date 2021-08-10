@@ -25,19 +25,37 @@
         },
         "idpClientId": {
             "type": "string"
+        },
+        "aspNetCoreEnvironment": {
+            "type": "string"
         }
     },
     "variables": {
         "appName": "[concat(parameters('appName'))]",
         "sku": "S1",
         "baseSiteConfig": {
-            "linuxFxVersion": "DOTNETCORE|3.1",
+            // .NET 3.1 Core uses "v4.0", .NET 5 uses "v5.0"
+            "netFrameworkVersion": "v4.0",
+            "metadata": [
+                {
+                    // .NET 3.1 Core uses "dotnetcore", .NET 5 uses "dotnet"
+                    "name": "CURRENT_STACK",
+                    "value": "dotnetcore"
+                }
+            ],
+            // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments
+            "use32BitWorkerProcess": false,
+            "ipSecurityRestrictions": [],
             "ftpsState": "Disabled",
             "appSettings": [
                 // Environment Variables
                 {
                     "name": "OrchApiUri",
                     "value": "[parameters('OrchApiUri')]"
+                },
+                {
+                    "name": "ASPNETCORE_ENVIRONMENT",
+                    "value": "[parameters('aspNetCoreEnvironment')]"
                 }
             ]
         },
@@ -55,9 +73,10 @@
             "sku": {
                 "name": "[variables('sku')]"
             },
-            "kind": "linux",
+            "kind": "windows",
             "properties": {
-                "reserved": true
+                // Must be false for Windows deployments
+                "reserved": false
             }
         },
         {
@@ -149,7 +168,8 @@
                 "globalValidation": {
                     "requireAuthentication": true,
                     "unauthenticatedClientAction": "RedirectToLoginPage",
-                    "redirectToProvider": "oidcProvider"
+                    "redirectToProvider": "oidcProvider",
+                    "excludedPaths": ["/health-probe.html"]
                 },
                 "identityProviders": {
                     "customOpenIdConnectProviders": {
@@ -167,7 +187,9 @@
                             "login": {
                                 "nameClaimType": "name",
                                 "scopes": [
-                                    "openid"
+                                    "openid",
+                                    "email",
+                                    "profile"
                                 ]
                             }
                         }

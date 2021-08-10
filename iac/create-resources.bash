@@ -34,9 +34,6 @@ set_constants () {
   QUERY_TOOL_FRONTDOOR_NAME=$PREFIX-fd-querytool-$ENV
   QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
 
-  # Base name of lookup API storage account
-  LOOKUP_STORAGE_NAME=${PREFIX}stlookupapi${ENV}
-
   # Orchestrator Function app and its blob storage
   ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
@@ -121,7 +118,25 @@ main () {
       objectId="$CURRENT_USER_OBJID" \
       resourceTags="$RESOURCE_TAGS"
 
-  # Create an Event Hub namespace and hub where resource logs will be streamed
+  # Create an Event Hub namespace and hub where resource logs will be streamed,
+  # as well as an application registration that can be used to read logs
+  siem_app_id=$(\
+    az ad sp list \
+      --display-name "$SIEM_RECEIVER" \
+      --filter "displayname eq '$SIEM_RECEIVER'" \
+      --query "[0].objectId" \
+      --output tsv)
+  # Avoid resetting password by only creating app registration if it does not exist
+  if [ -z "$siem_app_id" ]; then
+    siem_app_id=$(\
+      az ad sp create-for-rbac \
+        --name "$SIEM_RECEIVER" \
+        --role Reader \
+        --query objectId \
+        --output tsv)
+  fi
+
+  # Create event hub and assign role to app registration
   az deployment group create \
     --name monitoring \
     --resource-group "$RESOURCE_GROUP" \
@@ -130,7 +145,17 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       location="$LOCATION" \
       env="$ENV" \
-      prefix="$PREFIX"
+      prefix="$PREFIX" \
+      receiverId="$siem_app_id"
+
+  # Send Policy events from subscription's activity log to event hub
+  az deployment sub create \
+    --name activity-log-diagnostics \
+    --location "$LOCATION" \
+    --template-file ./arm-templates/activity-log.json \
+    --parameters \
+      eventHubName="$EVENT_HUB_NAME" \
+      coreResourceGroup="$RESOURCE_GROUP"
 
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
@@ -261,7 +286,8 @@ main () {
       name="$APP_SERVICE_PLAN_FUNC_NAME" \
       location="$LOCATION" \
       kind="$APP_SERVICE_PLAN_FUNC_KIND" \
-      sku="$APP_SERVICE_PLAN_FUNC_SKU"
+      sku="$APP_SERVICE_PLAN_FUNC_SKU" \
+      resourceTags="$RESOURCE_TAGS"
 
   # Function apps need an Event Hub authorization rule ID for log streaming
   eh_rule_id=$(\
@@ -501,8 +527,8 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       location="$LOCATION" \
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-      LookupStorageName="$LOOKUP_STORAGE_NAME" \
       StateApiUriStrings="$match_api_uris" \
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
@@ -514,6 +540,20 @@ main () {
   pushd ../match/src/Piipan.Match.Orchestrator
     func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet
   popd
+
+  # Resource ID required when vnet is in a separate resource group
+  vnet_id=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$vnet_id"
 
   # Create App Service resources for query tool app.
   # This needs to happen after the orchestrator is created in order for
@@ -557,11 +597,18 @@ main () {
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
-      idpOidcConfigUri="$IDP_OIDC_CONFIG_URI" \
-      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID"
+      idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
+      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
+      aspNetCoreEnvironment="$PREFIX"
+
+  # Sets the OIDC client secrets for web applications
+  ./configure-oidc.bash "$azure_env" "$QUERY_TOOL_APP_NAME"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"
+
+  # Core database server and schemas
+  ./create-core-databases.bash "$azure_env"
 
   # API Management instances need to be created before configuring Easy Auth.
   ./create-apim.bash "$azure_env" "$APIM_EMAIL"
@@ -571,11 +618,18 @@ main () {
   #   - OrchestratorApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
+  # Configures Azure Defender at the subscription level for:
+  #   - Storage accounts
+  ./configure-defender.bash "$azure_env"
+
   echo "Secure database connection"
   ./remove-external-network.bash \
     "$azure_env" \
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
+
+  # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
+  ./configure-cis-policy.bash "$azure_env"
 
   script_completed
 }

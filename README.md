@@ -61,6 +61,12 @@ Piipan uses the monorepo strategy; subsystems get their own top-level directory 
 
 Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), are organized in [this index](./docs/README.md).
 
+## Building, testing, and deployment
+
+Each subsystem has its own `build.bash` script that will build, test, or deploy the subsystem. Flags and arguments for each build script are the same and are specified in `tools/build-common.bash`.
+
+To build, test, or deploy all subsystems at once, run the top-level `build.bash` script.
+
 ## Public domain
 
 This project is in the worldwide [public domain](LICENSE.md). As stated in [CONTRIBUTING](CONTRIBUTING.md):

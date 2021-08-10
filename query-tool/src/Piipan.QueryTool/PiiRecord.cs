@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -6,11 +7,11 @@ namespace Piipan.QueryTool
 {
     public class MatchRequest
     {
-        [JsonPropertyName("query")]
-        public PiiRecord Query { get; set; }
+        [JsonPropertyName("data")]
+        public List<PiiRecord> Data { get; set; }
     }
 
-    public class PiiRecord : IQueryable
+    public class PiiRecord
     {
         [Required]
         [Display(Name = "First name")]
@@ -51,10 +52,6 @@ namespace Piipan.QueryTool
         [Display(Name = "ParticipantId")]
         [JsonPropertyName("participant_id")]
         public string ParticipantId { get; set; }
-
-        [Display(Name = "Lookup ID")]
-        [JsonPropertyName("lookup_id")]
-        public string LookupId { get; set; }
 
         [Display(Name = "Benefits End Month")]
         [JsonPropertyName("benefits_end_month")]

@@ -107,6 +107,9 @@ main () {
   upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
   upload_policy_xml=$(< "$upload_policy_path")
 
+  apim_policy_path=$(dirname "$0")/apim-policy.xml
+  apim_policy_xml=$(< "$apim_policy_path")
+
   local state_abbrs
   state_abbrs=$(get_state_abbrs)
 
@@ -131,7 +134,8 @@ main () {
         location="$LOCATION" \
         resourceTags="$RESOURCE_TAGS" \
         coreResourceGroup="$RESOURCE_GROUP" \
-        eventHubName="$EVENT_HUB_NAME")
+        eventHubName="$EVENT_HUB_NAME" \
+        apimPolicyXml="$apim_policy_xml")
 
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))
   for account in "${upload_accounts[@]}"

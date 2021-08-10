@@ -26,8 +26,6 @@ The following environment variables are required by the orchestrator and are set
 | Name | |
 |---|---|
 | `StateApiUriStrings` | [details](../../docs/iac.md#\:\~\:text=StateApiUriStrings) |
-| `LookupConnectionString` | [details](../../docs/iac.md#\:\~\:text=LookupConnectionString) |
-| `LookupTableName` | [details](../../docs/iac.md#\:\~\:text=LookupTableName) |
 
 ## Binding to state APIs
 
@@ -39,16 +37,15 @@ At runtime, the app requests an authentication token from the state app's Active
 
 ## Local development
 
-Local development is achieved by connecting a locally running instance of the orchestrator API to remote instances of the bound resources (per-state APIs, lookup table). When running locally, `Startup.cs` conditionally configures the `Piipan.Shared.Autentication.AuthorizedJsonApiClient` dependency to use Azure CLI credentials when obtaining access tokens for the per-state APIs. To make use of this functionality:
+Local development is achieved by connecting a locally running instance of the orchestrator API to remote instances of the bound resources (per-state APIs). When running locally, `Startup.cs` conditionally configures the `Piipan.Shared.Autentication.AuthorizedJsonApiClient` dependency to use Azure CLI credentials when obtaining access tokens for the per-state APIs. To make use of this functionality:
 
 1. Run `func azure functionapp fetch-app-settings <remote orchestrator name>` to ensure you have up-to-date local settings configured in `local.settings.json`.
 1. Run `func settings add DEVELOPMENT true` to add a `"DEVELOPMENT"` setting with a value of `"true"` to `local.settings.json`. This triggers the orchestrator to use your Azure CLI credentials when authenticating with the state APIs.
-1. Assign your user account the `StateApi.Query` role for each state the orchestrator queries. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script. E.g., `./assign-app-role.bash tts/dev <remote state function name> StateApi.Query`.
-1. Add the Azure CLI as an authorized client application to each state API's application object. This can be done using [`tools/authorize-cli.bash`](../../tools/authorize-cli.bash). E.g., `./authorize-cli.bash tts/dev <application ID URI>`, where [`application ID URI`](../../docs/securing-internal-apis.md#application-id-uri) is the base URL of the API's Azure Function *without a trailing slash*.
+1. Follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `StateApi.Query` role for the remote state Function App(s) and authorize the Azure CLI.
 
 With the orchestrator running locally (`func start` or `dotnet watch msbuild /t:RunFunctions`), any requests to the local endpoint will now use the user account authorized with Azure CLI to obtain access tokens from the per-state APIs.
 
-A true local development approach with locally run instances of the per-state APIs, lookup table, and participant records database does not yet exist.
+A true local development approach with locally run instances of the per-state APIs, and participant records database does not yet exist.
 
 ### App deployment
 
@@ -63,7 +60,6 @@ func azure functionapp publish <app_name> --dotnet
 ## Remote testing
 
 To test the orchestrator remotely:
-1. Assign your user account the `OrchestratorApi.Query` role for the remote orchestrator application. Assignment can be done using the [`tools/assign-app-role.bash`](../../tools/assign-app-role.bash) script. E.g., `./assign-app-role.bash tts/dev <remote orchestrator name> OrchestratorApi.Query`.
-1. Ensure the Azure CLI has been added as an authorized client application to the orchestrator's application object (see [local development](#local-development)).
+1. Follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `OrchestratorApi.Query` role for the remote orchestrator Function App and authorize the Azure CLI.
 1. Retrieve a token for your user using the Azure CLI: `az account get-access-token --resource <orchestrator application ID URI>`.
 1. Send a request to the remote endpoint—perhaps using a tool like Postman or `curl`—and include the access token in the Authorization header: `Authorization: Bearer {token}`.

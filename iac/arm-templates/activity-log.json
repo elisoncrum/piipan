@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "eventHubName": {
+      "type": "string"
+    },
+    "coreResourceGroup": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2017-05-01-preview",
+      "name": "stream-logs-to-event-hub",
+      "dependsOn": [],
+      "properties": {
+        "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', parameters('coreResourceGroup'), '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
+        "eventHubName": "logs",
+        "logs": [
+          {
+            "category": "Policy",
+            "enabled": true
+          },
+          {
+            "category": "Security",
+            "enabled": true
+          }
+        ]
+      }
+    }
+  ]
+}
