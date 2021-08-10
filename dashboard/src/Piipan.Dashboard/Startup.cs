@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -59,7 +58,11 @@ namespace Piipan.Dashboard
             services.AddDistributedMemoryCache();
             services.AddSession();
 
-            services.ConfigureAuthorizationPolicy(Configuration);
+            services.AddAuthorizationCore(options => {
+                options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
+                    .GetSection(AuthorizationPolicyOptions.SectionName)
+                    .Get<AuthorizationPolicyOptions>());
+            });
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
