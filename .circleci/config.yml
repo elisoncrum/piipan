@@ -25,6 +25,10 @@ commands:
           name: Install pa11y
           command: npm install -g pa11y-ci --unsafe-perm=true --allow-root
       - run:
+          name: trust dev certs
+          working_directory: << parameters.directory >>
+          command: dotnet dev-certs https
+      - run:
           name: Run dev version of app for pa11y testing
           working_directory: << parameters.directory >>
           command: dotnet run
