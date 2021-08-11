@@ -25,6 +25,18 @@
       {
         "typ": "name",
         "val": "John Doe"
+      },
+      {
+        "typ": "ial",
+        "val": "2"
+      },
+      {
+        "typ": "role",
+        "val": "role_1"
+      },
+      {
+        "typ": "role",
+        "val": "asdf"
       }
     ]
   }

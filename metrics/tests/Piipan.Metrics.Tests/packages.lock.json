@@ -143,11 +143,12 @@
       },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "QUMtMVY7mQeJWlP8wmmhZf1HEGM/V8prW/XnYeKDpEniNBCRw0a3qktRb9aBU0vR+bpJwWZ0ibcB8QOvZEmDHQ==",
+        "resolved": "3.1.17",
+        "contentHash": "Ekq781lQg82KWpG8Zbl9PliPoGsThl3/eblIqAGqmjUe1ZXdeu50AcVzUIjnOxRVjCcHKKx65V/GZdzhb/Q11Q==",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "2.1.0",
-          "Microsoft.Extensions.Options": "2.1.0"
+          "Microsoft.AspNetCore.Metadata": "3.1.17",
+          "Microsoft.Extensions.Logging.Abstractions": "3.1.17",
+          "Microsoft.Extensions.Options": "3.1.17"
         }
       },
       "Microsoft.AspNetCore.Authorization.Policy": {
@@ -226,6 +227,11 @@
           "Microsoft.CSharp": "4.5.0",
           "Newtonsoft.Json": "11.0.2"
         }
+      },
+      "Microsoft.AspNetCore.Metadata": {
+        "type": "Transitive",
+        "resolved": "3.1.17",
+        "contentHash": "3kT/4WFQ6hrDCCr3QOee0o4yf9qUsHYDPdVZRmTBK99BNsr6gQ74TSKMDduzJBRu1aeCCl5tNaaXmEaGegd0Ew=="
       },
       "Microsoft.AspNetCore.Mvc.Abstractions": {
         "type": "Transitive",
@@ -1864,6 +1870,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
+          "Microsoft.AspNetCore.Authorization": "3.1.17",
           "Azure.Core": "1.17.0",
           "Azure.Identity": "1.4.1",
           "Microsoft.AspNetCore.Http": "2.2.2",
