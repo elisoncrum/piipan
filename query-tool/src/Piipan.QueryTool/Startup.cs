@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
 
@@ -30,7 +31,10 @@ namespace Piipan.QueryTool
         {
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
-            services.AddRazorPages().AddMvcOptions(options =>
+            services.AddRazorPages(options => 
+            {
+                options.Conventions.AuthorizeFolder("/");
+            }).AddMvcOptions(options =>
             {
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
@@ -57,6 +61,12 @@ namespace Piipan.QueryTool
 
             services.AddDistributedMemoryCache();
             services.AddSession();
+
+            services.AddAuthorizationCore(options => {
+                options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
+                    .GetSection(AuthorizationPolicyOptions.SectionName)
+                    .Get<AuthorizationPolicyOptions>());
+            });
 
             if (_env.IsDevelopment())
             {
