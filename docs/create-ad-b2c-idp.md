@@ -62,3 +62,13 @@ We use an [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory
    6. Click `Create`
    7. [Open the profile editing user flow and sign in as the new user](https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_pe&client_id=e7e769ad-e9bc-4c5f-8c3e-ebaf6cf9cacb&nonce=defaultNonce&redirect_uri=https%3A%2F%2Fjwt.ms&scope=openid&response_type=id_token&prompt=login). Under email, enter the same email address that was used for sign in and click continue.
       - You should be redirected to [jwt.ms](jwt.ms) where, under `Decoded Token`, you should see a claim with a type of `extension_EmailAddress`.
+
+#### Set or update existing user attributes (claims)
+1. From within the B2C tenant, search for and select `Azure AD B2C`
+2. Open the `User flows` blade
+   1. From the list of user flows, select `B2C_1_pe` (`pe` in this case stands for profile edit)
+   2. Click `Run user flow`
+   3. Under `Application`, select either `tts-app-dashboard-dev` or `tts-app-querytool-dev`
+   4. Under `Reply URL`, select `https://jwt.ms`
+   5. Click `Run user flow`
+   6. The profile editor will open in a new tab. Once you sign in, you will be able to update the attributes for the user, and the associated claims will reflect those updates on the next sign in.
