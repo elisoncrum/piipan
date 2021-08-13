@@ -578,6 +578,8 @@ main () {
     --output tsv)
   echo "Front Door iD: ${front_door_id}"
 
+  front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
+
   orch_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
@@ -599,7 +601,9 @@ main () {
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
-      aspNetCoreEnvironment="$PREFIX"
+      aspNetCoreEnvironment="$PREFIX" \
+      frontDoorId="$front_door_id" \
+      frontDoorUri="$front_door_uri"
 
   # Sets the OIDC client secrets for web applications
   ./configure-oidc.bash "$azure_env" "$QUERY_TOOL_APP_NAME"
