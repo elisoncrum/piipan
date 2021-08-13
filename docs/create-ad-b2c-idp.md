@@ -1,4 +1,4 @@
-# Create Azure AD B2C IDP
+# Create & Manage Azure AD B2C IDP
 
 ## Background
 We use an [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/overview) tenant as our Open ID Connect identity provider in the TTS sandbox environment.
