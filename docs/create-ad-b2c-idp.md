@@ -72,3 +72,16 @@ We use an [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory
    4. Under `Reply URL`, select `https://jwt.ms`
    5. Click `Run user flow`
    6. The profile editor will open in a new tab. Once you sign in, you will be able to update the attributes for the user, and the associated claims will reflect those updates on the next sign in.
+
+#### Add a new user attribute (claim)
+1. From within the B2C tenant, search for and select `Azure AD B2C`
+2. Open the `User attributes` blade
+   1. Click `Add`
+   2. Enter the name and data type of the attribute, and click `Create`
+3. Click the `User flows` blade
+   1. Select `B2C_1_si` (`si` in this case stands for sign in)
+   2. Click `Application claims`
+   3. Find the attribute you just added in the list and check the box next to it
+   4. Click save
+4. Repeat step 3 for the `B2C_1_pe` user flow
+5. Follow the [instructions for updating user attribute values](#set-or-update-existing-user-attributes-claims)
