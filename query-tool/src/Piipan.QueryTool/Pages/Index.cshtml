@@ -2,10 +2,10 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "NAC Query Tool";
+    ViewData["Title"] = "NAC Participant Search";
 }
 <div class="grid-container">
-    <h2>@Model.Title</h2>
+    <h2>Search for SNAP participants</h2>
     <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
             @if (!string.IsNullOrEmpty(Model.RequestError))
@@ -41,18 +41,17 @@
                     </div>
                 </div>
             }
-            <legend class="usa-legend">Search for SNAP participants</legend>
-            <label class="usa-label" asp-for="Query.LastName"></label>
-            <input class="usa-input" type="text" asp-for="Query.LastName" />
-            <label class="usa-label" asp-for="Query.MiddleName"></label>
-            <input class="usa-input" type="text" asp-for="Query.MiddleName" />
             <label class="usa-label" asp-for="Query.FirstName"></label>
             <input class="usa-input" type="text" asp-for="Query.FirstName" />
-            <label class="usa-label" asp-for="Query.SocialSecurityNum"></label>
-            <input class="usa-input" type="text" asp-for="Query.SocialSecurityNum">
+            <label class="usa-label" for="Query_MiddleName">@Html.DisplayNameFor(m => m.Query.MiddleName) <span class="text-gray-50">(optional)</span></label>
+            <input class="usa-input" type="text" asp-for="Query.MiddleName" />
+            <label class="usa-label" asp-for="Query.LastName"></label>
+            <input class="usa-input" type="text" asp-for="Query.LastName" />
             <label class="usa-label" asp-for="Query.DateOfBirth"></label>
             <input class="usa-input" type="date" asp-for="Query.DateOfBirth">
-            <input class="usa-button" type="submit" value="Submit" />
+            <label class="usa-label" for="Query_SocialSecurityNum">@Html.DisplayNameFor(m => m.Query.SocialSecurityNum) <span class="text-gray-50">(xxx-xx-xxxx)</span></label>
+            <input class="usa-input" type="text" asp-for="Query.SocialSecurityNum">
+            <input class="usa-button" type="submit" value="Search" />
         </fieldset>
     </form>
     <partial name="_ResultsTable" model="Model.QueryResult" />
