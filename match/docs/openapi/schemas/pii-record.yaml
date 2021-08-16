@@ -30,9 +30,6 @@ PiiRecord:
       type: string
       description: "State/territory two-letter postal abbreviation. Deprecated, superseded by `state`."
       deprecated: true
-    exception:
-      type: string
-      description: "Placeholder for value indicating special processing instructions"
     case_id:
       type: string
       description: "Participant's state-specific case identifier. Can be the same for multiple participants."
@@ -68,7 +65,6 @@ PiiRecordExamples:
     dob: "1970-01-01"
     state: "ea"
     state_abbr: "ea"
-    exception: "string"
     case_id: "string"
     participant_id: "string"
     benefits_end_month: "2021-01"
@@ -85,7 +81,6 @@ PiiRecordExamples:
     dob: "1970-01-01"
     state: "eb"
     state_abbr: "eb"
-    exception: "string"
     case_id: "string"
     participant_id: "string"
     benefits_end_month: "2021-01"
@@ -102,7 +97,6 @@ PiiRecordExamples:
     dob: "1970-01-01"
     state: "ec"
     state_abbr: "ec"
-    exception: null
     case_id: "string"
     participant_id: null
     benefits_end_month: null

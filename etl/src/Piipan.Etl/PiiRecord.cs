@@ -24,7 +24,6 @@ namespace Piipan.Etl
         public string Ssn { get; set; } = null!;
         public string CaseId { get; set; } = null!;
         public string? ParticipantId { get; set; }
-        public string? Exception { get; set; }
         public DateTime? BenefitsEndDate { get; set; }
         public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
         // Set Boolean values here, based on:

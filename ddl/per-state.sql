@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS participants(
 	middle text,
 	dob date NOT NULL,
 	ssn text NOT NULL,
-	exception text,
 	upload_id integer REFERENCES uploads (id),
     	case_id text NOT NULL,
     	participant_id text,
@@ -40,7 +39,6 @@ COMMENT ON COLUMN participants.first IS 'Participant''s first name';
 COMMENT ON COLUMN participants.middle IS 'Participant''s middle name';
 COMMENT ON COLUMN participants.dob IS 'Participant''s date of birth';
 COMMENT ON COLUMN participants.ssn IS 'Participant''s Social Security Number';
-COMMENT ON COLUMN participants.exception IS 'Placeholder for value indicating special processing instructions';
 COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
 COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
 COMMENT ON COLUMN participants.benefits_end_date IS 'Participant''s ending benefits date';

@@ -41,11 +41,6 @@
         }
       },
       {
-        "name": "exception",
-        "type": "string",
-        "description": "Placeholder for value indicating special processing instructions"
-      },
-      {
         "name": "case_id",
         "type": "string",
         "description": "Participant's state-specific case identifier",

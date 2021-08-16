@@ -88,7 +88,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "ea",
             "state_abbr": "ea",
-            "exception": "string",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": "2021-01",
@@ -140,7 +139,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "eb",
             "state_abbr": "eb",
-            "exception": "string",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": "2021-01",
@@ -159,7 +157,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "ec",
             "state_abbr": "ec",
-            "exception": null,
             "case_id": "string",
             "participant_id": null,
             "benefits_end_month": null,
@@ -190,7 +187,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "ec",
             "state_abbr": "ec",
-            "exception": null,
             "case_id": "string",
             "participant_id": null,
             "benefits_end_month": null,
@@ -209,7 +205,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "ec",
             "state_abbr": "ec",
-            "exception": null,
             "case_id": "string",
             "participant_id": null,
             "benefits_end_month": null,
@@ -244,7 +239,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "ec",
             "state_abbr": "ec",
-            "exception": null,
             "case_id": "string",
             "participant_id": null,
             "benefits_end_month": null,
@@ -275,7 +269,6 @@ Queries all state databases for any PII records that are an exact match to the l
             "dob": "1970-01-01",
             "state": "ec",
             "state_abbr": "ec",
-            "exception": null,
             "case_id": "string",
             "participant_id": null,
             "benefits_end_month": null,
@@ -335,7 +328,6 @@ Status Code **200**
 |»»»» dob|string(date)|true|none|Date of birth|
 |»»»» state|string|false|none|State/territory two-letter postal abbreviation|
 |»»»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
-|»»»» exception|string|false|none|Placeholder for value indicating special processing instructions|
 |»»»» case_id|string|false|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
 |»»»» participant_id|string|false|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
 |»»»» benefits_end_month|string|false|none|Participant's ending benefits month|

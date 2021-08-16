@@ -23,9 +23,6 @@ namespace Piipan.Match.Orchestrator
         [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
         public DateTime Dob { get; set; }
 
-        [JsonProperty("exception")]
-        public string Exception { get; set; }
-
         [JsonProperty("state")]
         public string State { get; set; }
 
