@@ -8,6 +8,7 @@
     <h2>Search for SNAP participants</h2>
     <form asp-page="Index" class="usa-form">
         <fieldset class="usa-fieldset">
+            <legend class="usa-sr-only">participant information</legend>
             @if (!string.IsNullOrEmpty(Model.RequestError))
             {
                 <div class="usa-alert usa-alert--error usa-alert--slim">
