@@ -23,8 +23,17 @@
                 <header class="usa-header usa-header--extended">
                     <div class="usa-navbar">
                         <div class="usa-logo" id="extended-logo">
-                            <h1 class="usa-logo__text font-heading-xl"><a asp-page="/Index" title="Home"
-                                    aria-label="Home">National Accuracy Clearinghouse</a></h1>
+                            <a href="/" class="agency">
+                                <img class="usa-banner__header-flag" src="~/images/usda-symbol-color.svg" alt="United States Department of Agriculture">
+                                <div>
+                                    <div class="agency__text--top">
+                                        National Accuracy Clearinghouse
+                                    </div>
+                                    <div class="agency__text--bottom">
+                                        U.S. Department of Agriculture
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                         <button class="usa-menu-btn">Menu</button>
                         <div class="usa-nav" style="">
@@ -43,7 +52,7 @@
                         </div>
                     </div>
                 </header>
-                <div class="container margin-bottom-3">
+                <div class="container margin-bottom-6 border-top-1px border-base-light">
                     <main id="main-content">
                         @RenderBody()
                     </main>

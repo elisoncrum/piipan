@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using DataAnnotationInMVC.Common;
 
 namespace Piipan.QueryTool
 {
@@ -31,12 +32,13 @@ namespace Piipan.QueryTool
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        [DateOfBirthRange("01/01/1900", ErrorMessage = "Date of birth must be between 01-01-1900 and today's date")]
         [JsonPropertyName("dob")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [Required]
         [RegularExpression(@"^\d{3}-\d{2}-\d{4}$",
-            ErrorMessage = "SSN must have the form 000-00-0000")]
+            ErrorMessage = "SSN must have the form XXX-XX-XXXX.")]
         [Display(Name = "SSN")]
         [JsonPropertyName("ssn")]
         public string SocialSecurityNum { get; set; }
