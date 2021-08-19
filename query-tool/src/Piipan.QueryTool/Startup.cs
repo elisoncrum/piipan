@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,6 +31,11 @@ namespace Piipan.QueryTool
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
+
+            services.Configure<ForwardedHeadersOptions>(options => {
+                options.ForwardedHeaders = 
+                    ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
+            });
 
             services.AddRazorPages(options => 
             {
@@ -87,6 +93,7 @@ namespace Piipan.QueryTool
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseForwardedHeaders();
             }
 
             app.UseHttpsRedirection();
