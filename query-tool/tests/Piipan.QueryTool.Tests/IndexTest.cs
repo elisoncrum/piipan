@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.QueryTool.Pages;
@@ -45,6 +46,24 @@ namespace Piipan.QueryTool.Tests
             return claimsProviderMock.Object;
         }
 
+        public static HttpContext contextMock()
+        {
+            var request = new Mock<HttpRequest>();
+
+            request
+                .Setup(m => m.Scheme)
+                .Returns("https");
+
+            request
+                .Setup(m => m.Host)
+                .Returns(new HostString("tts.test"));
+
+            var context = new Mock<HttpContext>();
+            context.Setup(m => m.Request).Returns(request.Object);
+
+            return context.Object;
+        }
+
         [Fact]
         public void TestBeforeOnGet()
         {
@@ -69,6 +88,7 @@ namespace Piipan.QueryTool.Tests
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient, mockClaimsProvider);
+            pageModel.PageContext.HttpContext = contextMock();
 
             // act
             pageModel.OnGet();
@@ -76,6 +96,7 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.Equal("NAC Query Tool", pageModel.Title);
             Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
 
         [Fact]
@@ -111,6 +132,7 @@ namespace Piipan.QueryTool.Tests
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
+            pageModel.PageContext.HttpContext = contextMock();
 
             // act
             await pageModel.OnPostAsync();
@@ -121,6 +143,7 @@ namespace Piipan.QueryTool.Tests
             Assert.NotNull(pageModel.QueryResult.Data.Results[0].Matches);
             Assert.False(pageModel.NoResults);
             Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
 
         [Fact]
@@ -148,6 +171,7 @@ namespace Piipan.QueryTool.Tests
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
+            pageModel.PageContext.HttpContext = contextMock();
 
             // act
             await pageModel.OnPostAsync();
@@ -157,6 +181,7 @@ namespace Piipan.QueryTool.Tests
             Assert.Empty(pageModel.QueryResult.Data.Results[0].Matches);
             Assert.True(pageModel.NoResults);
             Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
 
         [Fact]
@@ -174,6 +199,7 @@ namespace Piipan.QueryTool.Tests
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
             pageModel.Query = requestPii;
+            pageModel.PageContext.HttpContext = contextMock();
 
             // act
             await pageModel.OnPostAsync();
@@ -181,6 +207,7 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.NotNull(pageModel.RequestError);
             Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
     }
 }
