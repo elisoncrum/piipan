@@ -19,7 +19,7 @@ namespace Piipan.Dashboard.Tests
             // act
 
             // assert
-            Assert.Equal("", pageModel.Email);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]

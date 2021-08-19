@@ -30,7 +30,7 @@ namespace Piipan.Dashboard.Tests
                 mockClaimsProvider
             );
             Assert.Equal("Participant Uploads", pageModel.Title);
-            Assert.Equal("", pageModel.Email);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Piipan.Dashboard.Tests
                 new NullLogger<ParticipantUploadsModel>(),
                 mockClaimsProvider
             );
-            Assert.Matches("http://example.com", pageModel.BaseUrl);
+            Assert.Matches("http://example.com", pageModel.MetricsApiBaseUrl);
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
 

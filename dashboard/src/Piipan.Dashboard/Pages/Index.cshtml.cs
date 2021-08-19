@@ -4,22 +4,19 @@ using Piipan.Shared.Claims;
 
 namespace Piipan.Dashboard.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel : BasePageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly IClaimsProvider _claimsProvider;
 
         public IndexModel(ILogger<IndexModel> logger,
             IClaimsProvider claimsProvider)
+            : base(claimsProvider)
         {
             _logger = logger;
-            _claimsProvider = claimsProvider;
         }
-        public string Email { get; private set; } = "";
 
         public void OnGet()
         {
-            Email = _claimsProvider.GetEmail(User);
         }
     }
 }
