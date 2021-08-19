@@ -23,13 +23,7 @@ namespace Piipan.Dashboard.Pages
         }
         public string BaseUrl
         {
-            get 
-            {
-                var url = _requestUrlProvider.GetBaseUrl(Request).ToString();
-                Console.WriteLine(url);
-                return url;
-                
-            }
+            get { return _requestUrlProvider.GetBaseUrl(Request).ToString(); }
         }
     }
 }
