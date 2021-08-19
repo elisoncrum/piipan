@@ -10,6 +10,7 @@ using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Http;
 using Piipan.Shared.Logging;
 
 namespace Piipan.QueryTool
@@ -70,8 +71,14 @@ namespace Piipan.QueryTool
 
             if (_env.IsDevelopment())
             {
+                services.AddTransient<IRequestUrlProvider, RequestUrlProvider>();
+
                 var mockFile = $"{_env.ContentRootPath}/mock_user.json";
                 services.UseJsonFileToMockEasyAuth(mockFile);
+            }
+            else
+            {
+                services.AddTransient<IRequestUrlProvider, ProxiedRequestUrlProvider>();
             }
         }
 

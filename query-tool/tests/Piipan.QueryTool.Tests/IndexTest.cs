@@ -8,6 +8,7 @@ using Moq;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Http;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -52,15 +53,17 @@ namespace Piipan.QueryTool.Tests
 
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
                 mockApiClient,
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockRequestUrlProvider.Object
                 );
             // act
             // assert
             Assert.Equal("", pageModel.Title);
-            Assert.Equal("", pageModel.Email);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
         [Fact]
         public void TestAfterOnGet()
@@ -68,7 +71,8 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient, mockClaimsProvider);
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient, mockClaimsProvider, mockRequestUrlProvider.Object);
 
             // act
             pageModel.OnGet();
@@ -109,7 +113,8 @@ namespace Piipan.QueryTool.Tests
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider, mockRequestUrlProvider.Object);
             pageModel.Query = requestPii;
 
             // act
@@ -146,7 +151,8 @@ namespace Piipan.QueryTool.Tests
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider, mockRequestUrlProvider.Object);
             pageModel.Query = requestPii;
 
             // act
@@ -172,7 +178,8 @@ namespace Piipan.QueryTool.Tests
             };
             var mockClient = clientMock(HttpStatusCode.BadRequest, "");
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider, mockRequestUrlProvider.Object);
             pageModel.Query = requestPii;
 
             // act
