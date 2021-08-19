@@ -10,6 +10,7 @@ using Piipan.Dashboard.Api;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Http;
 using Piipan.Shared.Logging;
 
 namespace Piipan.Dashboard
@@ -68,8 +69,14 @@ namespace Piipan.Dashboard
 
             if (_env.IsDevelopment())
             {
+                services.AddTransient<IRequestUrlProvider, RequestUrlProvider>();
+                
                 var mockFile = $"{_env.ContentRootPath}/mock_user.json";
                 services.UseJsonFileToMockEasyAuth(mockFile);
+            }
+            else
+            {
+                services.AddTransient<IRequestUrlProvider, ProxiedRequestUrlProvider>();
             }
         }
 
