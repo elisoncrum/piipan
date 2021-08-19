@@ -1,8 +1,9 @@
 BEGIN;
 
 -- Creates participant records tables and their access controls.
--- Assumes 3 database roles, to be set via the psql -v option:
+-- Assumes 4 database roles, to be set via the psql -v option:
 --  * cluster `superuser`
+--  * cluster `reader`, which gets read-only access
 --  * database `owner`, which owns the tables, sequences
 --  * database `admin`, which gets read/write access
 
@@ -60,6 +61,9 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON participants TO :admin;
 GRANT SELECT, INSERT, UPDATE, DELETE ON uploads TO :admin;
 GRANT USAGE, SELECT, UPDATE ON participants_id_seq TO :admin;
 GRANT USAGE, SELECT, UPDATE ON uploads_id_seq TO :admin;
+
+GRANT SELECT ON participants TO :reader;
+GRANT SELECT ON uploads TO :reader;
 
 -- restore privileges
 REVOKE :owner FROM :superuser;

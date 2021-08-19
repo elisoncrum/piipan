@@ -114,6 +114,15 @@ config_managed_role () {
 EOF
 }
 
+config_readonly_role () {
+  db=$1
+  role=$2
+  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
+    GRANT CONNECT ON DATABASE $db TO $role;
+    GRANT USAGE ON SCHEMA $APP_SCHEMA to $role;
+EOF
+}
+
 # Trading off isolation and cost, use a single PostgreSQL cluster to host
 # separate databases for each participating state.
 #
@@ -150,6 +159,11 @@ main () {
   echo "Baseline $TEMPLATE_DB before creating new databases from it"
   config_db $TEMPLATE_DB
 
+  # Create cluster role for readonly access
+  reader="readonly"
+  create_role "$reader"
+  config_role "$reader"
+
   # Use the state abbreviation as the name of the db and its owner
   while IFS=, read -r abbr name ; do
     echo "Creating owner role and database for $name ($abbr)"
@@ -162,6 +176,7 @@ main () {
 
     create_db "$db"
     set_db_owner "$db" "$owner"
+    config_readonly_role "$db" "$reader"
     config_db "$db"
   done < states.csv
 
