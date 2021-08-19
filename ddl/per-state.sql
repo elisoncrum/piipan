@@ -3,9 +3,9 @@ BEGIN;
 -- Creates participant records tables and their access controls.
 -- Assumes 4 database roles, to be set via the psql -v option:
 --  * cluster `superuser`
---  * cluster `reader`, which gets read-only access
 --  * database `owner`, which owns the tables, sequences
 --  * database `admin`, which gets read/write access
+--  * database `reader`, which gets read-only access
 
 SET search_path=piipan,public;
 
