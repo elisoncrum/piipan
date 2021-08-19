@@ -13,6 +13,7 @@ using Moq;
 using Piipan.Dashboard.Api;
 using Piipan.Dashboard.Pages;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Http;
 using Xunit;
 
 namespace Piipan.Dashboard.Tests
@@ -24,13 +25,15 @@ namespace Piipan.Dashboard.Tests
         {
             var mockApi = new Mock<IParticipantUploadRequest>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>().Object;
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockRequestUrlProvider
             );
             Assert.Equal("Participant Uploads", pageModel.Title);
-            Assert.Equal("", pageModel.Email);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -51,12 +54,14 @@ namespace Piipan.Dashboard.Tests
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
             var mockApi = new Mock<IParticipantUploadRequest>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>().Object;
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockRequestUrlProvider
             );
-            Assert.Matches("http://example.com", pageModel.BaseUrl);
+            Assert.Matches("http://example.com", pageModel.MetricsApiBaseUrl);
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
 
@@ -65,10 +70,12 @@ namespace Piipan.Dashboard.Tests
         {
             var mockApi = new Mock<IParticipantUploadRequest>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>().Object;
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockRequestUrlProvider
             );
             Assert.IsType<List<ParticipantUpload>>(pageModel.ParticipantUploadResults);
         }
@@ -86,12 +93,14 @@ namespace Piipan.Dashboard.Tests
             var meta = new ParticipantUploadResponseMeta();
             var mockApi = mockApiWithResponse(data, meta);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>().Object;
             var pageContext = MockPageContext(new DefaultHttpContext());
             // setup page model with mocks
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockRequestUrlProvider
             )
             {
                 PageContext = pageContext
@@ -117,6 +126,7 @@ namespace Piipan.Dashboard.Tests
             var meta = new ParticipantUploadResponseMeta();
             var mockApi = mockApiWithResponse(data, meta);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>().Object;
             // setup mock page context with form data
             var httpContext = new DefaultHttpContext();
             var form = new FormCollection(new Dictionary<string,
@@ -130,7 +140,8 @@ namespace Piipan.Dashboard.Tests
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockRequestUrlProvider
             )
             {
                 PageContext = pageContext

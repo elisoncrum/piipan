@@ -2,6 +2,7 @@ using Xunit;
 using Piipan.Dashboard.Pages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Http;
 using Moq;
 using System.Security.Claims;
 
@@ -14,12 +15,13 @@ namespace Piipan.Dashboard.Tests
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider);
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider, mockRequestUrlProvider.Object);
 
             // act
 
             // assert
-            Assert.Equal("", pageModel.Email);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
         [Fact]
@@ -27,7 +29,8 @@ namespace Piipan.Dashboard.Tests
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider);
+            var mockRequestUrlProvider = new Mock<RequestUrlProvider>();
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider, mockRequestUrlProvider.Object);
 
             // act
             pageModel.OnGet();
