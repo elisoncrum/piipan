@@ -47,8 +47,8 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.17.0",
-        "contentHash": "ByJGsP7zqeMG+QFLEpd0ILzWVlRtB1ZWwgkqNWEN2KV0axRyWZDm6uPsKtsfBkNeiPtr4fUW0NSZez69TBSGrA==",
+        "resolved": "1.18.0",
+        "contentHash": "h0DQLyIKvowm6n9XV2njDiiI5Et0QecpE2VcGfhps9J4m9MJ6tBD4Qxl+fbL8k/41sD7UXP4nAWgxC81oV11oQ==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.0.0",
           "System.Buffers": "4.5.1",
@@ -1476,7 +1476,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.17.0",
+          "Azure.Core": "1.18.0",
           "Azure.Identity": "1.4.1",
           "Microsoft.AspNetCore.Authorization": "3.1.18",
           "Microsoft.AspNetCore.Http": "2.2.2",
