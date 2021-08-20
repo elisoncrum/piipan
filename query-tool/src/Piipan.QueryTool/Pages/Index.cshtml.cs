@@ -1,29 +1,25 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
 
 namespace Piipan.QueryTool.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel : BasePageModel
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IAuthorizedApiClient _apiClient;
-        private readonly IClaimsProvider _claimsProvider;
         private readonly OrchestratorApiRequest _apiRequest;
 
         public IndexModel(ILogger<IndexModel> logger,
                           IAuthorizedApiClient apiClient,
                           IClaimsProvider claimsProvider)
+                          : base(claimsProvider)
         {
             _logger = logger;
             _apiClient = apiClient;
-            _claimsProvider = claimsProvider;
 
             var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
             _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
@@ -37,8 +33,6 @@ namespace Piipan.QueryTool.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            Email = _claimsProvider.GetEmail(User);
-
             if (ModelState.IsValid)
             {
                 try
@@ -63,12 +57,10 @@ namespace Piipan.QueryTool.Pages
         }
 
         public string Title { get; private set; } = "";
-        public string Email { get; private set; } = "";
 
         public void OnGet()
         {
             Title = "NAC Query Tool";
-            Email = _claimsProvider.GetEmail(User);
         }
     }
 }
