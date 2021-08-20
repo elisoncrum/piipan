@@ -264,15 +264,6 @@ main () {
   ./apply-ddl.bash
   popd
 
-  if [ "$exists" = "true" ]; then
-    echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
-  else
-    # Revoke temporary assignment of current user as a PostgreSQL AD admin
-    az ad group member remove \
-      --group "$PG_AAD_ADMIN" \
-      --member-id "$CURRENT_USER_OBJID"
-  fi
-
   # This is a subscription-level resource provider
   az provider register --wait --namespace Microsoft.EventGrid
 
@@ -296,6 +287,140 @@ main () {
       --namespace-name "$EVENT_HUB_NAME" \
       --query "[?name == 'RootManageSharedAccessKey'].id" \
       -o tsv)
+
+  # Create per-state Function apps for state-level matching API using
+  # ARM template and deploy project code to each function using functions
+  # core tools. ARM template assigns a corresponding storage account,
+  # managed identity, hosting plan, and application insights instance.
+  #
+  # Assumes existence of a managed identity with name `{abbr}admin`.
+
+  # Relative path for per-state Query endpoint
+  MATCH_API_QUERY_NAME='Query'
+
+  match_api_uris=''
+  match_func_names=()
+
+  while IFS=, read -r abbr name ; do
+    echo "Creating match API function app for $name ($abbr)"
+    abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
+
+    identity=$(state_managed_id_name "$abbr" "$ENV")
+    db_name=${abbr}
+    client_id=$(\
+      az identity show \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$identity" \
+        --query clientId \
+        --output tsv)
+    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
+    az_serv_str=$(az_connection_string "$RESOURCE_GROUP" "$identity")
+    func_app_name=$PREFIX-func-${abbr}match-$ENV
+    storage_acct_name=${PREFIX}st${abbr}match${ENV}
+
+    echo "Deploying ${name} function resources"
+    func_name=$(\
+      az deployment group create \
+        --name match-api \
+        --resource-group "$RESOURCE_GROUP" \
+        --template-file  ./arm-templates/function-state-match.json \
+        --query properties.outputs.functionAppName.value \
+        --output tsv \
+        --parameters \
+          resourceTags="$RESOURCE_TAGS" \
+          identityGroup="$RESOURCE_GROUP" \
+          location="$LOCATION" \
+          azAuthConnectionString="$az_serv_str" \
+          stateAbbr="$abbr" \
+          functionAppName="$func_app_name" \
+          storageAccountName="$storage_acct_name" \
+          managedIdentityName="$identity" \
+          dbConnectionString="$db_conn_str" \
+          cloudName="$CLOUD_NAME" \
+          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+          coreResourceGroup="$RESOURCE_GROUP" \
+          eventHubName="$EVENT_HUB_NAME")
+
+    # Store function names for future auth configuration
+    match_func_names+=("$func_name")
+
+    echo "Waiting to publish function app"
+    sleep 60
+
+    # Integrate Function app into virtual network
+    echo "Integrating ${func_app_name} into virtual network"
+    az functionapp vnet-integration add \
+      --name "$func_app_name" \
+      --resource-group "$RESOURCE_GROUP" \
+      --subnet "$FUNC_SUBNET_NAME" \
+      --vnet "$VNET_NAME"
+
+    echo "Publishing ${name} function app"
+    pushd ../match/src/Piipan.Match.State
+    func azure functionapp publish "$func_name" --dotnet
+    popd
+
+    # Store API query URIs as a JSON array to be bound to orchestrator API
+    func_uri=$(\
+      az functionapp function show \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$func_name" \
+        --function-name "$MATCH_API_QUERY_NAME" \
+        --query invokeUrlTemplate \
+        --output tsv)
+    match_api_uris=${match_api_uris}",\"$func_uri\""
+  done < states.csv
+
+  # Create orchestrator-level Function app using ARM template and
+  # deploy project code using functions core tools.
+  match_api_uris="[${match_api_uris:1}]"
+  state_db_strings="[${state_db_strings:1}]"
+  az deployment group create \
+    --name orch-api \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --template-file  ./arm-templates/function-orch-match.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+      storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+      StateApiUriStrings="$match_api_uris" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
+
+  echo "Waiting to publish function app"
+  sleep 60
+
+  echo "Publishing ${ORCHESTRATOR_FUNC_APP_NAME} function app"
+  pushd ../match/src/Piipan.Match.Orchestrator
+    func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet
+  popd
+
+  # Resource ID required when vnet is in a separate resource group
+  vnet_id=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$vnet_id"
+
+  ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
+
+  if [ "$exists" = "true" ]; then
+    echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
+  else
+    # Revoke temporary assignment of current user as a PostgreSQL AD admin
+    az ad group member remove \
+      --group "$PG_AAD_ADMIN" \
+      --member-id "$CURRENT_USER_OBJID"
+  fi
 
   # Create per-state Function apps and assign corresponding managed identity for
   # access to the per-state blob-storage and database, set up system topics and
@@ -432,128 +557,6 @@ main () {
       --included-event-types Microsoft.Storage.BlobCreated \
       --subject-begins-with /blobServices/default/containers/upload/blobs/
   done < states.csv
-
-  # Create per-state Function apps for state-level matching API using
-  # ARM template and deploy project code to each function using functions
-  # core tools. ARM template assigns a corresponding storage account,
-  # managed identity, hosting plan, and application insights instance.
-  #
-  # Assumes existence of a managed identity with name `{abbr}admin`.
-
-  # Relative path for per-state Query endpoint
-  MATCH_API_QUERY_NAME='Query'
-
-  match_api_uris=''
-  match_func_names=()
-
-  while IFS=, read -r abbr name ; do
-    echo "Creating match API function app for $name ($abbr)"
-    abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
-
-    identity=$(state_managed_id_name "$abbr" "$ENV")
-    db_name=${abbr}
-    client_id=$(\
-      az identity show \
-        --resource-group "$RESOURCE_GROUP" \
-        --name "$identity" \
-        --query clientId \
-        --output tsv)
-    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
-    az_serv_str=$(az_connection_string "$RESOURCE_GROUP" "$identity")
-    func_app_name=$PREFIX-func-${abbr}match-$ENV
-    storage_acct_name=${PREFIX}st${abbr}match${ENV}
-
-    echo "Deploying ${name} function resources"
-    func_name=$(\
-      az deployment group create \
-        --name match-api \
-        --resource-group "$RESOURCE_GROUP" \
-        --template-file  ./arm-templates/function-state-match.json \
-        --query properties.outputs.functionAppName.value \
-        --output tsv \
-        --parameters \
-          resourceTags="$RESOURCE_TAGS" \
-          identityGroup="$RESOURCE_GROUP" \
-          location="$LOCATION" \
-          azAuthConnectionString="$az_serv_str" \
-          stateAbbr="$abbr" \
-          functionAppName="$func_app_name" \
-          storageAccountName="$storage_acct_name" \
-          managedIdentityName="$identity" \
-          dbConnectionString="$db_conn_str" \
-          cloudName="$CLOUD_NAME" \
-          appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
-          coreResourceGroup="$RESOURCE_GROUP" \
-          eventHubName="$EVENT_HUB_NAME")
-
-    # Store function names for future auth configuration
-    match_func_names+=("$func_name")
-
-    echo "Waiting to publish function app"
-    sleep 60
-
-    # Integrate Function app into virtual network
-    echo "Integrating ${func_app_name} into virtual network"
-    az functionapp vnet-integration add \
-      --name "$func_app_name" \
-      --resource-group "$RESOURCE_GROUP" \
-      --subnet "$FUNC_SUBNET_NAME" \
-      --vnet "$VNET_NAME"
-
-    echo "Publishing ${name} function app"
-    pushd ../match/src/Piipan.Match.State
-    func azure functionapp publish "$func_name" --dotnet
-    popd
-
-    # Store API query URIs as a JSON array to be bound to orchestrator API
-    func_uri=$(\
-      az functionapp function show \
-        --resource-group "$RESOURCE_GROUP" \
-        --name "$func_name" \
-        --function-name "$MATCH_API_QUERY_NAME" \
-        --query invokeUrlTemplate \
-        --output tsv)
-    match_api_uris=${match_api_uris}",\"$func_uri\""
-  done < states.csv
-
-  # Create orchestrator-level Function app using ARM template and
-  # deploy project code using functions core tools.
-  match_api_uris="[${match_api_uris:1}]"
-  az deployment group create \
-    --name orch-api \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --template-file  ./arm-templates/function-orch-match.json \
-    --parameters \
-      resourceTags="$RESOURCE_TAGS" \
-      location="$LOCATION" \
-      functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
-      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
-      storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-      StateApiUriStrings="$match_api_uris" \
-      coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
-
-  echo "Waiting to publish function app"
-  sleep 60
-
-  echo "Publishing ${ORCHESTRATOR_FUNC_APP_NAME} function app"
-  pushd ../match/src/Piipan.Match.Orchestrator
-    func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet
-  popd
-
-  # Resource ID required when vnet is in a separate resource group
-  vnet_id=$(\
-    az network vnet show \
-      -n "$VNET_NAME" \
-      -g "$RESOURCE_GROUP" \
-      --query id \
-      -o tsv)
-  echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
-  az functionapp vnet-integration add \
-    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --subnet "$FUNC_SUBNET_NAME" \
-    --vnet "$vnet_id"
 
   # Create App Service resources for query tool app.
   # This needs to happen after the orchestrator is created in order for
