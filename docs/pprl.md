@@ -1,0 +1,155 @@
+# A Privacy-Preserving Record Linkage (PPRL) approach
+
+## Overview
+
+Piipan incorporates a secure hash encoding technique to de-identify Personally Identifiable Information (PII) of SNAP participants using a centralized [Privacy-Preserving Record Linkage (PPRL)](https://link.springer.com/referenceworkentry/10.1007%2F978-3-319-63962-8_17-1) model.
+
+In brief:
+- States compute a secure hash for every SNAP participant using the participant's PII as input
+- The secure hash is submitted in the state's daily bulk upload instead of the participant's source PII
+- Piipan searches for exact matches across the secure hashes of the participating states
+- When state eligibility systems query the duplicate participation API during (re)certification, the secure hash for the SNAP applicant is provided as input, instead of their PII
+
+Only one secure hash is currently defined for Piipan and is derived from a participant's *last name*, *Date of Birth (DoB)*, and *Social Security Number (SSN)* and the application of the [SHA-512 cryptographic hash function](https://en.wikipedia.org/wiki/SHA-2). Additional secure hashes may be defined in the future to support additional matching algorithms beyond an exact match against last name, DoB, and SSN.
+
+Finally, in order for exact matching against de-identified PII to be effective, states must consistently validate and normalize the participant PII values, concatenate them a specified manner, and then apply the SHA-512 hash function. These steps are described in detail below.
+
+## 1. Validation and Normalization
+
+### Last name
+
+Participant's Last name should be normalized and validated in accordance with these **ordered** rules. These transformations assume ASCII-encoded input.
+
+1. Convert to lower case
+1. Remove any suffixes (e.g.; `junior`, `jnr`, `jr`, `jr.`, `iii`, etc.)
+1. Replace hyphens with a space
+1. Remove any character that is not an ASCII space (`0x20`) or in the range `[a-z]` (`0x61`-`0x70`)
+1. Replace multiple spaces with one space
+1. Trim any spaces at the start and end of the last name
+1. Validate that the resulting value is at least one ASCII character in length
+
+If your source data set includes non-ASCII characters using the ISO-8859-1 (Latin-1) or Unicode encoding formats, [an ASCII normalization process to remove diacritics and derive base characters](https://ahinea.com/en/tech/accented-translate.html) should be applied before these rules.
+
+Reference: [Social Security Program Operations Manual System](https://secure.ssa.gov/poms.nsf/lnx/0110205125)
+
+Correct:
+- `hopper` (from `Hopper`)
+- `von neumann` (from `von Neumann`)
+- `osullivan` (from `O'Sullivan`)
+- `jones drew` (from `Jones-Drew`)
+
+Incorrect:
+- `garcía` (from `García`, includes non-ASCII character) 
+- `jones iii` (from `Jones III`, includes suffix)
+- `Thatcher` (from `Thatcher`, not lower-cased)
+- `barrable-tishauer` (from `Barrable-Tishauer`, hyphen not replaced with space)
+- `heathcote drummond-willoughby` (from `Heathcote-Drummond-Willoughby`, only first hyphen replaced with space)
+- `o'grady` (from `O'Grady`, apostrophe not removed)
+
+### Date of Birth (DoB)
+
+Participant's Date of Birth in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601#Dates). The ISO 8601 format uses a 4-digit year, a zero-padded month, and a zero-padded day. The 3 values are separated by a hyphen: `YYYY-MM-DD`.
+
+Before normalizing, dates must be validated against the Gregorian calendar and be within the past 130 years.
+
+Correct:
+- `1978-08-14`
+- `2004-02-29`
+- `1999-12-03`
+
+Incorrect:
+- `98-08-14` (year is not fully specified)
+- `5/15/2002` (wrong value order, wrong separator character, value is not zero-padded)
+- `2000-11-2`(day is not zero-padded)
+- `2001-02-29` (date does not exist)
+
+### Social Security Number (SSN)
+
+Participant's nine-digit Social Security Number formatted in 3 parts: the 3-digit Area Number, the 2-digit Group Number, and the 4-digit Serial Number. The 3 parts are separated by a hyphen: `AAA-GG-SSSS`.
+
+Before normalizing, SSNs must be validated against the following Social Security Administration (SSA) rules:
+- Area numbers `000`, `666`, and `900-999` [are invalid](https://www.ssa.gov/employer/randomization.html)
+- Group number `00` [is invalid](https://www.ssa.gov/employer/randomizationfaqs.html)
+- Serial number `0000` [is invalid](https://www.ssa.gov/employer/randomizationfaqs.html)
+
+Correct:
+- `078-05-1121`
+- `219-09-9998`
+- `987-65-4219`
+
+Incorrect:
+- `000345678` (invalid area number, missing hyphens)
+- `MR1234567` (non-digit in SSN, missing hyphens)
+- `0664-81-234 ` (hyphen misplaced)
+- `06-648-1234` (hyphen misplace)
+- `567-89-0000` (invalid serial number)
+
+## 2. Concatenation
+
+The normalized values of `Last name`, `DoB`, and `SSN` must be concatenated, using a comma as a field separator, before applying the hashing function in the next step.
+
+For example:
+- `hopper,1978-08-14,078-05-1121`
+- `von neumann,2004-02-29,987-65-4219`
+
+## 3. Hash generation
+
+1. Take the validated, normalized, and concatenated values and apply the SHA-512 hash algorithm, resulting in a 64-byte byte array
+1. Convert the byte array to a 128-character lower-cased hexadecimal digest to get a value suitable for the bulk upload and duplicate participation APIs
+
+Examples in C#/.NET, bash/openssl, and Python are provided below. 
+
+Executing all examples using an input of:
+```
+hopper,1978-08-14,078-05-1121
+``` 
+results in a hash digest of:
+```
+04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef
+```
+
+### C# with .NET
+
+```
+using System;
+using System.Security.Cryptography;
+using System.Text;
+
+public class Program
+{
+    public static void Main()
+    {
+        string source = "hopper,1978-08-14,078-05-1121";
+        SHA512 sha = SHA512Managed.Create();
+        byte[] result = sha.ComputeHash(Encoding.UTF8.GetBytes(source));
+
+        Console.WriteLine(ByteArrayToHexDigest(result));
+    }
+
+    private static string ByteArrayToHexDigest(byte[] data)
+    {
+        var sb = new StringBuilder();
+
+        for (int i = 0; i < data.Length; i++)
+        {
+            sb.Append(data[i].ToString("x2"));
+        }
+        return sb.ToString();
+    }
+}
+```
+
+### bash with openssl
+
+```
+echo -n "hopper,1978-08-14,078-05-1121" | openssl dgst -sha512
+```
+
+### Python 3
+
+```
+import hashlib
+sha = hashlib.sha512()
+sha.update(b"hopper,1978-08-14,078-05-1121")
+print(sha.hexdigest())
+```
