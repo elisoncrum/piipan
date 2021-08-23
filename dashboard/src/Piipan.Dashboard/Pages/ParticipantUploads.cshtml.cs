@@ -18,7 +18,7 @@ namespace Piipan.Dashboard.Pages
         private readonly IParticipantUploadRequest _participantUploadRequest;
         private readonly ILogger<ParticipantUploadsModel> _logger;
 
-        public ParticipantUploadsModel(IParticipantUploadRequest participantUploadRequest, 
+        public ParticipantUploadsModel(IParticipantUploadRequest participantUploadRequest,
             ILogger<ParticipantUploadsModel> logger,
             IClaimsProvider claimsProvider)
             : base(claimsProvider)
@@ -26,7 +26,7 @@ namespace Piipan.Dashboard.Pages
             _participantUploadRequest = participantUploadRequest;
             _logger = logger;
         }
-        public string Title = "Participant Uploads";
+        public string Title = "State participant data uploads";
         public List<ParticipantUpload> ParticipantUploadResults { get; private set; } = new List<ParticipantUpload>();
         public string? NextPageParams { get; private set; }
         public string? PrevPageParams { get; private set; }
@@ -56,7 +56,7 @@ namespace Piipan.Dashboard.Pages
         public async Task<IActionResult> OnPostAsync()
         {
             try
-            {   
+            {
                 _logger.LogInformation("Querying uploads via search form");
 
                 if (MetricsApiBaseUrl == null)

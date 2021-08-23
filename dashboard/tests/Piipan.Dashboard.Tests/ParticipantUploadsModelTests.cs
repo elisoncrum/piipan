@@ -31,7 +31,7 @@ namespace Piipan.Dashboard.Tests
             );
             pageModel.PageContext.HttpContext = contextMock();
 
-            Assert.Equal("Participant Uploads", pageModel.Title);
+            Assert.Equal("State participant data uploads", pageModel.Title);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
