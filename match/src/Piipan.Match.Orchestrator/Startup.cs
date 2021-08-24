@@ -1,8 +1,7 @@
-using System;
-using System.Net.Http;
-using Microsoft.Azure.Cosmos.Table;
+using System.Data.Common;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Piipan.Shared.Authentication;
 
 [assembly: FunctionsStartup(typeof(Piipan.Match.Orchestrator.Startup))]
@@ -12,22 +11,17 @@ namespace Piipan.Match.Orchestrator
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            ITokenProvider tokenProvider;
             var configuration = builder.GetContext().Configuration;
 
-            if (configuration?["DEVELOPMENT"] == "true")
+            builder.Services.AddSingleton<ITokenProvider>((s) =>
             {
-                tokenProvider = new CliTokenProvider();
-            }
-            else
-            {
-                tokenProvider = new EasyAuthTokenProvider();
-            }
-
-            builder.Services.AddSingleton<IAuthorizedApiClient>((s) =>
-            {
-                return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
+                if (configuration?["DEVELOPMENT"] == "true")
+                {
+                    return new CliTokenProvider();
+                }
+                return new EasyAuthTokenProvider();
             });
+            builder.Services.AddSingleton<DbProviderFactory>(NpgsqlFactory.Instance);
         }
     }
 }
