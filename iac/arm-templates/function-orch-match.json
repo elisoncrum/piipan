@@ -8,9 +8,6 @@
         "location": {
             "type": "string"
         },
-        "StateApiUriStrings": {
-            "type": "string"
-        },
         "functionAppName": {
             "type": "string"
         },
@@ -24,6 +21,12 @@
             "type": "String"
         },
         "eventHubName": {
+            "type": "String"
+        },
+        "databaseConnectionString": {
+            "type": "String"
+        },
+        "states": {
             "type": "String"
         }
     },
@@ -118,10 +121,14 @@
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
                         },
-                        // Bind state-level APIs
+                        // Bind backing services
                         {
-                            "name": "StateApiUriStrings",
-                            "value": "[parameters('StateApiUriStrings')]"
+                            "name": "DatabaseConnectionString",
+                            "value": "[parameters('databaseConnectionString')]"
+                        },
+                        {
+                            "name": "States",
+                            "value": "[parameters('states')]"
                         }
                     ]
                 }
