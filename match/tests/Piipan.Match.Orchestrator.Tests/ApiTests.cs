@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using Npgsql;
 using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
 using Xunit;
@@ -87,7 +89,8 @@ namespace Piipan.Match.Orchestrator.Tests
             };
         }
 
-        static OrchMatchRequest OverMaxRequest() {
+        static OrchMatchRequest OverMaxRequest()
+        {
             var list = new List<RequestPerson>();
             for (int i = 0; i < 51; i++)
             {
@@ -148,8 +151,8 @@ namespace Piipan.Match.Orchestrator.Tests
         {
             return new HttpResponseMessage
             {
-              StatusCode = statusCode,
-              Content = new StringContent(body, Encoding.UTF8, "application/json")
+                StatusCode = statusCode,
+                Content = new StringContent(body, Encoding.UTF8, "application/json")
             };
         }
 
@@ -182,21 +185,19 @@ namespace Piipan.Match.Orchestrator.Tests
 
         static Api Construct()
         {
-            var client = new HttpClient();
+            var factory = NpgsqlFactory.Instance;
             var tokenProvider = new EasyAuthTokenProvider();
-            var apiClient = new AuthorizedJsonApiClient(client, tokenProvider);
-            var api = new Api(apiClient);
+            var api = new Api(factory, tokenProvider);
 
             return api;
         }
 
         static Api ConstructMocked(Mock<HttpMessageHandler> handler)
         {
+            var factory = NpgsqlFactory.Instance;
             var mockTokenProvider = MockTokenProvider("|token|");
-            var client = new HttpClient(handler.Object);
-            var apiClient = new AuthorizedJsonApiClient(client, mockTokenProvider.Object);
 
-            var api = new Api(apiClient);
+            var api = new Api(factory, mockTokenProvider.Object);
 
             return api;
         }
@@ -247,18 +248,19 @@ namespace Piipan.Match.Orchestrator.Tests
             var response = await api.Query(mockRequest.Object, logger);
 
             // Assert
-            var result = response as JsonResult;
-            Assert.Equal(500, result.StatusCode);
+            var result = response as BadRequestObjectResult;
+            Assert.Equal(400, result.StatusCode);
 
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal("500", errorResponse.Errors[0].Status);
+            Assert.Equal("400", errorResponse.Errors[0].Status);
             Assert.NotEmpty(errorResponse.Errors[0].Title);
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
 
         [Theory]
         [InlineData("{ data: 'foobar' }")]
+        [InlineData("{ data: [] }")]
         public async void ExpectMalformedDataResultsInBadRequest(string query)
         {
             // Arrange
@@ -337,67 +339,6 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.NotEmpty(errorResponse.Errors[0].Detail);
         }
 
-        // Successful API call
-        [Fact]
-        public async void SuccessfulApiCall()
-        {
-            // Arrange Mocks
-            var logger = Mock.Of<ILogger>();
-            var mockRequest = MockRequest(FullRequest().ToJson());
-            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
-                MockResponse(HttpStatusCode.OK, StateResponse().ToJson())
-            });
-
-            // Arrage Environment
-            var uriString = "[\"https://localhost/\"]";
-            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
-
-            // Act
-            var api = ConstructMocked(mockHandler);
-            var response = await api.Query(mockRequest.Object, logger);
-
-            // Assert
-            Assert.IsType<JsonResult>(response);
-
-            mockHandler.Protected().Verify(
-                "SendAsync",
-                Times.Exactly(1),
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            );
-        }
-
-        // Failed state API call results in InternalServerError
-        [Fact]
-        public async void FailedStateCall()
-        {
-            // Arrange Mocks
-            var logger = Mock.Of<ILogger>();
-            var mockRequest = MockRequest(FullRequest().ToJson());
-            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
-                MockResponse(HttpStatusCode.InternalServerError, "")
-            });
-
-            // Arrage Environment
-            var uriString = "[\"https://localhost/\"]";
-            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
-
-            // Act
-            var api = ConstructMocked(mockHandler);
-            var response = await api.Query(mockRequest.Object, logger);
-            var result = response as JsonResult;
-            var resBody = result.Value as OrchMatchResponse;
-            var error = resBody.Data.Errors[0];
-
-            // Assert
-            Assert.Equal(0, (int)resBody.Data.Results.Count);
-            Assert.Equal(1, (int)resBody.Data.Errors.Count);
-            Assert.Equal(0, error.Index);
-            Assert.NotNull(error.Code);
-            Assert.NotNull(error.Detail);
-
-        }
-
         // Required services are passed to Api on startup
         [Fact]
         public void DependencyInjection()
@@ -408,108 +349,8 @@ namespace Piipan.Match.Orchestrator.Tests
                 .Build();
 
             Assert.NotNull(host);
-            Assert.NotNull(host.Services.GetRequiredService<IAuthorizedApiClient>());
-        }
-
-        // Multiple Queries tests
-        // Successful API call
-        [Fact]
-        public async void SuccessfulApiCallMultipleQueries()
-        {
-            // Arrange Mocks
-            var logger = Mock.Of<ILogger>();
-            var mockRequest = MockRequest(FullRequestMultiple().ToJson());
-            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
-                MockResponse(HttpStatusCode.OK, StateResponse().ToJson()),
-                MockResponse(HttpStatusCode.OK, StateResponse().ToJson())
-            });
-
-            // Arrage Environment
-            var uriString = "[\"https://localhost/\"]";
-            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
-
-            // Act
-            var api = ConstructMocked(mockHandler);
-            var response = await api.Query(mockRequest.Object, logger);
-
-            // Assert - top-level data
-            var res = response as JsonResult;
-            var resBody = res.Value as OrchMatchResponse;
-            Assert.Equal(2, (int)resBody.Data.Results.Count);
-            Assert.Equal(0, (int)resBody.Data.Errors.Count);
-
-            // Assert results data
-            var result = resBody.Data.Results[0];
-            Assert.NotEmpty(result.Matches);
-            Assert.Equal(0, result.Index);
-
-            mockHandler.Protected().Verify(
-                "SendAsync",
-                Times.Exactly(2),
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            );
-        }
-
-        // Over the max number pf persons in a request
-        [Fact]
-        public async void OverMaxInRequestReturnsError()
-        {
-            // Arrange Mocks
-            var logger = Mock.Of<ILogger>();
-            var mockRequest = MockRequest(OverMaxRequest().ToJson());
-            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
-                MockResponse(HttpStatusCode.OK, StateResponse().ToJson())
-            });
-
-            // Arrage Environment
-            var uriString = "[\"https://localhost/\"]";
-            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
-
-            // Act
-            var api = ConstructMocked(mockHandler);
-            var response = await api.Query(mockRequest.Object, logger);
-
-            // Assert
-            var result = response as BadRequestObjectResult;
-            Assert.Equal(400, result.StatusCode);
-
-            var errorResponse = result.Value as ApiErrorResponse;
-            Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal("400", errorResponse.Errors[0].Status);
-            Assert.NotEmpty(errorResponse.Errors[0].Title);
-            Assert.NotEmpty(errorResponse.Errors[0].Detail);
-        }
-
-        // Multiple persons in request——returns error for one and success for another
-        [Fact]
-        public async void ItemLevelErrorIsPresent()
-        {
-            // Arrange Mocks
-            var logger = Mock.Of<ILogger>();
-            var mockRequest = MockRequest(FullRequestMultiple().ToJson());
-            var mockHandler = MockMessageHandler(new List<HttpResponseMessage>() {
-                MockResponse(HttpStatusCode.OK, StateResponse().ToJson()),
-                MockResponse(HttpStatusCode.InternalServerError, "")
-            });
-
-            // Arrage Environment
-            var uriString = "[\"https://localhost/\"]";
-            Environment.SetEnvironmentVariable("StateApiUriStrings", uriString);
-
-            // Act
-            var api = ConstructMocked(mockHandler);
-            var response = await api.Query(mockRequest.Object, logger);
-            var res = response as JsonResult;
-            var resBody = res.Value as OrchMatchResponse;
-            var error = resBody.Data.Errors[0];
-
-            // Assert
-            Assert.Equal(1, (int)resBody.Data.Results.Count);
-            Assert.Equal(1, (int)resBody.Data.Errors.Count);
-            Assert.Equal(1, error.Index);
-            Assert.NotNull(error.Code);
-            Assert.NotNull(error.Detail);
+            Assert.NotNull(host.Services.GetRequiredService<ITokenProvider>());
+            Assert.NotNull(host.Services.GetRequiredService<DbProviderFactory>());
         }
 
         // Whole thing blows up and returns a top-level error
