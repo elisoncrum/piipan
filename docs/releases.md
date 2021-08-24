@@ -15,7 +15,7 @@ Note: before tagging the release, it is easiest to update the CHANGELOG first.
 Tagging process:
 
 ```
-git checkout develop
+git checkout dev
 git checkout -b release/<version-number>    # e.g., release/0.5
 git tag v<version-number>                   # e.g., v0.5
 git push origin v<version-number>
