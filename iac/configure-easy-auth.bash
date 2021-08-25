@@ -56,11 +56,11 @@ app_role_manifest () {
 create_aad_app_reg () {
   app=$1
   role=$2
-  resource_group=$3
+  group=$3
 
   app_uri=$(\
     az functionapp show \
-    --resource-group "$resource_group" \
+    --resource-group "$group" \
     --name "$app" \
     --query defaultHostName \
     --output tsv)
@@ -164,11 +164,11 @@ assign_app_role () {
 # principal already exist for the app
 enable_easy_auth () {
   app=$1
-  resource_group=$2
+  group=$2
 
   app_uri=$(\
     az functionapp show \
-    --resource-group "$resource_group" \
+    --resource-group "$group" \
     --name "$app" \
     --query defaultHostName \
     --output tsv)
@@ -191,7 +191,7 @@ enable_easy_auth () {
 
   echo "Configuring Easy Auth settings for ${app}"
   az webapp auth update \
-    --resource-group "$resource_group" \
+    --resource-group "$group" \
     --name "$app" \
     --aad-allowed-token-audiences "$app_uri" \
     --aad-client-id "$app_aad_client" \
@@ -253,12 +253,8 @@ main () {
   verify_cloud
 
   # Name of application roles authorized to call match APIs
-  STATE_API_APP_ROLE='StateApi.Query'
   ORCH_API_APP_ROLE='OrchestratorApi.Query'
   METRICS_API_APP_ROLE='Metrics.Read'
-
-  match_func_names=($(\
-    get_resources "$PER_STATE_MATCH_API_TAG" "$RESOURCE_GROUP"))
 
   orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
 
@@ -269,13 +265,6 @@ main () {
   dashboard_name=$(get_resources "$DASHBOARD_APP_TAG" "$RESOURCE_GROUP")
 
   metrics_api_name=$METRICS_API_APP_NAME
-
-  orch_identity=$(\
-    az webapp identity show \
-      --name "$orch_name" \
-      --resource-group "$MATCH_RESOURCE_GROUP" \
-      --query principalId \
-      --output tsv)
 
   query_tool_identity=$(\
     az webapp identity show \
@@ -297,15 +286,6 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --query principalId \
       --output tsv)
-
-  for func in "${match_func_names[@]}"
-  do
-    echo "Configure Easy Auth for PerStateMatchApi:${func} and OrchestratorApi"
-    configure_easy_auth_pair \
-      "$func" "$RESOURCE_GROUP" \
-      "$STATE_API_APP_ROLE" \
-      "$orch_identity"
-  done
 
   echo "Configure Easy Auth for OrchestratorApi and QueryApp"
   configure_easy_auth_pair \
