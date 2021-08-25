@@ -14,10 +14,7 @@ The orchestrator matching API is implemented in the `Piipan.Match.Orchestrator` 
 To query the API:
 1. A JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
 1. The `POST` event triggers a function named `Query` in the orchestrator Function App.
-    - If the request is unauthorized (does not include a valid bearer token), the function returns a `401` response.
-    - If the request is not valid (malformed, missing required data, etc), the function returns a `400` response. Currently no error messaging is included in the response.
-    - If the request is valid, the function queries the per-state APIs for matches. A `200` response is returned containing any matching records.
-    - If there is an issue connecting to or querying any of the per-state APIs, the orchestrator returns a `500` response.
+1. The orchestrator Function App looks for matches across each per-state participant database
 
 ## Environment variables
 
@@ -25,29 +22,39 @@ The following environment variables are required by the orchestrator and are set
 
 | Name | |
 |---|---|
-| `StateApiUriStrings` | [details](../../docs/iac.md#\:\~\:text=StateApiUriStrings) |
-
-## Binding to state APIs
-
-The orchestrator treats per-state APIs as backing services. When running the [IaC](../../docs/iac.md):
-- Per-state URIs are compiled into a JSON list and saved as an environment variable
-- The orchestrator's system-assigned identity is given an authorized application role (which will be checked by the state API upon receiving requests)
-
-At runtime, the app requests an authentication token from the state app's Active Directory application object. The token is then included as an authorization header (`Authorization: Bearer {token}`) in the request sent to the state API. For more detail on this process see [Securing internal APIs](../../docs/securing-internal-apis.md).
+| `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) — Additionally, `Database` is set to the placeholder value `{database}`. The relevant per-state database name is inserted at run-time as needed. |
+| `States` | [details](../../docs/iac.md#\:\~\:text=States) |
 
 ## Local development
 
-Local development is achieved by connecting a locally running instance of the orchestrator API to remote instances of the bound resources (per-state APIs). When running locally, `Startup.cs` conditionally configures the `Piipan.Shared.Autentication.AuthorizedJsonApiClient` dependency to use Azure CLI credentials when obtaining access tokens for the per-state APIs. To make use of this functionality:
+Local development is currently limited as a result of using a managed identity to connect to the state databases. The Instance Metadata Service used by managed identities to retrieve authentication tokens is not available locally. There are [potential solutions](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication#local-development-authentication) using the `Microsoft.Azure.Services.AppAuthentication` library. None have been implemented at this time.
 
-1. Run `func azure functionapp fetch-app-settings <remote orchestrator name>` to ensure you have up-to-date local settings configured in `local.settings.json`.
-1. Run `func settings add DEVELOPMENT true` to add a `"DEVELOPMENT"` setting with a value of `"true"` to `local.settings.json`. This triggers the orchestrator to use your Azure CLI credentials when authenticating with the state APIs.
-1. Follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `StateApi.Query` role for the remote state Function App(s) and authorize the Azure CLI.
+The app will still build and run locally. However, any valid request sent to the local endpoint will result in an exception when the app attempts to retrieve an access token for the managed identity. Invalid requests (e.g., malformed or missing data in the request body) will return proper error responses.
 
-With the orchestrator running locally (`func start` or `dotnet watch msbuild /t:RunFunctions`), any requests to the local endpoint will now use the user account authorized with Azure CLI to obtain access tokens from the per-state APIs.
+To build and run the app with this limited functionality:
 
-A true local development approach with locally run instances of the per-state APIs, and participant records database does not yet exist.
+1. Fetch any app settings using `func azure functionapp fetch-app-settings {app-name}`. The app name can be retrieved from the Portal.
+1. Run `func start` or, if hot reloading is desired, `dotnet watch msbuild /t:RunFunctions`.
 
-### App deployment
+## Unit / integration tests
+
+Unit tests are contained within `Piipan.Match.Orchestrator.Tests` and integration tests within `Piipan.Match.Orchestrator.IntegrationTests`.
+
+To run unit tests:
+
+```
+cd match/tests/Piipan.Match.Orchestrator.Tests
+dotnet test
+```
+
+Integration tests are run by connecting to a PostgreSQL Docker container. With Docker installed on your machine, run the integration tests using Docker Compose:
+
+```
+cd match/tests/
+docker-compose run --rm app dotnet test /code/match/tests/Piipan.Match.Orchestrator.IntegrationTests/Piipan.Match.State.IntegrationTests.csproj
+```
+
+## App deployment
 
 Deploy the app using the Functions Core Tools, making sure to pass the `--dotnet` flag:
 

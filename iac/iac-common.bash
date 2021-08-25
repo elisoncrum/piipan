@@ -44,8 +44,9 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 # so that application code can use the appropriate, cloud-specific domain
 CLOUD_NAME_STR_KEY=CloudName
 
-# For connection strings, our established placeholder value
+# For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'
+DATABASE_PLACEHOLDER='{database}'
 
 # Virtual Network and Subnets
 VNET_NAME=vnet-core-$ENV

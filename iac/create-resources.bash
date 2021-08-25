@@ -294,13 +294,6 @@ main () {
   # managed identity, hosting plan, and application insights instance.
   #
   # Assumes existence of a managed identity with name `{abbr}admin`.
-
-  # Relative path for per-state Query endpoint
-  MATCH_API_QUERY_NAME='Query'
-
-  match_api_uris=''
-  match_func_names=()
-
   while IFS=, read -r abbr name ; do
     echo "Creating match API function app for $name ($abbr)"
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
@@ -341,9 +334,6 @@ main () {
           coreResourceGroup="$RESOURCE_GROUP" \
           eventHubName="$EVENT_HUB_NAME")
 
-    # Store function names for future auth configuration
-    match_func_names+=("$func_name")
-
     echo "Waiting to publish function app"
     sleep 60
 
@@ -359,22 +349,18 @@ main () {
     pushd ../match/src/Piipan.Match.State
     func azure functionapp publish "$func_name" --dotnet
     popd
-
-    # Store API query URIs as a JSON array to be bound to orchestrator API
-    func_uri=$(\
-      az functionapp function show \
-        --resource-group "$RESOURCE_GROUP" \
-        --name "$func_name" \
-        --function-name "$MATCH_API_QUERY_NAME" \
-        --query invokeUrlTemplate \
-        --output tsv)
-    match_api_uris=${match_api_uris}",\"$func_uri\""
   done < states.csv
+
+  state_abbrs=""
+  while IFS=, read -r abbr name ; do
+    abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
+    state_abbrs+=",${abbr}"
+  done < states.csv
+  state_abbrs=${state_abbrs:1}
 
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools.
-  match_api_uris="[${match_api_uris:1}]"
-  state_db_strings="[${state_db_strings:1}]"
+  db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
     --name orch-api \
     --resource-group "$MATCH_RESOURCE_GROUP" \
@@ -385,7 +371,9 @@ main () {
       functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
       appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-      StateApiUriStrings="$match_api_uris" \
+      databaseConnectionString="$db_conn_str" \
+      cloudName="$CLOUD_NAME" \
+      states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
 

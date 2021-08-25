@@ -15,7 +15,8 @@ public class OrchMatchRequestValidatorTests
     public void ReturnsErrorWhenDataEmpty()
     {
         // Setup
-        var model = new OrchMatchRequest() {
+        var model = new OrchMatchRequest()
+        {
             Data = new List<RequestPerson>()
         };
         // Act
@@ -31,14 +32,14 @@ public class OrchMatchRequestValidatorTests
         var list = new List<RequestPerson>();
         for (int i = 0; i < 51; i++)
         {
-        list.Add(new RequestPerson
-        {
-            First = "First",
-            Middle = "Middle",
-            Last = "Last",
-            Dob = new DateTime(1970, 1, 1),
-            Ssn = "000-00-0000"
-        });
+            list.Add(new RequestPerson
+            {
+                First = "First",
+                Middle = "Middle",
+                Last = "Last",
+                Dob = new DateTime(1970, 1, 1),
+                Ssn = "000-00-0000"
+            });
         }
         var model = new OrchMatchRequest { Data = list };
         // Act
@@ -58,7 +59,8 @@ public class PersonValidatorTests
     [Fact]
     public void ReturnsErrorWhenLastNameEmpty()
     {
-        var model = new RequestPerson() {
+        var model = new RequestPerson()
+        {
             Last = "",
             First = "Foo",
             Ssn = "123-45-6789"
@@ -85,9 +87,9 @@ public class PersonValidatorTests
     {
         var model = new RequestPerson()
         {
-        Last = "Foo",
-        First = "Bar",
-        Ssn = "baz"
+            Last = "Foo",
+            First = "Bar",
+            Ssn = "baz"
         };
         var result = Validator().TestValidate(model);
         result.ShouldHaveValidationErrorFor(person => person.Ssn);
