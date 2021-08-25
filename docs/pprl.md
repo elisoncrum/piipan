@@ -18,7 +18,7 @@ Finally, in order for exact matching against de-identified PII to be effective, 
 
 ### Last name
 
-Participant's Last name should be normalized and validated in accordance with these **ordered** rules. These transformations assume ASCII-encoded input.
+Participant's Last name must be normalized and validated in accordance with these **ordered** rules. These transformations assume ASCII-encoded input.
 
 1. Convert to lower case
 1. Remove any suffixes (e.g.; `junior`, `jnr`, `jr`, `jr.`, `iii`, etc.)
@@ -28,7 +28,7 @@ Participant's Last name should be normalized and validated in accordance with th
 1. Trim any spaces at the start and end of the last name
 1. Validate that the resulting value is at least one ASCII character in length
 
-If your source data set includes non-ASCII characters using the ISO-8859-1 (Latin-1) or Unicode encoding formats, [an ASCII normalization process to remove diacritics and derive base characters](https://ahinea.com/en/tech/accented-translate.html) should be applied before these rules.
+If your source data set includes non-ASCII characters using the ISO-8859-1 (Latin-1) or Unicode encoding formats, [an ASCII normalization process to remove diacritics and derive base characters](https://ahinea.com/en/tech/accented-translate.html) must be applied before these rules.
 
 Reference: [Social Security Program Operations Manual System](https://secure.ssa.gov/poms.nsf/lnx/0110205125)
 
@@ -56,7 +56,7 @@ Examples of *incorrect* output:
 
 ### Date of Birth (DoB)
 
-Participant's Date of Birth in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601#Dates). The ISO 8601 format uses a 4-digit year, a zero-padded month, and a zero-padded day. The 3 values are separated by a hyphen: `YYYY-MM-DD`.
+Participant's Date of Birth must be formatted in accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Dates). The ISO 8601 format uses a 4-digit year, a zero-padded month, and a zero-padded day. The 3 values are separated by a hyphen: `YYYY-MM-DD`.
 
 Before normalizing, dates must be validated against the Gregorian calendar and be within the past 130 years.
 
@@ -79,7 +79,7 @@ Examples of *incorrect* output:
 
 ### Social Security Number (SSN)
 
-Participant's nine-digit Social Security Number formatted in 3 parts: the 3-digit Area Number, the 2-digit Group Number, and the 4-digit Serial Number. The 3 parts are separated by a hyphen: `AAA-GG-SSSS`.
+Participant's nine-digit Social Security Number is to be formatted in 3 parts: the 3-digit Area Number, the 2-digit Group Number, and the 4-digit Serial Number. The 3 parts must be separated by a hyphen: `AAA-GG-SSSS`.
 
 Before normalizing, SSNs must be validated against the following Social Security Administration (SSA) rules:
 - Area numbers `000`, `666`, and `900-999` [are invalid](https://www.ssa.gov/employer/randomization.html)
