@@ -12,11 +12,6 @@ namespace Piipan.Match.Orchestrator
     {
         [JsonProperty("data", Required = Required.Always)]
         public List<RequestPerson> Data { get; set; } = new List<RequestPerson>();
-
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-        }
     }
 
     /// <summary>

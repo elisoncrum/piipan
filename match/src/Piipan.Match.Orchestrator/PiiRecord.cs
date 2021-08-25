@@ -26,9 +26,16 @@ namespace Piipan.Match.Orchestrator
         [JsonProperty("state")]
         public string State { get; set; }
 
-        // Deprecated, duplicates value of `State`
+        // Read-only
+        // Deprecated
         [JsonProperty("state_abbr")]
-        public string StateAbbr { get; set; }
+        public string StateAbbr
+        {
+            get
+            {
+                return State;
+            }
+        }
 
         [JsonProperty("case_id")]
         public string CaseId { get; set; }
