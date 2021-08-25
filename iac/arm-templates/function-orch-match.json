@@ -26,6 +26,9 @@
         "databaseConnectionString": {
             "type": "String"
         },
+        "cloudName": {
+            "type": "String"
+        },
         "states": {
             "type": "String"
         }
@@ -125,6 +128,10 @@
                         {
                             "name": "DatabaseConnectionString",
                             "value": "[parameters('databaseConnectionString')]"
+                        },
+                        {
+                            "name": "CloudName",
+                            "value": "[parameters('cloudName')]"
                         },
                         {
                             "name": "States",

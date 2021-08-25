@@ -372,6 +372,7 @@ main () {
       appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
       databaseConnectionString="$db_conn_str" \
+      cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
