@@ -68,11 +68,11 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
                 {
                     cmd.Connection = conn;
 
-                    // cmd.CommandText = "DROP TABLE IF EXISTS participants;";
-                    // cmd.ExecuteNonQuery();
+                    cmd.CommandText = "DROP TABLE IF EXISTS participants;";
+                    cmd.ExecuteNonQuery();
 
-                    // cmd.CommandText = "DROP TABLE IF EXISTS uploads;";
-                    // cmd.ExecuteNonQuery();
+                    cmd.CommandText = "DROP TABLE IF EXISTS uploads;";
+                    cmd.ExecuteNonQuery();
                 }
 
                 conn.Close();
