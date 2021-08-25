@@ -32,19 +32,27 @@ If your source data set includes non-ASCII characters using the ISO-8859-1 (Lati
 
 Reference: [Social Security Program Operations Manual System](https://secure.ssa.gov/poms.nsf/lnx/0110205125)
 
-Correct:
-- `hopper` (from `Hopper`)
-- `von neumann` (from `von Neumann`)
-- `osullivan` (from `O'Sullivan`)
-- `jones drew` (from `Jones-Drew`)
+Examples of *correct* output:
 
-Incorrect:
-- `garcía` (from `García`, includes non-ASCII character) 
-- `jones iii` (from `Jones III`, includes suffix)
-- `Thatcher` (from `Thatcher`, not lower-cased)
-- `barrable-tishauer` (from `Barrable-Tishauer`, hyphen not replaced with space)
-- `heathcote drummond-willoughby` (from `Heathcote-Drummond-Willoughby`, only first hyphen replaced with space)
-- `o'grady` (from `O'Grady`, apostrophe not removed)
+| Input       | Correct         |
+|-------------|-----------------|
+| Hopper      | `hopper`        |
+| von Neuman  | `von neumann`   |
+| O'Sullivan  | `osullivan`     |
+| Jones-Drew  | `jones drew`    |
+| Nguyễn      | `nguyen`        |
+
+Examples of *incorrect* output:
+
+| Input                         | Incorrect                       | Issue                                 |
+|-------------------------------|---------------------------------|---------------------------------------|
+| García                        | `garcía`                        | includes non-ASCII character          |
+| Jones III                     | `jones iii`                     | includes suffix                       |
+| Thatcher                      | `Thatcher`                      | not lower-cased                       |
+| Barrable-Tishauer             | `barrable-tishauer`             | hyphen not replaced with space        |
+| Heathcote-Drummond-Willoughby | `heathcote drummond-willoughby` | only first hyphen replaced with space |
+| O'Grady                       | `o'grady`                       | apostrophe not removed                |
+
 
 ### Date of Birth (DoB)
 
@@ -52,16 +60,22 @@ Participant's Date of Birth in [ISO 8601 format](https://en.wikipedia.org/wiki/I
 
 Before normalizing, dates must be validated against the Gregorian calendar and be within the past 130 years.
 
-Correct:
-- `1978-08-14`
-- `2004-02-29`
-- `1999-12-03`
+Examples of *correct* output:
 
-Incorrect:
-- `98-08-14` (year is not fully specified)
-- `5/15/2002` (wrong value order, wrong separator character, value is not zero-padded)
-- `2000-11-2`(day is not zero-padded)
-- `2001-02-29` (date does not exist)
+| Input              | Correct         |
+|--------------------|-----------------|
+| August 14, 1978    | `1978-08-14`    |
+| February 29, 2004  | `2004-02-29`    |
+| December 3, 1999   | `1999-12-03`    |
+
+Examples of *incorrect* output:
+
+| Input              | Incorrect         | Issue                                                                  |
+|--------------------|-------------------|------------------------------------------------------------------------|
+| August 14, 1998    | `98-08-14`        | year is not fully specified                                            |
+| May 15, 2002       | `5/15/2002`       | wrong value order, wrong separator character, value is not zero-padded |
+| November 2, 2000   | `2000-11-2`       | day is not zero-padded                                                 |
+| February 29, 2001  | `2001-02-29`      | date does not exist on Gregorian calendar, 2001 is not a leap year     |
 
 ### Social Security Number (SSN)
 
@@ -72,17 +86,23 @@ Before normalizing, SSNs must be validated against the following Social Security
 - Group number `00` [is invalid](https://www.ssa.gov/employer/randomizationfaqs.html)
 - Serial number `0000` [is invalid](https://www.ssa.gov/employer/randomizationfaqs.html)
 
-Correct:
-- `078-05-1121`
-- `219-09-9998`
-- `987-65-4219`
+Reference: [Social Security Number Randomization](https://www.ssa.gov/employer/randomization.html)
 
-Incorrect:
-- `000345678` (invalid area number, missing hyphens)
-- `MR1234567` (non-digit in SSN, missing hyphens)
-- `0664-81-234 ` (hyphen misplaced)
-- `06-648-1234` (hyphen misplace)
-- `567-89-0000` (invalid serial number)
+Examples of *correct* output:
+
+| Input     | Correct         |
+|-----------|-----------------|
+| 078051121 | `078-05-1121`   |
+| 219099998 | `219-09-9998`   |
+| 987654219 | `987-65-4219`   |
+
+Examples of *incorrect* output:
+
+| Input     | Incorrect        | Issue                                |
+|-----------|------------------|--------------------------------------|
+| 000345678 | `000345678`      | invalid area number, missing hyphens |
+| 066481234 | `0664-81-234 `   | hyphen misplaced                     |
+| 567890000 | `567-89-0000`    | invalid serial number                |
 
 ## 2. Concatenation
 
