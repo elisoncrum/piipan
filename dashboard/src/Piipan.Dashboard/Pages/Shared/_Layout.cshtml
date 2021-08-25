@@ -33,16 +33,19 @@
             <button class="usa-menu-btn">Menu</button>
             <div class="usa-nav" style="">
                 <ul class="usa-nav__primary usa-accordion flex-justify-end">
-                    <li class="usa-nav__primary-item">
-                        <button class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="nav-user">
-                            <span>@Model.Email</span>
-                        </button>
-                        <ul id="nav-user" class="usa-nav__submenu" hidden>
-                            <li class="usa-nav__submenu-item">
-                                <a href="/.auth/logout?post_logout_redirect_uri=@(Model.BaseUrl)/.auth/logout/complete">Sign out</a>
-                            </li>
-                        </ul>
-                    </li>
+                    @if(!String.IsNullOrEmpty(Model.Email))
+                    {
+                        <li class="usa-nav__primary-item">
+                            <button class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="nav-user">
+                                <span>@Model.Email</span>
+                            </button>
+                            <ul id="nav-user" class="usa-nav__submenu" hidden>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="/.auth/logout?post_logout_redirect_uri=@(Model.BaseUrl)/SignedOut">Sign out</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

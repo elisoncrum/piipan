@@ -189,7 +189,10 @@
                     "requireAuthentication": true,
                     "unauthenticatedClientAction": "RedirectToLoginPage",
                     "redirectToProvider": "oidcProvider",
-                    "excludedPaths": ["/health-probe.html"]
+                    "excludedPaths": [
+                        "/SignedOut",
+                        "/health-probe.html"
+                    ]
                 },
                 "httpSettings": {
                     "requireHttps": true,

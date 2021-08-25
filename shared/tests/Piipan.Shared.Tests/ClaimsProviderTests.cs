@@ -47,15 +47,11 @@ namespace Piipan.Shared.Claims.Tests
                 new Claim("email_claim_type_different", "noreply@tts.test")
             }));
 
-            // Act / Assert
-            Assert.Throws<System.InvalidOperationException>(() => claimsProvider.GetEmail(claimsPrincipal));
+            // Act
+            var email = claimsProvider.GetEmail(claimsPrincipal);
 
-            logger.Verify(m => m.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Error),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains("Unable to extract claim with type email_claim_type for current user!")),
-                It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once());
+            // Assert
+            Assert.Null(email);
         }  
     }
 }
