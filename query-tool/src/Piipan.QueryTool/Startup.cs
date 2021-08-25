@@ -40,6 +40,7 @@ namespace Piipan.QueryTool
             services.AddRazorPages(options => 
             {
                 options.Conventions.AuthorizeFolder("/");
+                options.Conventions.AllowAnonymousToPage("/SignedOut");
             }).AddMvcOptions(options =>
             {
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
