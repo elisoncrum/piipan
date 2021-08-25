@@ -42,14 +42,14 @@ Many popular tools do not support references to external files. To avoid this is
     swagger-cli bundle path/to/index.yaml -o openapi.yaml -t yaml
 ```
 
-These two commands have been combined into a helper script at `tools/generate-specs.bash` which runs against both the state-level (`openapi/state`) and orchestrator-level (`openapi/orchestrator`) specs:
+These two commands have been combined into a helper script at `tools/generate-specs.bash` which runs against the orchestrator (`openapi/orchestrator`) spec:
 
 ```
     cd match
     ./tools/generate-specs.bash
 ```
 
-If the specs validate successfully they will be bundled and the result will be outputted to `docs/openapi/{state|orchestrator}/generated/openapi.yaml`.
+If the spec validates successfully it will be bundled and the result will be outputted to `docs/openapi/orchestrator/generated/openapi.yaml`.
 
 ## Notes
 

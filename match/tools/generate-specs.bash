@@ -11,7 +11,7 @@ set -e
 set -u
 
 main () {
-    specs=(orchestrator state)
+    specs=(orchestrator)
 
     for s in "${specs[@]}"
     do
