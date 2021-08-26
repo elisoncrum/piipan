@@ -52,12 +52,10 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Collect, Piipan.Metrics.Api |
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
-| `StateName` | Name of the state associated with the Function App instance. | Piipan.Match.State |
-| `StateAbbr` | Abbreviation of the state associated with the Function App instance. | Piipan.Match.State |
 | `States` | Comma-separated list of the lower-case two letter abbreviations for each participating state. | Piipan.Match.Orchestrator |
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Api, Piipan.Metrics.Collect |
-| `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.State, Piipan.Metrics.Api, Piipan.Metrics.Collect |
+| `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Api, Piipan.Metrics.Collect |
 
 
 ## `SysType` resource tag
@@ -68,7 +66,6 @@ The following environment variables are pre-configured by the Infrastructure-as-
 |---|---|
 | PerStateEtl | one of _N_ function apps for per-state bulk ETL process |
 | PerStateStorage | one of _N_ storage accounts for per-state bulk PII uploads |
-| PerStateMatchApi | one of _N_ API Function Apps for Per-state matching |
 | OrchestratorApi | the single Function App for the Orchestrator API |
 | DashboardApp | the single Dashboard App Service |
 | QueryApp | the single Query tool App Service |
