@@ -139,10 +139,6 @@
                 "eventHubName": "logs",
                 "logs": [
                     {
-                        "category": "AppServiceAntivirusScanAuditLogs",
-                        "enabled": true
-                    },
-                    {
                         "category": "AppServiceHTTPLogs",
                         "enabled": true
                     },
@@ -152,10 +148,6 @@
                     },
                     {
                         "category": "AppServiceAppLogs",
-                        "enabled": true
-                    },
-                    {
-                        "category": "AppServiceFileAuditLogs",
                         "enabled": true
                     },
                     {
