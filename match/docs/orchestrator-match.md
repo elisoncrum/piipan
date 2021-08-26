@@ -51,7 +51,7 @@ Integration tests are run by connecting to a PostgreSQL Docker container. With D
 
 ```
 cd match/tests/
-docker-compose run --rm app dotnet test /code/match/tests/Piipan.Match.Orchestrator.IntegrationTests/Piipan.Match.State.IntegrationTests.csproj
+docker-compose run --rm app dotnet test /code/match/tests/Piipan.Match.Orchestrator.IntegrationTests/Piipan.Match.Orchestrator.IntegrationTests.csproj
 ```
 
 ## App deployment

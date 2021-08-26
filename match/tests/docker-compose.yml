@@ -9,7 +9,6 @@ services:
       - statedb
     environment:
       DatabaseConnectionString: "Server=statedb;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
-      StateAbbr: ea
       States: ea
   statedb:
     image: postgres:11-alpine
