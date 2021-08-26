@@ -23,6 +23,7 @@ APIM_EMAIL=noreply@tts.test
 
 # OIDC configuration - Dashboard app
 DASHBOARD_APP_IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
+DASHBOARD_APP_IDP_OIDC_SCOPES='("openid","email","profile")'
 DASHBOARD_APP_IDP_CLIENT_ID=d7281a84-817d-4a76-8005-b29f67594340
 
 # OIDC configuration - Query Tool app
