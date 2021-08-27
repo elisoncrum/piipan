@@ -22,6 +22,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParticipantUploadsResponse'
+  /getlastupload:
+    get:
+      tags:
+        - "Participant Uploads"
+      summary: "get last upload"
+      description: "Gets the last upload from each state, ordered by least recent upload first"
+      responses:
+        '200':
+          description: "List of participant upload events"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParticipantUploadsResponse'
 components:
   schemas:
     ParticipantUploadsResponse:

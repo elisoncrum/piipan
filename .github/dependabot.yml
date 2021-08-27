@@ -30,22 +30,7 @@ updates:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
-  directory: "/match/src/Piipan.Match.State"
-  schedule:
-    interval: daily
-    time: "09:00"
-- package-ecosystem: nuget
   directory: "/match/src/Piipan.Match.Orchestrator"
-  schedule:
-    interval: daily
-    time: "09:00"
-- package-ecosystem: nuget
-  directory: "/match/tests/Piipan.Match.State.Tests"
-  schedule:
-    interval: daily
-    time: "09:00"
-- package-ecosystem: nuget
-  directory: "/match/tests/Piipan.Match.State.IntegrationTests"
   schedule:
     interval: daily
     time: "09:00"
