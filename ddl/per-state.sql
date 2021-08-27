@@ -1,10 +1,11 @@
 BEGIN;
 
 -- Creates participant records tables and their access controls.
--- Assumes 3 database roles, to be set via the psql -v option:
+-- Assumes 4 database roles, to be set via the psql -v option:
 --  * cluster `superuser`
 --  * database `owner`, which owns the tables, sequences
 --  * database `admin`, which gets read/write access
+--  * database `reader`, which gets read-only access
 
 SET search_path=piipan,public;
 
@@ -25,7 +26,6 @@ CREATE TABLE IF NOT EXISTS participants(
 	middle text,
 	dob date NOT NULL,
 	ssn text NOT NULL,
-	exception text,
 	upload_id integer REFERENCES uploads (id),
     	case_id text NOT NULL,
     	participant_id text,
@@ -40,7 +40,6 @@ COMMENT ON COLUMN participants.first IS 'Participant''s first name';
 COMMENT ON COLUMN participants.middle IS 'Participant''s middle name';
 COMMENT ON COLUMN participants.dob IS 'Participant''s date of birth';
 COMMENT ON COLUMN participants.ssn IS 'Participant''s Social Security Number';
-COMMENT ON COLUMN participants.exception IS 'Placeholder for value indicating special processing instructions';
 COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
 COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
 COMMENT ON COLUMN participants.benefits_end_date IS 'Participant''s ending benefits date';
@@ -62,6 +61,9 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON participants TO :admin;
 GRANT SELECT, INSERT, UPDATE, DELETE ON uploads TO :admin;
 GRANT USAGE, SELECT, UPDATE ON participants_id_seq TO :admin;
 GRANT USAGE, SELECT, UPDATE ON uploads_id_seq TO :admin;
+
+GRANT SELECT ON participants TO :reader;
+GRANT SELECT ON uploads TO :reader;
 
 -- restore privileges
 REVOKE :owner FROM :superuser;

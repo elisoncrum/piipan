@@ -23,7 +23,7 @@ namespace Piipan.Etl.Tests
                 }
                 else
                 {
-                    writer.WriteLine("last,first,middle,dob,ssn,exception,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
+                    writer.WriteLine("last,first,middle,dob,ssn,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
 
                 }
             }
@@ -57,7 +57,6 @@ namespace Piipan.Etl.Tests
                 Middle = "Middle",
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = "Exception",
                 CaseId = "CaseId",
                 ParticipantId = "ParticipantId",
                 BenefitsEndDate = new DateTime(1970, 1, 1),
@@ -79,7 +78,6 @@ namespace Piipan.Etl.Tests
                 Middle = null,
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = null,
                 CaseId = "CaseId",
                 ParticipantId = null,
                 BenefitsEndDate = null,
@@ -112,7 +110,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,1970-01-01,000-00-0000,Exception,CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03,true"
+                "Last,First,Middle,1970-01-01,000-00-0000,CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03,true"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -123,7 +121,6 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("Middle", record.Middle);
                 Assert.Equal(new DateTime(1970, 1, 1), record.Dob);
                 Assert.Equal("000-00-0000", record.Ssn);
-                Assert.Equal("Exception", record.Exception);
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
                 Assert.Equal(new DateTime(1970, 1, 31), record.BenefitsEndDate);
@@ -137,7 +134,7 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,,,1970-01-01,000-00-0000,,CaseId,,,,,"
+                "Last,,,1970-01-01,000-00-0000,CaseId,,,,,"
             });
 
             var records = BulkUpload.Read(stream, logger);
@@ -145,7 +142,6 @@ namespace Piipan.Etl.Tests
             {
                 Assert.Null(record.First);
                 Assert.Null(record.Middle);
-                Assert.Null(record.Exception);
                 Assert.Null(record.ParticipantId);
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Empty(record.RecentBenefitMonths);
@@ -154,12 +150,12 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData(",,,1970-01-01,000-00-0000,,,,,,")] // Missing last name
-        [InlineData("Last,,,1970-01-01,,,,,,,")] // Missing SSN
-        [InlineData("Last,,,1970-01-01,000000000,,,,,,")] // Malformed SSN
-        [InlineData("Last,,,1970-01-01,000-00-0000,,,,,,")] // Missing CaseId
-        [InlineData("Last,,,1970-01-01,000-00-0000,,CaseId,,foobar,")] // Malformed Benefits End Month
-        [InlineData("Last,,,1970-01-01,000-00-0000,,CaseId,,,foobar")] // Malformed Recent Benefit Months
+        [InlineData(",,,1970-01-01,000-00-0000,,,,,")] // Missing last name
+        [InlineData("Last,,,1970-01-01,,,,,,")] // Missing SSN
+        [InlineData("Last,,,1970-01-01,000000000,,,,,")] // Malformed SSN
+        [InlineData("Last,,,1970-01-01,000-00-0000,,,,,")] // Missing CaseId
+        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,foobar,")] // Malformed Benefits End Month
+        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,,foobar")] // Malformed Recent Benefit Months
         public void ExpectFieldValidationError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -176,7 +172,7 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData("Last,,,1970-01-01,000-00-0000,,CaseId,,,,foobar")] // Malformed Protect Location
+        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,,,foobar")] // Malformed Protect Location
         public void ExpectTypeConverterError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -211,7 +207,7 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData("Last,,,1970-01-01,000-00-0000,,CaseId,,,")] // Missing last column
+        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,,")] // Missing last column
         public void ExpectMissingFieldError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -243,7 +239,6 @@ namespace Piipan.Etl.Tests
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Null(record.First);
                 Assert.Null(record.Middle);
-                Assert.Null(record.Exception);
                 Assert.Null(record.ParticipantId);
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Null(record.ProtectLocation);

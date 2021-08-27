@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
 
@@ -28,9 +29,12 @@ namespace Piipan.QueryTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
+            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
-            services.AddRazorPages().AddMvcOptions(options =>
+            services.AddRazorPages(options => 
+            {
+                options.Conventions.AuthorizeFolder("/");
+            }).AddMvcOptions(options =>
             {
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
@@ -57,6 +61,12 @@ namespace Piipan.QueryTool
 
             services.AddDistributedMemoryCache();
             services.AddSession();
+
+            services.AddAuthorizationCore(options => {
+                options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
+                    .GetSection(AuthorizationPolicyOptions.SectionName)
+                    .Get<AuthorizationPolicyOptions>());
+            });
 
             if (_env.IsDevelopment())
             {

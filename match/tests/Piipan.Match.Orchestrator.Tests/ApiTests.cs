@@ -34,7 +34,6 @@ namespace Piipan.Match.Orchestrator.Tests
                 Last = "Last",
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = "Exception",
                 CaseId = "CaseIdExample",
                 BenefitsEndMonth = new DateTime(1970, 1, 31),
                 RecentBenefitMonths = new List<DateTime>() {
@@ -219,7 +218,6 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Contains("\"ssn\": \"000000000\"", jsonRecord);
             Assert.Contains("\"first\": \"First\"", jsonRecord);
             Assert.Contains("\"middle\": null", jsonRecord);
-            Assert.Contains("\"exception\": null", jsonRecord);
             Assert.Contains("\"state\": null", jsonRecord);
             Assert.Contains("\"case_id\": \"foo\"", jsonRecord);
             Assert.Contains("\"benefits_end_month\": \"2020-01\"", jsonRecord);

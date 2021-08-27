@@ -3,6 +3,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6] - 2021-08-23
+
+### Added
+### Changed
+### Removed
+### Fixed
+
+## [0.5] - 2021-08-10
+### Added
+- OpenID Connect (OIDC) authentication to dashboard and query tool 
+- managed identity to metrics Function Apps and database access
+- IaC for streaming logs to an external SIEM via Event Hub
+- system account and initiating user to audit logs for API calls
+- Defender to all storage accounts in subscription
+- CIS benchmark to Policy
+- top-level build/test script
+### Changed
+- duplicate participation API to allow an entire household to be queried for
+- App Service instances to use Windows under-the-hood
+- query tool to remove lookup API feature and accomodate query API changes
+- Front Door to use a designated public file in dashboard and query tool for health check
+- duplicate participation Function Apps so they do not hibernate
+- Orchestrator Function App so that network egress is through a VNet 
+### Removed
+- Lookup API call; it's been obsoleted by PPRL model
+- `METRICS_RESOURCE_GROUP`; folded resources into `RESOURCE_GROUP`
+### Fixed
+- `update-packages.bash --highest-major`
+- Key Vault-related IaC so as to be compatible in either `AzureCloud` or `AzureUSGovernment`
+
 ## [0.4] - 2021-06-15
 ### Added
 - `benefits_end_month`, `protect_location`, and `recent_benefit_months` to query response.
@@ -45,6 +75,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.6]: https://github.com/18F/piipan/releases/tag/v0.6
+[0.5]: https://github.com/18F/piipan/releases/tag/v0.5
 [0.4]: https://github.com/18F/piipan/releases/tag/v0.4
 [0.3]: https://github.com/18F/piipan/releases/tag/v0.3
 [0.2]: https://github.com/18F/piipan/releases/tag/v0.2

@@ -28,6 +28,12 @@
         },
         "aspNetCoreEnvironment": {
             "type": "string"
+        },
+        "frontDoorId": {
+            "type": "string"
+        },
+        "frontDoorUri": {
+            "type": "string"
         }
     },
     "variables": {
@@ -45,7 +51,21 @@
             ],
             // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments
             "use32BitWorkerProcess": false,
-            "ipSecurityRestrictions": [],
+            "ipSecurityRestrictions": [
+                // Restricts access to Front Door
+                {
+                    "ipAddress": "AzureFrontDoor.Backend",
+                    "tag": "ServiceTag",
+                    "action": "Allow",
+                    "priority": 100,
+                    "name": "Allow Azure Front Door access",
+                    "headers": {
+                        "x-azure-fdid": [
+                            "[parameters('frontDoorId')]"
+                        ]
+                    }
+                }
+            ],
             "ftpsState": "Disabled",
             "appSettings": [
                 // Environment Variables
@@ -171,6 +191,13 @@
                     "redirectToProvider": "oidcProvider",
                     "excludedPaths": ["/health-probe.html"]
                 },
+                "httpSettings": {
+                    "requireHttps": true,
+                    // Required for Easy Auth and Front Door to work together
+                    "forwardProxy": {
+                        "convention": "Standard"
+                    }
+                },
                 "identityProviders": {
                     "customOpenIdConnectProviders": {
                         "oidcProvider": {
@@ -194,6 +221,18 @@
                             }
                         }
                     }
+                },
+                "login": {
+                    "tokenStore": {
+                        // If enabled, /.auth/me URL is exposed to the authenticated user,
+                        // which is useful for debugging OIDC claims
+                        "enabled": false
+                    },
+                    "preserveUrlFragmentsForLogins": true,
+                    "allowedExternalRedirectUrls": [
+                        // Required for Easy Auth and Front Door to work together
+                        "[parameters('frontDoorUri')]"
+                    ]
                 }
             }
         }

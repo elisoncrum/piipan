@@ -27,7 +27,6 @@ namespace Piipan.Match.State.Tests
                 Last = "Last",
                 Dob = new DateTime(1970, 1, 1),
                 Ssn = "000-00-0000",
-                Exception = "Exception",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
                 BenefitsEndMonth = new DateTime(1970, 1, 31),

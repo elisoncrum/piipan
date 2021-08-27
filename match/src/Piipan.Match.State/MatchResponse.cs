@@ -40,9 +40,6 @@ namespace Piipan.Match.State
         [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
         public DateTime Dob { get; set; }
 
-        [JsonProperty("exception")]
-        public string Exception { get; set; }
-
         // Read-only
         [JsonProperty("state")]
         public string State { get; }

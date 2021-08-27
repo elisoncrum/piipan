@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.Dashboard.Api;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
 
@@ -28,9 +29,10 @@ namespace Piipan.Dashboard
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.Claims));
-
-            services.AddRazorPages();
+            services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
+            services.AddRazorPages(options => {
+                options.Conventions.AuthorizeFolder("/");
+            });
             services.AddSingleton<IParticipantUploadRequest>((s) =>
             {
                 ITokenProvider tokenProvider;
@@ -55,6 +57,12 @@ namespace Piipan.Dashboard
             
             services.AddDistributedMemoryCache();
             services.AddSession();
+
+            services.AddAuthorizationCore(options => {
+                options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
+                    .GetSection(AuthorizationPolicyOptions.SectionName)
+                    .Get<AuthorizationPolicyOptions>());
+            });
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 

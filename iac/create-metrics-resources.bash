@@ -253,6 +253,8 @@ main () {
     --output tsv)
   echo "Front Door iD: ${front_door_id}"
 
+  front_door_uri="https://$DASHBOARD_FRONTDOOR_NAME"$(front_door_host_suffix)
+
   metrics_api_uri=$(\
     az functionapp function show \
       -g "$RESOURCE_GROUP" \
@@ -276,7 +278,9 @@ main () {
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$DASHBOARD_APP_IDP_OIDC_CONFIG_URI" \
       idpClientId="$DASHBOARD_APP_IDP_CLIENT_ID" \
-      aspNetCoreEnvironment="$PREFIX"
+      aspNetCoreEnvironment="$PREFIX" \
+      frontDoorId="$front_door_id" \
+      frontDoorUri="$front_door_uri"
 
   ./configure-oidc.bash "$azure_env" "$DASHBOARD_APP_NAME"
 

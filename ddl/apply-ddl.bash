@@ -29,10 +29,12 @@ apply_ddl () {
   db=$1
   owner=$2
   admin=$3
+  reader="readonly"
 
   psql "${PSQL_OPTS[@]}" -d "$db" \
     -v owner="$owner" \
     -v admin="$admin" \
+    -v reader="$reader" \
     -v superuser="$SUPERUSER" \
     -f ./per-state.sql
 }

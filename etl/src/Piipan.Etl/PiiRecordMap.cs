@@ -34,9 +34,6 @@ namespace Piipan.Etl
                 return match.Success;
             });
 
-            Map(m => m.Exception).Name("exception")
-                .TypeConverterOption.NullValues(string.Empty).Optional();
-
             Map(m => m.CaseId).Name("case_id").Validate(field =>
             {
                 return !string.IsNullOrEmpty(field.Field);
