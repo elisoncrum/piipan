@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.6] - 2021-08-23
 
 ### Added
+- OIDC claim-based policy enforcement to query tool and dashboard
 ### Changed
+- Numerous style/layout changes for the query tool
+- Azure B2C IDP docs to include notes on updating user claims
 ### Removed
+- `exceptions` field from bulk upload format and APIs
 ### Fixed
+- Front Door and Easy Auth now work together in the query tool and dashboard
 
 ## [0.5] - 2021-08-10
 ### Added
