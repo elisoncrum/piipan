@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6] - 2021-08-23
+
+### Added
+### Changed
+### Removed
+### Fixed
+
 ## [0.5] - 2021-08-10
 ### Added
 - OpenID Connect (OIDC) authentication to dashboard and query tool 
@@ -68,6 +75,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.6]: https://github.com/18F/piipan/releases/tag/v0.6
 [0.5]: https://github.com/18F/piipan/releases/tag/v0.5
 [0.4]: https://github.com/18F/piipan/releases/tag/v0.4
 [0.3]: https://github.com/18F/piipan/releases/tag/v0.3
