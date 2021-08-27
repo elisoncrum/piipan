@@ -26,7 +26,7 @@ namespace Piipan.Dashboard.Pages
             _participantUploadRequest = participantUploadRequest;
             _logger = logger;
         }
-        public string Title = "State participant data uploads";
+        public string Title = "Most recent upload from each state";
         public List<ParticipantUpload> ParticipantUploadResults { get; private set; } = new List<ParticipantUpload>();
         public string? NextPageParams { get; private set; }
         public string? PrevPageParams { get; private set; }
