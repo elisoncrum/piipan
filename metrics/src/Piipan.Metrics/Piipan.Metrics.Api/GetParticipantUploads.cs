@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Piipan.Metrics.Api.Serializers;
 using Piipan.Metrics.Models;
-using Piipan.Shared.Authentication;
 
 #nullable enable
 
@@ -110,7 +109,7 @@ namespace Piipan.Metrics.Api
             ILogger log)
         {
             Int64 count = 0;
-            string connString = await ConnectionString(log);
+            string connString = await DatabaseHelpers.ConnectionString();
             using (var conn = factory.CreateConnection())
             {
                 conn.ConnectionString = connString;
@@ -160,7 +159,7 @@ namespace Piipan.Metrics.Api
             ILogger log)
         {
             List<ParticipantUpload> results = new List<ParticipantUpload>();
-            string connString = await ConnectionString(log);
+            string connString = await DatabaseHelpers.ConnectionString();
             using (var conn = factory.CreateConnection())
             {
                 conn.ConnectionString = connString;
@@ -193,41 +192,6 @@ namespace Piipan.Metrics.Api
                 log.LogInformation("Closed db connection");
             }
             return results;
-        }
-
-        internal async static Task<string> ConnectionString(ILogger log)
-        {
-            // Environment variable (and placeholder) established
-            // during initial function app provisioning in IaC
-            const string CloudName = "CloudName";
-            const string DatabaseConnectionString = "DatabaseConnectionString";
-            const string PasswordPlaceholder = "{password}";
-            const string GovernmentCloud = "AzureUSGovernment";
-
-            // Resource ids for open source software databases in the public and
-            // US government clouds. Set the desired active cloud, then see:
-            // `az cloud show --query endpoints.ossrdbmsResourceId`
-            const string CommercialId = "https://ossrdbms-aad.database.windows.net";
-            const string GovermentId = "https://ossrdbms-aad.database.usgovcloudapi.net";
-
-            var resourceId = CommercialId;
-            var cn = Environment.GetEnvironmentVariable(CloudName);
-            if (cn == GovernmentCloud)
-            {
-                resourceId = GovermentId;
-            }
-
-            var builder = new NpgsqlConnectionStringBuilder(
-                Environment.GetEnvironmentVariable(DatabaseConnectionString));
-
-            if (builder.Password == PasswordPlaceholder)
-            {
-                var provider = new EasyAuthTokenProvider();
-                var token = await provider.RetrieveAsync(resourceId);
-                builder.Password = token.Token;
-            }
-
-            return builder.ConnectionString;
         }
 
         static void AddWithValue(DbCommand cmd, DbType type, String name, object value)

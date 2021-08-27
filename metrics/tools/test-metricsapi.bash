@@ -20,6 +20,8 @@ main () {
   source "$(dirname "$0")"/../../iac/iac-common.bash
   verify_cloud
 
+  TOKEN=$(az account get-access-token --resource "https://${METRICS_API_APP_NAME}.azurewebsites.net" --query accessToken -o tsv)
+
   # grab url for metrics api
   function_uri=$(az functionapp function show \
     --name "$METRICS_API_APP_NAME" \
@@ -29,9 +31,26 @@ main () {
     --output tsv)
 
   echo "Submitting request to ${function_uri}"
-  curl \
-    --request GET "${function_uri}" \
-    --include
+  curl -X GET -i \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${TOKEN}" \
+    "${function_uri}"
+
+  printf "\n"
+
+  # grab url for metrics api
+  function_uri_lastupload=$(az functionapp function show \
+    --name "$METRICS_API_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --function-name $METRICS_API_FUNCTION_NAME_LASTUPLOAD \
+    --query invokeUrlTemplate \
+    --output tsv)
+
+  echo "Submitting request to ${function_uri}"
+  curl -X GET -i \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${TOKEN}" \
+    "${function_uri_lastupload}"
 
   printf "\n"
 

@@ -34,6 +34,8 @@ namespace Piipan.Dashboard.Pages
         public static int PerPageDefault = 10;
         public static string ApiUrlKey = "MetricsApiUri";
         public string? MetricsApiBaseUrl = Environment.GetEnvironmentVariable(ApiUrlKey);
+        public string MetricsApiSearchPath = "/getparticipantuploads";
+        public string MetricsApiLastUploadPath = "/getlastupload";
 
         private HttpClient httpClient = new HttpClient();
 
@@ -42,7 +44,11 @@ namespace Piipan.Dashboard.Pages
             try
             {
                 _logger.LogInformation("Loading initial results");
-                var url = FormatUrl();
+                if (MetricsApiBaseUrl == null)
+                {
+                    throw new Exception("MetricsApiBaseUrl is null.");
+                }
+                var url = MetricsApiBaseUrl + MetricsApiLastUploadPath;
                 var response = await _participantUploadRequest.Get(url);
                 ParticipantUploadResults = response.data;
                 SetPageLinks(response.meta);
@@ -65,7 +71,7 @@ namespace Piipan.Dashboard.Pages
                 }
 
                 StateQuery = Request.Form["state"];
-                var url = QueryHelpers.AddQueryString(MetricsApiBaseUrl, "state", StateQuery);
+                var url = QueryHelpers.AddQueryString(MetricsApiBaseUrl + MetricsApiSearchPath, "state", StateQuery);
                 url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
                 var response = await _participantUploadRequest.Get(url);
                 ParticipantUploadResults = response.data;

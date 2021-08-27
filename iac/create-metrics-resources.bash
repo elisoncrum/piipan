@@ -255,13 +255,13 @@ main () {
 
   front_door_uri="https://$DASHBOARD_FRONTDOOR_NAME"$(front_door_host_suffix)
 
-  metrics_api_uri=$(\
-    az functionapp function show \
-      -g "$RESOURCE_GROUP" \
-      -n "$METRICS_API_APP_NAME" \
-      --function-name $METRICS_API_FUNCTION_NAME \
-      --query invokeUrlTemplate \
-      --output tsv)
+  metrics_api_hostname=$(\
+    az functionapp show \
+    -n "$METRICS_API_APP_NAME" \
+    -g "$RESOURCE_GROUP" \
+    --query "defaultHostName" \
+    --output tsv)
+  metrics_api_uri="https://${metrics_api_hostname}/api"
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
