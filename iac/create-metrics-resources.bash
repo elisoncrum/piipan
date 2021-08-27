@@ -251,7 +251,7 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --query frontdoorId \
     --output tsv)
-  echo "Front Door iD: ${front_door_id}"
+  echo "Front Door ID: ${front_door_id}"
 
   front_door_uri="https://$DASHBOARD_FRONTDOOR_NAME"$(front_door_host_suffix)
 
@@ -277,6 +277,7 @@ main () {
       metricsApiUri="$metrics_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$DASHBOARD_APP_IDP_OIDC_CONFIG_URI" \
+      idpOidcScopes="$DASHBOARD_APP_IDP_OIDC_SCOPES" \
       idpClientId="$DASHBOARD_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \

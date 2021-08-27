@@ -23,6 +23,9 @@
         "idpOidcConfigUri": {
             "type": "string"
         },
+        "idpOidcScopes": {
+            "type": "array"
+        },
         "idpClientId": {
             "type": "string"
         },
@@ -208,11 +211,7 @@
                             },
                             "login": {
                                 "nameClaimType": "name",
-                                "scopes": [
-                                    "openid",
-                                    "email",
-                                    "profile"
-                                ]
+                                "scopes": "[parameters('idpOidcScopes')]"
                             }
                         }
                     }

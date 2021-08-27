@@ -528,6 +528,7 @@ main () {
       OrchApiUri="$orch_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
+      idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
