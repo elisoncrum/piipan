@@ -20,7 +20,7 @@
       {
         "name": "participant_id",
         "type": "string",
-        "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information.",
+        "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information. No rows in the same upload should have the same participant_id and case_id.",
         "constraints": {
           "required": true
         }

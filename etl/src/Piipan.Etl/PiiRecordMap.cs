@@ -15,22 +15,9 @@ namespace Piipan.Etl
     {
         public PiiRecordMap()
         {
-            Map(m => m.Last).Name("last").Validate(field =>
+            Map(m => m.LdsHash).Name("lds_hash").Validate(field =>
             {
-                return !string.IsNullOrEmpty(field.Field);
-            });
-
-            Map(m => m.First).Name("first")
-                .TypeConverterOption.NullValues(string.Empty).Optional();
-
-            Map(m => m.Middle).Name("middle")
-                .TypeConverterOption.NullValues(string.Empty).Optional();
-
-            Map(m => m.Dob).Name("dob");
-
-            Map(m => m.Ssn).Name("ssn").Validate(field =>
-            {
-                Match match = Regex.Match(field.Field, "^[0-9]{3}-[0-9]{2}-[0-9]{4}$");
+                Match match = Regex.Match(field.Field, "^[0-9a-f]{128}$");
                 return match.Success;
             });
 
@@ -39,8 +26,10 @@ namespace Piipan.Etl
                 return !string.IsNullOrEmpty(field.Field);
             });
 
-            Map(m => m.ParticipantId).Name("participant_id")
-                .TypeConverterOption.NullValues(string.Empty).Optional();
+            Map(m => m.ParticipantId).Name("participant_id").Validate(field =>
+            {
+                return !string.IsNullOrEmpty(field.Field);
+            });
 
             Map(m => m.BenefitsEndDate)
                 .Name("benefits_end_month")
