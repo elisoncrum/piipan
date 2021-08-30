@@ -1,43 +1,11 @@
 {
     "fields": [
       {
-        "name": "last",
+        "name": "lds_hash",
         "type": "string",
-        "description": "Participant's last name",
+        "description": "SHA-512 digest of participant's last name, DoB, and SSN. See pprl.md for details",
         "constraints": {
-            "required": true,
-            "minLength": 1
-        }
-      },
-      {
-        "name": "first",
-        "type": "string",
-        "description": "Participant's first name"
-      },
-      {
-        "name": "middle",
-        "type": "string",
-        "description": "Participant's middle name"
-      },
-      {
-        "name": "dob",
-        "type": "date",
-        "format": "%Y-%m-%d",
-        "description": "Participant's date of birth in ISO 8601 format",
-        "constraints": {
-            "required": true
-        }
-      },
-      {
-        "name": "ssn",
-        "type": "string",
-        "description": "Participant's Social Security Number",
-        "constraints": {
-            "required": true,
-            "minLength": 11,
-            "maxLength": 11,
-            "unique": true,
-            "pattern": "^[0-9]{3}-[0-9]{2}-[0-9]{4}$"
+          "pattern": "^[0-9a-f]{128}$"
         }
       },
       {
@@ -52,7 +20,10 @@
       {
         "name": "participant_id",
         "type": "string",
-        "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information."
+        "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information.",
+        "constraints": {
+          "required": true
+        }
       },
       {
         "name": "benefits_end_month",
