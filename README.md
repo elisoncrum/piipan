@@ -1,71 +1,55 @@
 [![Build Status][badge_ci]][1] [![Maintainability][badge_cc_maint]][2] [![Test Coverage][badge_cc_cov]][3]
 
 
-# piipan
+# 🥧 piipan
 
-*A system for storing and matching Personal Identifiable Information (PII) records.*
+*A privacy-preserving system for storing and matching de-identified Personal Identifiable Information (PII) records.*
 
 ## Quick links
-- [Quickstart Guide for States](https://github.com/18F/piipan/blob/main/docs/quick-start-guide-states.md)
-- [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/main/docs/piipan-architecture.png)
+- [Quickstart Guide for States](https://github.com/18F/piipan/blob/dev/docs/quick-start-guide-states.md)
+- [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/dev/docs/piipan-architecture.png)
 
 ## Overview
 
-Piipan is a reference model for program integrity initiatives that aim to prevent multiple enrollment in federally-funded, but state-managed benefit programs. Under this model, each state regularly submits their entire list of program participants (i.e., their unique PII) to a federally run instance of Piipan. State-level eligibility workers for the benefit program then query Piipan as part of their (re)certification process; if the applicant is found to be receiving benefits in another state, the eligibility worker deconflicts the multiple enrollment.
+Piipan is a reference model for program integrity initiatives that aim to prevent multiple enrollment in federally-funded, but state-managed benefit programs. It is the open-source foundation for the [USDA Food and Nutrition Service](https://www.fns.usda.gov) National Accuracy Clearinghouse (NAC), a congressionally mandated matching system for the [Supplemental Nutrition Assistance Program (SNAP)](https://www.fns.usda.gov/snap/supplemental-nutrition-assistance-program).
+
+Under this model:
+1. State eligibility systems share *de-identified* participant data to Piipan daily
+
+<p align="center">
+  <a href="./docs/diagrams/daily-snapshots.png"><img src="./docs/diagrams/daily-snapshots.png" alt="De-identified participant data" width="60%"></a>
+</p>
+
+2. Duplicate participation is prevented by using Piipan to search for matches during eligibility (re)certification
+
+<p align="center">
+  <a href="./docs/diagrams/prevent-duplicate-enrolment.png"><img src="./docs/diagrams/prevent-duplicate-enrolment.png" alt="De-identified participant data" width="80%"></a>
+</p>
 
 Paramount quality attributes of this system include:
-* Only collect PII data elements that are strictly required
-* Confidentiality of program participant information
+* Preserving the privacy of program participants
 * Accuracy of matches
-* Adaptability to policy changes and multiple benefit programs
+* Adaptability to multiple benefit programs
 
-Further, this reference model is motivated and guided by [Sec. 4011 of the 2018 Farm Bill](https://www.congress.gov/bill/115th-congress/house-bill/2/text), *Interstate data matching to prevent multiple issuances*, which mandates that the information made available by state agencies:
+[Sec. 4011 of the 2018 Farm Bill](https://www.congress.gov/bill/115th-congress/house-bill/2/text), *Interstate data matching to prevent multiple issuances*, further guides our work, mandating that the information made available by state agencies:
 * Shall be used only for the purpose of preventing multiple enrollment
 * Shall not be retained for longer than is necessary
 
-## High-level architecture
-
-Piipan is designed to be a cloud-native system. It is under active development and is not complete. Several subsystems are anticipated and partially implemented:
-
-* [Extract-Transform-Load (ETL)](./etl)
-* [Active Match Orchestrator API](./match)
-* [Query Tool & Collaboration app](./query-tool)
-* [Dashboard app](./dashboard)
-* [Metrics](./metrics)
-* Collaboration
-* Batch-driven Bulk Match
- 
-Here is a diagram depicting these anticipated subsystems:
-
-<p align="center">
-  <a href="./docs/piipan-architecture.png"><img src="./docs/piipan-architecture.png" alt="High-level architecture"></a>
-</p>
-
-A guiding architectural principle is to treat state agencies and their data as tenants of a platform (i.e., Piipan), and accordingly apply isolation best practices and the principle of least privilege throughout the system.
-
-Finally, this reference model is designed to be extended to support a fully federated system, whereby PII records never leave state-run enclaves in bulk. Under this hypothetical extension, the federally-run API orchestrator would reach back to each state, rather than its own isolated copies of state participant records. And the bulk match API would incorporate a Privacy Set Intersection (PSI) protocol, with the federal system acting as a semi-trusted 3rd party. 
-
-## Implementation
-
-Piipan targets Microsoft Azure as its cloud computing platform, but generally selects for commoditized features that are available on other cloud platforms.
-
-To expedite development and compliance processes, Piipan maximizes the use of managed services, including Function-as-a-Service (FaaS). No virtual machines or containers are directly employed in the production system.
-
-Piipan's programming languages and frameworks include: .NET Core, C#, and ASP.NET using Razor Pages. Bash and ARM templates are used for Infrastructure-as-Code.
-
-Our processes and code are intended to be platform agnostic: the 18F team primarily uses macOS-hosted local development tools and the managed services use a mix of Windows and Linux.
-
-Piipan uses the monorepo strategy; subsystems get their own top-level directory and are independently deployable modulo any shared datastores. A system-wide CircleCI configuration manages continuous integration and deployment.
+**Note**: Our documentation will sometimes use the terms Piipan and NAC interchangeably. However, more precisely, Piipan is our [open-source product available on GitHub](https://github.com/18F/piipan), while the NAC is a deployment of that product, configured specifically for the Food and Nutrition Service, and operated under their policies and regulations. 
 
 ## Documentation
 
-Process and (sub)system documentation, as well as Architectural Decision Records (ADRs), are organized in [this index](./docs/README.md).
+[High-level architecture](./docs/architecture.md), process, and (sub)system documentation, as well as Architectural Decision Records (ADRs), are organized in [this index](./docs/README.md).
 
-## Building, testing, and deployment
+## Development
 
-Each subsystem has its own `build.bash` script that will build, test, or deploy the subsystem. Flags and arguments for each build script are the same and are specified in `tools/build-common.bash`.
+Piipan has [several prerequisites](./docs/iac.md#prerequisites). Once installed, the system can be built and tested by navigating to the top of the project tree and running:
 
-To build, test, or deploy all subsystems at once, run the top-level `build.bash` script.
+```
+./build.bash test
+```
+
+For more details, see Piipan's [architecture and implementation notes](./docs/architecture.md), our [team practices](./docs/engineering-team-practices.md), and our [other technical documentation](./docs/README.md).
 
 ## Public domain
 
