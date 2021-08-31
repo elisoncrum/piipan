@@ -2,6 +2,8 @@
 
 We’re designing the NAC so the system doesn’t store sensitive personally identifiable information (PII) of the ~40 million people applying for or receiving SNAP benefits. That means there will be no database that directly stores SNAP participants’ names, dates of birth, or social security numbers.
 
+A high-level description of our approach is below; a [detailed technical specification](./pprl.md) is also available.
+
 ## How are we building the NAC so it doesn’t store PII? 
 
 In order for the NAC to work, states will upload records of active SNAP participants to the NAC on a daily basis. States will use a tool to de-identify the PII of SNAP applicants and participants before uploading this data to the NAC. Each person’s PII is converted to a seemingly-random string of characters that acts as a de-identified code for that individual: the exact same PII always produces the same code. 

@@ -1,10 +1,12 @@
 # A Privacy-Preserving Record Linkage (PPRL) approach
 
-## Overview
-
 Piipan incorporates a secure hash encoding technique to de-identify Personally Identifiable Information (PII) of SNAP participants using a centralized [Privacy-Preserving Record Linkage (PPRL)](https://link.springer.com/referenceworkentry/10.1007%2F978-3-319-63962-8_17-1) model.
 
-In brief:
+A detailed technical description is below; a [high-level treatment](./pprl-plain.md) is also available.
+
+## Overview
+
+Our PPRL technique in brief:
 - States compute a secure hash for every SNAP participant using the participant's PII as input
 - The secure hash is submitted in the state's daily bulk upload instead of the participant's source PII
 - Piipan searches for exact matches across the secure hashes of the participating states
