@@ -7,7 +7,7 @@
 
 ## Quick links
 - [Quickstart Guide for States](https://github.com/18F/piipan/blob/dev/docs/quick-start-guide-states.md)
-- [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/dev/docs/piipan-architecture.png)
+- [High-level architecture diagram](https://raw.githubusercontent.com/18F/piipan/dev/docs/diagrams/piipan-architecture.png)
 
 ## Overview
 
