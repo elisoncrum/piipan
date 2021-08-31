@@ -43,17 +43,7 @@
         "appName": "[concat(parameters('appName'))]",
         "sku": "S1",
         "baseSiteConfig": {
-            // .NET 3.1 Core uses "v4.0", .NET 5 uses "v5.0"
-            "netFrameworkVersion": "v4.0",
-            "metadata": [
-                {
-                    // .NET 3.1 Core uses "dotnetcore", .NET 5 uses "dotnet"
-                    "name": "CURRENT_STACK",
-                    "value": "dotnetcore"
-                }
-            ],
-            // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments
-            "use32BitWorkerProcess": false,
+            "linuxFxVersion": "DOTNET|5.0",
             "ipSecurityRestrictions": [
                 // Restricts access to Front Door
                 {
@@ -96,10 +86,10 @@
             "sku": {
                 "name": "[variables('sku')]"
             },
-            "kind": "windows",
+            "kind": "linux",
             "properties": {
                 // Must be false for Windows deployments
-                "reserved": false
+                "reserved": true
             }
         },
         {

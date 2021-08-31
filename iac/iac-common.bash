@@ -20,7 +20,7 @@ CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
 # Name of App Service Plan, used by both query tool and dashboard
-APP_SERVICE_PLAN=plan-apps2-$ENV
+APP_SERVICE_PLAN=piipan-app-plan
 
 # App Service Plan used by function apps with VNet integration
 APP_SERVICE_PLAN_FUNC_NAME=plan-apps1-$ENV
