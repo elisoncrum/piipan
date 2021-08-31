@@ -35,6 +35,8 @@ Paramount quality attributes of this system include:
 * Shall be used only for the purpose of preventing multiple enrollment
 * Shall not be retained for longer than is necessary
 
+To achieve this product vision, Piipan incorporates a Privacy-Preserving Record Linkage (PPRL) technique to de-identify the PII of program participants at the state-level. Please see our [high-level treatment](./docs/pprl-plain.md) and our [technical specification](./docs/pprl.md) for more details.
+
 **Note**: Our documentation will sometimes use the terms Piipan and NAC interchangeably. However, more precisely, Piipan is our [open-source product available on GitHub](https://github.com/18F/piipan), while the NAC is a deployment of that product, configured specifically for the Food and Nutrition Service, and operated under their policies and regulations. 
 
 ## Documentation
@@ -43,7 +45,7 @@ Paramount quality attributes of this system include:
 
 ## Development
 
-Piipan has [several prerequisites](./docs/iac.md#prerequisites). Once installed, the system can be built and tested by navigating to the top of the project tree and running:
+Piipan is implemented with .NET and Microsoft Azure, using a Platform as a Service (PaaS) and Function as a Service (FaaS) approach. Once Piipan's [prerequisites](./docs/iac.md#prerequisites) are installed in a development environment, its subsystems can be built and tested by navigating to the top of its project tree and running:
 
 ```
 ./build.bash test
