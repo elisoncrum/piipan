@@ -14,6 +14,7 @@ Here is a diagram depicting these anticipated subsystems:
 
 <p align="center">
   <a href="./diagrams/piipan-architecture.png"><img src="./diagrams/piipan-architecture.png" alt="High-level architecture"></a>
+  <!-- Google Drawing: https://docs.google.com/drawings/d/1iSC5M6pxcnfV_LoqTnSGgZ9U4TZTbfPf4CpHCv001ug/ -->
 </p>
 
 A guiding architectural principle is to treat state agencies and their data as tenants of a platform (i.e., Piipan), and accordingly apply isolation best practices and the principle of least privilege throughout the system.

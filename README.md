@@ -18,12 +18,14 @@ Under this model:
 
 <p align="center">
   <a href="./docs/diagrams/daily-snapshots.png"><img src="./docs/diagrams/daily-snapshots.png" alt="De-identified participant data" width="60%"></a>
+  <!-- Google Slides: https://docs.google.com/presentation/d/1Lctqx9EuGvC9M5PGgQK6zXSiMfUWyafaX00KlZDhx4c/edit#slide=id.gbbca7102b2_0_175 -->
 </p>
 
 2. Duplicate participation is prevented by using Piipan to search for matches during eligibility (re)certification
 
 <p align="center">
   <a href="./docs/diagrams/prevent-duplicate-enrolment.png"><img src="./docs/diagrams/prevent-duplicate-enrolment.png" alt="De-identified participant data" width="80%"></a>
+  <!-- Google Slides: https://docs.google.com/presentation/d/1Lctqx9EuGvC9M5PGgQK6zXSiMfUWyafaX00KlZDhx4c/edit#slide=id.gbbca7102b2_0_182 -->
 </p>
 
 Paramount quality attributes of this system include:
