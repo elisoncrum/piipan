@@ -78,7 +78,7 @@ With the server's authentication and authorization mechanisms configured and the
 An illustrated version of this flow:
 
 <p align="center">
-  <a href="./piipan-internal-authentication.png"><img src="./piipan-internal-authentication.png" alt="Authenticated API diagram"></a>
+  <a href="./diagrams/piipan-internal-authentication.png"><img src="./diagrams/piipan-internal-authentication.png" alt="Authenticated API diagram"></a>
   <!-- Google Drawing: https://docs.google.com/drawings/d/1PlAZwHBbf1QkRC4LDkce7FmnUq25veJGj2Vafyj9-FY/edit?usp=sharing -->
 </p>
 
