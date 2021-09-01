@@ -13,20 +13,6 @@ namespace Piipan.Etl.IntegrationTests
     /// </summary>
     public class BulkUploadIntegrationTests : DbFixture
     {
-        static string LDS_HASH = "04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef";
-
-        static Stream CsvFixture(string[] records)
-        {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.WriteLine("lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
-            foreach (var record in records) writer.WriteLine(record);
-            writer.Flush();
-            stream.Position = 0;
-
-            return stream;
-        }
-
         [Fact]
         public async void SavesCsvRecords()
         {
@@ -34,9 +20,7 @@ namespace Piipan.Etl.IntegrationTests
             ClearParticipants();
             var eventGridEvent = Mock.Of<EventGridEvent>();
             eventGridEvent.Data = new Object();
-            Stream input = CsvFixture(new string[] {
-                $"{LDS_HASH},CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03,true"
-            });
+            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
             // act
             await BulkUpload.Run(
@@ -46,13 +30,13 @@ namespace Piipan.Etl.IntegrationTests
             );
             var records = QueryParticipants("SELECT * from participants;");
             // assert
-            Assert.Equal(LDS_HASH, records[0].LdsHash);
-            Assert.Equal("CaseId", records[0].CaseId);
-            Assert.Equal("ParticipantId", records[0].ParticipantId);
-            Assert.Equal(new DateTime(1970, 01, 31), records[0].BenefitsEndDate);
-            Assert.Equal(new DateTime(2021, 05, 31), records[0].RecentBenefitMonths[0]);
-            Assert.Equal(new DateTime(2021, 04, 30), records[0].RecentBenefitMonths[1]);
-            Assert.Equal(new DateTime(2021, 03, 31), records[0].RecentBenefitMonths[2]);
+            Assert.Equal("eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458", records[0].LdsHash);
+            Assert.Equal("caseid1", records[0].CaseId);
+            Assert.Equal("participantid1", records[0].ParticipantId);
+            Assert.Equal(new DateTime(2021, 05, 31), records[0].BenefitsEndDate);
+            Assert.Equal(new DateTime(2021, 04, 30), records[0].RecentBenefitMonths[0]);
+            Assert.Equal(new DateTime(2021, 03, 31), records[0].RecentBenefitMonths[1]);
+            Assert.Equal(new DateTime(2021, 02, 28), records[0].RecentBenefitMonths[2]);
             Assert.True(records[0].ProtectLocation);
         }
     }

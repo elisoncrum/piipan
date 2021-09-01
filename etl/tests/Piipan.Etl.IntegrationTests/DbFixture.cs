@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using System.Threading;
-using System.Threading.Tasks;
 using Npgsql;
-using Piipan.Etl;
 
 namespace Piipan.Etl.IntegrationTests
 {
@@ -147,9 +143,9 @@ namespace Piipan.Etl.IntegrationTests
                             LdsHash = reader[1].ToString(),
                             CaseId = reader[3].ToString(),
                             ParticipantId = reader[4].ToString(),
-                            BenefitsEndDate = Convert.ToDateTime(reader[5]),
-                            RecentBenefitMonths = new List<DateTime>((DateTime[])reader[6]),
-                            ProtectLocation = Convert.ToBoolean(reader[7])
+                            BenefitsEndDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
+                            RecentBenefitMonths = reader[6] is DBNull ? new List<DateTime>() : new List<DateTime>((DateTime[])reader[6]),
+                            ProtectLocation = reader[7] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[7])
                         };
                         records.Add(record);
                     }
