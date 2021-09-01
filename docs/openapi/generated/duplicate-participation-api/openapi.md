@@ -25,7 +25,7 @@ Base URLs:
 
 ```shell
 # You can also use wget
-curl -X POST /v2/find_participants \
+curl -X POST /v2/find_matches \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
   -H 'From: string' \
@@ -33,7 +33,7 @@ curl -X POST /v2/find_participants \
 
 ```
 
-`POST /find_participants`
+`POST /find_matches`
 
 *Search for all matching participant records using de-identified data*
 

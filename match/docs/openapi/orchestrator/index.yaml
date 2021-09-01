@@ -9,9 +9,9 @@ tags:
 servers:
   - url: "/v2"
 paths:
-  /find_participants:
+  /find_matches:
     $ref: './find.yaml'
-  /find_participants_by_pii:
+  /find_matches_by_pii:
     $ref: './find-pii.yaml'
 security:
   - BearerAuth: []

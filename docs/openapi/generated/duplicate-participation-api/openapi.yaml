@@ -6,7 +6,7 @@ info:
 servers:
   - url: /v2
 paths:
-  /find_participants:
+  /find_matches:
     post:
       operationId: Find matches
       tags:
@@ -222,10 +222,10 @@ paths:
                       results:
                         - index: 0
                           matches:
-                            - $ref: '#/paths/~1find_participants/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
+                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
                         - index: 1
                           matches:
-                            - $ref: '#/paths/~1find_participants/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
+                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
                       errors: []
                 Multiple persons with one match:
                   description: A query for two persons returning no matches for one person and a match for the other
@@ -236,7 +236,7 @@ paths:
                           matches: []
                         - index: 1
                           matches:
-                            - $ref: '#/paths/~1find_participants/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
+                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
                       errors: []
                 Multiple persons with errors:
                   description: A query for two persons returning a successful result for one person and an error for the other person
@@ -245,7 +245,7 @@ paths:
                       results:
                         - index: 1
                           matches:
-                            - $ref: '#/paths/~1find_participants/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
+                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
                       errors:
                         - index: 0
                           code: XYZ

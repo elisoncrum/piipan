@@ -6,7 +6,7 @@ info:
 servers:
   - url: "/v2"
 paths:
-  /find_participants:
+  /find_matches:
     $ref: '../../match/docs/openapi/orchestrator/find.yaml'
 security:
   - ApiKeyAuth: []
