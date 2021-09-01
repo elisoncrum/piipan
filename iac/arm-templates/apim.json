@@ -226,7 +226,7 @@
                     "https"
                 ],
                 "path": "[concat(variables('uploadSetName'), '/', variables('uploadStatesList')[copyIndex()])]",
-                "apiVersion": "v1",
+                "apiVersion": "v2",
                 "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
                 "serviceUrl": "[concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase'))]"
             },

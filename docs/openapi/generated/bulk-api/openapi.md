@@ -1,6 +1,6 @@
 <!-- Generator: Widdershins v4.0.1 -->
 
-<h1 id="bulk-api">Bulk API v1.0.0</h1>
+<h1 id="bulk-api">Bulk API v2.0.0</h1>
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
@@ -8,7 +8,7 @@ The API for performing bulk uploads
 
 Base URLs:
 
-* <a href="/bulk/{stateAbbr}/v1">/bulk/{stateAbbr}/v1</a>
+* <a href="/bulk/{stateAbbr}/v2">/bulk/{stateAbbr}/v2</a>
 
     * **stateAbbr** - Lowercase two-letter postal code abbreviation Default: none
 
@@ -27,7 +27,7 @@ Base URLs:
 
 ```shell
 # You can also use wget
-curl -X PUT /bulk/{stateAbbr}/v1/upload/{filename} \
+curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
   -H 'Content-Type: text/plain' \
   -H 'Content-Length: 0' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
