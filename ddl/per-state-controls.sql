@@ -7,6 +7,8 @@ BEGIN;
 --  * database `admin`, which gets read/write access
 --  * database `reader`, which gets read-only access
 
+SET search_path=piipan,public;
+
 -- "superuser" account under Azure is not so super
 GRANT :owner to :superuser;
 
