@@ -71,30 +71,7 @@ namespace Piipan.Match.Orchestrator
                 // Top-level request validation
                 (new OrchMatchRequestValidator()).ValidateAndThrow(request);
 
-                var response = new OrchMatchResponse();
-                for (int i = 0; i < request.Data.Count; i++)
-                {
-                    try
-                    {
-                        var result = await PersonMatch(request.Data[i], i, log);
-                        response.Data.Results.Add(result);
-                    }
-                    catch (ValidationException ex)
-                    {
-                        // Person-level validation errors are returned in the
-                        // response rather than triggering a 4xx error
-                        response.Data.Errors.AddRange(HandlePersonValidationFailure(ex, i));
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogInformation(ex.Message);
-                    }
-                }
-
-                return (ActionResult)new JsonResult(response)
-                {
-                    StatusCode = (int)HttpStatusCode.OK
-                };
+                return await FindMatches(request, log);
             }
             catch (ValidationException ex)
             {
@@ -141,9 +118,37 @@ namespace Piipan.Match.Orchestrator
             return request;
         }
 
-        private async Task<List<PiiRecord>> PerStateMatch(string state, RequestPerson person, ILogger log)
+        private async Task<IActionResult> FindMatches(OrchMatchRequest request, ILogger log)
         {
-            List<PiiRecord> records;
+            var response = new OrchMatchResponse();
+            for (int i = 0; i < request.Data.Count; i++)
+            {
+                try
+                {
+                    var result = await PersonMatch(request.Data[i], i, log);
+                    response.Data.Results.Add(result);
+                }
+                catch (ValidationException ex)
+                {
+                    // Person-level validation errors are returned in the
+                    // response rather than triggering a 4xx error
+                    response.Data.Errors.AddRange(HandlePersonValidationFailure(ex, i));
+                }
+                catch (Exception ex)
+                {
+                    log.LogInformation(ex.Message);
+                }
+            }
+
+            return (ActionResult)new JsonResult(response)
+            {
+                StatusCode = (int)HttpStatusCode.OK
+            };
+        }
+
+        private async Task<List<ParticipantRecord>> PerStateMatch(string state, RequestPerson person, ILogger log)
+        {
+            List<ParticipantRecord> records;
 
             using (var conn = _dbFactory.CreateConnection())
             {
@@ -151,12 +156,12 @@ namespace Piipan.Match.Orchestrator
                 conn.Open();
 
                 (var sql, var parameters) = Prepare(person, log);
-                records = conn.Query<PiiRecord>(sql, (object)parameters).AsList();
+                records = conn.Query<ParticipantRecord>(sql, (object)parameters).AsList();
 
                 conn.Close();
             }
 
-            // Inject state into PiiRecord
+            // Inject state into ParticipantRecord
             records.ForEach(r => r.State = state);
 
             return records;
@@ -174,11 +179,11 @@ namespace Piipan.Match.Orchestrator
             personValidator.ValidateAndThrow(person);
 
             var states = Environment.GetEnvironmentVariable(States).Split(',');
-            var stateResults = new List<Task<List<PiiRecord>>>();
+            var stateResults = new List<Task<List<ParticipantRecord>>>();
             var personResult = new OrchMatchResult
             {
                 Index = index,
-                Matches = new List<PiiRecord>()
+                Matches = new List<ParticipantRecord>()
             };
 
             foreach (var state in states)

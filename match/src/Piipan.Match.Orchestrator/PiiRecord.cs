@@ -5,7 +5,7 @@ using Piipan.Match.Shared;
 
 namespace Piipan.Match.Orchestrator
 {
-    public class PiiRecord
+    public class ParticipantRecord
     {
         [JsonProperty("last")]
         public string Last { get; set; }
