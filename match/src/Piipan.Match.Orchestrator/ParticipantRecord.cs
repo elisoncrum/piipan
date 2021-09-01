@@ -7,21 +7,9 @@ namespace Piipan.Match.Orchestrator
 {
     public class ParticipantRecord
     {
-        [JsonProperty("last")]
-        public string Last { get; set; }
-
-        [JsonProperty("first")]
-        public string First { get; set; }
-
-        [JsonProperty("middle")]
-        public string Middle { get; set; }
-
-        [JsonProperty("ssn")]
-        public string Ssn { get; set; }
-
-        [JsonProperty("dob")]
-        [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
-        public DateTime Dob { get; set; }
+        [JsonProperty("lds_hash",
+            NullValueHandling = NullValueHandling.Ignore)]
+        public string LdsHash { get; set; }
 
         [JsonProperty("state")]
         public string State { get; set; }

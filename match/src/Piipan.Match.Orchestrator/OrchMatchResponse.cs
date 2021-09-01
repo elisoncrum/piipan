@@ -9,10 +9,5 @@ namespace Piipan.Match.Orchestrator
     {
         [JsonProperty("data")]
         public OrchMatchResponseData Data { get; set; } = new OrchMatchResponseData();
-
-        public string ToJson()
-        {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-        }
     }
 }

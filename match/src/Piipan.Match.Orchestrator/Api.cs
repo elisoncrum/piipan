@@ -33,19 +33,21 @@ namespace Piipan.Match.Orchestrator
             _tokenProvider = provider;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
         /// <summary>
-        /// API endpoint for conducting a PII match across all participating states
+        /// API endpoint for conducting matches across all participating states
+        /// using de-identified data
         /// </summary>
         /// <param name="req">incoming HTTP request</param>
         /// <param name="log">handle to the function log</param>
         /// <remarks>
-        /// This function is expected to be executing as a resource with query
-        /// access to the individual per-state API resources.
+        /// This function is expected to be executing as a resource with read
+        /// access to the per-state participant databases.
         /// </remarks>
-        [FunctionName("query")]
-        public async Task<IActionResult> Query(
+        [FunctionName("find_matches")]
+        public async Task<IActionResult> Find(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -93,6 +95,24 @@ namespace Piipan.Match.Orchestrator
             {
                 return InternalServerErrorResponse(ex);
             }
+        }
+
+        /// <summary>
+        /// API endpoint for conducting a PII match across all participating states
+        /// </summary>
+        /// <param name="req">incoming HTTP request</param>
+        /// <param name="log">handle to the function log</param>
+        /// <remarks>
+        /// This function is expected to be executing as a resource with read
+        /// access to the individual per-state participant databases.
+        /// </remarks>
+        [FunctionName("find_matches_by_pii")]
+        public IActionResult FindPii(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            // xxx Implement parsing, validating, and hashing of PII
+            return (ActionResult)new NoContentResult();
         }
 
         private OrchMatchRequest Parse(string requestBody, ILogger log)
@@ -155,8 +175,16 @@ namespace Piipan.Match.Orchestrator
                 conn.ConnectionString = await ConnectionString(state);
                 conn.Open();
 
-                (var sql, var parameters) = Prepare(person, log);
-                records = conn.Query<ParticipantRecord>(sql, (object)parameters).AsList();
+                records = conn.Query<ParticipantRecord>(@"
+                    SELECT participant_id,
+                        case_id,
+                        benefits_end_date BenefitsEndMonth,
+                        recent_benefit_months,
+                        protect_location
+                    FROM participants
+                    WHERE lds_hash=@LdsHash
+                        AND upload_id=(SELECT id FROM uploads ORDER BY id DESC LIMIT 1)",
+                    person).AsList();
 
                 conn.Close();
             }
@@ -238,24 +266,6 @@ namespace Piipan.Match.Orchestrator
             }
 
             return builder.ConnectionString;
-        }
-
-        internal static (string, dynamic) Prepare(RequestPerson person, ILogger log)
-        {
-            var p = new
-            {
-                ssn = person.Ssn,
-                dob = person.Dob,
-                last = person.Last
-            };
-            var sql = "SELECT upload_id, first, last, middle, dob, ssn, case_id CaseId, " +
-                            "participant_id ParticipantId, benefits_end_date BenefitsEndMonth, " +
-                            "recent_benefit_months RecentBenefitMonths, protect_location ProtectLocation " +
-                        "FROM participants " +
-                        "WHERE ssn=@ssn AND dob=@dob AND upper(last)=upper(@last) " +
-                        "AND upload_id=(SELECT id FROM uploads ORDER BY id DESC LIMIT 1)";
-
-            return (sql, p);
         }
 
         private List<OrchMatchError> HandlePersonValidationFailure(ValidationException exception, int index)

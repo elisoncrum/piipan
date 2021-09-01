@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using FluentValidation.TestHelper;
 using Piipan.Match.Orchestrator;
@@ -34,11 +33,7 @@ public class OrchMatchRequestValidatorTests
         {
             list.Add(new RequestPerson
             {
-                First = "First",
-                Middle = "Middle",
-                Last = "Last",
-                Dob = new DateTime(1970, 1, 1),
-                Ssn = "000-00-0000"
+                LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
             });
         }
         var model = new OrchMatchRequest { Data = list };
@@ -57,41 +52,24 @@ public class PersonValidatorTests
     }
 
     [Fact]
-    public void ReturnsErrorWhenLastNameEmpty()
+    public void ReturnsErrorWhenHashEmpty()
     {
         var model = new RequestPerson()
         {
-            Last = "",
-            First = "Foo",
-            Ssn = "123-45-6789"
+            LdsHash = ""
         };
         var result = Validator().TestValidate(model);
-        result.ShouldHaveValidationErrorFor(person => person.Last);
+        result.ShouldHaveValidationErrorFor(person => person.LdsHash);
     }
 
     [Fact]
-    public void ReturnsErrorWhenFirstNameEmpty()
+    public void ReturnsErrorWhenHashMalformed()
     {
         var model = new RequestPerson()
         {
-            First = "",
-            Last = "Foo",
-            Ssn = "123-45-6789"
+            LdsHash = "Foo"
         };
         var result = Validator().TestValidate(model);
-        result.ShouldHaveValidationErrorFor(person => person.First);
-    }
-
-    [Fact]
-    public void ReturnsErrorWhenSsnMalformed()
-    {
-        var model = new RequestPerson()
-        {
-            Last = "Foo",
-            First = "Bar",
-            Ssn = "baz"
-        };
-        var result = Validator().TestValidate(model);
-        result.ShouldHaveValidationErrorFor(person => person.Ssn);
+        result.ShouldHaveValidationErrorFor(person => person.LdsHash);
     }
 }
