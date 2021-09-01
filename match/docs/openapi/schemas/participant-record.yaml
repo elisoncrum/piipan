@@ -1,28 +1,11 @@
-#/components/schemas/PiiRecord
-PiiRecord:
+# Schema for participant records in response objects
+ParticipantRecord:
   type: "object"
   required:
-    - last
-    - ssn
-    - dob
+    - state
+    - participant_id
+    - case_id
   properties:
-    first:
-      type: string
-      description: "First name"
-    middle:
-      type: string
-      description: "Middle name"
-    last:
-      type: string
-      description: "Last name"
-    ssn:
-      type: string
-      description: "Social Security number"
-      pattern: '^\d{3}-\d{2}-\d{4}$'
-    dob:
-      type: string
-      format: "date"
-      description: "Date of birth"
     state:
       type: string
       description: "State/territory two-letter postal abbreviation"
@@ -56,13 +39,8 @@ PiiRecord:
       example: true
       description: "Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values."
 
-PiiRecordExamples:
+ParticipantRecordExamples:
   All:
-    first: "string"
-    middle: "string"
-    last: "string"
-    ssn: "000-00-0000"
-    dob: "1970-01-01"
     state: "ea"
     state_abbr: "ea"
     case_id: "string"
@@ -74,11 +52,6 @@ PiiRecordExamples:
       - "2021-03"
     protect_location: true
   AllEB:
-    first: "string"
-    middle: "string"
-    last: "string"
-    ssn: "000-00-0000"
-    dob: "1970-01-01"
     state: "eb"
     state_abbr: "eb"
     case_id: "string"
@@ -90,11 +63,6 @@ PiiRecordExamples:
       - "2021-03"
     protect_location: true
   Required:
-    first: null
-    middle: null
-    last: "string"
-    ssn: "000-00-0000"
-    dob: "1970-01-01"
     state: "ec"
     state_abbr: "ec"
     case_id: "string"

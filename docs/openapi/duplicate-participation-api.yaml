@@ -4,10 +4,10 @@ info:
   version: 1.0.0
   description: "The API where matching will occur"
 servers:
-  - url: "/v1"
+  - url: "/v2"
 paths:
-  /query:
-    $ref: '../../match/docs/openapi/orchestrator/query.yaml'
+  /find_matches:
+    $ref: '../../match/docs/openapi/orchestrator/find.yaml'
 security:
   - ApiKeyAuth: []
 components:
