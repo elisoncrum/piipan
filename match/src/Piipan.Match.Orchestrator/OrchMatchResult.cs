@@ -15,6 +15,6 @@ namespace Piipan.Match.Orchestrator
         public int Index { get; set; }
 
         [JsonProperty("matches")]
-        public List<PiiRecord> Matches { get; set; }
+        public List<ParticipantRecord> Matches { get; set; }
     }
 }

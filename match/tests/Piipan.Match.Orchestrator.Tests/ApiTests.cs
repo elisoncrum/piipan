@@ -27,9 +27,9 @@ namespace Piipan.Match.Orchestrator.Tests
 {
     public class ApiTests
     {
-        static PiiRecord FullRecord()
+        static ParticipantRecord FullRecord()
         {
-            return new PiiRecord
+            return new ParticipantRecord
             {
                 First = "First",
                 Middle = "Middle",
@@ -111,7 +111,7 @@ namespace Piipan.Match.Orchestrator.Tests
             var stateResponse = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<PiiRecord> { FullRecord() }
+                Matches = new List<ParticipantRecord> { FullRecord() }
             };
             return stateResponse;
         }
@@ -207,10 +207,10 @@ namespace Piipan.Match.Orchestrator.Tests
         ////
 
         [Fact]
-        public void PiiRecordJson()
+        public void ParticipantRecordJson()
         {
             var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
-            var record = JsonConvert.DeserializeObject<PiiRecord>(json);
+            var record = JsonConvert.DeserializeObject<ParticipantRecord>(json);
 
             string jsonRecord = record.ToJson();
 

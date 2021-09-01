@@ -146,7 +146,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             }
         }
 
-        public void Insert(PiiRecord record)
+        public void Insert(ParticipantRecord record)
         {
             var factory = NpgsqlFactory.Instance;
 

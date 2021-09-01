@@ -15,9 +15,9 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {
-        static PiiRecord FullRecord()
+        static ParticipantRecord FullRecord()
         {
-            return new PiiRecord
+            return new ParticipantRecord
             {
                 First = "First",
                 Middle = "Middle",
