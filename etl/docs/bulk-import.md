@@ -22,7 +22,7 @@ Exclude participant records that meet any of the following criteria from your up
 
 ## Validating files
 
-There are Table Schema libraries available for [multiple programming languages](https://frictionlessdata.io/tooling/table-schema-tools/). The following example will use macOS, homebrew, Python, and [tableschema-py](https://github.com/frictionlessdata/tableschema-py):
+There are Table Schema libraries available for [multiple programming languages](https://github.com/orgs/frictionlessdata/repositories?language=&q=tableschema&sort=&type=). The following example will use macOS, homebrew, Python, and [tableschema-py](https://github.com/frictionlessdata/tableschema-py):
 
 ```
 brew install python
