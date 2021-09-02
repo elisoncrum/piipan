@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -23,6 +24,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Match.Orchestrator\Piipan.Match.Orchestrator.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\ddl\per-state.sql" Link="per-state.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
 using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,11 +29,6 @@ namespace Piipan.Match.Orchestrator.Tests
         {
             return new ParticipantRecord
             {
-                First = "First",
-                Middle = "Middle",
-                Last = "Last",
-                Dob = new DateTime(1970, 1, 1),
-                Ssn = "000-00-0000",
                 CaseId = "CaseIdExample",
                 BenefitsEndMonth = new DateTime(1970, 1, 31),
                 RecentBenefitMonths = new List<DateTime>() {
@@ -54,11 +47,8 @@ namespace Piipan.Match.Orchestrator.Tests
                 Data = new List<RequestPerson>() {
                     new RequestPerson
                     {
-                        First = "First",
-                        Middle = "Middle",
-                        Last = "Last",
-                        Dob = new DateTime(1970, 1, 1),
-                        Ssn = "000-00-0000"
+                        // farrington,1931-10-13,000-12-3456
+                        LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
                     }
                 }
             };
@@ -71,19 +61,13 @@ namespace Piipan.Match.Orchestrator.Tests
                 Data = new List<RequestPerson>() {
                     new RequestPerson
                     {
-                        First = "First",
-                        Middle = "Middle",
-                        Last = "Last",
-                        Dob = new DateTime(1970, 1, 1),
-                        Ssn = "000-00-0000"
+                        // farrington,1931-10-13,000-12-3456
+                        LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
                     },
                     new RequestPerson
                     {
-                        First = "FirstTwo",
-                        Middle = "MiddleTwo",
-                        Last = "LastTwo",
-                        Dob = new DateTime(1970, 1, 2),
-                        Ssn = "000-00-0001"
+                        // lynn,1940-08-01,000-12-3457
+                        LdsHash = "97719c32bb3c6a5e08c1241a7435d6d7047e75f40d8b3880744c07fef9d586954f77dc93279044c662d5d379e9c8a447ce03d9619ce384a7467d322e647e5d95"
                     }
                 }
             };
@@ -96,11 +80,8 @@ namespace Piipan.Match.Orchestrator.Tests
             {
                 list.Add(new RequestPerson
                 {
-                    First = "First",
-                    Middle = "Middle",
-                    Last = "Last",
-                    Dob = new DateTime(1970, 1, 1),
-                    Ssn = "000-00-0000"
+                    // farrington,1931-10-13,000-12-3456
+                    LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
                 });
             }
             return new OrchMatchRequest { Data = list };
@@ -209,17 +190,13 @@ namespace Piipan.Match.Orchestrator.Tests
         [Fact]
         public void ParticipantRecordJson()
         {
-            var json = @"{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '000000000', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
+            var json = @"{participant_id: 'baz', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
             var record = JsonConvert.DeserializeObject<ParticipantRecord>(json);
 
             string jsonRecord = record.ToJson();
 
-            Assert.Contains("\"last\": \"Last\"", jsonRecord);
-            Assert.Contains("\"dob\": \"2020-01-01\"", jsonRecord);
-            Assert.Contains("\"ssn\": \"000000000\"", jsonRecord);
-            Assert.Contains("\"first\": \"First\"", jsonRecord);
-            Assert.Contains("\"middle\": null", jsonRecord);
             Assert.Contains("\"state\": null", jsonRecord);
+            Assert.Contains("\"participant_id\": \"baz\"", jsonRecord);
             Assert.Contains("\"case_id\": \"foo\"", jsonRecord);
             Assert.Contains("\"benefits_end_month\": \"2020-01\"", jsonRecord);
             Assert.Contains("\"recent_benefit_months\": [", jsonRecord);
@@ -245,7 +222,7 @@ namespace Piipan.Match.Orchestrator.Tests
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
 
             // Assert
             var result = response as BadRequestObjectResult;
@@ -269,7 +246,7 @@ namespace Piipan.Match.Orchestrator.Tests
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
 
             // Assert
             var result = response as BadRequestObjectResult;
@@ -284,11 +261,8 @@ namespace Piipan.Match.Orchestrator.Tests
 
         // Invalid person-level results in item-level validation errors
         [Theory]
-        [InlineData(@"[{last: 'Last', first: 'First', dob: '2020-01-01', ssn: '0000000000'}]")] // Invalid Ssn format
-        [InlineData(@"[{last: '', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Empty last
-        [InlineData(@"[{last: '        ', first: 'First', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Whitespace last
-        [InlineData(@"[{last: 'Last', first: '', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Empty first
-        [InlineData(@"[{last: 'Last', first: '       ', dob: '2020-01-01', ssn: '000-00-0000'}]")] // Whitespace first
+        [InlineData(@"[{lds_hash: 'abc'}]")] // Invalid hash
+        [InlineData(@"[{lds_hash: ''}]")] // Empty hash
         public async void ExpectBadResultFromInvalidPersonData(string query)
         {
             // Arrange
@@ -297,7 +271,7 @@ namespace Piipan.Match.Orchestrator.Tests
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
 
             // Assert
             var result = response as JsonResult;
@@ -312,12 +286,8 @@ namespace Piipan.Match.Orchestrator.Tests
 
         // Incomplete person-level results in top-level bad request response
         [Theory]
-        [InlineData(@"[{first: 'First'}]")] // Missing Last, Dob, and Ssn
-        [InlineData(@"[{last: 'Last'}]")] // Missing Dob and Ssn
-        [InlineData(@"[{last: 'Last', dob: '2020-01-01'}]")] // Missing Ssn
-        [InlineData(@"[{last: 'Last', dob: '2020-01-1', ssn: '000-00-000'}]")] // Invalid Dob DateTime
-        [InlineData(@"[{last: 'Last', dob: '', ssn: '000-00-000'}]")] // Empty Dob DateTime
-        [InlineData(@"[{last: 'Last', dob: '2020-01-01', ssn: '000-00-000'}]")] // Missing First
+        [InlineData(@"[{ssn: '000-00-0000'}]")] // Missing hash
+        [InlineData(@"[{}]")] // Empty record
         public async void ExpectBadResultFromIncompleteData(string query)
         {
             // Arrange
@@ -326,7 +296,7 @@ namespace Piipan.Match.Orchestrator.Tests
             var logger = Mock.Of<ILogger>();
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
 
             // Assert
             var result = response as BadRequestObjectResult;
@@ -373,7 +343,7 @@ namespace Piipan.Match.Orchestrator.Tests
             .Throws(new Exception("example message"));
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger.Object);
+            var response = await api.Find(mockRequest.Object, logger.Object);
             var result = response as JsonResult;
             var resBody = result.Value as ApiErrorResponse;
             var error = resBody.Errors[0];

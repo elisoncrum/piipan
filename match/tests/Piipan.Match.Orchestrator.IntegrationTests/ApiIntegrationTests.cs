@@ -19,11 +19,8 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
         {
             return new ParticipantRecord
             {
-                First = "First",
-                Middle = "Middle",
-                Last = "Last",
-                Dob = new DateTime(1970, 1, 1),
-                Ssn = "000-00-0000",
+                // farrington,1931-10-13,000-12-3456
+                LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
                 BenefitsEndMonth = new DateTime(1970, 1, 31),
@@ -86,7 +83,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             Insert(record);
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
             var result = response as JsonResult;
             var resultObject = result.Value as OrchMatchResponse;
 
@@ -94,11 +91,6 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             Assert.Single(resultObject.Data.Results);
 
             var person = resultObject.Data.Results[0];
-            Assert.Equal(record.First, person.Matches[0].First);
-            Assert.Equal(record.Middle, person.Matches[0].Middle);
-            Assert.Equal(record.Last, person.Matches[0].Last);
-            Assert.Equal(record.Dob, person.Matches[0].Dob);
-            Assert.Equal(record.Ssn, person.Matches[0].Ssn);
             Assert.Equal(record.CaseId, person.Matches[0].CaseId);
             Assert.Equal(record.ParticipantId, person.Matches[0].ParticipantId);
             Assert.Equal(state[0], person.Matches[0].State);
@@ -120,7 +112,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             ClearParticipants();
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
             var result = response as JsonResult;
             var resultObject = result.Value as OrchMatchResponse;
 
@@ -134,7 +126,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             // Arrange
             var recordA = FullRecord();
             var recordB = FullRecord();
-            recordB.Ssn = "00-00-00";
+            recordB.LdsHash = "foo";
             var logger = Mock.Of<ILogger>();
             var body = new object[] { recordA, recordB };
             var mockRequest = MockRequest(JsonBody(body));
@@ -144,7 +136,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             Insert(recordA);
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
             var result = response as JsonResult;
             var resultObject = result.Value as OrchMatchResponse;
 
@@ -154,37 +146,14 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
         }
 
         [Fact]
-        public async void ApiReturnsMultipleValidationErrors()
-        {
-            // Arrange
-            var recordA = FullRecord();
-            var logger = Mock.Of<ILogger>();
-
-            ClearParticipants();
-            Insert(recordA);
-
-            recordA.Ssn = "00-00-0000";
-            recordA.First = "";
-            var body = new object[] { recordA };
-            var mockRequest = MockRequest(JsonBody(body));
-            var api = Construct();
-
-            // Act
-            var response = await api.Query(mockRequest.Object, logger);
-            var result = response as JsonResult;
-            var resultObject = result.Value as OrchMatchResponse;
-
-            // Assert
-            Assert.Equal(2, resultObject.Data.Errors.Count);
-        }
-
-        [Fact]
         public async void ApiReturnsExpectedIndices()
         {
             // Arrange
             var recordA = FullRecord();
             var recordB = FullRecord();
-            recordB.Last = "LastB";
+            // lynn,1940-08-01,000-12-3457
+            recordB.LdsHash = "97719c32bb3c6a5e08c1241a7435d6d7047e75f40d8b3880744c07fef9d586954f77dc93279044c662d5d379e9c8a447ce03d9619ce384a7467d322e647e5d95";
+            recordB.ParticipantId = "ParticipantB";
             var logger = Mock.Of<ILogger>();
             var body = new object[] { recordA, recordB };
             var mockRequest = MockRequest(JsonBody(body));
@@ -195,7 +164,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             Insert(recordB);
 
             // Act
-            var response = await api.Query(mockRequest.Object, logger);
+            var response = await api.Find(mockRequest.Object, logger);
             var result = response as JsonResult;
             var resultObject = result.Value as OrchMatchResponse;
 
@@ -203,8 +172,8 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             var resultA = resultObject.Data.Results.Find(p => p.Index == 0);
             var resultB = resultObject.Data.Results.Find(p => p.Index == 1);
 
-            Assert.Equal(resultA.Matches[0].Last, recordA.Last);
-            Assert.Equal(resultB.Matches[0].Last, recordB.Last);
+            Assert.Equal(resultA.Matches[0].ParticipantId, recordA.ParticipantId);
+            Assert.Equal(resultB.Matches[0].ParticipantId, recordB.ParticipantId);
         }
     }
 }
