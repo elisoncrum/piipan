@@ -135,7 +135,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -160,7 +160,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -173,7 +173,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -202,7 +202,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -227,7 +227,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
