@@ -69,7 +69,6 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
 
         }
 
-        // xxx Apply schema directly from ddl/per-state.sql
         private void ApplySchema()
         {
             string sqltext = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
