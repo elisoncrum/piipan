@@ -25,7 +25,7 @@ run_deploy () {
 
   echo "Publish ${METRICS_API_APP_NAME} to Azure Environment ${azure_env}"
   pushd ./src/Piipan.Metrics/Piipan.Metrics.Api
-    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet
+    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet-isolated --force
   popd
 }
 
