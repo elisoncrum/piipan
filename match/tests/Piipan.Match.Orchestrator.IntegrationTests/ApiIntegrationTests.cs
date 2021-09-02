@@ -19,6 +19,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
         {
             return new ParticipantRecord
             {
+                // farrington,1931-10-13,000-12-3456
                 LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
@@ -150,6 +151,7 @@ namespace Piipan.Match.Orchestrator.IntegrationTests
             // Arrange
             var recordA = FullRecord();
             var recordB = FullRecord();
+            // lynn,1940-08-01,000-12-3457
             recordB.LdsHash = "97719c32bb3c6a5e08c1241a7435d6d7047e75f40d8b3880744c07fef9d586954f77dc93279044c662d5d379e9c8a447ce03d9619ce384a7467d322e647e5d95";
             recordB.ParticipantId = "ParticipantB";
             var logger = Mock.Of<ILogger>();
