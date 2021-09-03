@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: "The API where matching will occur"
 servers:
-  - url: "/v2"
+  - url: "/match/v2"
 paths:
   /find_matches:
     $ref: '../../match/docs/openapi/orchestrator/find.yaml'

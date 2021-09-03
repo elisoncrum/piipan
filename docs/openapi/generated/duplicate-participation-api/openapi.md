@@ -8,7 +8,7 @@ The API where matching will occur
 
 Base URLs:
 
-* <a href="/v2">/v2</a>
+* <a href="/match/v2">/match/v2</a>
 
 # Authentication
 
@@ -25,7 +25,7 @@ Base URLs:
 
 ```shell
 # You can also use wget
-curl -X POST /v2/find_matches \
+curl -X POST /match/v2/find_matches \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
   -H 'From: string' \
