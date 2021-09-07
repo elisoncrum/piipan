@@ -204,9 +204,6 @@ namespace Piipan.Match.Orchestrator.Tests
             Assert.Contains("\"2019-11\",", jsonRecord);
             Assert.Contains("\"2019-10\"", jsonRecord);
             Assert.Contains("\"protect_location\": true", jsonRecord);
-
-            // Deprecated
-            Assert.Contains("\"state_abbr\": null", record.ToJson());
         }
 
         // Malformed request results in BadRequest

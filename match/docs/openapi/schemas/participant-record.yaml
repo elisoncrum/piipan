@@ -9,10 +9,6 @@ ParticipantRecord:
     state:
       type: string
       description: "State/territory two-letter postal abbreviation"
-    state_abbr:
-      type: string
-      description: "State/territory two-letter postal abbreviation. Deprecated, superseded by `state`."
-      deprecated: true
     case_id:
       type: string
       description: "Participant's state-specific case identifier. Can be the same for multiple participants."
@@ -42,7 +38,6 @@ ParticipantRecord:
 ParticipantRecordExamples:
   All:
     state: "ea"
-    state_abbr: "ea"
     case_id: "string"
     participant_id: "string"
     benefits_end_month: "2021-01"
@@ -53,7 +48,6 @@ ParticipantRecordExamples:
     protect_location: true
   AllEB:
     state: "eb"
-    state_abbr: "eb"
     case_id: "string"
     participant_id: "string"
     benefits_end_month: "2021-01"
@@ -64,7 +58,6 @@ ParticipantRecordExamples:
     protect_location: true
   Required:
     state: "ec"
-    state_abbr: "ec"
     case_id: "string"
     participant_id: "string"
     benefits_end_month: null

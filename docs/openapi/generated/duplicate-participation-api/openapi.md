@@ -74,7 +74,6 @@ Searches all state databases for any participant records that are an exact match
         "matches": [
           {
             "state": "ea",
-            "state_abbr": "ea",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": "2021-01",
@@ -120,7 +119,6 @@ Searches all state databases for any participant records that are an exact match
         "matches": [
           {
             "state": "eb",
-            "state_abbr": "eb",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": "2021-01",
@@ -133,7 +131,6 @@ Searches all state databases for any participant records that are an exact match
           },
           {
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": null,
@@ -158,7 +155,6 @@ Searches all state databases for any participant records that are an exact match
         "matches": [
           {
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": null,
@@ -171,7 +167,6 @@ Searches all state databases for any participant records that are an exact match
         "matches": [
           {
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": null,
@@ -200,7 +195,6 @@ Searches all state databases for any participant records that are an exact match
         "matches": [
           {
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": null,
@@ -225,7 +219,6 @@ Searches all state databases for any participant records that are an exact match
         "matches": [
           {
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": null,
@@ -281,7 +274,6 @@ Status Code **200**
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» matches|[object]|true|none|none|
 |»»»» state|string|true|none|State/territory two-letter postal abbreviation|
-|»»»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
 |»»»» case_id|string|true|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
 |»»»» participant_id|string|true|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
 |»»»» benefits_end_month|string|false|none|Participant's ending benefits month|
