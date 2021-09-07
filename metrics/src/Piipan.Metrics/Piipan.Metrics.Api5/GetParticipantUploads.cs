@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
 using System.Net;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Azure.Functions.Worker;
@@ -20,8 +21,9 @@ namespace Piipan.Metrics.Api5
     {
         [Function("GetParticipantUploads")]
         public static async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req,
-            FunctionContext executionContext, ILogger log)
+            FunctionContext executionContext)
         {
+            var log = executionContext.GetLogger("GetParticipantUploads");
             try
             {
                 var dbfactory = NpgsqlFactory.Instance;
@@ -32,19 +34,25 @@ namespace Piipan.Metrics.Api5
                     log
                 );
                 var meta = new Meta();
-                meta.page = StrToIntWithDefault(query["page"], 1);
-                meta.perPage = StrToIntWithDefault(query["perPage"], 50);
+                StringValues page = "";
+                query.TryGetValue("page", out page);
+                StringValues perPage = "";
+                query.TryGetValue("perPage", out perPage);
+                StringValues state = "";
+                query.TryGetValue("state", out state);
+                meta.page = StrToIntWithDefault(page, 1);
+                meta.perPage = StrToIntWithDefault(perPage, 50);
                 meta.total = await TotalQuery(
                     query,
                     dbfactory,
                     log);
                 meta.nextPage = NextPageParams(
-                    query["state"],
+                    state,
                     meta.page,
                     meta.perPage,
                     meta.total);
                 meta.prevPage = PrevPageParams(
-                    query["state"],
+                    state,
                     meta.page,
                     meta.perPage,
                     meta.total);
@@ -119,12 +127,13 @@ namespace Piipan.Metrics.Api5
                 {
                     cmd.Connection = conn;
                     var text = "SELECT COUNT(*) from participant_uploads";
-                    string? state = query["state"];
+                    StringValues state = "";
+                    query.TryGetValue("state", out state);
                     if (!String.IsNullOrEmpty(state))
                         text += $" WHERE lower(state) LIKE @state";
                     cmd.CommandText = text;
                     if (!String.IsNullOrEmpty(state))
-                        AddWithValue(cmd, DbType.String, "state", state.ToLower());
+                        AddWithValue(cmd, DbType.String, "state", state.ToString().ToLower());
                     count = (Int64)cmd.ExecuteScalar();
                 }
                 conn.Close();
@@ -135,9 +144,9 @@ namespace Piipan.Metrics.Api5
 
         public static String ResultsQueryString(Dictionary<String,StringValues> query)
         {
-            string? state = query["state"];
+            StringValues state = "";
             var statement = "SELECT state, uploaded_at FROM participant_uploads";
-            if (!String.IsNullOrEmpty(state))
+            if (query.TryGetValue("state", out state))
                 statement += $" WHERE lower(state) LIKE @state";
             statement += " ORDER BY uploaded_at DESC";
             statement += $" LIMIT @limit";
@@ -169,11 +178,15 @@ namespace Piipan.Metrics.Api5
                 {
                     cmd.Connection = conn;
                     cmd.CommandText = ResultsQueryString(query);
-                    string? state = query["state"];
-                    if (!String.IsNullOrEmpty(state))
-                        AddWithValue(cmd, DbType.String, "state", state.ToLower());
-                    int limit = StrToIntWithDefault(query["perPage"], 50);
-                    int page = StrToIntWithDefault(query["page"], 1);
+                    StringValues state = "";
+                    if (query.TryGetValue("state", out state))
+                        AddWithValue(cmd, DbType.String, "state", state.ToString().ToLower());
+                    StringValues perPage = "";
+                    query.TryGetValue("perPage", out perPage);
+                    int limit = StrToIntWithDefault(perPage, 50);
+                    StringValues pageStr = "";
+                    query.TryGetValue("page", out pageStr);
+                    int page = StrToIntWithDefault(pageStr, 1);
                     int offset = limit * (page - 1);
                     AddWithValue(cmd, DbType.Int64, "limit", limit);
                     AddWithValue(cmd, DbType.Int64, "offset", offset);
