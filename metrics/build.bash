@@ -25,8 +25,10 @@ run_deploy () {
 
   echo "Publish ${METRICS_API_APP_NAME} to Azure Environment ${azure_env}"
   pushd ./src/Piipan.Metrics/Piipan.Metrics.Api5
-    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet-isolated --force
+    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet --force
   popd
+
+  az functionapp config appsettings set --name "$METRICS_API_APP_NAME" --resource-group rg-core-dev --settings "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated"
 }
 
 main "$@"
