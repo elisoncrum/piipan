@@ -1,5 +1,6 @@
 using System;
 using Piipan.Shared.Helpers;
+using TimeZoneConverter;
 
 namespace Piipan.Dashboard
 {
@@ -7,7 +8,7 @@ namespace Piipan.Dashboard
     {
         public string State { get; set; }
         public DateTime UploadedAt { get; set; }
-        public TimeZoneInfo TZ = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+        public TimeZoneInfo TZ = TZConvert.GetTimeZoneInfo("America/New_York");
 
         public ParticipantUpload(string state, DateTime uploaded_at)
         {

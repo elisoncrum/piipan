@@ -1419,6 +1419,11 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
+      "TimeZoneConverter": {
+        "type": "Transitive",
+        "resolved": "3.5.0",
+        "contentHash": "ziTcQ5rVxRdtWJEnEqhKBukZGuUQregbf5G7QRrFKj6CwBLss5tSz0dlSHy9gzi5M5ES0PNQ0K2ACP/0XVT5Ow=="
+      },
       "xunit.abstractions": {
         "type": "Transitive",
         "resolved": "2.0.3",
@@ -1470,7 +1475,8 @@
           "Microsoft.Extensions.Logging.AzureAppServices": "3.1.18",
           "NEasyAuthMiddleware": "2.0.0",
           "Newtonsoft.Json": "13.0.1",
-          "Piipan.Shared": "1.0.0"
+          "Piipan.Shared": "1.0.0",
+          "TimeZoneConverter": "3.5.0"
         }
       },
       "piipan.shared": {
