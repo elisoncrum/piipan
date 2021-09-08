@@ -148,8 +148,8 @@
                 "protocols": [
                     "https"
                 ],
-                "path": "",
-                "apiVersion": "v1",
+                "path": "[variables('matchSetName')]",
+                "apiVersion": "v2",
                 "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('matchSetName'))]",
                 "serviceUrl": "[parameters('orchestratorUrl')]"
             }
@@ -158,7 +158,7 @@
         {
             "type": "Microsoft.ApiManagement/service/apis/operations",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-query')]",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-find')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]"
@@ -166,26 +166,15 @@
             "properties": {
                 "displayName": "Search for all matching PII records",
                 "method": "POST",
-                "urlTemplate": "/query",
-                "description": "Queries all state databases for any PII records that are an exact match to the last name, date of birth, and social security number in the request body's `query` property.",
-                "responses": [
-                    {
-                        "statusCode": 200,
-                        "description": "Matching PII records, if any exist"
-                    },
-                    {
-                        "statusCode": 400,
-                        "description": "Bad request. Missing one of the required properties in the request body."
-                    }
-                ]
+                "urlTemplate": "/find_matches"
             }
         },
         {
             "type": "Microsoft.ApiManagement/service/apis/operations/policies",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-query/policy')]",
+            "name": "[concat(parameters('apiName'), '/', variables('matchSetName'), '/post-find/policy')]",
             "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('matchSetName'), 'post-query')]",
+                "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('matchSetName'), 'post-find')]",
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('matchSetName'))]",
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
@@ -226,7 +215,7 @@
                     "https"
                 ],
                 "path": "[concat(variables('uploadSetName'), '/', variables('uploadStatesList')[copyIndex()])]",
-                "apiVersion": "v1",
+                "apiVersion": "v2",
                 "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
                 "serviceUrl": "[concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase'))]"
             },

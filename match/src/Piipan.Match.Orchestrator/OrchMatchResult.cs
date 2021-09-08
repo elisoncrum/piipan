@@ -15,11 +15,6 @@ namespace Piipan.Match.Orchestrator
         public int Index { get; set; }
 
         [JsonProperty("matches")]
-        public List<PiiRecord> Matches { get; set; }
-
-        public string ToJson()
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-        }
+        public List<ParticipantRecord> Matches { get; set; }
     }
 }

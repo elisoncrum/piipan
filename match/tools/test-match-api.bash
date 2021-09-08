@@ -1,30 +1,23 @@
 #!/bin/bash
 #
-# Basic integration test tool for the orchestrator and per-state APIs. Sends a curl
-# request with a pre-set PII query to the API's query endpoint and writes result to
+# Basic remote test tool for the orchestrator match API. Sends a curl request
+# with de-identified data to the API's find_matches endpoint and writes result to
 # stdout. Requires that the user has been added to the necessary application role
-# for the function app (see Remote Testing in match/docs/orchestrator-match.md and
-# match/docs/state-match.md).
+# for the function app (see Remote Testing in match/docs/orchestrator-match.md).
 #
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
 #
-# function-name is the function app name in Azure.
-#
-# usage: test-match-api.bash <azure-env> <function-name>
+# usage: test-match-api.bash <azure-env>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit
 
-QUERY_API_FUNC_NAME="query"
+MATCH_API_FUNC_NAME="find_matches"
 JSON='{
-    "query": {
-        "last": "Lynn",
-        "dob": "1940-08-01",
-        "ssn": "000-12-3457",
-        "first": "Wesley",
-        "middle": "Eura"
-    }
+    "data": [{
+      "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
+    }]
 }'
 
 main () {
@@ -36,7 +29,7 @@ main () {
   source "$(dirname "$0")"/../../iac/iac-common.bash
   verify_cloud
 
-  name=$2
+  name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
 
   resource_uri=$(\
     az functionapp show \
@@ -58,7 +51,7 @@ main () {
     az functionapp function show \
       -g "$MATCH_RESOURCE_GROUP" \
       -n "$name" \
-      --function-name "$QUERY_API_FUNC_NAME" \
+      --function-name "$MATCH_API_FUNC_NAME" \
       --query invokeUrlTemplate \
       -o tsv)
 

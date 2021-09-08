@@ -1,6 +1,6 @@
 <!-- Generator: Widdershins v4.0.1 -->
 
-<h1 id="duplicate-participation-api">Duplicate Participation API v1.0.0</h1>
+<h1 id="duplicate-participation-api">Duplicate Participation API v2.0.0</h1>
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
@@ -8,7 +8,7 @@ The API where matching will occur
 
 Base URLs:
 
-* <a href="/v1">/v1</a>
+* <a href="/match/v2">/match/v2</a>
 
 # Authentication
 
@@ -17,15 +17,15 @@ Base URLs:
 
 <h1 id="duplicate-participation-api-match">Match</h1>
 
-## Query for Matches
+## Find matches
 
-<a id="opIdQuery for Matches"></a>
+<a id="opIdFind matches"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
-curl -X POST /v1/query \
+curl -X POST /match/v2/find_matches \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
   -H 'From: string' \
@@ -33,11 +33,11 @@ curl -X POST /v1/query \
 
 ```
 
-`POST /query`
+`POST /find_matches`
 
-*Search for all matching PII records*
+*Search for all matching participant records using de-identified data*
 
-Queries all state databases for any PII records that are an exact match to the last name, date of birth, and social security number of persons provided in the request.
+Searches all state databases for any participant records that are an exact match to the `lds_hash` of persons provided in the request.
 
 > Body parameter
 
@@ -47,27 +47,19 @@ Queries all state databases for any PII records that are an exact match to the l
 {
   "data": [
     {
-      "first": "string",
-      "middle": "string",
-      "last": "string",
-      "ssn": "000-00-0000",
-      "dob": "1970-01-01"
+      "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
     }
   ]
 }
 ```
 
-<h3 id="query-for-matches-parameters">Parameters</h3>
+<h3 id="find-matches-parameters">Parameters</h3>
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
 |data|body|[object]|true|none|
-|» first|body|string|true|PII record's first name|
-|» middle|body|string|false|PII record's middle name|
-|» last|body|string|true|PII record's last name|
-|» ssn|body|string|true|PII record's social security number|
-|» dob|body|string(date)|true|PII record's date of birth|
+|» lds_hash|body|string|true|SHA-512 digest of participant's last name, DoB, and SSN. See docs/pprl.md for details|
 
 > Example responses
 
@@ -81,13 +73,7 @@ Queries all state databases for any PII records that are an exact match to the l
         "index": 0,
         "matches": [
           {
-            "first": "string",
-            "middle": "string",
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "ea",
-            "state_abbr": "ea",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": "2021-01",
@@ -132,13 +118,7 @@ Queries all state databases for any PII records that are an exact match to the l
         "index": 0,
         "matches": [
           {
-            "first": "string",
-            "middle": "string",
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "eb",
-            "state_abbr": "eb",
             "case_id": "string",
             "participant_id": "string",
             "benefits_end_month": "2021-01",
@@ -150,15 +130,9 @@ Queries all state databases for any PII records that are an exact match to the l
             "protect_location": true
           },
           {
-            "first": null,
-            "middle": null,
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -180,15 +154,9 @@ Queries all state databases for any PII records that are an exact match to the l
         "index": 0,
         "matches": [
           {
-            "first": null,
-            "middle": null,
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -198,15 +166,9 @@ Queries all state databases for any PII records that are an exact match to the l
         "index": 1,
         "matches": [
           {
-            "first": null,
-            "middle": null,
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -232,15 +194,9 @@ Queries all state databases for any PII records that are an exact match to the l
         "index": 1,
         "matches": [
           {
-            "first": null,
-            "middle": null,
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -262,15 +218,9 @@ Queries all state databases for any PII records that are an exact match to the l
         "index": 1,
         "matches": [
           {
-            "first": null,
-            "middle": null,
-            "last": "string",
-            "ssn": "000-00-0000",
-            "dob": "1970-01-01",
             "state": "ec",
-            "state_abbr": "ec",
             "case_id": "string",
-            "participant_id": null,
+            "participant_id": "string",
             "benefits_end_month": null,
             "protect_location": null
           }
@@ -304,41 +254,37 @@ Queries all state databases for any PII records that are an exact match to the l
 }
 ```
 
-<h3 id="query-for-matches-responses">Responses</h3>
+<h3 id="find-matches-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns match response items.|Inline|
-|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request. Missing one of the required properties in the request body.|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request. Request body does not match the required format.|None|
 
-<h3 id="query-for-matches-responseschema">Response Schema</h3>
+<h3 id="find-matches-responseschema">Response Schema</h3>
 
 Status Code **200**
+
+*Match response*
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |» data|object¦null|false|none|The response payload. Either an errors or data property will be present in the response, but not both.|
-|»» results|array|true|none|Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array.|
+|»» results|[object]|true|none|Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» matches|[object]|true|none|none|
-|»»»» first|string|false|none|First name|
-|»»»» middle|string|false|none|Middle name|
-|»»»» last|string|true|none|Last name|
-|»»»» ssn|string|true|none|Social Security number|
-|»»»» dob|string(date)|true|none|Date of birth|
-|»»»» state|string|false|none|State/territory two-letter postal abbreviation|
-|»»»» state_abbr|string|false|none|State/territory two-letter postal abbreviation. Deprecated, superseded by `state`.|
-|»»»» case_id|string|false|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
-|»»»» participant_id|string|false|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
+|»»»» state|string|true|none|State/territory two-letter postal abbreviation|
+|»»»» case_id|string|true|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
+|»»»» participant_id|string|true|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
 |»»»» benefits_end_month|string|false|none|Participant's ending benefits month|
 |»»»» recent_benefit_months|[string]|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
 |»»»» protect_location|boolean¦null|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
-|»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
+|»» errors|[object]|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» code|string|false|none|The application-specific error code|
 |»»» title|string|false|none|The short, human-readable summary of the error, consistent across all occurrences of the error|
 |»»» detail|string|false|none|The human-readable explanation specific to this occurrence of the error|
-|» errors|array¦null|false|none|Holds HTTP and other top-level errors. Either an errors or data property will be present in the response, but not both.|
+|» errors|[object]¦null|false|none|Holds HTTP and other top-level errors. Either an errors or data property will be present in the response, but not both.|
 |»» status|string|true|none|The HTTP status code|
 |»» code|string|false|none|The application-specific error code|
 |»» title|string|false|none|The short, human-readable summary of the error, consistent across all occurrences of the error|

@@ -32,11 +32,14 @@ apply_ddl () {
   reader="readonly"
 
   psql "${PSQL_OPTS[@]}" -d "$db" \
+    -f ./per-state.sql
+
+  psql "${PSQL_OPTS[@]}" -d "$db" \
     -v owner="$owner" \
     -v admin="$admin" \
     -v reader="$reader" \
     -v superuser="$SUPERUSER" \
-    -f ./per-state.sql
+    -f ./per-state-controls.sql
 }
 
 main () {

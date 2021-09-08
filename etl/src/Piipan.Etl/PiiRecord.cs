@@ -16,14 +16,9 @@ namespace Piipan.Etl
     /// </remarks>
     public class PiiRecord
     {
-
-        public string Last { get; set; } = null!;
-        public string? First { get; set; }
-        public string? Middle { get; set; }
-        public DateTime Dob { get; set; }
-        public string Ssn { get; set; } = null!;
+        public string LdsHash { get; set; } = null!;
         public string CaseId { get; set; } = null!;
-        public string? ParticipantId { get; set; }
+        public string ParticipantId { get; set; } = null!;
         public DateTime? BenefitsEndDate { get; set; }
         public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
         // Set Boolean values here, based on:

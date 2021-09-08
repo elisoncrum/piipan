@@ -147,14 +147,10 @@ namespace Piipan.Etl
                     using (var cmd = factory.CreateCommand())
                     {
                         cmd.Connection = conn;
-                        cmd.CommandText = "INSERT INTO participants (last, first, middle, dob, ssn, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location) " +
-                            "VALUES (@last, @first, @middle, @dob, @ssn, @upload_id, @case_id, @participant_id, @benefits_end_date, @recent_benefit_months::date[], @protect_location)";
+                        cmd.CommandText = "INSERT INTO participants (lds_hash, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location) " +
+                            "VALUES (@lds_hash, @upload_id, @case_id, @participant_id, @benefits_end_date, @recent_benefit_months::date[], @protect_location)";
 
-                        AddWithValue(cmd, DbType.String, "last", record.Last);
-                        AddWithValue(cmd, DbType.String, "first", (object)record.First ?? DBNull.Value);
-                        AddWithValue(cmd, DbType.String, "middle", (object)record.Middle ?? DBNull.Value);
-                        AddWithValue(cmd, DbType.DateTime, "dob", record.Dob);
-                        AddWithValue(cmd, DbType.String, "ssn", record.Ssn);
+                        AddWithValue(cmd, DbType.String, "lds_hash", record.LdsHash);
                         AddWithValue(cmd, DbType.Int64, "upload_id", lastval);
                         AddWithValue(cmd, DbType.String, "case_id", record.CaseId);
                         AddWithValue(cmd, DbType.String, "participant_id", (object)record.ParticipantId ?? DBNull.Value);

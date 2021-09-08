@@ -29,8 +29,11 @@ namespace Piipan.Dashboard.Tests
                 new NullLogger<ParticipantUploadsModel>(),
                 mockClaimsProvider
             );
-            Assert.Equal("Participant Uploads", pageModel.Title);
-            Assert.Equal("", pageModel.Email);
+            pageModel.PageContext.HttpContext = contextMock();
+
+            Assert.Equal("Most recent upload from each state", pageModel.Title);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
 
         [Fact]
@@ -56,7 +59,11 @@ namespace Piipan.Dashboard.Tests
                 new NullLogger<ParticipantUploadsModel>(),
                 mockClaimsProvider
             );
-            Assert.Matches("http://example.com", pageModel.BaseUrl);
+            pageModel.PageContext.HttpContext = contextMock();
+
+            Assert.Matches("http://example.com", pageModel.MetricsApiBaseUrl);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
 
@@ -86,7 +93,10 @@ namespace Piipan.Dashboard.Tests
             var meta = new ParticipantUploadResponseMeta();
             var mockApi = mockApiWithResponse(data, meta);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageContext = MockPageContext(new DefaultHttpContext());
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Scheme = "https";
+            httpContext.Request.Host = new HostString("tts.test");
+            var pageContext = MockPageContext(httpContext);
             // setup page model with mocks
             var pageModel = new ParticipantUploadsModel(
                 mockApi.Object,
@@ -96,14 +106,19 @@ namespace Piipan.Dashboard.Tests
             {
                 PageContext = pageContext
             };
+
             // run
             await pageModel.OnGetAsync();
+
             // assert
             Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
             Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
+
             // teardown
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
+
         // sets participant uploads after Post request
         [Fact]
         public async void AfterOnPostAsync_setsParticipantUploadResults()
@@ -125,6 +140,8 @@ namespace Piipan.Dashboard.Tests
                 { "state", "foo" }
             });
             httpContext.Request.Form = form;
+            httpContext.Request.Scheme = "https";
+            httpContext.Request.Host = new HostString("tts.test");
             var pageContext = MockPageContext(httpContext);
             // setup page model with mocks
             var pageModel = new ParticipantUploadsModel(
@@ -135,11 +152,15 @@ namespace Piipan.Dashboard.Tests
             {
                 PageContext = pageContext
             };
+
             // run
             await pageModel.OnPostAsync();
+
             // assert
             Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
             Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
+
             // teardown
             Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
@@ -178,6 +199,24 @@ namespace Piipan.Dashboard.Tests
                 .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
                 .Returns(email);
             return claimsProviderMock.Object;
+        }
+
+        public static HttpContext contextMock()
+        {
+            var request = new Mock<HttpRequest>();
+
+            request
+                .Setup(m => m.Scheme)
+                .Returns("https");
+
+            request
+                .Setup(m => m.Host)
+                .Returns(new HostString("tts.test"));
+
+            var context = new Mock<HttpContext>();
+            context.Setup(m => m.Request).Returns(request.Object);
+
+            return context.Object;
         }
     }
 }

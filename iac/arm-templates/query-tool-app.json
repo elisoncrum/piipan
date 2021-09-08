@@ -23,6 +23,9 @@
         "idpOidcConfigUri": {
             "type": "string"
         },
+        "idpOidcScopes": {
+            "type": "array"
+        },
         "idpClientId": {
             "type": "string"
         },
@@ -139,10 +142,6 @@
                 "eventHubName": "logs",
                 "logs": [
                     {
-                        "category": "AppServiceAntivirusScanAuditLogs",
-                        "enabled": true
-                    },
-                    {
                         "category": "AppServiceHTTPLogs",
                         "enabled": true
                     },
@@ -152,10 +151,6 @@
                     },
                     {
                         "category": "AppServiceAppLogs",
-                        "enabled": true
-                    },
-                    {
-                        "category": "AppServiceFileAuditLogs",
                         "enabled": true
                     },
                     {
@@ -189,7 +184,10 @@
                     "requireAuthentication": true,
                     "unauthenticatedClientAction": "RedirectToLoginPage",
                     "redirectToProvider": "oidcProvider",
-                    "excludedPaths": ["/health-probe.html"]
+                    "excludedPaths": [
+                        "/SignedOut",
+                        "/health-probe.html"
+                    ]
                 },
                 "httpSettings": {
                     "requireHttps": true,
@@ -213,11 +211,7 @@
                             },
                             "login": {
                                 "nameClaimType": "name",
-                                "scopes": [
-                                    "openid",
-                                    "email",
-                                    "profile"
-                                ]
+                                "scopes": "[parameters('idpOidcScopes')]"
                             }
                         }
                     }

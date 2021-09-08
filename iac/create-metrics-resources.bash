@@ -251,17 +251,17 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --query frontdoorId \
     --output tsv)
-  echo "Front Door iD: ${front_door_id}"
+  echo "Front Door ID: ${front_door_id}"
 
   front_door_uri="https://$DASHBOARD_FRONTDOOR_NAME"$(front_door_host_suffix)
 
-  metrics_api_uri=$(\
-    az functionapp function show \
-      -g "$RESOURCE_GROUP" \
-      -n "$METRICS_API_APP_NAME" \
-      --function-name $METRICS_API_FUNCTION_NAME \
-      --query invokeUrlTemplate \
-      --output tsv)
+  metrics_api_hostname=$(\
+    az functionapp show \
+    -n "$METRICS_API_APP_NAME" \
+    -g "$RESOURCE_GROUP" \
+    --query "defaultHostName" \
+    --output tsv)
+  metrics_api_uri="https://${metrics_api_hostname}/api"
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
@@ -277,6 +277,7 @@ main () {
       metricsApiUri="$metrics_api_uri" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$DASHBOARD_APP_IDP_OIDC_CONFIG_URI" \
+      idpOidcScopes="$DASHBOARD_APP_IDP_OIDC_SCOPES" \
       idpClientId="$DASHBOARD_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \

@@ -8,7 +8,6 @@ RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
 # Tag filters for system types; descriptions are in iac.md
 PER_STATE_ETL_TAG="SysType=PerStateEtl"
 PER_STATE_STORAGE_TAG="SysType=PerStateStorage"
-PER_STATE_MATCH_API_TAG="SysType=PerStateMatchApi"
 ORCHESTRATOR_API_TAG="SysType=OrchestratorApi"
 DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
@@ -44,8 +43,9 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 # so that application code can use the appropriate, cloud-specific domain
 CLOUD_NAME_STR_KEY=CloudName
 
-# For connection strings, our established placeholder value
+# For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'
+DATABASE_PLACEHOLDER='{database}'
 
 # Virtual Network and Subnets
 VNET_NAME=vnet-core-$ENV
@@ -61,6 +61,7 @@ METRICS_COLLECT_APP_NAME=${PREFIX}-func-${METRICS_COLLECT_APP_ID}-${ENV}
 METRICS_API_APP_ID=metricsapi
 METRICS_API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
 METRICS_API_FUNCTION_NAME=GetParticipantUploads
+METRICS_API_FUNCTION_NAME_LASTUPLOAD=GetLastUpload
 
 # Event Hub
 EVENT_HUB_NAME=$PREFIX-evh-monitoring-$ENV

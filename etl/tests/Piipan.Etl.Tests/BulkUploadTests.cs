@@ -11,6 +11,8 @@ namespace Piipan.Etl.Tests
 {
     public class BulkUploadTests
     {
+        static string LDS_HASH = "04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef";
+
         static Stream CsvFixture(string[] records, bool includeHeader = true, bool requiredOnly = false)
         {
             var stream = new MemoryStream();
@@ -19,11 +21,11 @@ namespace Piipan.Etl.Tests
             {
                 if (requiredOnly)
                 {
-                    writer.WriteLine("last,dob,ssn,case_id");
+                    writer.WriteLine("lds_hash,case_id,participant_id");
                 }
                 else
                 {
-                    writer.WriteLine("last,first,middle,dob,ssn,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
+                    writer.WriteLine("lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
 
                 }
             }
@@ -52,11 +54,7 @@ namespace Piipan.Etl.Tests
         {
             return new PiiRecord
             {
-                Last = "Last",
-                First = "First",
-                Middle = "Middle",
-                Dob = new DateTime(1970, 1, 1),
-                Ssn = "000-00-0000",
+                LdsHash = LDS_HASH,
                 CaseId = "CaseId",
                 ParticipantId = "ParticipantId",
                 BenefitsEndDate = new DateTime(1970, 1, 1),
@@ -73,11 +71,7 @@ namespace Piipan.Etl.Tests
         {
             return new PiiRecord
             {
-                Last = "Last",
-                First = null,
-                Middle = null,
-                Dob = new DateTime(1970, 1, 1),
-                Ssn = "000-00-0000",
+                LdsHash = LDS_HASH,
                 CaseId = "CaseId",
                 ParticipantId = null,
                 BenefitsEndDate = null,
@@ -110,17 +104,13 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,First,Middle,1970-01-01,000-00-0000,CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03,true"
+                $"{LDS_HASH},CaseId,ParticipantId,1970-01,2021-05 2021-04 2021-03,true"
             });
 
             var records = BulkUpload.Read(stream, logger);
             foreach (var record in records)
             {
-                Assert.Equal("Last", record.Last);
-                Assert.Equal("First", record.First);
-                Assert.Equal("Middle", record.Middle);
-                Assert.Equal(new DateTime(1970, 1, 1), record.Dob);
-                Assert.Equal("000-00-0000", record.Ssn);
+                Assert.Equal(LDS_HASH, record.LdsHash);
                 Assert.Equal("CaseId", record.CaseId);
                 Assert.Equal("ParticipantId", record.ParticipantId);
                 Assert.Equal(new DateTime(1970, 1, 31), record.BenefitsEndDate);
@@ -134,15 +124,12 @@ namespace Piipan.Etl.Tests
         {
             var logger = Mock.Of<ILogger>();
             var stream = CsvFixture(new string[] {
-                "Last,,,1970-01-01,000-00-0000,CaseId,,,,,"
+                $"{LDS_HASH},CaseId,ParticipantId,,,,"
             });
 
             var records = BulkUpload.Read(stream, logger);
             foreach (var record in records)
             {
-                Assert.Null(record.First);
-                Assert.Null(record.Middle);
-                Assert.Null(record.ParticipantId);
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Empty(record.RecentBenefitMonths);
                 Assert.Null(record.ProtectLocation);
@@ -150,12 +137,10 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData(",,,1970-01-01,000-00-0000,,,,,")] // Missing last name
-        [InlineData("Last,,,1970-01-01,,,,,,")] // Missing SSN
-        [InlineData("Last,,,1970-01-01,000000000,,,,,")] // Malformed SSN
-        [InlineData("Last,,,1970-01-01,000-00-0000,,,,,")] // Missing CaseId
-        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,foobar,")] // Malformed Benefits End Month
-        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,,foobar")] // Malformed Recent Benefit Months
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,,ParticipantId,,,")] // Missing CaseId
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,,,,")] // Missing ParticipantId
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,foobar,")] // Malformed Benefits End Month
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,foobar,")] // Malformed Recent Benefit Months
         public void ExpectFieldValidationError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -172,7 +157,7 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,,,foobar")] // Malformed Protect Location
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,,foobar")] // Malformed Protect Location
         public void ExpectTypeConverterError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -189,25 +174,7 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData("Last,,,,000-00-0000,")] // Missing DOB
-        [InlineData("Last,,,1970-02-31,000-00-0000,")] // Invalid DOB
-        public void ExpectReadErrror(String inline)
-        {
-            var logger = Mock.Of<ILogger>();
-            var stream = CsvFixture(new string[] { inline });
-
-            var records = BulkUpload.Read(stream, logger);
-            Assert.Throws<CsvHelper.ReaderException>(() =>
-            {
-                foreach (var record in records)
-                {
-                    ;
-                }
-            });
-        }
-
-        [Theory]
-        [InlineData("Last,,,1970-01-01,000-00-0000,CaseId,,,")] // Missing last column
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,")] // Missing last column
         public void ExpectMissingFieldError(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -224,7 +191,7 @@ namespace Piipan.Etl.Tests
         }
 
         [Theory]
-        [InlineData("Last,1939-05-16,000-00-0000,CaseId")]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId")]
         public void OnlyRequiredColumns(String inline)
         {
             var logger = Mock.Of<ILogger>();
@@ -233,13 +200,9 @@ namespace Piipan.Etl.Tests
             var records = BulkUpload.Read(stream, logger);
             foreach (var record in records)
             {
-                Assert.Equal("Last", record.Last);
-                Assert.Equal(new DateTime(1939, 5, 16), record.Dob);
-                Assert.Equal("000-00-0000", record.Ssn);
+                Assert.Equal(LDS_HASH, record.LdsHash);
                 Assert.Equal("CaseId", record.CaseId);
-                Assert.Null(record.First);
-                Assert.Null(record.Middle);
-                Assert.Null(record.ParticipantId);
+                Assert.Equal("ParticipantId", record.ParticipantId);
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Null(record.ProtectLocation);
                 Assert.Empty(record.RecentBenefitMonths);

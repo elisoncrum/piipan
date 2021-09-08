@@ -1,0 +1,23 @@
+post:
+  operationId: "Find matches using PII"
+  tags:
+    - "Match"
+  summary: "Search for all matching participant records using PII"
+  description: "Searches all state databases for any participant records that are an exact match to the last name, date of birth, and social security number of persons provided in the request."
+  parameters:
+    - in: header
+      name: From
+      schema:
+        type: string
+      description: "As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization."
+  requestBody:
+    $ref: '../schemas/match-query.yaml#/MatchRequestWithPii'
+  responses:
+    '200':
+      description: "Successful response. Returns match response items."
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/match-query.yaml#/MatchResponse'
+    '400':
+      description: "Bad request. Request body does not match the required format."

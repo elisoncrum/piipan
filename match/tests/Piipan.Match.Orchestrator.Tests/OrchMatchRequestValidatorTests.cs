@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using FluentValidation.TestHelper;
 using Piipan.Match.Orchestrator;
@@ -15,7 +14,8 @@ public class OrchMatchRequestValidatorTests
     public void ReturnsErrorWhenDataEmpty()
     {
         // Setup
-        var model = new OrchMatchRequest() {
+        var model = new OrchMatchRequest()
+        {
             Data = new List<RequestPerson>()
         };
         // Act
@@ -31,14 +31,10 @@ public class OrchMatchRequestValidatorTests
         var list = new List<RequestPerson>();
         for (int i = 0; i < 51; i++)
         {
-        list.Add(new RequestPerson
-        {
-            First = "First",
-            Middle = "Middle",
-            Last = "Last",
-            Dob = new DateTime(1970, 1, 1),
-            Ssn = "000-00-0000"
-        });
+            list.Add(new RequestPerson
+            {
+                LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
+            });
         }
         var model = new OrchMatchRequest { Data = list };
         // Act
@@ -56,40 +52,24 @@ public class PersonValidatorTests
     }
 
     [Fact]
-    public void ReturnsErrorWhenLastNameEmpty()
-    {
-        var model = new RequestPerson() {
-            Last = "",
-            First = "Foo",
-            Ssn = "123-45-6789"
-        };
-        var result = Validator().TestValidate(model);
-        result.ShouldHaveValidationErrorFor(person => person.Last);
-    }
-
-    [Fact]
-    public void ReturnsErrorWhenFirstNameEmpty()
+    public void ReturnsErrorWhenHashEmpty()
     {
         var model = new RequestPerson()
         {
-            First = "",
-            Last = "Foo",
-            Ssn = "123-45-6789"
+            LdsHash = ""
         };
         var result = Validator().TestValidate(model);
-        result.ShouldHaveValidationErrorFor(person => person.First);
+        result.ShouldHaveValidationErrorFor(person => person.LdsHash);
     }
 
     [Fact]
-    public void ReturnsErrorWhenSsnMalformed()
+    public void ReturnsErrorWhenHashMalformed()
     {
         var model = new RequestPerson()
         {
-        Last = "Foo",
-        First = "Bar",
-        Ssn = "baz"
+            LdsHash = "Foo"
         };
         var result = Validator().TestValidate(model);
-        result.ShouldHaveValidationErrorFor(person => person.Ssn);
+        result.ShouldHaveValidationErrorFor(person => person.LdsHash);
     }
 }

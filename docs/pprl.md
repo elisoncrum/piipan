@@ -1,10 +1,12 @@
 # A Privacy-Preserving Record Linkage (PPRL) approach
 
-## Overview
-
 Piipan incorporates a secure hash encoding technique to de-identify Personally Identifiable Information (PII) of SNAP participants using a centralized [Privacy-Preserving Record Linkage (PPRL)](https://link.springer.com/referenceworkentry/10.1007%2F978-3-319-63962-8_17-1) model.
 
-In brief:
+A detailed technical description is below; a [high-level treatment](./pprl-plain.md) is also available.
+
+## Overview
+
+Our PPRL technique in brief:
 - States compute a secure hash for every SNAP participant using the participant's PII as input
 - The secure hash is submitted in the state's daily bulk upload instead of the participant's source PII
 - Piipan searches for exact matches across the secure hashes of the participating states
@@ -18,7 +20,7 @@ Finally, in order for exact matching against de-identified PII to be effective, 
 
 ### Last name
 
-Participant's Last name should be normalized and validated in accordance with these **ordered** rules. These transformations assume ASCII-encoded input.
+Participant's Last name must be normalized and validated in accordance with these **ordered** rules. These transformations assume ASCII-encoded input.
 
 1. Convert to lower case
 1. Remove any suffixes (e.g.; `junior`, `jnr`, `jr`, `jr.`, `iii`, etc.)
@@ -28,61 +30,81 @@ Participant's Last name should be normalized and validated in accordance with th
 1. Trim any spaces at the start and end of the last name
 1. Validate that the resulting value is at least one ASCII character in length
 
-If your source data set includes non-ASCII characters using the ISO-8859-1 (Latin-1) or Unicode encoding formats, [an ASCII normalization process to remove diacritics and derive base characters](https://ahinea.com/en/tech/accented-translate.html) should be applied before these rules.
+If your source data set includes non-ASCII characters using the ISO-8859-1 (Latin-1) or Unicode encoding formats, [an ASCII normalization process to remove diacritics and derive base characters](https://ahinea.com/en/tech/accented-translate.html) must be applied before these rules.
 
 Reference: [Social Security Program Operations Manual System](https://secure.ssa.gov/poms.nsf/lnx/0110205125)
 
-Correct:
-- `hopper` (from `Hopper`)
-- `von neumann` (from `von Neumann`)
-- `osullivan` (from `O'Sullivan`)
-- `jones drew` (from `Jones-Drew`)
+Examples of *correct* output:
 
-Incorrect:
-- `garcía` (from `García`, includes non-ASCII character) 
-- `jones iii` (from `Jones III`, includes suffix)
-- `Thatcher` (from `Thatcher`, not lower-cased)
-- `barrable-tishauer` (from `Barrable-Tishauer`, hyphen not replaced with space)
-- `heathcote drummond-willoughby` (from `Heathcote-Drummond-Willoughby`, only first hyphen replaced with space)
-- `o'grady` (from `O'Grady`, apostrophe not removed)
+| Input       | Correct         |
+|-------------|-----------------|
+| Hopper      | `hopper`        |
+| von Neuman  | `von neumann`   |
+| O'Sullivan  | `osullivan`     |
+| Jones-Drew  | `jones drew`    |
+| Nguyễn      | `nguyen`        |
+
+Examples of *incorrect* output:
+
+| Input                         | Incorrect                       | Issue                                 |
+|-------------------------------|---------------------------------|---------------------------------------|
+| García                        | `garcía`                        | includes non-ASCII character          |
+| Jones III                     | `jones iii`                     | includes suffix                       |
+| Thatcher                      | `Thatcher`                      | not lower-cased                       |
+| Barrable-Tishauer             | `barrable-tishauer`             | hyphen not replaced with space        |
+| Heathcote-Drummond-Willoughby | `heathcote drummond-willoughby` | only first hyphen replaced with space |
+| O'Grady                       | `o'grady`                       | apostrophe not removed                |
+
 
 ### Date of Birth (DoB)
 
-Participant's Date of Birth in [ISO 8601 format](https://en.wikipedia.org/wiki/ISO_8601#Dates). The ISO 8601 format uses a 4-digit year, a zero-padded month, and a zero-padded day. The 3 values are separated by a hyphen: `YYYY-MM-DD`.
+Participant's Date of Birth must be formatted in accordance with [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Dates). The ISO 8601 format uses a 4-digit year, a zero-padded month, and a zero-padded day. The 3 values are separated by a hyphen: `YYYY-MM-DD`.
 
 Before normalizing, dates must be validated against the Gregorian calendar and be within the past 130 years.
 
-Correct:
-- `1978-08-14`
-- `2004-02-29`
-- `1999-12-03`
+Examples of *correct* output:
 
-Incorrect:
-- `98-08-14` (year is not fully specified)
-- `5/15/2002` (wrong value order, wrong separator character, value is not zero-padded)
-- `2000-11-2`(day is not zero-padded)
-- `2001-02-29` (date does not exist)
+| Input              | Correct         |
+|--------------------|-----------------|
+| August 14, 1978    | `1978-08-14`    |
+| February 29, 2004  | `2004-02-29`    |
+| December 3, 1999   | `1999-12-03`    |
+
+Examples of *incorrect* output:
+
+| Input              | Incorrect         | Issue                                                                  |
+|--------------------|-------------------|------------------------------------------------------------------------|
+| August 14, 1998    | `98-08-14`        | year is not fully specified                                            |
+| May 15, 2002       | `5/15/2002`       | wrong value order, wrong separator character, value is not zero-padded |
+| November 2, 2000   | `2000-11-2`       | day is not zero-padded                                                 |
+| February 29, 2001  | `2001-02-29`      | date does not exist on Gregorian calendar, 2001 is not a leap year     |
 
 ### Social Security Number (SSN)
 
-Participant's nine-digit Social Security Number formatted in 3 parts: the 3-digit Area Number, the 2-digit Group Number, and the 4-digit Serial Number. The 3 parts are separated by a hyphen: `AAA-GG-SSSS`.
+Participant's nine-digit Social Security Number is to be formatted in 3 parts: the 3-digit Area Number, the 2-digit Group Number, and the 4-digit Serial Number. The 3 parts must be separated by a hyphen: `AAA-GG-SSSS`.
 
 Before normalizing, SSNs must be validated against the following Social Security Administration (SSA) rules:
 - Area numbers `000`, `666`, and `900-999` [are invalid](https://www.ssa.gov/employer/randomization.html)
 - Group number `00` [is invalid](https://www.ssa.gov/employer/randomizationfaqs.html)
 - Serial number `0000` [is invalid](https://www.ssa.gov/employer/randomizationfaqs.html)
 
-Correct:
-- `078-05-1121`
-- `219-09-9998`
-- `987-65-4219`
+Reference: [Social Security Number Randomization](https://www.ssa.gov/employer/randomization.html)
 
-Incorrect:
-- `000345678` (invalid area number, missing hyphens)
-- `MR1234567` (non-digit in SSN, missing hyphens)
-- `0664-81-234 ` (hyphen misplaced)
-- `06-648-1234` (hyphen misplace)
-- `567-89-0000` (invalid serial number)
+Examples of *correct* output:
+
+| Input     | Correct         |
+|-----------|-----------------|
+| 078051121 | `078-05-1121`   |
+| 219099998 | `219-09-9998`   |
+| 987654219 | `987-65-4219`   |
+
+Examples of *incorrect* output:
+
+| Input     | Incorrect        | Issue                                |
+|-----------|------------------|--------------------------------------|
+| 000345678 | `000345678`      | invalid area number, missing hyphens |
+| 066481234 | `0664-81-234 `   | hyphen misplaced                     |
+| 567890000 | `567-89-0000`    | invalid serial number                |
 
 ## 2. Concatenation
 

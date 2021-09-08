@@ -6,13 +6,13 @@ UTF-8 encoding is required for all fields.
 
 ## Cleaning participant records
 
-Participant name fields should omit title (Mr. / Mrs. / etc) and suffix (Jr. / Sr. / III / etc.)
+The `lds_hash` csv column represents the hashed value of the various identity data necessary for matching participants. Refer to [our Privacy-Preserving Record Linkage approach](../../docs/pprl.md) for how to validate, normalize, concatenate, and hash this data. [Csv-level validation](#validating-files) will only validate that the column data is a hexadecimal digest as specified in the PPRL documententation.
 
 ## Participant records to exclude
 
 Exclude participant records that meet any of the following criteria from your uploads to Piipan:
 
-- Participants who are missing any of these required fields:
+- Participants who are missing any of these required data:
   - First name
   - Last name
   - Social Security number
@@ -22,7 +22,7 @@ Exclude participant records that meet any of the following criteria from your up
 
 ## Validating files
 
-There are Table Schema libraries available for [multiple programming languages](https://frictionlessdata.io/tooling/table-schema-tools/). The following example will use macOS, homebrew, Python, and [tableschema-py](https://github.com/frictionlessdata/tableschema-py):
+There are Table Schema libraries available for [multiple programming languages](https://github.com/orgs/frictionlessdata/repositories?language=&q=tableschema&sort=&type=). The following example will use macOS, homebrew, Python, and [tableschema-py](https://github.com/frictionlessdata/tableschema-py):
 
 ```
 brew install python

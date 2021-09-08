@@ -3,12 +3,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7] - 2021-09-08
+
+### Added
+- New Privacy-Preserving Record Linkage (PPRL) documentation
+- Custom authorization error display and sign-out pages for web apps
+### Changed
+- Numerous style/layout changes for the dashboard
+- Duplicate participation API for PPRL approach
+  - base URL is now `/match/v2`
+  - `query` renamed to `find_matches` which takes de-identified PII
+  - `participant_id` and `case_id` is now required in match queries and responses
+- Bulk upload API for PPRL approach
+  - base URL is now `/bulk/v2`
+  - `first`, `middle`, `last`, `dob`, and `ssn` columns in CSV replaced with `lds_hash`
+  - `participant_id` and `case_id` is now required in CSV
+### Removed
+- `state_abbr` property in duplicate participation API
+- Internal per-state Function Apps for duplicate participation API
+### Fixed
+- Log categories used by App Service resources
+### Broke
+- Query tool match functionality (temporarily have no support for plain text match queries)
+
 ## [0.6] - 2021-08-23
 
 ### Added
+- OIDC claim-based policy enforcement to query tool and dashboard
 ### Changed
+- Numerous style/layout changes for the query tool
+- Azure B2C IDP docs to include notes on updating user claims
 ### Removed
+- `exceptions` field from bulk upload format and APIs
 ### Fixed
+- Front Door and Easy Auth now work together in the query tool and dashboard
 
 ## [0.5] - 2021-08-10
 ### Added
@@ -75,6 +103,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.7]: https://github.com/18F/piipan/releases/tag/v0.7
 [0.6]: https://github.com/18F/piipan/releases/tag/v0.6
 [0.5]: https://github.com/18F/piipan/releases/tag/v0.5
 [0.4]: https://github.com/18F/piipan/releases/tag/v0.4
