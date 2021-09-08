@@ -10,6 +10,34 @@
         <set-header name="Ocp-Apim-Subscription-Name" exists-action="override">
             <value>@(context.Subscription.Name)</value>
         </set-header>
+        <!--
+            Derive the state abbreviation from the subscription name and forward to
+            the internal endpoint. Subscriptions names are expected to be in the
+            format: {state-abbr}-DupPart
+        -->
+        <set-variable name="InitiatingState" value="@{
+            string pattern = @"^(?<state>[a-z]{2})-";
+            var matches = Regex.Match(context.Subscription.Name.ToLower(), pattern);
+            return matches.Groups["state"].Value;
+        }" />
+        <!--
+            Inject derived state abbreviation into request body's `meta` object,
+            creating `meta` if it does not exist.
+        -->
+        <set-body>@{
+            const string metaKey = "meta";
+            JObject inBody = context.Request.Body.As<JObject>();
+
+            if (!inBody.ContainsKey(metaKey))
+            {
+                inBody[metaKey] = new JObject();
+            }
+
+            JToken meta = inBody.GetValue(metaKey);
+            meta["initiating_state"] = context.Variables.GetValueOrDefault<string>("InitiatingState");
+
+            return inBody.ToString();
+        }</set-body>
     </inbound>
     <backend>
         <base />

@@ -44,6 +44,23 @@ The connection between an operation and a backend server is made by specifying t
 
 ## Managing API keys
 
-API keys are managed as [subscriptions](https://docs.microsoft.com/en-us/azure/api-management/api-management-subscriptions) in APIM. Each subscription is granted a primary and secondary API key to support credential rotation without downtime. Subscriptions can be scoped to a single API, a group of APIs (called a [product](https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts#--products)), or all APIs.
+API keys are managed as [subscriptions](https://docs.microsoft.com/en-us/azure/api-management/api-management-subscriptions) in APIM. Currently, keys are created and managed ad-hoc by system developers via the Portal (Portal > {APIM instance} > Subscriptions).
 
-Currently, keys are created and managed ad-hoc by system developers via the Portal (Portal > {APIM instance} > Subscriptions).
+When creating subscriptions during the onboarding process for states use the following process:
+
+- Add one new subscription per-API
+- Use the following details:
+    - If creating a subscription for the Duplicate Participation API:
+        - Name: `{state-abbreviation}-DupPart`; e.g., `EA-DupPart`
+        - Display name: `{state-abbreviation}-DupPart`; e.g., `EA-DupPart`
+        - Scope: API
+        - API: (Current version of the Duplicate Participation API)
+        - User: leave blank
+    - If creating a subscription for the Bulk Upload API:
+        - Name: `{state-abbreviation}-BulkUpload`; e.g., `EA-BulkUpload`
+        - Display name: `{state-abbreviation}-BulkUpload`; e.g., `EA-BulkUpload`
+        - Scope: API
+        - API: (Current version of the state-specific Bulk Upload API)
+        - User: leave blank
+
+*Note:* The APIM instance relies on a consistent naming format to dynamically derive a state's two-letter postal abbreviation from incoming requests.
