@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Duplicate participation API for PPRL approach
   - base URL is now `/match/v2`
   - `query` renamed to `find_matches` which takes de-identified PII
-  - `participant_id` and `case_id` is now required in match queries and responses
+  - `participant_id` and `case_id` is now required in match esponses
 - Bulk upload API for PPRL approach
   - base URL is now `/bulk/v2`
   - `first`, `middle`, `last`, `dob`, and `ssn` columns in CSV replaced with `lds_hash`
