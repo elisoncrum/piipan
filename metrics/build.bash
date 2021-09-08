@@ -28,7 +28,7 @@ run_deploy () {
     func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet --force
   popd
 
-  az functionapp config appsettings set --name "$METRICS_API_APP_NAME" --resource-group rg-core-dev --settings "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated"
+  az functionapp config appsettings set --name "$METRICS_API_APP_NAME" --resource-group "$RESOURCE_GROUP" --settings "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated"
 }
 
 main "$@"
