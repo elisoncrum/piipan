@@ -14,7 +14,7 @@ These actions correspond to 2 web service APIs:
 1. [Bulk Upload API](./openapi/generated/bulk-api/openapi.md)
 1. [Duplicate Participation API](./openapi/generated/duplicate-participation-api/openapi.md)
 
-Each API has one or more RPC or REST operations and uses JSON in the operation request and/or response bodies. All operations must be made over HTTPS are authenticated by an API key. Each state will be issued a key for the Bulk Upload API and a separate key for the Duplicate Participation API.
+Each API has one or more RPC or REST operations and uses JSON in the operation request and/or response bodies. All operations must be made over HTTPS and authenticated by an API key. Each state will be issued a key for the Bulk Upload API and a separate key for the Duplicate Participation API.
 
 For details, please see our specifications:
 - [Bulk Upload API](./openapi/generated/bulk-api/openapi.md)
@@ -27,7 +27,7 @@ For details, please see our specifications:
 1. Export participant data in plain text from your eligibility system to CSV.
 1. Transform the plain text CSV to the Bulk Upload CSV format, in accordance with the PII de-identification specification.
 1. Integrate with the Bulk Upload API to submit the CSV to the NAC using the `/upload` operation.
-1. Integrate with the Duplicate Participation API to conduct searches, de-identifying applicant PII, before making the `/find_matches` call.
+1. Integrate with the Duplicate Participation API to conduct searches, de-identifying applicant PII before making the `/find_matches` call.
 
 ## Environments
 
