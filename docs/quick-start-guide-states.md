@@ -1,79 +1,64 @@
-# Quickstart Guide for States
+# Quickstart Integration Guide for States
 
-> This documentation is for state use.
+This guide is to help development teams working at state and territory governments integrate their SNAP eligibility systems with the NAC. 
 
-> ⚠️  Under construction
+## Overview
 
-A high-level view of the system architecture can be found [here](../README.md).
+In order to onboard to the NAC, states will need to:
 
-## System Status
+1. Upload de-identified participant data to the NAC on daily basis
+1. Conduct searches against the NAC during (re)certification and resolve matches
 
-APIs are in Alpha stage and under active development. APIs are available for state testing now.
+These actions correspond to 2 web service APIs:
 
-## APIs Overview
+1. [Bulk Upload API](./openapi/generated/bulk-api/openapi.md)
+1. [Duplicate Participation API](./openapi/generated/duplicate-participation-api/openapi.md)
 
-In order to participate, states will need to:
+Each API has one or more RPC or REST operations and uses JSON in the operation request and/or response bodies. All operations must be made over HTTPS are authenticated by an API key. Each state will be issued a key for the Bulk Upload API and a separate key for the Duplicate Participation API.
 
-1. Upload participant data to the system
-1. Conduct matches against the system
+For details, please see our specifications:
+- [Bulk Upload API](./openapi/generated/bulk-api/openapi.md)
+- [Bulk Upload CSV format](../etl/docs/bulk-import.md)
+- [Personal Identifiable Information (PII) de-identification](./pprl.md)
+- [Duplicate Participation API](./openapi/generated/duplicate-participation-api/openapi.md)
 
-These three elements translate to two main API calls that states will integrate into their existing eligibility systems and workflows:
+## Notional, high-level integration steps
+1. Understand the NAC material in the [system overview](https://github.com/18F/piipan#overview) and our [introduction to our Privacy-Preserving Record Linkage approach](https://github.com/18F/piipan/blob/dev/docs/pprl-plain.md).
+1. Export participant data in plain text from your eligibility system to CSV.
+1. Transform the plain text CSV to the Bulk Upload CSV format, in accordance with the PII de-identification specification.
+1. Integrate with the Bulk Upload API to submit the CSV to the NAC using the `/upload` operation.
+1. Integrate with the Duplicate Participation API to conduct searches, de-identifying applicant PII, before making the `/find_matches` call.
 
-1. States will upload participant data through a scheduled [CSV upload](./openapi/generated/bulk-api/openapi.md#bulk-api-upload) (CSV formatting instructions can be found [here](https://github.com/18F/piipan/blob/main/etl/docs/bulk-import.md))
-2. States will conduct matches through [Active Matching](./openapi/generated/duplicate-participation-api/openapi.md#duplicate-participation-api-match)
+## Environments
 
-### Environments
+Several isolated NAC systems are being built for states to use:
 
-Separate endpoints and credentials will be provided for each environment.
+| Environment    | Purpose                                 | Status    | API hostname                           |
+|----------------|-----------------------------------------|-----------|----------------------------------------|
+| Testing        | For initial testing with synthetic data | Available | tts-apim-duppartapi-test.azure-api.net |
+| Pre-production | For testing with real data at scale     | Pending   | -                                      |
+| Production     | For production use with real data       | Pending   | -                                      |
 
-| Environment | Purpose |
-|---|---|
-| Testing | For initial testing of the integration; fake data only |
-| Staging | For testing with actual data at scale; data is not used in production |
-| Production | Actual data used in the production system |
+## Usage notes
 
-### Endpoints Overview
+### De-identification testing
+- Correct de-identification in accordance with our defined process is critical for cross-state matching. We strongly recommend unit testing your de-identification code, [covering the specific normalization and validation scenarios we describe](./pprl.md). The NAC team is exploring strategies to verify state-performed de-identification in an automated, ongoing fashion.
 
-Endpoints are separated into two logical APIs:
+### Record retention
+- Save API responses received from the duplicate participation API for 3 years.
+- API responses that are used for SNAP eligibility determinations are subject to the requirements of 7 CFR 272.1(f).
 
-#### Bulk upload API
-
-[Detailed documentation](./openapi/generated/bulk-api/openapi.md)
-
-| Endpoint | Description | Request Type |
-|---|---|---|
-| `/upload/:filename` | uploads bulk participant data to the system | PUT |
-
-#### Duplicate participation API
-
-[Detailed documentation](./openapi/generated/duplicate-participation-api/openapi.md)
-
-| Endpoint | Description | Request Type |
-|---|---|---|
-| `/find_matches` | search for active matches | POST |
-
-## Authentication
-
-States will be issued API keys that are placed into request headers to authenticate a web service call. The bulk upload API requires a separate API key from the duplicate participation API.
-
-Example using cURL:
-
-```
-curl --request PUT '<uri>' --header 'Ocp-Apim-Subscription-Key: <api-key>'
-```
+### Failed requests
+- Bulk uploads can be resubmitted as required; the most recent upload will overwrite any pre-existing participant snapshot.
 
 ## Sample records
 
-To allow States to test the matching endpoint, the Piipan test environment currently includes three sample states that are populated from the [example CSV](https://github.com/18F/piipan/blob/main/etl/docs/csv/example.csv).  Match attempts for any of the individuals in that sample file should return match results.
+The test environment currently includes three sample states (i.e., `EA`, `EB`, `EC`) that reflect an upload of this [de-identified example CSV](../etl/docs/csv/example.csv). 
 
-## Record retention
-
-Save API responses received from the duplicate participation API for 3 years.
-
-API responses that are used for SNAP eligibility determinations are subject to the requirements of 7 CFR 272.1(f).
+The [plain text CSV](../etl/docs/csv/plaintext-example.csv) that this file is derived from is also published. Searching for any of the individuals in the [plain text CSV](../etl/docs/csv/plaintext-example.csv) should return back a match result.
 
 ## Feedback
 
-Got any feedback for us? We track API issues through [Github Issues](https://github.com/18F/piipan/issues).
+Need to report a defect? We track API issues through [GitHub](https://github.com/18F/piipan/issues).
 
-We also have a Microsoft Teams channel for daily communication with state agency engineers.
+Have a question, or want to work through a technical issue? Start a thread in our Microsoft Teams channel or reach out to us by email.
