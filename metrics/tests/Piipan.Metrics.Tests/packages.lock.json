@@ -337,6 +337,15 @@
         "resolved": "1.0.0",
         "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
       },
+      "Microsoft.Azure.Functions.Extensions": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "zYKtQQoS1fdzufxFApuMFiFtoi9QAGH6McXxntpylwLKgKjmCMWdgUd1dcekzTKNR9DPSDPRLiulvukqXnpWrQ==",
+        "dependencies": {
+          "Microsoft.Azure.WebJobs": "3.0.18",
+          "Microsoft.Extensions.DependencyInjection": "2.1.0"
+        }
+      },
       "Microsoft.Azure.WebJobs": {
         "type": "Transitive",
         "resolved": "3.0.23",
@@ -778,8 +787,8 @@
       },
       "Newtonsoft.Json": {
         "type": "Transitive",
-        "resolved": "11.0.2",
-        "contentHash": "IvJe1pj7JHEsP8B8J8DwlMEx8UInrs/x+9oVY+oCD13jpLu4JbJU2WCIsMRn5C4yW9+DgkaO8uiVE5VHKjpmdQ=="
+        "resolved": "12.0.3",
+        "contentHash": "6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg=="
       },
       "Newtonsoft.Json.Bson": {
         "type": "Transitive",
@@ -788,6 +797,14 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Newtonsoft.Json": "10.0.1"
+        }
+      },
+      "Newtonsoft.Json.Schema": {
+        "type": "Transitive",
+        "resolved": "3.0.14",
+        "contentHash": "Qnu41yEFuMEJMuD1kJgslc4cF981K+hA7SmgXQ/N6pk6Zknvxt4g5Hx7KRykycP3oKyoz3aTFRV/TX+Vp6v7uQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "12.0.3"
         }
       },
       "NuGet.Frameworks": {
@@ -1847,8 +1864,11 @@
         "dependencies": {
           "Azure.Identity": "1.4.1",
           "Azure.Security.KeyVault.Secrets": "4.2.0",
+          "Microsoft.Azure.Functions.Extensions": "1.1.0",
+          "Microsoft.Extensions.DependencyInjection": "3.1.18",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.7",
+          "Piipan.Metrics.Core": "1.0.0",
           "Piipan.Metrics.Models": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
@@ -1864,8 +1884,18 @@
           "Piipan.Shared": "1.0.0"
         }
       },
+      "piipan.metrics.core": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection": "3.1.18",
+          "Piipan.Metrics.Models": "1.0.0"
+        }
+      },
       "piipan.metrics.models": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json.Schema": "3.0.14"
+        }
       },
       "piipan.shared": {
         "type": "Project",
