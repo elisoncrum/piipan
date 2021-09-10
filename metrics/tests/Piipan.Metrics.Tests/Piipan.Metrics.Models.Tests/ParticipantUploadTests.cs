@@ -1,7 +1,7 @@
 using System;
 using System.Data.Common;
 using Xunit;
-using Piipan.Metrics.Models;
+using Piipan.Metrics.Api;
 
 namespace Piipan.Metrics.Tests
 {

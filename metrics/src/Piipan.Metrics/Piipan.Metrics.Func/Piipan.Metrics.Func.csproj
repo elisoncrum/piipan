@@ -23,7 +23,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Piipan.Metrics.Models\Piipan.Metrics.Models.csproj" />
+    <ProjectReference Include="..\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
     <ProjectReference Include="..\Piipan.Metrics.Core\Piipan.Metrics.Core.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
   </ItemGroup>

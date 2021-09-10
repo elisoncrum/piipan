@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Piipan.Metrics.Models
+namespace Piipan.Metrics.Api
 {
     public class GetParticipantUploadsResponse
     {

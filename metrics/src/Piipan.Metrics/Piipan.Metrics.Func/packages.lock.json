@@ -1603,17 +1603,17 @@
           "Newtonsoft.Json": "10.0.2"
         }
       },
+      "piipan.metrics.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json.Schema": "3.0.14"
+        }
+      },
       "piipan.metrics.core": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection": "3.1.18",
-          "Piipan.Metrics.Models": "1.0.0"
-        }
-      },
-      "piipan.metrics.models": {
-        "type": "Project",
-        "dependencies": {
-          "Newtonsoft.Json.Schema": "3.0.14"
+          "Piipan.Metrics.Api": "1.0.0"
         }
       },
       "piipan.shared": {

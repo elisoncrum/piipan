@@ -1,4 +1,4 @@
-using Piipan.Metrics.Models;
+using Piipan.Metrics.Api;
 
 namespace Piipan.Metrics.Func.Builders
 {

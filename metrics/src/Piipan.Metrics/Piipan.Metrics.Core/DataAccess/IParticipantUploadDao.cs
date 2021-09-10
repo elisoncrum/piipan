@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Piipan.Metrics.Models; 
+using Piipan.Metrics.Api; 
 
 namespace Piipan.Metrics.Core.DataAccess
 {

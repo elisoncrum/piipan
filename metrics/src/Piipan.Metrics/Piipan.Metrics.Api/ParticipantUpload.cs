@@ -1,6 +1,6 @@
 using System;
 
-namespace Piipan.Metrics.Models
+namespace Piipan.Metrics.Api
 {
     /// <summary>
     /// Data Mapper for participant_uploads table in metrics database

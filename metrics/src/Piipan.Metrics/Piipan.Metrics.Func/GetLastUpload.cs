@@ -8,7 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Piipan.Metrics.Models;
+using Piipan.Metrics.Api;
 
 #nullable enable
 

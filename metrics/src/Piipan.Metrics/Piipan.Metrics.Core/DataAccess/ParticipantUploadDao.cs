@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Piipan.Metrics.Core.Extensions;
-using Piipan.Metrics.Models;
+using Piipan.Metrics.Api;
 
 namespace Piipan.Metrics.Core.DataAccess
 {

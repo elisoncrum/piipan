@@ -1,6 +1,6 @@
 using System;
 
-namespace Piipan.Metrics.Models
+namespace Piipan.Metrics.Api
 {
     public class Meta
     {

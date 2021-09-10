@@ -13,7 +13,7 @@ using Npgsql;
 using Piipan.Metrics.Func.Builders;
 using Piipan.Metrics.Func.Extensions;
 using Piipan.Metrics.Core.DataAccess;
-using Piipan.Metrics.Models;
+using Piipan.Metrics.Api;
 
 #nullable enable
 

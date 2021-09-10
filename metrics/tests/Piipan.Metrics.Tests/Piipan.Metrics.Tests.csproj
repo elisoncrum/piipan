@@ -26,7 +26,7 @@
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Collect\Piipan.Metrics.Collect.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Models\Piipan.Metrics.Models.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Func\Piipan.Metrics.Func.csproj" />

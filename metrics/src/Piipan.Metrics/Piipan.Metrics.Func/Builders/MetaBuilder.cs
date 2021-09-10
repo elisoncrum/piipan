@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
 using Piipan.Metrics.Core.DataAccess;
-using Piipan.Metrics.Models;
+using Piipan.Metrics.Api;
 
 #nullable enable
 
