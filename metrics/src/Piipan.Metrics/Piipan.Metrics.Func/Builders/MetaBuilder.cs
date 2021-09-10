@@ -6,7 +6,7 @@ using Piipan.Metrics.Models;
 
 #nullable enable
 
-namespace Piipan.Metrics.Api.Builders
+namespace Piipan.Metrics.Func.Builders
 {
     public class MetaBuilder : IMetaBuilder
     {

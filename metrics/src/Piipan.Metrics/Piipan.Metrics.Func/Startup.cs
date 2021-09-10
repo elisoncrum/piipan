@@ -3,14 +3,14 @@ using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Metrics.Api.Builders;
+using Piipan.Metrics.Func.Builders;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Shared.Authentication;
 using Npgsql;
 
-[assembly: FunctionsStartup(typeof(Piipan.Metrics.Api.Startup))]
+[assembly: FunctionsStartup(typeof(Piipan.Metrics.Func.Startup))]
 
-namespace Piipan.Metrics.Api
+namespace Piipan.Metrics.Func
 {
     public class Startup : FunctionsStartup
     {

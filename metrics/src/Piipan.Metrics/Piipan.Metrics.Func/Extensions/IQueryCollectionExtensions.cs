@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace Piipan.Metrics.Api.Extensions
+namespace Piipan.Metrics.Func.Extensions
 {
     public static class IQueryCollectionExtensions
     {
