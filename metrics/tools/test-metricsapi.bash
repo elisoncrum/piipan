@@ -46,7 +46,7 @@ main () {
     --query invokeUrlTemplate \
     --output tsv)
 
-  echo "Submitting request to ${function_uri}"
+  echo "Submitting request to ${function_uri_lastupload}"
   curl -X GET -i \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TOKEN}" \

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Microsoft.Extensions.Logging;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Metrics.Api;
 
@@ -9,10 +10,14 @@ namespace Piipan.Metrics.Core.DataAccessObjects
     public class ParticipantUploadDao : IParticipantUploadDao
     {
         private readonly IDbConnection _dbConnection;
+        private readonly ILogger<ParticipantUploadDao> _logger;
 
-        public ParticipantUploadDao(IDbConnection dbConnection)
+        public ParticipantUploadDao(
+            IDbConnection dbConnection, 
+            ILogger<ParticipantUploadDao> logger)
         {
             _dbConnection = dbConnection;
+            _logger = logger;
         }
 
         public Int64 GetUploadCount(string? state)

@@ -11,9 +11,11 @@ namespace Piipan.Metrics.Func.Extensions
 
         public static int ParseInt(this IQueryCollection query, string key, int defaultValue = 0)
         {
-            int result = defaultValue;
-            int.TryParse(query[key], out result);
-            return result;
+            if (int.TryParse(query[key], out int result))
+            {
+                return result;
+            }
+            return defaultValue;
         }
     }
 }
