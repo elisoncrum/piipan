@@ -44,4 +44,8 @@ The purpose of this project is to provide implementations for each of the API in
 
 ## Consequences
 
-What becomes easier or more difficult to do and any risks introduced by the change that will need to be mitigated.
+We expect that adopting a consistent subsystem architecture will ease the onboarding process for new developers and perhaps reduce the amount of documentation required for each subsystem.
+
+Additionally, decoupling subsystem logic and data access from particular HTTP and Azure frameworks will make the system as a whole more portable -- in theory, only the `.[Func,Web]` project would need to be replaced to change or extend the operating environment for a subsystem (e.g. to run as a Web API instead of an Azure Function).
+
+Lastly, we expect that implementing the `Core` logic as a standalone library will improve our ability to extend and test subsystem functionality.
