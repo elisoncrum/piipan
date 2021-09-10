@@ -1859,7 +1859,7 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
-      "piipan.metrics.api": {
+      "piipan.metrics.func": {
         "type": "Project",
         "dependencies": {
           "Azure.Identity": "1.4.1",

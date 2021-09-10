@@ -12,7 +12,7 @@ using Piipan.Metrics.Models;
 
 #nullable enable
 
-namespace Piipan.Metrics.Api
+namespace Piipan.Metrics.Func
 {
     /// <summary>
     /// implements getting latest upload from each state.
