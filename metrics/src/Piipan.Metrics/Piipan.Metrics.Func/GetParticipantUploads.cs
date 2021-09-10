@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Piipan.Metrics.Func.Builders;
 using Piipan.Metrics.Func.Extensions;
-using Piipan.Metrics.Core.DataAccess;
+using Piipan.Metrics.Core.Services;
 using Piipan.Metrics.Api;
 
 #nullable enable
@@ -21,14 +21,14 @@ namespace Piipan.Metrics.Func
 {
     public class GetParticipantUploads
     {
-        private readonly IParticipantUploadDao _participantUploadDao;
+        private readonly IParticipantUploadApi _participantUploadApi;
         private readonly IMetaBuilder _metaBuilder;
 
         public GetParticipantUploads(
-            IParticipantUploadDao participantUploadDao,
+            IParticipantUploadApi participantUploadApi,
             IMetaBuilder metaBuilder)
         {
-            _participantUploadDao = participantUploadDao;
+            _participantUploadApi = participantUploadApi;
             _metaBuilder = metaBuilder;
         }
 
@@ -46,7 +46,7 @@ namespace Piipan.Metrics.Func
                 var state = req.Query.ParseString("state");
                 var offset = perPage * (page - 1);
 
-                var data = _participantUploadDao.GetParticipantUploads(state, perPage, offset);
+                var data = _participantUploadApi.GetUploads(state, perPage, offset);
 
                 var meta = _metaBuilder
                     .SetPage(page)

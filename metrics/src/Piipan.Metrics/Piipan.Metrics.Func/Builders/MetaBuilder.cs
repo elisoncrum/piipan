@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
-using Piipan.Metrics.Core.DataAccess;
+using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
 
 #nullable enable
@@ -12,16 +12,16 @@ namespace Piipan.Metrics.Func.Builders
     {
         private Meta _meta = new Meta();
         private string? _state;
-        private readonly IParticipantUploadDao _participantUploadDao;
+        private readonly IParticipantUploadApi _participantUploadApi;
 
-        public MetaBuilder(IParticipantUploadDao participantUploadDao)
+        public MetaBuilder(IParticipantUploadApi participantUploadApi)
         {
-            _participantUploadDao = participantUploadDao;
+            _participantUploadApi = participantUploadApi;
         }
 
         public Meta Build()
         {
-            _meta.total = _participantUploadDao.GetParticipantUploadCount(_state);
+            _meta.total = _participantUploadApi.GetUploadCount(_state);
             SetPrevPage(_state);
             SetNextPage(_state);
             return _meta;

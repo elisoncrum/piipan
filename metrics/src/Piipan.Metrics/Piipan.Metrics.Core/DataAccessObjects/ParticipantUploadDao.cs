@@ -4,7 +4,7 @@ using System.Data;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Metrics.Api;
 
-namespace Piipan.Metrics.Core.DataAccess
+namespace Piipan.Metrics.Core.DataAccessObjects
 {
     public class ParticipantUploadDao : IParticipantUploadDao
     {
@@ -15,17 +15,36 @@ namespace Piipan.Metrics.Core.DataAccess
             _dbConnection = dbConnection;
         }
 
-        public Int64 GetParticipantUploadCount(string? state)
+        public Int64 GetUploadCount(string? state)
         {
             var cmd = ParticipantUploadCountQueryCommand(state);
 
             return (Int64)cmd.ExecuteScalar();
         }
 
-        public IEnumerable<ParticipantUpload> GetParticipantUploads(string? state, int limit, int offset = 0)
+        public IEnumerable<ParticipantUpload> GetUploads(string? state, int limit, int offset = 0)
         {
             var results = new List<ParticipantUpload>();
             var cmd = ParticipantUploadQueryCommand(state, limit, offset);
+
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var record = new ParticipantUpload
+                {
+                    state = reader[0].ToString(),
+                    uploaded_at = Convert.ToDateTime(reader[1])
+                };
+                results.Add(record);
+            }
+
+            return results;
+        }
+
+        public IEnumerable<ParticipantUpload> GetLatestUploadsByState()
+        {
+            var results = new List<ParticipantUpload>();
+            var cmd = LatestParticipantUploadByStateQueryCommand();
 
             var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -82,6 +101,23 @@ namespace Piipan.Metrics.Core.DataAccess
 
             cmd.AddParameter(DbType.Int64, "limit", limit);
             cmd.AddParameter(DbType.Int64, "offset", offset);
+
+            return cmd;
+        }
+
+        private IDbCommand LatestParticipantUploadByStateQueryCommand()
+        {
+            var cmd = _dbConnection.CreateCommand();
+            cmd.CommandType = CommandType.Text;
+
+            var statement = @"
+                SELECT state, max(uploaded_at) as uploaded_at
+                FROM participant_uploads
+                GROUP BY state
+                ORDER BY uploaded_at ASC
+            ;";
+            
+            cmd.CommandText = statement;
 
             return cmd;
         }

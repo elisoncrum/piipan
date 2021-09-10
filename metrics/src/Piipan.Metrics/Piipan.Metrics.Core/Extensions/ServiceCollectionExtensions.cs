@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Metrics.Core.DataAccess;
+using Piipan.Metrics.Core.DataAccessObjects;
 
 namespace Piipan.Metrics.Core.Extensions
 {
