@@ -45,8 +45,9 @@ _Target date: TBD_
 _Target date: TBD_
 
 Acceptance criteria
-- Allows 3 states to begin using NAC for every required case action
-- Email notifications
-- Flag bad matches
-- Monitor dispositions and measure accuracy
-- _Other features with scope still under development_
+- At least 3 states are using the NAC for every required case action
+- The NAC sends email notifications to each state involved in a match when that match is found
+- States can flag invalid matches
+- Both states involved in a match can report dispositions (eligible / ineligible)
+- FNS can use dispositions reported by states and invalid matches to measure accuracy
+- _Other features with scope are still being evaluated_
