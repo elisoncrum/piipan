@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Piipan.Metrics.Api;
+using Piipan.Metrics.Func.Builders;
 
 #nullable enable
 
@@ -17,13 +18,24 @@ namespace Piipan.Metrics.Func
     /// <summary>
     /// implements getting latest upload from each state.
     /// </summary>
-    public static class GetLastUpload
+    public class GetLastUpload
     {
+        private readonly IParticipantUploadApi _participantUploadApi;
+        private readonly IMetaBuilder _metaBuilder;
+
+        public GetLastUpload(
+            IParticipantUploadApi participantUploadApi,
+            IMetaBuilder metaBuilder)
+        {
+            _participantUploadApi = participantUploadApi;
+            _metaBuilder = metaBuilder;
+        }
+
         /// <summary>
         /// Azure Function implementing getting latest upload from each state.
         /// </summary>
         [FunctionName("GetLastUpload")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -31,13 +43,9 @@ namespace Piipan.Metrics.Func
 
             try
             {
-                var dbfactory = NpgsqlFactory.Instance;
-                var data = await ResultsQuery(
-                    dbfactory,
-                    log
-                );
-                var meta = new Meta();
-                meta.total = data.Count;
+                var data = _participantUploadApi.GetLatestUploadsByState();
+                var meta = _metaBuilder.Build();
+
                 var response = new GetParticipantUploadsResponse
                 {
                     Data = data,
@@ -51,49 +59,6 @@ namespace Piipan.Metrics.Func
                 log.LogError(ex.Message);
                 throw;
             }
-        }
-
-        public async static Task<List<ParticipantUpload>> ResultsQuery(
-            DbProviderFactory factory,
-            ILogger log)
-        {
-            List<ParticipantUpload> results = new List<ParticipantUpload>();
-            string connString = await DatabaseHelpers.ConnectionString();
-            using (var conn = factory.CreateConnection())
-            {
-                conn.ConnectionString = connString;
-                log.LogInformation("Opening db connection");
-                conn.Open();
-                using (var cmd = factory.CreateCommand())
-                {
-                    cmd.Connection = conn;
-                    cmd.CommandText = ResultsQueryString();
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        var record = new ParticipantUpload
-                        {
-                            state = reader[0].ToString(),
-                            uploaded_at = Convert.ToDateTime(reader[1])
-                        };
-                        results.Add(record);
-                    }
-                }
-                conn.Close();
-                log.LogInformation("Closed db connection");
-            }
-            return results;
-        }
-
-        public static String ResultsQueryString()
-        {
-            var statement = @"
-                SELECT state, max(uploaded_at) as uploaded_at
-                FROM participant_uploads
-                GROUP BY state
-                ORDER BY uploaded_at ASC
-            ;";
-            return statement;
         }
     }
 }

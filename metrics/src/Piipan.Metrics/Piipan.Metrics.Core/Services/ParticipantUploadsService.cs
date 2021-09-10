@@ -26,7 +26,7 @@ namespace Piipan.Metrics.Core.Services
 
         public IEnumerable<ParticipantUpload> GetLatestUploadsByState()
         {
-            throw new NotImplementedException();
+            return _participantUploadDao.GetLatestUploadsByState();
         }
     }
 }
