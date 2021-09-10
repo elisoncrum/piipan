@@ -46,8 +46,8 @@ _Target date: TBD_
 
 Acceptance criteria
 - At least 3 states are using the NAC for every required case action
-- The NAC sends email notifications to each state involved in a match when that match is found
+- The NAC sends email notifications to each state involved in a match when a match is found
 - States can flag invalid matches
 - Both states involved in a match can report dispositions (eligible / ineligible)
-- FNS can use dispositions reported by states and invalid matches to measure accuracy
-- _Other features with scope are still being evaluated_
+- FNS can use dispositions and invalid matches reported by states to measure accuracy
+- _Other features within scope are still being evaluated_
