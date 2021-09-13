@@ -1,5 +1,7 @@
 using System;
 
+#nullable enable
+
 namespace Piipan.Metrics.Api
 {
     public class Meta
