@@ -22,7 +22,7 @@ _Target date: December 2021_
 A detailed list of the issues involved in achieving this goal can be found in the [1st release: Initial Production Deployment milestone](https://github.com/18F/piipan/milestone/21) 
 
 ## Pre-MVP Test Launch
-**Goal: FNS can confirm that uploads and matching will work by allowing States to send production data (without triggering match actions).  FNS begins monitoring key performance indicators.**
+**Goal: FNS can confirm that uploads and matching will work by allowing States to send production data (without triggering match actions).  FNS begins monitoring key performance indicators.  FNS can test usability of the process for match determinations to be made.**
 
 _Target date: TBD_
 
@@ -33,11 +33,17 @@ _Target date: TBD_
 - At least 2 states are uploading data to the NAC daily and sending queries to the NAC with each relevant case action
 - FNS can monitor and confirm key performance indicators
   - States are uploading data each day
+  - Some queries result in matches
+- States have the ability to report determinations on matches, resolving them when complete
+  - States can report matches as invalid
+  - Each state in a 2-state match can report the determination
+  - Matches are closed when both states take action, or when either state reports the match as invalid
+  - Once a match is closed, another application involving the same person results in a new match
+
+Optional extensions that can be deferred to the next launch if necessary:
   - States are performing queries
   - The NAC is online as often as needed
   - The NAC responds to queries in a reasonable time frame
-  - Some queries result in matches
-
 
 ## MVP Launch: NAC in use
 **Goal: Meet all needs to operationalize the NAC.**
@@ -47,7 +53,5 @@ _Target date: TBD_
 Acceptance criteria
 - At least 3 states are using the NAC for every required case action
 - The NAC sends email notifications to each state involved in a match when a match is found
-- States can flag invalid matches
-- Both states involved in a match can report dispositions (eligible / ineligible)
 - FNS can use dispositions and invalid matches reported by states to measure accuracy
 - _Other features within scope are still being evaluated_
