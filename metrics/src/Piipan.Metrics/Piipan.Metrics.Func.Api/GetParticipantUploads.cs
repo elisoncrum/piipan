@@ -10,14 +10,14 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Piipan.Metrics.Func.Builders;
-using Piipan.Metrics.Func.Extensions;
+using Piipan.Metrics.Func.Api.Builders;
+using Piipan.Metrics.Func.Api.Extensions;
 using Piipan.Metrics.Core.Services;
 using Piipan.Metrics.Api;
 
 #nullable enable
 
-namespace Piipan.Metrics.Func
+namespace Piipan.Metrics.Func.Api
 {
     public class GetParticipantUploads
     {

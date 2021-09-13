@@ -26,7 +26,7 @@ set_constants () {
   COLLECT_STORAGE_NAME=${PREFIX}st${METRICS_COLLECT_APP_ID}${ENV}
   COLLECT_FUNC=BulkUploadMetrics
   # Metrics API Info
-  API_APP_FILEPATH=Piipan.Metrics.Api
+  API_APP_FILEPATH=Piipan.Metrics.Func.Api
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
 }
 

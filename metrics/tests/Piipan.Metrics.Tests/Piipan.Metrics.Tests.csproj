@@ -29,7 +29,7 @@
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Func\Piipan.Metrics.Func.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Func.Api\Piipan.Metrics.Func.Api.csproj" />
   </ItemGroup>
 
 </Project>

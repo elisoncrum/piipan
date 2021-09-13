@@ -1884,7 +1884,7 @@
           "Piipan.Metrics.Api": "1.0.0"
         }
       },
-      "piipan.metrics.func": {
+      "piipan.metrics.func.api": {
         "type": "Project",
         "dependencies": {
           "Azure.Identity": "1.4.1",

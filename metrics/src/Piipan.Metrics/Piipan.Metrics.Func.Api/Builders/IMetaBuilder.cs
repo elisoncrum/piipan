@@ -1,6 +1,6 @@
 using Piipan.Metrics.Api;
 
-namespace Piipan.Metrics.Func.Builders
+namespace Piipan.Metrics.Func.Api.Builders
 {
     public interface IMetaBuilder
     {

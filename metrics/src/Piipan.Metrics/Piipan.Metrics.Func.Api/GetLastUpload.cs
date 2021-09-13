@@ -9,11 +9,11 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Piipan.Metrics.Api;
-using Piipan.Metrics.Func.Builders;
+using Piipan.Metrics.Func.Api.Builders;
 
 #nullable enable
 
-namespace Piipan.Metrics.Func
+namespace Piipan.Metrics.Func.Api
 {
     /// <summary>
     /// implements getting latest upload from each state.
