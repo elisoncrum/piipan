@@ -19,7 +19,7 @@ run_deploy () {
   verify_cloud
 
   echo "Publish ${METRICS_COLLECT_APP_NAME} to Azure Environment ${azure_env}"
-  pushd ./src/Piipan.Metrics/Piipan.Metrics.Collect
+  pushd ./src/Piipan.Metrics/Piipan.Metrics.Func.Collect
     func azure functionapp publish "$METRICS_COLLECT_APP_NAME" --dotnet
   popd
 

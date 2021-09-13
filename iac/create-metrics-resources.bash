@@ -22,7 +22,7 @@ set_constants () {
   DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
   DASHBOARD_WAF_NAME=wafdashboard${ENV}
   # Metrics Collection Info
-  COLLECT_APP_FILEPATH=Piipan.Metrics.Collect
+  COLLECT_APP_FILEPATH=Piipan.Metrics.Func.Collect
   COLLECT_STORAGE_NAME=${PREFIX}st${METRICS_COLLECT_APP_ID}${ENV}
   COLLECT_FUNC=BulkUploadMetrics
   # Metrics API Info

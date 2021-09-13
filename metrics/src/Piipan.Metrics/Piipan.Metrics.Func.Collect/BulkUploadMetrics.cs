@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Shared.Authentication;
 
-namespace Piipan.Metrics.Collect
+namespace Piipan.Metrics.Func.Collect
 {
     public static class BulkUploadMetrics
     {

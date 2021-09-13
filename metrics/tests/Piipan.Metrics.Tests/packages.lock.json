@@ -1865,7 +1865,7 @@
           "Newtonsoft.Json.Schema": "3.0.14"
         }
       },
-      "piipan.metrics.collect": {
+      "piipan.metrics.func.collect": {
         "type": "Project",
         "dependencies": {
           "Azure.Identity": "1.4.1",
