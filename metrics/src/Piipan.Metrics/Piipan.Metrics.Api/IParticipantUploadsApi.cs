@@ -8,5 +8,6 @@ namespace Piipan.Metrics.Api
         Int64 GetUploadCount(string? state);
         IEnumerable<ParticipantUpload> GetUploads(string? state, int limit, int offset = 0);
         IEnumerable<ParticipantUpload> GetLatestUploadsByState();
+        int AddUpload(string state, DateTime uploadedAt);
     }
 }

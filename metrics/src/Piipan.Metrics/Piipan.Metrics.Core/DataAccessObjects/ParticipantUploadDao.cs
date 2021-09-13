@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Metrics.Api;
 
+#nullable enable
+
 namespace Piipan.Metrics.Core.DataAccessObjects
 {
     public class ParticipantUploadDao : IParticipantUploadDao
@@ -65,6 +67,15 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             return results;
         }
 
+        public int AddUpload(string state, DateTime uploadedAt)
+        {
+            var tx = _dbConnection.BeginTransaction();
+            var cmd = AddUploadCommand(state, uploadedAt);
+            int nRows = cmd.ExecuteNonQuery();
+            tx.Commit();
+            return nRows;
+        }
+
         private IDbCommand ParticipantUploadCountQueryCommand(string? state)
         {
             var cmd = _dbConnection.CreateCommand();
@@ -123,6 +134,21 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             ;";
             
             cmd.CommandText = statement;
+
+            return cmd;
+        }
+
+        private IDbCommand AddUploadCommand(string state, DateTime uploadedAt)
+        {
+            var cmd = _dbConnection.CreateCommand();
+            cmd.CommandType = CommandType.Text;
+            cmd.CommandText = @"
+                INSERT INTO participant_uploads (state, uploaded_at) 
+                VALUES (@state, @uploaded_at)
+            ;";
+
+            cmd.AddParameter(DbType.String, "state", state);
+            cmd.AddParameter(DbType.DateTime, "uploaded_at", uploadedAt);
 
             return cmd;
         }

@@ -1865,17 +1865,6 @@
           "Newtonsoft.Json.Schema": "3.0.14"
         }
       },
-      "piipan.metrics.func.collect": {
-        "type": "Project",
-        "dependencies": {
-          "Azure.Identity": "1.4.1",
-          "Azure.Security.KeyVault.Secrets": "4.2.0",
-          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
-          "Microsoft.NET.Sdk.Functions": "3.0.13",
-          "Npgsql": "5.0.7",
-          "Piipan.Shared": "1.0.0"
-        }
-      },
       "piipan.metrics.core": {
         "type": "Project",
         "dependencies": {
@@ -1894,6 +1883,20 @@
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.7",
           "Piipan.Metrics.Api": "1.0.0",
+          "Piipan.Metrics.Core": "1.0.0",
+          "Piipan.Shared": "1.0.0"
+        }
+      },
+      "piipan.metrics.func.collect": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Identity": "1.4.1",
+          "Azure.Security.KeyVault.Secrets": "4.2.0",
+          "Microsoft.Azure.Functions.Extensions": "1.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
+          "Microsoft.Extensions.DependencyInjection": "3.1.18",
+          "Microsoft.NET.Sdk.Functions": "3.0.13",
+          "Npgsql": "5.0.7",
           "Piipan.Metrics.Core": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }

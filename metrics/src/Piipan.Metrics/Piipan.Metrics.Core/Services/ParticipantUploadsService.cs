@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
 
+#nullable enable
+
 namespace Piipan.Metrics.Core.Services
 {
     public class ParticipantUploadService : IParticipantUploadApi
@@ -27,6 +29,11 @@ namespace Piipan.Metrics.Core.Services
         public IEnumerable<ParticipantUpload> GetLatestUploadsByState()
         {
             return _participantUploadDao.GetLatestUploadsByState();
+        }
+
+        public int AddUpload(string state, DateTime uploadedAt)
+        {
+            return _participantUploadDao.AddUpload(state, uploadedAt);
         }
     }
 }
