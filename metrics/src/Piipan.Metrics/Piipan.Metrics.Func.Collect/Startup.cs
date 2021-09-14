@@ -5,11 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Shared.Authentication;
 using Npgsql;
+using System.Diagnostics.CodeAnalysis;
 
 [assembly: FunctionsStartup(typeof(Piipan.Metrics.Func.Collect.Startup))]
 
 namespace Piipan.Metrics.Func.Collect
 {
+    [ExcludeFromCodeCoverage]
     public class Startup : FunctionsStartup
     {
         public override void Configure(IFunctionsHostBuilder builder)

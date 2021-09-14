@@ -1,17 +1,18 @@
 using System;
 using System.Data;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Piipan.Metrics.Func.Api.Builders;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Shared.Authentication;
 using Npgsql;
+using System.Diagnostics.CodeAnalysis;
 
 [assembly: FunctionsStartup(typeof(Piipan.Metrics.Func.Api.Startup))]
 
 namespace Piipan.Metrics.Func.Api
 {
+    [ExcludeFromCodeCoverage]
     public class Startup : FunctionsStartup
     {
         public override void Configure(IFunctionsHostBuilder builder)
