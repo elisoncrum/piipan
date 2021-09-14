@@ -1,7 +1,5 @@
 using System;
-using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
-using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
 
 #nullable enable
@@ -63,7 +61,7 @@ namespace Piipan.Metrics.Func.Api.Builders
             string result = "";
             int nextPage = _meta.page + 1;
             // if there are next pages to be had
-            if (_meta.total >= (_meta.page * _meta.perPage))
+            if (_meta.total > (_meta.page * _meta.perPage))
             {
                 if (!String.IsNullOrEmpty(state))
                     result = QueryHelpers.AddQueryString(result, "state", state);
