@@ -11,6 +11,7 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
     {
         private Mock<IDbCommand> _command;
         private string _commandText;
+        private Mock<IDbTransaction> _transaction;
         private Mock<IDbConnection> _connection;
         private Mock<ILogger<ParticipantUploadDao>> _logger;
 
@@ -251,6 +252,27 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
             Assert.Empty(uploads);
         }
 
+        [Fact]
+        public void AddUpload()
+        {
+            // Arrange
+            var dao = Setup();
+            _command
+                .Setup(m => m.ExecuteNonQuery())
+                .Returns(1);
+
+            var uploadedAt = DateTime.Now;
+
+            // Act
+            var nRows = dao.AddUpload("somestate", uploadedAt);
+
+            // Assert
+            Assert.Equal(1, nRows);
+            _connection.Verify(m => m.BeginTransaction(), Times.Once);
+            _command.Verify(m => m.ExecuteNonQuery(), Times.Once);
+            _transaction.Verify(m => m.Commit(), Times.Once);
+        }
+
         private ParticipantUploadDao Setup()
         {
             _command = new Mock<IDbCommand>();
@@ -264,10 +286,15 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
                 .SetupSet(m => m.CommandText = It.IsAny<string>())
                 .Callback<string>(value => _commandText = value);
 
+            _transaction = new Mock<IDbTransaction>();
+
             _connection = new Mock<IDbConnection>();
             _connection
                 .Setup(m => m.CreateCommand())
                 .Returns(_command.Object);
+            _connection
+                .Setup(m => m.BeginTransaction())
+                .Returns(_transaction.Object);
                 
             _logger = new Mock<ILogger<ParticipantUploadDao>>();
             return new ParticipantUploadDao(_connection.Object, _logger.Object);
