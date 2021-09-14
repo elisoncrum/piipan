@@ -45,8 +45,8 @@ namespace Piipan.Metrics.Func.Api.Tests
                 {
                     new ParticipantUpload 
                     {
-                        state = "ea",
-                        uploaded_at = uploadedAt
+                        State = "ea",
+                        UploadedAt = uploadedAt
                     }
                 };
             var uploadApi = new Mock<IParticipantUploadApi>();
@@ -56,11 +56,11 @@ namespace Piipan.Metrics.Func.Api.Tests
 
             var meta = new Meta
             {
-                page = 1,
-                perPage = 1,
-                total = 1,
-                nextPage = null,
-                prevPage = null
+                Page = 1,
+                PerPage = 1,
+                Total = 1,
+                NextPage = null,
+                PrevPage = null
             };
 
             var function = new GetParticipantUploads(uploadApi.Object, MockBuilder(meta).Object);
@@ -98,11 +98,11 @@ namespace Piipan.Metrics.Func.Api.Tests
 
             var meta = new Meta
             {
-                page = 1,
-                perPage = 1,
-                total = 1,
-                nextPage = null,
-                prevPage = null
+                Page = 1,
+                PerPage = 1,
+                Total = 1,
+                NextPage = null,
+                PrevPage = null
             };
 
             var function = new GetParticipantUploads(uploadApi.Object, MockBuilder(meta).Object);
@@ -133,8 +133,8 @@ namespace Piipan.Metrics.Func.Api.Tests
                 {
                     new ParticipantUpload 
                     {
-                        state = "ea",
-                        uploaded_at = uploadedAt
+                        State = "ea",
+                        UploadedAt = uploadedAt
                     }
                 };
             var uploadApi = new Mock<IParticipantUploadApi>();

@@ -39,8 +39,8 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             {
                 var record = new ParticipantUpload
                 {
-                    state = reader[0].ToString(),
-                    uploaded_at = Convert.ToDateTime(reader[1])
+                    State = reader[0].ToString(),
+                    UploadedAt = Convert.ToDateTime(reader[1])
                 };
                 results.Add(record);
             }
@@ -58,8 +58,8 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             {
                 var record = new ParticipantUpload
                 {
-                    state = reader[0].ToString(),
-                    uploaded_at = Convert.ToDateTime(reader[1])
+                    State = reader[0].ToString(),
+                    UploadedAt = Convert.ToDateTime(reader[1])
                 };
                 results.Add(record);
             }

@@ -40,8 +40,8 @@ namespace Piipan.Metrics.Core.Tests.Services
                 {
                     new ParticipantUpload
                     {
-                        state = "somestate",
-                        uploaded_at = uploadedAt,
+                        State = "somestate",
+                        UploadedAt = uploadedAt,
                     }
                 });
 
@@ -52,8 +52,8 @@ namespace Piipan.Metrics.Core.Tests.Services
 
             // Assert
             Assert.Single(uploads);
-            Assert.Single(uploads, (u) => u.state == "somestate");
-            Assert.Single(uploads, (u) => u.uploaded_at == uploadedAt);
+            Assert.Single(uploads, (u) => u.State == "somestate");
+            Assert.Single(uploads, (u) => u.UploadedAt == uploadedAt);
         }
 
         [Fact]
@@ -68,8 +68,8 @@ namespace Piipan.Metrics.Core.Tests.Services
                 {
                     new ParticipantUpload
                     {
-                        state = "somestate",
-                        uploaded_at = uploadedAt,
+                        State = "somestate",
+                        UploadedAt = uploadedAt,
                     }
                 });
 
@@ -80,8 +80,8 @@ namespace Piipan.Metrics.Core.Tests.Services
 
             // Assert
             Assert.Single(uploads);
-            Assert.Single(uploads, (u) => u.state == "somestate");
-            Assert.Single(uploads, (u) => u.uploaded_at == uploadedAt);
+            Assert.Single(uploads, (u) => u.State == "somestate");
+            Assert.Single(uploads, (u) => u.UploadedAt == uploadedAt);
         }
 
         [Fact]

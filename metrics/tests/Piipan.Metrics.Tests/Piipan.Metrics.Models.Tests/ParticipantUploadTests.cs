@@ -13,11 +13,11 @@ namespace Piipan.Metrics.Tests
             public static void CreateSuccess()
             {
                 var result = new ParticipantUpload();
-                result.state = "foobar";
-                result.uploaded_at = new DateTime();
+                result.State = "foobar";
+                result.UploadedAt = new DateTime();
 
-                Assert.Equal("foobar", result.state);
-                Assert.Equal(typeof(DateTime), result.uploaded_at.GetType());
+                Assert.Equal("foobar", result.State);
+                Assert.Equal(typeof(DateTime), result.UploadedAt.GetType());
             }
         }
 

@@ -23,11 +23,11 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(expectedTotal, meta.total);
-            Assert.Equal(0, meta.page);
-            Assert.Equal(0, meta.perPage);
-            Assert.Empty(meta.nextPage);
-            Assert.Null(meta.prevPage);
+            Assert.Equal(expectedTotal, meta.Total);
+            Assert.Equal(0, meta.Page);
+            Assert.Equal(0, meta.PerPage);
+            Assert.Empty(meta.NextPage);
+            Assert.Null(meta.PrevPage);
         }
 
         [Theory]
@@ -46,11 +46,11 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(expectedTotal, meta.total);
-            Assert.Equal(0, meta.page);
-            Assert.Equal(0, meta.perPage);
-            Assert.Contains("page=1", meta.nextPage);
-            Assert.Null(meta.prevPage);
+            Assert.Equal(expectedTotal, meta.Total);
+            Assert.Equal(0, meta.Page);
+            Assert.Equal(0, meta.PerPage);
+            Assert.Contains("page=1", meta.NextPage);
+            Assert.Null(meta.PrevPage);
         }
 
         [Theory]
@@ -71,11 +71,11 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(5, meta.total);
-            Assert.Equal(expectedPage, meta.page);
-            Assert.Equal(0, meta.perPage);
-            Assert.Contains($"page={expectedPage + 1}", meta.nextPage);
-            Assert.Null(meta.prevPage);
+            Assert.Equal(5, meta.Total);
+            Assert.Equal(expectedPage, meta.Page);
+            Assert.Equal(0, meta.PerPage);
+            Assert.Contains($"page={expectedPage + 1}", meta.NextPage);
+            Assert.Null(meta.PrevPage);
         }
 
         [Theory]
@@ -96,11 +96,11 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(5, meta.total);
-            Assert.Equal(expectedPage, meta.page);
-            Assert.Equal(0, meta.perPage);
-            Assert.Contains($"page={expectedPage + 1}", meta.nextPage);
-            Assert.Contains($"page={expectedPage - 1}", meta.prevPage);
+            Assert.Equal(5, meta.Total);
+            Assert.Equal(expectedPage, meta.Page);
+            Assert.Equal(0, meta.PerPage);
+            Assert.Contains($"page={expectedPage + 1}", meta.NextPage);
+            Assert.Contains($"page={expectedPage - 1}", meta.PrevPage);
         }
 
         [Theory]
@@ -128,12 +128,12 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(expectedTotal, meta.total);
-            Assert.Equal(expectedPage, meta.page);
-            Assert.Equal(expectedPerPage, meta.perPage);
-            Assert.Empty(meta.nextPage);
-            Assert.Contains($"page={expectedPage - 1}", meta.prevPage);
-            Assert.Contains($"perPage={expectedPerPage}", meta.prevPage);
+            Assert.Equal(expectedTotal, meta.Total);
+            Assert.Equal(expectedPage, meta.Page);
+            Assert.Equal(expectedPerPage, meta.PerPage);
+            Assert.Empty(meta.NextPage);
+            Assert.Contains($"page={expectedPage - 1}", meta.PrevPage);
+            Assert.Contains($"perPage={expectedPerPage}", meta.PrevPage);
         }
 
         [Theory]
@@ -155,11 +155,11 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(5, meta.total);
-            Assert.Equal(0, meta.page);
-            Assert.Equal(expectedPerPage, meta.perPage);
-            Assert.Contains($"perPage={expectedPerPage}",meta.nextPage);
-            Assert.Null(meta.prevPage);
+            Assert.Equal(5, meta.Total);
+            Assert.Equal(0, meta.Page);
+            Assert.Equal(expectedPerPage, meta.PerPage);
+            Assert.Contains($"perPage={expectedPerPage}",meta.NextPage);
+            Assert.Null(meta.PrevPage);
         }
 
         [Theory]
@@ -182,10 +182,10 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             var meta = builder.Build();
 
             // Assert
-            Assert.Equal(5, meta.total);
-            Assert.Equal(2, meta.page);
-            Assert.Contains($"state={expectedState}", meta.nextPage);
-            Assert.Contains($"state={expectedState}", meta.prevPage);
+            Assert.Equal(5, meta.Total);
+            Assert.Equal(2, meta.Page);
+            Assert.Contains($"state={expectedState}", meta.NextPage);
+            Assert.Contains($"state={expectedState}", meta.PrevPage);
         }
     }
 }

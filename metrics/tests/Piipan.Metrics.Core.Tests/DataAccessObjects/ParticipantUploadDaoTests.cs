@@ -82,7 +82,7 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
 
             // Assert
             Assert.Single(uploads);
-            Assert.Single(uploads, (u) => u.state == "somestate" && u.uploaded_at == uploadedAt);
+            Assert.Single(uploads, (u) => u.State == "somestate" && u.UploadedAt == uploadedAt);
             Assert.Contains("SELECT state, uploaded_at FROM participant_uploads", _commandText);
             Assert.Contains("LIMIT", _commandText);
             Assert.Contains("OFFSET", _commandText);
@@ -118,7 +118,7 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
 
             // Assert
             Assert.Single(uploads);
-            Assert.Single(uploads, (u) => u.state == "somestate" && u.uploaded_at == uploadedAt);
+            Assert.Single(uploads, (u) => u.State == "somestate" && u.UploadedAt == uploadedAt);
             Assert.Contains("SELECT state, uploaded_at FROM participant_uploads", _commandText);
             Assert.Contains("LIMIT", _commandText);
             Assert.Contains("OFFSET", _commandText);
@@ -158,8 +158,8 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
 
             // Assert
             Assert.NotEmpty(uploads);
-            Assert.Single(uploads, (u) => u.state == "somestate" && u.uploaded_at == firstUploadedAt);
-            Assert.Single(uploads, (u) => u.state == "someotherstate" && u.uploaded_at == secondUploadedAt);
+            Assert.Single(uploads, (u) => u.State == "somestate" && u.UploadedAt == firstUploadedAt);
+            Assert.Single(uploads, (u) => u.State == "someotherstate" && u.UploadedAt == secondUploadedAt);
             Assert.Contains("SELECT state, uploaded_at FROM participant_uploads", _commandText);
             Assert.Contains("LIMIT", _commandText);
             Assert.Contains("OFFSET", _commandText);
@@ -221,8 +221,8 @@ namespace Piipan.Metrics.Core.Tests.DataAccessObjects
 
             // Assert
             Assert.NotEmpty(uploads);
-            Assert.Single(uploads, (u) => u.state == "somestate" && u.uploaded_at == firstUploadedAt);
-            Assert.Single(uploads, (u) => u.state == "someotherstate" && u.uploaded_at == secondUploadedAt);
+            Assert.Single(uploads, (u) => u.State == "somestate" && u.UploadedAt == firstUploadedAt);
+            Assert.Single(uploads, (u) => u.State == "someotherstate" && u.UploadedAt == secondUploadedAt);
             Assert.Contains("SELECT state, max(uploaded_at)", _commandText);
             Assert.Contains("ORDER BY", _commandText);
             Assert.Contains("ASC", _commandText);

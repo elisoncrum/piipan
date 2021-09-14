@@ -19,7 +19,7 @@ namespace Piipan.Metrics.Func.Api.Builders
 
         public Meta Build()
         {
-            _meta.total = _participantUploadApi.GetUploadCount(_state);
+            _meta.Total = _participantUploadApi.GetUploadCount(_state);
             SetPrevPage(_state);
             SetNextPage(_state);
             return _meta;
@@ -27,13 +27,13 @@ namespace Piipan.Metrics.Func.Api.Builders
 
         public IMetaBuilder SetPage(int page)
         {
-            _meta.page = page;
+            _meta.Page = page;
             return this;
         }
 
         public IMetaBuilder SetPerPage(int perPage)
         {
-            _meta.perPage = perPage;
+            _meta.PerPage = perPage;
             return this;
         }
 
@@ -45,30 +45,30 @@ namespace Piipan.Metrics.Func.Api.Builders
 
         private void SetPrevPage(string? state)
         {
-            var newPage = _meta.page - 1;
+            var newPage = _meta.Page - 1;
             if (newPage <= 0) return;
 
             string result = "";
             if (!String.IsNullOrEmpty(state))
                 result = QueryHelpers.AddQueryString(result, "state", state);
             result = QueryHelpers.AddQueryString(result, "page", newPage.ToString());
-            result = QueryHelpers.AddQueryString(result, "perPage", _meta.perPage.ToString());
-            _meta.prevPage = result;
+            result = QueryHelpers.AddQueryString(result, "perPage", _meta.PerPage.ToString());
+            _meta.PrevPage = result;
         }
 
         private void SetNextPage(string? state)
         {
             string result = "";
-            int nextPage = _meta.page + 1;
+            int nextPage = _meta.Page + 1;
             // if there are next pages to be had
-            if (_meta.total > (_meta.page * _meta.perPage))
+            if (_meta.Total > (_meta.Page * _meta.PerPage))
             {
                 if (!String.IsNullOrEmpty(state))
                     result = QueryHelpers.AddQueryString(result, "state", state);
                 result = QueryHelpers.AddQueryString(result, "page", nextPage.ToString());
-                result = QueryHelpers.AddQueryString(result, "perPage", _meta.perPage.ToString());
+                result = QueryHelpers.AddQueryString(result, "perPage", _meta.PerPage.ToString());
             }
-            _meta.nextPage = result;
+            _meta.NextPage = result;
         }
     }
 }

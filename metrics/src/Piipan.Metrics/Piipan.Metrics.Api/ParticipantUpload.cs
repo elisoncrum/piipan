@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace Piipan.Metrics.Api
 {
@@ -7,7 +8,9 @@ namespace Piipan.Metrics.Api
     /// </summary>
     public class ParticipantUpload
     {
-        public string state { get; set; }
-        public DateTime uploaded_at { get; set; }
+        [JsonProperty("state")]
+        public string State { get; set; }
+        [JsonProperty("uploaded_at")]
+        public DateTime UploadedAt { get; set; }
     }
 }

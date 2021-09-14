@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 #nullable enable
 
@@ -6,10 +7,15 @@ namespace Piipan.Metrics.Api
 {
     public class Meta
     {
-        public int page { get; set; }
-        public int perPage { get; set; }
-        public Int64 total { get; set; }
-        public string? nextPage { get; set; }
-        public string? prevPage { get; set; }
+        [JsonProperty("page")]
+        public int Page { get; set; }
+        [JsonProperty("perPage")]
+        public int PerPage { get; set; }
+        [JsonProperty("total")]
+        public Int64 Total { get; set; }
+        [JsonProperty("nextPage")]
+        public string? NextPage { get; set; }
+        [JsonProperty("prevPage")]
+        public string? PrevPage { get; set; }
     }
 }
