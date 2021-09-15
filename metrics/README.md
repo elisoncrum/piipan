@@ -6,23 +6,24 @@
 
 The `metrics/src` directory contains:
 
-* [Metrics Functions Function App](./src/PiipanMetricsFunctions) - monitors the other subsystems and stores the metrics data
-* [Metrics API Function App](./src/PiipanMetricsApi) - serves metrics data to external systems
-* [Metrics Shared Models](./src/Piipan.Metrics.Models) - maps data from metrics db into application objects
+* [Metrics API Library](./src/Piipan.Metrics/Piipan.Metrics.Api) - data models and API interfaces
+* [Metrics Core Library](./src/Piipan.Metrics/Piipan.Metrics.Core) - logic and data access layer
+* [Metrics API Function App](./src/Piipan.Metrics/Piipan.Metrics.Func.Api) - serves metrics data to external systems
+* [Metrics Collect Function App](./src/Piipan.Metrics/Piipan.Metrics.Func.Collect) - monitors other subsystems and stores metrics data
 
 ## Summary
 
-### Metrics Functions
-
-Metrics Functions is an Azure Function App made up of Azure Event Grid event functions.
-
-For now, there's a 1-1 relationship between a specific metric needing to be captured and a function within this app.
-
-### Metrics API
+### Metrics API Function App
 
 The Metrics API is a Function App made up of Azure HTTPTrigger event functions.
 
 For now, there's a 1-1 relationship between an API endpoint and a function within this app.
+
+### Metrics Collect Function App
+
+Metrics Collect is an Azure Function App made up of Azure Event Grid event functions.
+
+For now, there's a 1-1 relationship between a specific metric needing to be captured and a function within this app.
 
 ## Environment variables
 
@@ -47,15 +48,18 @@ To build and run the app with this limited functionality:
 
 ## Testing
 
-`Piipan.Metrics.Test` holds all tests for the Piipan Metrics Subsystem
+Each project in the `Piipan.Metrics` subsystem has a dedicated test project in the `metrics/tests` directory. 
+
+To execute tests for the subsystem as a whole:
 
 ``` bash
-$ cd metrics/tests/Piipan.Metrics.Tests
-```
-
-If running for the first time, do `dotnet build`, then:
-
-``` bash
+$ cd metrics
 $ dotnet test
 ```
 
+To execute tests for a particular subsystem project:
+
+``` bash
+$ cd metrics/tests/Piipan.Metrics.<*>.Tests
+$ dotnet test
+```
