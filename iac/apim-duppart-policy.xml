@@ -11,11 +11,11 @@
             <value>@(context.Subscription.Name)</value>
         </set-header>
         <!--
-            Derive the state abbreviation from the subscription name and forward to
-            the internal endpoint. Subscriptions names are expected to be in the
-            format: {state-abbr}-DupPart.
+            Derive the state abbreviation from the subscription name and pass it on
+            to the backend as a header.
 
-            Default to "ea".
+            Fail if subscription name does not match the expected format of:
+            {uppercase-state-abbr}-DupPart (e.g., EA-DupPart).
         -->
         <choose>
             <when condition="@(Regex.IsMatch(context.Subscription.Name, "^[A-Z]{2}-DupPart"))">
@@ -24,17 +24,24 @@
                     var matches = Regex.Match(context.Subscription.Name, pattern);
                     return matches.Groups["state"].Value.ToLower();
                 }" />
+                <set-header name="X-Initiating-State" exists-action="override">
+                    <value>@((string)context.Variables["InitiatingState"])</value>
+                </set-header>
             </when>
             <otherwise>
-                <set-variable name="IntitiatingState" value="ea" />
+                <!-- Subscription name does not match the prescribed format -->
+                <return-response>
+                    <set-status code="401" reason="Unauthorized"/>
+                    <set-header name="Content-Type" exists-action="override">
+                        <value>application/json</value>
+                    </set-header>
+                    <set-body>{
+                         "statusCode": 401,
+                         "message": "A state role could not be determined for this subscription key."
+                    }</set-body>
+                </return-response>
             </otherwise>
         </choose>
-        <!--
-            Pass derived state abbreviation to backend as X-Initiating-State header
-        -->
-        <set-header name="X-Initiating-State" exists-action="override">
-            <value>@(context.Variables.GetValueOrDefault<string>("InitiatingState", ""))</value>
-        </set-header>
     </inbound>
     <backend>
         <base />
