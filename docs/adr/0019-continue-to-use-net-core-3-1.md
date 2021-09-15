@@ -12,7 +12,7 @@ We [considered upgrading to .NET 5 from .NET Core 3.1](0009-continue-to-use-net-
 
 We revisited the decision of whether or not to upgrade to .NET 5 for two main reasons. The first is that in March 2021, Microsoft announced the general availabilty of .NET 5 in Azure Functions in their commercial cloud. Six months later, it was reasonable to think that .NET 5 may also be supported in the government cloud. Second, we expect that the eventual upgrade to .NET 6 will require fewer changes if upgrading from .NET 5 as opposed to .NET Core 3.1.
 
-However, our research and experimentation revealed a bug in the current version of the Azure Functions Core Tools which prevents the publishing of .NET 5 Function Apps in both the commercial and government clouds. Additionally, the FastTrack team referred us to the [current comparison between Azure Government and global Azure](https://docs.microsoft.com/EN-US/azure/azure-government/compare-azure-government-global-azure#azure-functions), which notes that the running of .NET 5 apps in Azure Functions is currently unsupported. 
+However, our research and experimentation revealed a bug in the current version of the Azure Functions Core Tools which prevents the publishing of .NET 5 Function Apps in both the commercial and government clouds.
 
 ## Decision
 
@@ -26,6 +26,5 @@ We will continue to use .NET Core 3.1 for all Piipan subsystems.
 * We will miss out on technical advantages of .NET 5 (C# 9 language features, performance enhancements, etc.).
 
 ## Resources
-* [Comparison of Azure Government and global Azure](https://docs.microsoft.com/EN-US/azure/azure-government/compare-azure-government-global-azure#azure-functions)
 * [GitHub issue in Azure Functions Core Tools](https://github.com/Azure/azure-functions-core-tools/issues/2615)
 * [Fix for above issue, as yet unreleased](https://github.com/Azure/azure-functions-core-tools/pull/2616)
