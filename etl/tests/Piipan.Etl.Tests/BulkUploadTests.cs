@@ -108,6 +108,7 @@ namespace Piipan.Etl.Tests
             });
 
             var records = BulkUpload.Read(stream, logger);
+            int count = 0;
             foreach (var record in records)
             {
                 Assert.Equal(LDS_HASH, record.LdsHash);
@@ -116,7 +117,9 @@ namespace Piipan.Etl.Tests
                 Assert.Equal(new DateTime(1970, 1, 31), record.BenefitsEndDate);
                 Assert.Equal(new DateTime(2021, 5, 31), record.RecentBenefitMonths[0]);
                 Assert.Equal(true, record.ProtectLocation);
+                count++;
             }
+            Assert.Equal(1, count);
         }
 
         [Fact]
@@ -128,12 +131,15 @@ namespace Piipan.Etl.Tests
             });
 
             var records = BulkUpload.Read(stream, logger);
+            int count = 0;
             foreach (var record in records)
             {
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Empty(record.RecentBenefitMonths);
                 Assert.Null(record.ProtectLocation);
+                count++;
             }
+            Assert.Equal(1, count);
         }
 
         [Theory]
@@ -198,6 +204,7 @@ namespace Piipan.Etl.Tests
             var stream = CsvFixture(new string[] { inline }, requiredOnly: true);
 
             var records = BulkUpload.Read(stream, logger);
+            int count = 0;
             foreach (var record in records)
             {
                 Assert.Equal(LDS_HASH, record.LdsHash);
@@ -206,7 +213,9 @@ namespace Piipan.Etl.Tests
                 Assert.Null(record.BenefitsEndDate);
                 Assert.Null(record.ProtectLocation);
                 Assert.Empty(record.RecentBenefitMonths);
+                count++;
             }
+            Assert.Equal(1, count);
         }
 
         [Fact]
