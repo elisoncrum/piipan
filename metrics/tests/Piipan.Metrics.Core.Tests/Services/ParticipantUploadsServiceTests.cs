@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Piipan.Metrics.Core.Tests.Services
 {
-    public class ParticipantUploadsServiceTests
+    public class ParticipantUploadServiceTests
     {
         [Fact]
         public void GetUploadCount()
