@@ -7,7 +7,22 @@ servers:
   - url: "/match/v2"
 paths:
   /find_matches:
-    $ref: '../../match/docs/openapi/orchestrator/find.yaml'
+    post:
+      operationId: "Find matches"
+      tags:
+        - "Match"
+      summary: "Search for all matching participant records using de-identified data"
+      description: "Searches all state databases for any participant records that are an exact match to the `lds_hash` of persons provided in the request."
+      parameters:
+        - $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/parameters/From'
+      requestBody:
+        $ref: '../../match/docs/openapi/schemas/match-query.yaml#/MatchRequest'
+      responses:
+        '200':
+          $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/200'
+        '400':
+          $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/400'
+
 security:
   - ApiKeyAuth: []
 components:
