@@ -13,10 +13,11 @@
 source "$(dirname "$0")"/../../tools/common.bash || exit
 
 STATE="EA"
+STATE_LC=$(echo "$STATE" | tr '[:upper:]' '[:lower:]')
 SUBSCRIPTION_NAME="${STATE}-BulkUpload"
 DATA_RELPATH=../docs/csv/
 DATA_BASENAME=example.csv
-UPLOAD_API_PATH="/bulk/${STATE}/v2/upload/${DATA_BASENAME}"
+UPLOAD_API_PATH="/bulk/${STATE_LC}/v2/upload/${DATA_BASENAME}"
 
 main () {
   # Load agency/subscription/deployment-specific settings
