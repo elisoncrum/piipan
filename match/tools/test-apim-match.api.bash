@@ -32,13 +32,15 @@ main () {
   verify_cloud
 
   serviceName=$(get_resources "$DUP_PART_API_TAG" "$MATCH_RESOURCE_GROUP")
-  domain=$(apim_host_suffix)
-  endpoint_uri="https://${serviceName}${domain}${MATCH_API_PATH}"
+  apim_domain=$(apim_host_suffix)
+  endpoint_uri="https://${serviceName}${apim_domain}${MATCH_API_PATH}"
+  mgmt_domain=$(resource_manager_host_suffix)
+  mgmt_uri="https://management${mgmt_domain}/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${MATCH_RESOURCE_GROUP}/providers/Microsoft.ApiManagement/service/${serviceName}/subscriptions/${SUBSCRIPTION_NAME}/listSecrets?api-version=2020-12-01"
 
   api_key=$(\
     az rest \
     --method POST \
-    --uri "https://management.azure.com/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${MATCH_RESOURCE_GROUP}/providers/Microsoft.ApiManagement/service/${serviceName}/subscriptions/${SUBSCRIPTION_NAME}/listSecrets?api-version=2020-12-01" \
+    --uri "$mgmt_uri" \
     --query primaryKey \
     --output tsv)
 
