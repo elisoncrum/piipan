@@ -159,6 +159,22 @@ graph_host_suffix () {
   fi
 }
 
+apim_host_suffix () {
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    echo ".azure-api.us"
+  else
+    echo ".azure-api.net"
+  fi
+}
+
+resource_manager_host_suffix () {
+  if [ "$CLOUD_NAME" = "AzureUSGovernment" ]; then
+    echo ".usgovcloudapi.net"
+  else
+    echo ".azure.com"
+  fi
+}
+
 state_managed_id_name () {
   abbr=$1
   env=$2
