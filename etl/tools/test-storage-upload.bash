@@ -8,7 +8,7 @@
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
 #
-# usage: upload.bash <azure-env> <path-to-file> <storage-account>
+# usage: test-storage-upload.bash <azure-env> <path-to-file> <storage-account>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit
