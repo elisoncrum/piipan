@@ -8,12 +8,14 @@
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
 #
-# usage: test-match-api.bash <azure-env>
+# usage: test-orch-match-api.bash <azure-env>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit
 
 MATCH_API_FUNC_NAME="find_matches"
+
+# Hash digest for farrington,10/13/31,000-12-3456
 JSON='{
     "data": [{
       "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
@@ -59,6 +61,7 @@ main () {
   curl \
     --request POST "${endpoint_uri}" \
     --header "Authorization: Bearer ${token}" \
+    --header 'Accept: application/json' \
     --header 'Content-Type: application/json' \
     --data-raw "$JSON" \
     --include
