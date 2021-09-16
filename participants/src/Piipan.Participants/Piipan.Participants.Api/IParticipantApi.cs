@@ -1,12 +1,12 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Piipan.Participants.Api.Models;
 
 namespace Piipan.Participants.Api
 {
     public interface IParticipantApi
     {
-        IParticipant GetParticipant(string ldsHash);
-        int AddParticipants(IEnumerable<IParticipant> participants);
+        Task<IParticipant> GetParticipant(string ldsHash);
+        Task<int> AddParticipants(IEnumerable<IParticipant> participants);
     }
 }

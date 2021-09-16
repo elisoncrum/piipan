@@ -1,8 +1,10 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Participants.Core.Models;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -19,15 +21,31 @@ namespace Piipan.Participants.Core.Services
             _uploadDao = uploadDao;
         }
 
-        public IParticipant GetParticipant(string ldsHash)
+        public async Task<IParticipant> GetParticipant(string ldsHash)
         {
-            var upload = _uploadDao.GetLatestUpload();
-            return _participantDao.GetParticipant(ldsHash, upload.Id);
+            var upload = await _uploadDao.GetLatestUpload();
+            return await _participantDao.GetParticipant(ldsHash, upload.Id);
         }
 
-        public int AddParticipants(IEnumerable<IParticipant> participants)
+        public async Task<int> AddParticipants(IEnumerable<IParticipant> participants)
         {
-            return _participantDao.AddParticipants(participants);
+            var upload = await _uploadDao.AddUpload();
+
+            var participantDbos = participants.Select((p) => 
+            {
+                return new ParticipantDbo
+                {
+                    LdsHash = p.LdsHash,
+                    CaseId = p.CaseId,
+                    ParticipantId = p.ParticipantId,
+                    BenefitsEndDate = p.BenefitsEndDate,
+                    RecentBenefitMonths = p.RecentBenefitMonths,
+                    ProtectLocation = p.ProtectLocation,
+                    UploadId = upload.Id
+                };
+            });
+
+            return await _participantDao.AddParticipants(participantDbos);
         }
     }
 }

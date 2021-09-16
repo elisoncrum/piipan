@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Data;
-using Piipan.Participants.Api.Models;
+using Piipan.Participants.Core.Models;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -14,12 +15,12 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _dbConnection = dbConnection;   
         }
 
-        public IParticipant GetParticipant(string ldsHash, int uploadId)
+        public Task<ParticipantDbo> GetParticipant(string ldsHash, int uploadId)
         {
             throw new NotImplementedException();
         }
 
-        public int AddParticipants(IEnumerable<IParticipant> participants)
+        public Task<int> AddParticipants(IEnumerable<ParticipantDbo> participants)
         {
             throw new NotImplementedException();
         }
