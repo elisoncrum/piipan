@@ -21,10 +21,10 @@ namespace Piipan.Participants.Core.Services
             _uploadDao = uploadDao;
         }
 
-        public async Task<IParticipant> GetParticipant(string ldsHash)
+        public async Task<IEnumerable<IParticipant>> GetParticipants(string ldsHash)
         {
             var upload = await _uploadDao.GetLatestUpload();
-            return await _participantDao.GetParticipant(ldsHash, upload.Id);
+            return await _participantDao.GetParticipants(ldsHash, upload.Id);
         }
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)

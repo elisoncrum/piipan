@@ -15,9 +15,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _dbConnection = dbConnection;   
         }
 
-        public async Task<ParticipantDbo> GetParticipant(string ldsHash, int uploadId)
+        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, int uploadId)
         {
-            return await _dbConnection.QuerySingleAsync<ParticipantDbo>(@"
+            return await _dbConnection.QueryAsync<ParticipantDbo>(@"
                 SELECT participant_id ParticipantId,
                     case_id CaseId,
                     benefits_end_date BenefitsEndDate,
