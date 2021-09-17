@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Participants.Api", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Participants.Core", "src\Piipan.Participants\Piipan.Participants.Core\Piipan.Participants.Core.csproj", "{26A348EA-1BF9-49A6-A8B6-2E1E8F3D3C40}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{64535C54-8F90-400A-8DCA-04446C020092}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Participants.Core.Tests", "tests\Piipan.Participants.Core.Tests\Piipan.Participants.Core.Tests.csproj", "{F852CF62-32A0-4786-9654-CBC051C14D4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,10 +52,23 @@ Global
 		{26A348EA-1BF9-49A6-A8B6-2E1E8F3D3C40}.Release|x64.Build.0 = Release|Any CPU
 		{26A348EA-1BF9-49A6-A8B6-2E1E8F3D3C40}.Release|x86.ActiveCfg = Release|Any CPU
 		{26A348EA-1BF9-49A6-A8B6-2E1E8F3D3C40}.Release|x86.Build.0 = Release|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Debug|x64.Build.0 = Debug|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Debug|x86.Build.0 = Debug|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Release|x64.ActiveCfg = Release|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Release|x64.Build.0 = Release|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Release|x86.ActiveCfg = Release|Any CPU
+		{F852CF62-32A0-4786-9654-CBC051C14D4F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3159F714-4BF7-4485-90BA-B35CC913E5A3} = {5B577135-4E8F-4396-A6F6-25A25E7A9A68}
 		{F644B325-BD99-4A5A-A9E8-FA836B00CF56} = {3159F714-4BF7-4485-90BA-B35CC913E5A3}
 		{26A348EA-1BF9-49A6-A8B6-2E1E8F3D3C40} = {3159F714-4BF7-4485-90BA-B35CC913E5A3}
+		{F852CF62-32A0-4786-9654-CBC051C14D4F} = {64535C54-8F90-400A-8DCA-04446C020092}
 	EndGlobalSection
 EndGlobal
