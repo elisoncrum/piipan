@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Data;
 using Piipan.Participants.Core.Models;
+using Dapper;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -15,14 +15,54 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _dbConnection = dbConnection;   
         }
 
-        public Task<ParticipantDbo> GetParticipant(string ldsHash, int uploadId)
+        public async Task<ParticipantDbo> GetParticipant(string ldsHash, int uploadId)
         {
-            throw new NotImplementedException();
+            return await _dbConnection.QuerySingleAsync<ParticipantDbo>(@"
+                SELECT participant_id,
+                    case_id,
+                    benefits_end_date,
+                    recent_benefits_months,
+                    protect_location
+                FROM participants
+                WHERE lds_hash=@ldsHash
+                    AND upload_id=@uploadId",
+                new
+                {
+                    ldsHash = ldsHash,
+                    uploadId = uploadId
+                }
+            );
         }
 
-        public Task<int> AddParticipants(IEnumerable<ParticipantDbo> participants)
+        public async Task AddParticipants(IEnumerable<ParticipantDbo> participants)
         {
-            throw new NotImplementedException();
+            const string sql = @"
+                INSERT INTO participants
+                (
+                    lds_hash,
+                    upload_id,
+                    case_id,
+                    participant_id,
+                    benefits_end_date,
+                    recent_benefit_months,
+                    protect_location
+                )
+                VALUES
+                (
+                    @LdsHash,
+                    @UploadId,
+                    @CaseId,
+                    @ParticipantId,
+                    @BenefitsEndDate,
+                    @RecentBenefitMonths,
+                    @ProtectLocation
+                )
+            ";
+
+            foreach (var participant in participants)
+            {
+                await _dbConnection.ExecuteAsync(sql, participant);
+            }
         }
     }
 }

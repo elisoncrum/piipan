@@ -27,7 +27,7 @@ namespace Piipan.Participants.Core.Services
             return await _participantDao.GetParticipant(ldsHash, upload.Id);
         }
 
-        public async Task<int> AddParticipants(IEnumerable<IParticipant> participants)
+        public async Task AddParticipants(IEnumerable<IParticipant> participants)
         {
             var upload = await _uploadDao.AddUpload();
 
@@ -45,7 +45,7 @@ namespace Piipan.Participants.Core.Services
                 };
             });
 
-            return await _participantDao.AddParticipants(participantDbos);
+            await _participantDao.AddParticipants(participantDbos);
         }
     }
 }
