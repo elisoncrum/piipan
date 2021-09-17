@@ -18,11 +18,11 @@ namespace Piipan.Participants.Core.DataAccessObjects
         public async Task<ParticipantDbo> GetParticipant(string ldsHash, int uploadId)
         {
             return await _dbConnection.QuerySingleAsync<ParticipantDbo>(@"
-                SELECT participant_id,
-                    case_id,
-                    benefits_end_date,
-                    recent_benefits_months,
-                    protect_location
+                SELECT participant_id ParticipantId,
+                    case_id CaseId,
+                    benefits_end_date BenefitsEndDate,
+                    recent_benefit_months RecentBenefitMonths,
+                    protect_location ProtectLocation
                 FROM participants
                 WHERE lds_hash=@ldsHash
                     AND upload_id=@uploadId",
