@@ -5,6 +5,7 @@ using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
+using System;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -29,6 +30,11 @@ namespace Piipan.Participants.Core.Services
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)
         {
+            if (!participants.Any())
+            {
+                throw new ArgumentException("participants cannot be empty!");
+            }
+
             var upload = await _uploadDao.AddUpload();
 
             var participantDbos = participants.Select((p) => 

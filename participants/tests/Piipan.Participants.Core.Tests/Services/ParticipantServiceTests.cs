@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
@@ -91,6 +92,59 @@ namespace Piipan.Participants.Core.Tests.Services
             // Assert
             uploadDao.Verify(m => m.GetLatestUpload(), Times.Once);
             participantDao.Verify(m => m.GetParticipants("something", uploadId), Times.Once);
+        }
+
+        [Fact]
+        public async void AddParticipants_ThrowsWhenEmpty()
+        {
+            // Arrange
+            var participants = RandomParticipants(0);
+            var participantDao = new Mock<IParticipantDao>();
+            var uploadDao = new Mock<IUploadDao>();
+            var service = new ParticipantService(participantDao.Object, uploadDao.Object);
+
+            // Act / Assert
+            await Assert.ThrowsAsync<ArgumentException>(() => service.AddParticipants(participants));
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(50)]
+        public async void AddParticipants_AllAddedWithUploadId(int nParticipants)
+        {
+            // Arrange
+            var participants = RandomParticipants(nParticipants);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload())
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var service = new ParticipantService(participantDao.Object, uploadDao.Object);
+
+            // Act
+            await service.AddParticipants(participants);
+
+            // Assert
+            
+            // we should add a new upload for this batch
+            uploadDao.Verify(m => m.AddUpload(), Times.Once);
+
+            // each participant added via the DAO should have the created upload ID
+            participantDao
+                .Verify(m => m
+                    .AddParticipants(It.Is<IEnumerable<ParticipantDbo>>(participants =>
+                        participants.All(p => p.UploadId == uploadId)
+                    ))
+                );
+
         }
     }
 }
