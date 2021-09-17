@@ -2,7 +2,7 @@
 
 System-wide:
 * [Architectural Decision Records](./adr)
-* [High-level Architecture](./piipan-architecture.png)
+* [High-level Architecture](./diagrams/piipan-architecture.png)
 * [Infrastructure-as-Code](./iac.md)
 * [CI/CD Pipeline](./ci-cd.md)
 * [Service principals in Azure](./service-principals.md)
