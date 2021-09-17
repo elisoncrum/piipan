@@ -46,7 +46,7 @@ main () {
     --request PUT "${endpoint_uri}" \
     --header 'Content-Type: text/plain' \
     --header "Ocp-Apim-Subscription-Key: ${api_key}" \
-    --data-binary "@${DATA_RELPATH}${DATA_BASENAME}" \
+    --data-binary "@$(dirname "$0")/${DATA_RELPATH}${DATA_BASENAME}" \
     --include
 }
 main "$@"
