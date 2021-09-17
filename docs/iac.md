@@ -82,7 +82,15 @@ az resource list  --tag SysType=PerStateMatchApi --query "[? resourceGroup == 'r
 - `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
 - If you forget to connect to a trusted network and `create-resources` fails, connect to the network, then re-run the script.
-- If you have recently deleted all the Piipan resource groups and are re-creating the infrastructure from scratch and get an `Exist soft deleted vault with the same name` error, try `az keyvault purge --name <vault-name>`. See output of `az keyvault list-deleted` for the name of the vault, which should correspond to `VAULT_NAME` in `create-resources.bash`.
+- If you have recently deleted all the Piipan resource groups and are re-creating the infrastructure from scratch, you will need to explicitly purge resource types that are initially soft-deleted. Be sure to **perform these commands against the correct subscription/resource groups** as they will cause **irreversible data loss**.
+  - Key Vaults
+    1. `az keyvault list-deleted` for the names of soft-deleted vaults and identify the ones corresponding to your environment's resource groups.
+    1. `az keyvault purge --name <vault-name>` for each relevant vault.
+    1. Now when you re-run `create-resources`, you should not get the `Exist soft deleted vault with the same name` error.
+  - API Management (APIM) instances
+    1. `az rest --method GET --uri https://management.azure.com/subscriptions/<subscription-id>/providers/Microsoft.ApiManagement/deletedservices?api-version=2020-06-01-preview` for the names of soft-deleted APIM instances and identity the ones corresponding to your environment's resource groups. You'll need to use `management.usgovcloudapi.net` in AzureUSGovernment.
+    1. `az rest --method DELETE --uri https://management.azure.com/subscriptions/<subscription-id>/providers/Microsoft.ApiManagement/locations/<region>/deletedservices/<apim-service-id>?api-version=2020-06-01-preview` for each relevant APIM instance.
+    1. Now when you re-run `create-resources`, you should not get an `DeploymentFailed` error in `create-apim`.
 - Some Azure CLI provisioning commands will return before all of their behind-the-scenes operations complete in the Azure environment. Very occasionally, subsequent provisioning commands in `create-resources` will fail as it won't be able to locate services it expects to be present; e.g., `Can't find app with name` when publishing a Function to a Function App. As a workaround, re-run the script.
 - .NET 5 with Azure Functions v3 is [not (yet) supported by Microsoft](https://github.com/Azure/azure-functions-host/issues/6674).
 - `iac/.azure` contains local Azure CLI configuration that is used by `create-resources`
