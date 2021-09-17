@@ -45,14 +45,14 @@ func azure functionapp publish <function-app-name> --dotnet
 
 In a development environment, the `test-storage-upload.bash` tool can be used to upload test CSV files to a storage account.
 
-For example, if you are targeting the `tts/dev` environment and the `eastate5or4l3nqzevf4` storage account:
+For example, if you are targeting the `tts/dev` environment and the `ttssteauploaddev` storage account:
 ```
-./tools/test-storage-upload.bash tts/dev ./docs/csv/example.csv eastate5or4l3nqzevf4
+./tools/test-storage-upload.bash tts/dev ./docs/csv/example.csv ttssteauploaddev
 ```
 
 `test-storage-upload.bash` uses the credentials of the signed in Azure administrator to access the storage accounts. Privileges to perform that operation have to be explicitly granted on each storage account:
 ```
-./tools/grant-blob.bash tts/dev eastate5or4l3nqzevf4
+./tools/grant-blob.bash tts/dev ttssteauploaddev
 ``` 
 
 While `grant-blob.bash` may return within a few seconds, it take can up to several minutes for Azure to replicate the privileges across its internal infrastructure; e.g., if `test-storage-upload.bash` fails right after `grant-blob.bash` has been run, try it again in a couple of minutes.
