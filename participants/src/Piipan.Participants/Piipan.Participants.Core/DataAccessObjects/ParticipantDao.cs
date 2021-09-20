@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Data;
@@ -15,14 +16,17 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _dbConnection = dbConnection;   
         }
 
-        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, int uploadId)
+        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId)
         {
             return await _dbConnection.QueryAsync<ParticipantDbo>(@"
-                SELECT participant_id ParticipantId,
+                SELECT 
+                    lds_hash LdsHash,
+                    participant_id ParticipantId,
                     case_id CaseId,
                     benefits_end_date BenefitsEndDate,
                     recent_benefit_months RecentBenefitMonths,
-                    protect_location ProtectLocation
+                    protect_location ProtectLocation,
+                    upload_id UploadId
                 FROM participants
                 WHERE lds_hash=@ldsHash
                     AND upload_id=@uploadId",
