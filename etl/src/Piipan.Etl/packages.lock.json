@@ -33,9 +33,9 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.Storage": {
         "type": "Direct",
-        "requested": "[4.0.4, )",
-        "resolved": "4.0.4",
-        "contentHash": "sNS63xR2Fx7P2ydvfDnrqEnGH1yWjvwQFDqx8iIk91/E2YXi7wCZjcD8SEu6bQS9n2p9yUxZTQg8CMtIqpfnSw==",
+        "requested": "[4.0.5, )",
+        "resolved": "4.0.5",
+        "contentHash": "MHfCoEb2o3+YXrynYXpsXBA8jWvNfel0pPwmXTJmuabdPvjzpGhdxiBTfM07wQptWl+A4L4vmHzeTTRyDUFbrg==",
         "dependencies": {
           "Microsoft.Azure.Cosmos.Table": "1.0.7",
           "Microsoft.Azure.Storage.Blob": "11.1.7",
