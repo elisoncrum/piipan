@@ -11,7 +11,6 @@ using Piipan.Participants.Core.Services;
 using Dapper;
 using Npgsql;
 using Xunit;
-using Newtonsoft.Json;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
