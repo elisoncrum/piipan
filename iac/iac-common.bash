@@ -198,8 +198,4 @@ private_dns_zone () {
 
   echo $base
 }
-
-# Include common database functions
-# shellcheck source=./iac/db-common.bash
-source "$(dirname "$0")"/db-common.bash
 ### END Functions

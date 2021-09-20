@@ -26,6 +26,8 @@ main () {
   source "$(dirname "$0")"/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
   source "$(dirname "$0")"/iac-common.bash
+  # shellcheck source=./iac/db-common.bash
+  source "$(dirname "$0")"/db-common.bash
   verify_cloud
 
   set_constants
