@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Piipan.Participants.Core.Models;
 using Xunit;
 
