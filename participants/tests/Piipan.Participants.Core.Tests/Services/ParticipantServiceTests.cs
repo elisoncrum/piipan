@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
 using Moq;
 using Xunit;
-using System.Collections.Generic;
 
 namespace Piipan.Participants.Core.Tests.Services
 {

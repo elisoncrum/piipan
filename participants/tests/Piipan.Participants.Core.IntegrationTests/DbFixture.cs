@@ -101,6 +101,19 @@ namespace Piipan.Participants.Core.IntegrationTests
             }
         }
 
+        public void ClearUploads()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute("DELETE FROM uploads");
+
+                conn.Close();
+            }
+        }
+
         public Int64 GetLastUploadId()
         {
             Int64 result = 0;
@@ -134,6 +147,19 @@ namespace Piipan.Participants.Core.IntegrationTests
                     VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @BenefitsEndDate, @RecentBenefitMonths::date[], @ProtectLocation)",
                     parameters);
 
+                conn.Close();
+            }
+        }
+
+        public void InsertUpload()
+        {
+            var factory = NpgsqlFactory.Instance;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now(), current_user)");
                 conn.Close();
             }
         }

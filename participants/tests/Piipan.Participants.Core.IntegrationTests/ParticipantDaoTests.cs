@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
+    [Collection("Core.IntegrationTests")]
     public class ParticipantDaoTests : DbFixture
     {
         private string RandomHashString()
