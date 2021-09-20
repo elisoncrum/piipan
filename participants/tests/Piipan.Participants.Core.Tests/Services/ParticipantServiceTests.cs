@@ -22,7 +22,7 @@ namespace Piipan.Participants.Core.Tests.Services
                     LdsHash = Guid.NewGuid().ToString(),
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
-                    BenefitsEndDate = DateTime.UtcNow,
+                    BenefitsEndDate = DateTime.UtcNow.Date,
                     RecentBenefitMonths = new List<DateTime>(),
                     ProtectLocation = (new Random()).Next(2) == 0,
                     UploadId = (new Random()).Next()
@@ -42,7 +42,7 @@ namespace Piipan.Participants.Core.Tests.Services
             var participants = RandomParticipants(nMatches);
             var participantDao = new Mock<IParticipantDao>();
             participantDao
-                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<int>()))
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<Int64>()))
                 .ReturnsAsync(participants);
             
             var uploadDao = new Mock<IUploadDao>();
@@ -70,7 +70,7 @@ namespace Piipan.Participants.Core.Tests.Services
             // Arrange
             var participantDao = new Mock<IParticipantDao>();
             participantDao
-                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<int>()))
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
             
             var uploadId = (new Random()).Next();

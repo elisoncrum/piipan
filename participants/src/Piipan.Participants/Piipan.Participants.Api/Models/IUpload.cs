@@ -4,7 +4,7 @@ namespace Piipan.Participants.Api.Models
 {
     public interface IUpload
     {
-        int Id { get; set; }
+        Int64 Id { get; set; }
         DateTime CreatedAt { get; set; }
         string Publisher { get; set; }
     }
