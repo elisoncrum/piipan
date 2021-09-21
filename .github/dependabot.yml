@@ -60,12 +60,17 @@ updates:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
-  directory: "/metrics/src/Piipan.Metrics/Piipan.Metrics.Collect"
+  directory: "/metrics/src/Piipan.Metrics/Piipan.Metrics.Func.Collect"
   schedule:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
-  directory: "/metrics/src/Piipan.Metrics/Piipan.Metrics.Models"
+  directory: "/metrics/src/Piipan.Metrics/Piipan.Metrics.Func.Api"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/metrics/src/Piipan.Metrics/Piipan.Metrics.Core"
   schedule:
     interval: daily
     time: "09:00"

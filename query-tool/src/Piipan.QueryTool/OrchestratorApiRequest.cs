@@ -22,11 +22,11 @@ namespace Piipan.QueryTool
             _logger = logger;
         }
 
-        public async Task<MatchResponse> Match(PiiRecord query)
+        public async Task<MatchResponse> Match(MatchRequestRecord record)
         {
-            const string Endpoint = "query";
+            const string Endpoint = "find_matches";
 
-            var request = new MatchRequest { Data = new List<PiiRecord> { query } };
+            var request = new MatchRequest { Data = new List<MatchRequestRecord> { record } };
             var json = JsonSerializer.Serialize(request);
             var response = await _apiClient.PostAsync(
                 new Uri(_baseUri, Endpoint),
@@ -40,30 +40,6 @@ namespace Piipan.QueryTool
 
             return matchResponse;
         }
-    }
-
-    public class MatchResponse
-    {
-        [JsonPropertyName("data")]
-        public MatchResponseData Data { get; set; } = new MatchResponseData();
-    }
-
-    public class MatchResponseData
-    {
-        [JsonPropertyName("results")]
-        public List<MatchResult> Results { get; set; } = new List<MatchResult>();
-
-        [JsonPropertyName("errors")]
-        public List<MatchError> Errors { get; set; } = new List<MatchError>();
-    }
-
-    public class MatchResult
-    {
-        [JsonPropertyName("index")]
-        public int Index { get; set; }
-
-        [JsonPropertyName("matches")]
-        public virtual List<PiiRecord> Matches { get; set; }
     }
 
     public class MatchError

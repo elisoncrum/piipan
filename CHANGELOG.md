@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8] - 2021-09-21
+
+### Added
+- `InitiatingState` header to internal request from APIM to Orchestrator API
+- Participants library/subsystem to generalize code across from ETL and Match subsystems
+- Normalization code to generate the secure hash digest (de-identified PII)
+### Changed
+- Metrics subsystem was refactored to reflect [ADR on internal software architecture](https://github.com/18F/piipan/blob/dev/docs/adr/0018-standardize-subsystem-software-architecture.md)
+### Fixed
+- Query tool match functionality using the new normalization code and PPRL API
+- `authorize-cli.bash` and `test-metricsapi.bash` to work in `AzureCloud` and `AzureUSGovernment`
+
 ## [0.7] - 2021-09-08
 
 ### Added
@@ -13,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Duplicate participation API for PPRL approach
   - base URL is now `/match/v2`
   - `query` renamed to `find_matches` which takes de-identified PII
-  - `participant_id` and `case_id` is now required in match queries and responses
+  - `participant_id` and `case_id` is now required in match esponses
 - Bulk upload API for PPRL approach
   - base URL is now `/bulk/v2`
   - `first`, `middle`, `last`, `dob`, and `ssn` columns in CSV replaced with `lds_hash`
@@ -103,6 +115,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.8]: https://github.com/18F/piipan/releases/tag/v0.8
 [0.7]: https://github.com/18F/piipan/releases/tag/v0.7
 [0.6]: https://github.com/18F/piipan/releases/tag/v0.6
 [0.5]: https://github.com/18F/piipan/releases/tag/v0.5

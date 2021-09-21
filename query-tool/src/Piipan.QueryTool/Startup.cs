@@ -11,6 +11,7 @@ using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Deidentification;
 using Piipan.Shared.Logging;
 
 namespace Piipan.QueryTool
@@ -33,11 +34,11 @@ namespace Piipan.QueryTool
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
             services.Configure<ForwardedHeadersOptions>(options => {
-                options.ForwardedHeaders = 
+                options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
             });
 
-            services.AddRazorPages(options => 
+            services.AddRazorPages(options =>
             {
                 options.Conventions.AuthorizeFolder("/");
                 options.Conventions.AllowAnonymousToPage("/SignedOut");
@@ -62,6 +63,12 @@ namespace Piipan.QueryTool
             });
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
+
+            services.AddSingleton<INameNormalizer, NameNormalizer>();
+            services.AddSingleton<IDobNormalizer, DobNormalizer>();
+            services.AddSingleton<ISsnNormalizer, SsnNormalizer>();
+            services.AddSingleton<ILdsHasher, LdsHasher>();
+            services.AddSingleton<ILdsDeidentifier, LdsDeidentifier>();
 
             services.AddHttpContextAccessor();
             services.AddEasyAuth();

@@ -21,11 +21,7 @@ namespace Piipan.QueryTool.Tests
                         {
                             ""matches"": [
                                 {
-                                    ""first"": ""Theodore"",
-                                    ""middle"": ""Carri"",
-                                    ""last"": ""Farrington"",
-                                    ""ssn"": ""000-00-0000"",
-                                    ""dob"": ""2021-01-01"",
+                                    ""lds_hash"": ""foobar"",
                                     ""state"": ""ea"",
                                     ""state_abbr"": ""ea""
                                 }
@@ -35,11 +31,9 @@ namespace Piipan.QueryTool.Tests
                     ""errors"": []
                 }
             }";
-            var query = new PiiRecord
+            var query = new MatchRequestRecord
             {
-                FirstName = "Theodore",
-                MiddleName = "Carri",
-                LastName = "Farrington"
+                LdsHash = "foobar"
             };
             var clientMock = new Mock<IAuthorizedApiClient>();
             clientMock
@@ -61,11 +55,7 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.IsType<MatchResponse>(result);
             Assert.Single(result.Data.Results[0].Matches);
-            Assert.Equal("Theodore", match.FirstName);
-            Assert.Equal("Carri", match.MiddleName);
-            Assert.Equal("Farrington", match.LastName);
-            Assert.Equal("000-00-0000", match.SocialSecurityNum);
-            Assert.Equal(new DateTime(2021, 1, 1), match.DateOfBirth);
+            Assert.Equal("foobar", match.LdsHash);
             Assert.Equal("ea", match.State);
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Deidentification;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -12,14 +13,17 @@ namespace Piipan.QueryTool.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IAuthorizedApiClient _apiClient;
         private readonly OrchestratorApiRequest _apiRequest;
+        private readonly ILdsDeidentifier _ldsDeidentifier;
 
         public IndexModel(ILogger<IndexModel> logger,
                           IAuthorizedApiClient apiClient,
-                          IClaimsProvider claimsProvider)
+                          IClaimsProvider claimsProvider,
+                          ILdsDeidentifier ldsDeidentifier)
                           : base(claimsProvider)
         {
             _logger = logger;
             _apiClient = apiClient;
+            _ldsDeidentifier = ldsDeidentifier;
 
             var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
             _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
@@ -39,8 +43,13 @@ namespace Piipan.QueryTool.Pages
                 {
                     _logger.LogInformation("Query form submitted");
 
-                    MatchResponse result = await _apiRequest.Match(Query);
-
+                    string digest = _ldsDeidentifier.Run(
+                        Query.LastName,
+                        Query.DateOfBirth.Value.ToString("yyyy-MM-dd"),
+                        Query.SocialSecurityNum
+                    );
+                    MatchRequestRecord requestRecord = new MatchRequestRecord() { LdsHash = digest };
+                    MatchResponse result = await _apiRequest.Match(requestRecord);
                     QueryResult = result;
                     NoResults = QueryResult.Data.Results.Count == 0 ||
                         QueryResult.Data.Results[0].Matches.Count == 0;

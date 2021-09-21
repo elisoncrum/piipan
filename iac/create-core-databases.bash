@@ -13,139 +13,10 @@ set_constants () {
   VAULT_NAME=$PREFIX-kv-core-$ENV
   PG_SECRET_NAME=core-pg-admin
 
-  PSQL_OPTS=(-v ON_ERROR_STOP=1 -X -q)
-  TEMPLATE_DB=template1
-
   # Name of Azure Active Directory admin for PostgreSQL server
   PG_AAD_ADMIN=piipan-admins
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
-}
-
-init_db () {
-  db=$1
-  owner=$db
-
-  create_role "$owner"
-  config_role "$owner"
-
-  create_db "$db"
-  set_db_owner "$db" "$owner"
-  config_db "$db"
-}
-
-create_db () {
-  db=$1
-  psql "${PSQL_OPTS[@]}" -d "$TEMPLATE_DB" -f - <<EOF
-    SELECT 'CREATE DATABASE $db TEMPLATE $TEMPLATE_DB'
-      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$db')\gexec
-EOF
-}
-
-create_role () {
-  role=$1
-  psql "${PSQL_OPTS[@]}" -d "$TEMPLATE_DB" -f - <<EOF
-    DO \$\$
-    BEGIN
-      CREATE ROLE $role;
-      EXCEPTION WHEN DUPLICATE_OBJECT THEN
-      RAISE NOTICE 'role "$role" already exists';
-    END
-    \$\$;
-EOF
-}
-
-config_db () {
-  db=$1
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    REVOKE ALL ON DATABASE $db FROM public;
-    REVOKE ALL ON SCHEMA public FROM public;
-    CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-EOF
-}
-
-config_role () {
-  role=$1
-  psql "${PSQL_OPTS[@]}" -d "$TEMPLATE_DB" -f - <<EOF
-    ALTER ROLE $role PASSWORD NULL;
-    ALTER ROLE $role NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOLOGIN;
-EOF
-}
-
-set_db_owner () {
-  db=$1
-  owner=$2
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    -- "superuser" account under Azure is not so super; must be a member of the
-    -- owner role before being able to create a database with it as owner
-    GRANT $owner to $SUPERUSER;
-    ALTER DATABASE $db OWNER TO $owner;
-    REVOKE $owner from $SUPERUSER;
-EOF
-}
-
-create_managed_role () {
-  db=$1
-  func=$2
-  role=${func//-/_}
-
-  principal_id=$(\
-    az webapp identity show \
-      -n "$func" \
-      -g "$RESOURCE_GROUP" \
-      --query principalId \
-      -o tsv)
-  app_id=$(\
-    az ad sp show \
-      --id "$principal_id" \
-      --query appId \
-      -o tsv)
-
-  # Establish a managed identity role for an application's
-  # system-assigned identity.
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    SET aad_validate_oids_in_tenant = off;
-    DO \$\$
-    BEGIN
-      CREATE ROLE $role LOGIN PASSWORD '$app_id' IN ROLE azure_ad_user;
-      EXCEPTION WHEN DUPLICATE_OBJECT THEN
-      RAISE NOTICE 'role "$role" already exists';
-    END
-    \$\$;
-EOF
-}
-
-config_managed_role () {
-  db=$1
-  func=$2
-  role=${func//-/_}
-
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT CONNECT,TEMPORARY ON DATABASE $db TO $role;
-    GRANT USAGE ON SCHEMA public TO $role;
-    ALTER ROLE $role NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
-EOF
-}
-
-grant_read_access () {
-  db=$1
-  func=$2
-  role=${func//-/_}
-
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT ON ALL TABLES IN SCHEMA public TO $role;
-EOF
-}
-
-grant_read_write_access () {
-  db=$1
-  func=$2
-  role=${func//-/_}
-
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO $role;
-    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $role;
-EOF
 }
 
 main () {
@@ -155,6 +26,8 @@ main () {
   source "$(dirname "$0")"/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
   source "$(dirname "$0")"/iac-common.bash
+  # shellcheck source=./iac/db-common.bash
+  source "$(dirname "$0")"/db-common.bash
   verify_cloud
 
   set_constants
@@ -188,80 +61,28 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       eventHubName="$EVENT_HUB_NAME"
 
-  export PGOPTIONS='--client-min-messages=warning'
-  PGHOST=$(az resource show \
-    --resource-group "$RESOURCE_GROUP" \
-    --name "$DB_SERVER_NAME" \
-    --resource-type "Microsoft.DbForPostgreSQL/servers" \
-    --query properties.fullyQualifiedDomainName -o tsv)
-  export PGHOST
-  export PGPASSWORD=$PG_SECRET
-  export PGUSER=${DB_ADMIN_NAME}@${DB_SERVER_NAME}
-
-  echo "Baseline $TEMPLATE_DB before creating new databases from it"
-  config_db "$TEMPLATE_DB"
+  db_set_env "$RESOURCE_GROUP" "$DB_SERVER_NAME" "$DB_ADMIN_NAME" "$PG_SECRET"
 
   # Create and configure metrics DB
-  init_db $METRICS_DB_NAME
+  db_init "$METRICS_DB_NAME" "$SUPERUSER"
 
   echo "Create $METRICS_DB_NAME table"
-  psql "${PSQL_OPTS[@]}" -d $METRICS_DB_NAME -f - <<EOF
-      CREATE TABLE IF NOT EXISTS participant_uploads(
-          id serial PRIMARY KEY,
-          state VARCHAR(50) NOT NULL,
-          uploaded_at timestamp NOT NULL
-      );
-EOF
+  db_apply_ddl "$METRICS_DB_NAME" ../metrics/ddl/metrics.sql
 
-  # AAD / managed identity
-  az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
-  PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
-  az postgres server ad-admin create \
-    --resource-group "$RESOURCE_GROUP" \
-    --server "$DB_SERVER_NAME" \
-    --display-name "$PG_AAD_ADMIN" \
-    --object-id "$PG_AAD_ADMIN_OBJID"
-
-  exists=$(az ad group member check \
-    --group "$PG_AAD_ADMIN" \
-    --member-id "$CURRENT_USER_OBJID" \
-    --query value -o tsv)
-
-  if [ "$exists" = "true" ]; then
-    echo "$CURRENT_USER_OBJID is already a member of $PG_AAD_ADMIN"
-  else
-    # Temporarily add current user as a PostgreSQL AD admin
-    # to allow provisioning of managed identity roles
-    az ad group member add \
-      --group "$PG_AAD_ADMIN" \
-      --member-id "$CURRENT_USER_OBJID"
-  fi
-
-  # Authenticate under the AD "superuser" group, in order to create managed
-  # identities. Assumes the current user is a member of PG_AAD_ADMIN.
-  aad_pgpassword=$(az account get-access-token --resource-type oss-rdbms \
-    --query accessToken --output tsv)
-  export PGPASSWORD=$aad_pgpassword
-  export PGUSER=${PG_AAD_ADMIN}@$DB_SERVER_NAME
+  db_config_aad "$RESOURCE_GROUP" "$DB_SERVER_NAME" "$PG_AAD_ADMIN"
+  db_use_aad "$DB_SERVER_NAME" "$PG_AAD_ADMIN"
 
   echo "Configuring database access for $METRICS_API_APP_NAME"
-  create_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
-  config_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
-  grant_read_access "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
+  db_create_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
+  db_config_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
+  db_grant_read "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
 
   echo "Configuring database access for $METRICS_COLLECT_APP_NAME"
-  create_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
-  config_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
-  grant_read_write_access "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+  db_create_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+  db_config_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+  db_grant_readwrite "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
 
-  if [ "$exists" = "true" ]; then
-    echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
-  else
-    # Revoke temporary assignment of current user as a PostgreSQL AD admin
-    az ad group member remove \
-      --group "$PG_AAD_ADMIN" \
-      --member-id "$CURRENT_USER_OBJID"
-  fi
+  db_leave_aad $PG_AAD_ADMIN
 
   echo "Secure database connection"
   ./remove-external-network.bash \

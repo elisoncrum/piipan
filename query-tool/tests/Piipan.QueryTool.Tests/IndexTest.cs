@@ -9,6 +9,7 @@ using Moq;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Deidentification;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -25,7 +26,7 @@ namespace Piipan.QueryTool.Tests
             var clientMock = new Mock<IAuthorizedApiClient>();
             clientMock
                 .Setup(c => c.PostAsync(
-                    It.Is<Uri>(u => u.ToString().Contains("/query")),
+                    It.Is<Uri>(u => u.ToString().Contains("/find_matches")),
                     It.IsAny<StringContent>()
                 ))
                 .Returns(Task.FromResult(new HttpResponseMessage()
@@ -71,10 +72,12 @@ namespace Piipan.QueryTool.Tests
 
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
                 mockApiClient,
-                mockClaimsProvider
+                mockClaimsProvider,
+                mockLdsDeidentifier
                 );
             // act
             // assert
@@ -87,7 +90,13 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var mockApiClient = Mock.Of<IAuthorizedApiClient>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockApiClient, mockClaimsProvider);
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockApiClient,
+                mockClaimsProvider,
+                mockLdsDeidentifier
+            );
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -108,13 +117,17 @@ namespace Piipan.QueryTool.Tests
                     ""results"": [
                         {
                             ""matches"": [{
-                                ""first"": ""Theodore"",
-                                ""middle"": ""Carri"",
-                                ""last"": ""Farrington"",
-                                ""ssn"": ""000-00-0000"",
-                                ""dob"": ""2021-01-01"",
+                                ""lds_hash"": ""foobar"",
                                 ""state"": ""ea"",
-                                ""state_abbr"": ""ea""
+                                ""case_id"": ""caseId"",
+                                ""participant_id"": ""pId"",
+                                ""benefits_end_month"": ""2021-05"",
+                                ""recent_benefit_months"": [
+                                    ""2021-04"",
+                                    ""2021-03"",
+                                    ""2021-02""
+                                ],
+                                ""protect_location"": false
                             }]
                         }
                     ],
@@ -125,12 +138,18 @@ namespace Piipan.QueryTool.Tests
             {
                 FirstName = "Theodore",
                 LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
-                DateOfBirth = new DateTime(2021, 1, 1)
+                SocialSecurityNum = "987-65-4320",
+                DateOfBirth = new DateTime(1931, 10, 13)
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockClient,
+                mockClaimsProvider,
+                mockLdsDeidentifier
+            );
             pageModel.Query = requestPii;
             pageModel.PageContext.HttpContext = contextMock();
 
@@ -169,7 +188,13 @@ namespace Piipan.QueryTool.Tests
             };
             var mockClient = clientMock(HttpStatusCode.OK, returnValue);
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockClient,
+                mockClaimsProvider,
+                mockLdsDeidentifier
+            );
             pageModel.Query = requestPii;
             pageModel.PageContext.HttpContext = contextMock();
 
@@ -197,7 +222,13 @@ namespace Piipan.QueryTool.Tests
             };
             var mockClient = clientMock(HttpStatusCode.BadRequest, "");
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClient, mockClaimsProvider);
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockClient,
+                mockClaimsProvider,
+                mockLdsDeidentifier
+            );
             pageModel.Query = requestPii;
             pageModel.PageContext.HttpContext = contextMock();
 

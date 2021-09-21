@@ -131,7 +131,7 @@
             ],
             "properties": {
                 "value": "[parameters('apimPolicyXml')]",
-                "format": "xml"
+                "format": "rawxml"
             }
         },
         {
@@ -180,7 +180,7 @@
             ],
             "properties": {
                 "value": "[parameters('dupPartPolicyXml')]",
-                "format": "xml"
+                "format": "rawxml"
             }
         },
         /* Bulk upload API(s) */
@@ -234,7 +234,7 @@
             ],
             "properties": {
                 "value": "[replace(parameters('uploadPolicyXml'), '{storageResourceId}', concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase')))]",
-                "format": "xml"
+                "format": "rawxml"
             },
             "copy": {
                 "name": "per-state-upload-policies",

@@ -134,6 +134,9 @@ main () {
         --role Reader \
         --query objectId \
         --output tsv)
+
+    # Wait bit to avoid "InvalidPrincipalId" on app registration use below
+    sleep 60
   fi
 
   # Create event hub and assign role to app registration
