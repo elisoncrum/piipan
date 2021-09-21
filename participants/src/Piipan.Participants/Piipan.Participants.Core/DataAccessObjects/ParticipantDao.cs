@@ -4,16 +4,21 @@ using System.Threading.Tasks;
 using System.Data;
 using Piipan.Participants.Core.Models;
 using Dapper;
+using Microsoft.Extensions.Logging;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
     public class ParticipantDao : IParticipantDao
     {
         private readonly IDbConnection _dbConnection;
+        private readonly ILogger<ParticipantDao> _logger;
 
-        public ParticipantDao(IDbConnection dbConnection)
+        public ParticipantDao(
+            IDbConnection dbConnection,
+            ILogger<ParticipantDao> logger)
         {
-            _dbConnection = dbConnection;   
+            _dbConnection = dbConnection;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId)
@@ -58,13 +63,16 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     @CaseId,
                     @ParticipantId,
                     @BenefitsEndDate,
-                    @RecentBenefitMonths,
+                    @RecentBenefitMonths::date[],
                     @ProtectLocation
                 )
             ";
 
             foreach (var participant in participants)
             {
+                _logger.LogDebug(
+                    $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
+
                 await _dbConnection.ExecuteAsync(sql, participant);
             }
         }

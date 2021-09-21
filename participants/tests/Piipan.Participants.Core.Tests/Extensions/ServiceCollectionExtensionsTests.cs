@@ -15,6 +15,7 @@ namespace Piipan.Participants.Core.Tests.Extensions
         {
             // Arrange
             var services = new ServiceCollection();
+            services.AddLogging();
             services.AddTransient<IDbConnection>(c => Mock.Of<IDbConnection>());
 
             // Act

@@ -42,7 +42,11 @@ namespace Piipan.Participants.Core.IntegrationTests
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
                     BenefitsEndDate = DateTime.UtcNow.Date,
-                    RecentBenefitMonths = new List<DateTime>(),
+                    RecentBenefitMonths = new List<DateTime>
+                    {
+                        new DateTime(2021, 4, 1),
+                        new DateTime(2021, 5, 1)
+                    },
                     ProtectLocation = (new Random()).Next(2) == 0,
                     UploadId = GetLastUploadId()
                 });
