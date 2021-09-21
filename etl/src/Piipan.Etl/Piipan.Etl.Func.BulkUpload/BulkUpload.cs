@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Piipan.Shared.Helpers;
 
-namespace Piipan.Etl
+namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>
     /// Azure Function implementing basic Extract-Transform-Load of piipan

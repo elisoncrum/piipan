@@ -6,7 +6,7 @@ using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using Piipan.Shared.Helpers;
 
-namespace Piipan.Etl
+namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>
     /// Converts month-only date to last day of month when as a DateTime

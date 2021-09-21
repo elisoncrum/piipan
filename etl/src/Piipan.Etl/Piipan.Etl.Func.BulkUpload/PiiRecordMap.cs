@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using CsvHelper.Configuration;
 using Piipan.Shared.Helpers;
 
-namespace Piipan.Etl
+namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>
     /// Maps and validates a record from a CSV file formatted in accordance with

@@ -4,7 +4,7 @@ using CsvHelper.Configuration.Attributes;
 
 #nullable enable
 
-namespace Piipan.Etl
+namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>
     /// A single record extracted from a CSV file formatted in accordance with
