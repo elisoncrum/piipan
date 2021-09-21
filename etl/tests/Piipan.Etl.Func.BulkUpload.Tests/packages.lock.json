@@ -368,6 +368,15 @@
         "resolved": "1.0.0",
         "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
       },
+      "Microsoft.Azure.Functions.Extensions": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "zYKtQQoS1fdzufxFApuMFiFtoi9QAGH6McXxntpylwLKgKjmCMWdgUd1dcekzTKNR9DPSDPRLiulvukqXnpWrQ==",
+        "dependencies": {
+          "Microsoft.Azure.WebJobs": "3.0.18",
+          "Microsoft.Extensions.DependencyInjection": "2.1.0"
+        }
+      },
       "Microsoft.Azure.KeyVault.Core": {
         "type": "Transitive",
         "resolved": "2.0.4",
@@ -2232,9 +2241,11 @@
         "type": "Project",
         "dependencies": {
           "CsvHelper": "27.1.1",
+          "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.5",
+          "Microsoft.Extensions.DependencyInjection": "3.1.19",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.10",
           "Piipan.Shared": "1.0.0"
