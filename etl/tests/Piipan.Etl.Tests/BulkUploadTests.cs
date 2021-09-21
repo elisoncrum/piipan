@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace Piipan.Etl.Tests
+namespace Piipan.Etl.Func.BulkUpload.Tests
 {
     public class BulkUploadTests
     {

@@ -2228,7 +2228,7 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
-      "piipan.etl": {
+      "piipan.etl.func.bulkupload": {
         "type": "Project",
         "dependencies": {
           "CsvHelper": "27.1.1",
