@@ -24,7 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-    <_Parameter1>Piipan.Etl.Tests</_Parameter1>
+    <_Parameter1>Piipan.Etl.Func.BulkUpload.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
