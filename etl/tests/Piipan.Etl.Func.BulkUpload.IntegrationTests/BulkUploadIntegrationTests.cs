@@ -32,6 +32,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 return connection;
             });
 
+            services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
             services.RegisterParticipantsServices();
 
             return services.BuildServiceProvider();
