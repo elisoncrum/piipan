@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Npgsql;
 
-namespace Piipan.Etl.IntegrationTests
+namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
     /// <summary>
     /// Test fixture for per-state match API database integration testing.

@@ -1,29 +1,65 @@
 using System;
 using System.IO;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Piipan.Etl.Func.BulkUpload;
+using Piipan.Participants.Core.Extensions;
 using Moq;
 using Npgsql;
 using Xunit;
+using System.Data;
+using Piipan.Participants.Api;
+using Piipan.Etl.Func.BulkUpload.Parsers;
 
-namespace Piipan.Etl.IntegrationTests
+namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
     /// <summary>
     /// Integration tests for saving csv records to the database on a bulk upload
     /// </summary>
     public class BulkUploadIntegrationTests : DbFixture
     {
+        private ServiceProvider BuildServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddLogging();
+            services.AddTransient<IDbConnection>(c =>
+            {
+                var connection = Factory.CreateConnection();
+                connection.ConnectionString = ConnectionString;
+                connection.Open();
+                return connection;
+            });
+
+            services.RegisterParticipantsServices();
+
+            return services.BuildServiceProvider();
+        }
+
+        private BulkUpload BuildFunction()
+        {
+            var services = BuildServices();
+            return new BulkUpload(
+                services.GetService<IParticipantApi>(),
+                services.GetService<IParticipantStreamParser>()
+            );
+        }
+
         [Fact]
         public async void SavesCsvRecords()
         {
             // setup
+            var services = BuildServices();
             ClearParticipants();
             var eventGridEvent = Mock.Of<EventGridEvent>();
             eventGridEvent.Data = new Object();
             var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
+            var function = BuildFunction();
+
             // act
-            await BulkUpload.Run(
+            await function.Run(
                 eventGridEvent,
                 input,
                 logger

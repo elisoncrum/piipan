@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Core.Extensions;
 
 [assembly: FunctionsStartup(typeof(Piipan.Etl.Func.BulkUpload.Startup))]
@@ -55,6 +56,7 @@ namespace Piipan.Etl.Func.BulkUpload
                 return connection;
             });
             
+            builder.Services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
             builder.Services.RegisterParticipantsServices();
         }
     }
