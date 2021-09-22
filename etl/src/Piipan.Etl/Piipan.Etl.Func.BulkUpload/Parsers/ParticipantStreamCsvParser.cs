@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using CsvHelper;
 using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Helpers;
 
 namespace Piipan.Etl.Func.BulkUpload.Parsers
 {
@@ -80,6 +83,34 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
         }
     }
 
+    /// <summary>
+    /// Converts month-only date to last day of month when as a DateTime
+    /// and to ISO 8601 year-months when as a string
+    /// </summary>
+	public class ToMonthEndConverter : DefaultTypeConverter
+	{
+		public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+		{
+			if (String.IsNullOrEmpty(text)) return null;
+            return MonthEndDateTime.Parse(text);
+		}
+	}
+
+    /// <summary>
+    /// Converts list of month-only dates to last day of month when as DateTimes
+    /// and to ISO 8601 year-months when as a string
+    /// </summary>
+  	public class ToMonthEndArrayConverter : DefaultTypeConverter
+  	{
+      	public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+      	{
+			if (text == "") return new List<DateTime>();
+			string[] allElements = text.Split(' ');
+			DateTime[] elementsAsDateTimes = allElements.Select(s => MonthEndDateTime.Parse(s)).ToArray();
+			return new List<DateTime>(elementsAsDateTimes);
+      	}
+  	}
+
     public class ParticipantCsvStreamParser : IParticipantStreamParser
     {
         public IEnumerable<IParticipant> Parse(Stream input)
@@ -90,7 +121,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 HasHeaderRecord = true,
                 TrimOptions = TrimOptions.Trim
             };
-            
+
             var csv = new CsvReader(reader, config);
             csv.Context.RegisterClassMap<ParticipantMap>();
 
