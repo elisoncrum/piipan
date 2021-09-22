@@ -3,14 +3,13 @@ using System.IO;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Piipan.Etl.Func.BulkUpload;
 using Piipan.Participants.Core.Extensions;
 using Moq;
-using Npgsql;
 using Xunit;
 using System.Data;
 using Piipan.Participants.Api;
 using Piipan.Etl.Func.BulkUpload.Parsers;
+using System.Linq;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
@@ -65,16 +64,18 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 input,
                 logger
             );
+
             var records = QueryParticipants("SELECT * from participants;");
+            
             // assert
-            Assert.Equal("eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458", records[0].LdsHash);
-            Assert.Equal("caseid1", records[0].CaseId);
-            Assert.Equal("participantid1", records[0].ParticipantId);
-            Assert.Equal(new DateTime(2021, 05, 31), records[0].BenefitsEndDate);
-            Assert.Equal(new DateTime(2021, 04, 30), records[0].RecentBenefitMonths[0]);
-            Assert.Equal(new DateTime(2021, 03, 31), records[0].RecentBenefitMonths[1]);
-            Assert.Equal(new DateTime(2021, 02, 28), records[0].RecentBenefitMonths[2]);
-            Assert.True(records[0].ProtectLocation);
+            Assert.Equal("eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458", records.First().LdsHash);
+            Assert.Equal("caseid1", records.First().CaseId);
+            Assert.Equal("participantid1", records.First().ParticipantId);
+            Assert.Equal(new DateTime(2021, 05, 31), records.First().BenefitsEndDate);
+            Assert.Equal(new DateTime(2021, 04, 30), records.First().RecentBenefitMonths.First());
+            Assert.Equal(new DateTime(2021, 03, 31), records.First().RecentBenefitMonths.ElementAt(1));
+            Assert.Equal(new DateTime(2021, 02, 28), records.First().RecentBenefitMonths.ElementAt(2));
+            Assert.True(records.First().ProtectLocation);
         }
     }
 }
