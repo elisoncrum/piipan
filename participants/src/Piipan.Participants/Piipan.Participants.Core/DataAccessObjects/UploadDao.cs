@@ -3,36 +3,44 @@ using System.Threading.Tasks;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.Models;
 using Dapper;
+using Piipan.Shared;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
     public class UploadDao : IUploadDao
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly IDbConnectionFactory _dbConnectionFactory;
 
-        public UploadDao(IDbConnection dbConnection)
+        public UploadDao(IDbConnectionFactory dbConnectionFactory)
         {
-            _dbConnection = dbConnection;
+            _dbConnectionFactory = dbConnectionFactory;
         }
 
         public async Task<IUpload> GetLatestUpload()
         {
-            return await _dbConnection.QuerySingleAsync<UploadDbo>(@"
-                SELECT id, created_at, publisher
-                FROM uploads
-                ORDER BY id DESC
-                LIMIT 1");
+            return await _dbConnectionFactory
+                .Build()
+                .QuerySingleAsync<UploadDbo>(@"
+                    SELECT id, created_at, publisher
+                    FROM uploads
+                    ORDER BY id DESC
+                    LIMIT 1");
         }
 
         public async Task<IUpload> AddUpload()
         {
-            var tx = _dbConnection.BeginTransaction();
+            var connection = _dbConnectionFactory.Build();
+            var tx = connection.BeginTransaction();
 
-            await _dbConnection.ExecuteAsync(@"
+            await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher)
                 VALUES (now(), current_user)");
 
-            var upload = await GetLatestUpload();
+            var upload = await connection.QuerySingleAsync<UploadDbo>(@"
+                    SELECT id, created_at, publisher
+                    FROM uploads
+                    ORDER BY id DESC
+                    LIMIT 1");
 
             tx.Commit();
 

@@ -5,6 +5,7 @@ using Moq;
 using Xunit;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Api;
+using Piipan.Shared;
 
 namespace Piipan.Participants.Core.Tests.Extensions
 {
@@ -16,7 +17,7 @@ namespace Piipan.Participants.Core.Tests.Extensions
             // Arrange
             var services = new ServiceCollection();
             services.AddLogging();
-            services.AddTransient<IDbConnection>(c => Mock.Of<IDbConnection>());
+            services.AddTransient<IDbConnectionFactory>(c => Mock.Of<IDbConnectionFactory>());
 
             // Act
             services.RegisterParticipantsServices();

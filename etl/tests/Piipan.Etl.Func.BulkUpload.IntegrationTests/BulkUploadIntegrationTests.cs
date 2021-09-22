@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ using Xunit;
 using System.Data;
 using Piipan.Participants.Api;
 using Piipan.Etl.Func.BulkUpload.Parsers;
-using System.Linq;
+using Piipan.Shared;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
@@ -23,12 +24,19 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = new ServiceCollection();
 
             services.AddLogging();
-            services.AddTransient<IDbConnection>(c =>
+            services.AddTransient<IDbConnectionFactory>(c =>
             {
-                var connection = Factory.CreateConnection();
-                connection.ConnectionString = ConnectionString;
-                connection.Open();
-                return connection;
+                var factory = new Mock<IDbConnectionFactory>();
+                factory
+                    .Setup(m => m.Build())
+                    .Returns(() =>
+                {
+                    var connection = Factory.CreateConnection();
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+                    return connection;
+                });
+                return factory.Object;
             });
 
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();

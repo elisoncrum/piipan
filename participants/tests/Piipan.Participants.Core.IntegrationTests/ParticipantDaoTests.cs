@@ -13,6 +13,7 @@ using Dapper;
 using Npgsql;
 using Xunit;
 using Moq;
+using Piipan.Shared;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
@@ -57,6 +58,22 @@ namespace Piipan.Participants.Core.IntegrationTests
             return result;
         }
 
+        private IDbConnectionFactory DbConnFactory()
+        {
+            var factory = new Mock<IDbConnectionFactory>();
+            factory
+                .Setup(m => m.Build())
+                .Returns(() => 
+                {
+                    var conn = Factory.CreateConnection();
+                    conn.ConnectionString = ConnectionString;
+                    conn.Open();
+                    return conn;
+                });
+
+            return factory.Object;
+        }
+
         [Theory]
         [InlineData(0)]
         [InlineData(1)]
@@ -72,7 +89,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 ClearParticipants();
 
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
-                var dao = new ParticipantDao(conn, logger);
+                var dao = new ParticipantDao(DbConnFactory(), logger);
                 var participants = RandomParticipants(nParticipants);
 
                 // Act
@@ -117,7 +134,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 participants.ToList().ForEach(p => Insert(p));
 
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
-                var dao = new ParticipantDao(conn, logger);
+                var dao = new ParticipantDao(DbConnFactory(), logger);
 
                 // Act
                 var matches = await dao.GetParticipants(randoms.First().LdsHash, randoms.First().UploadId);

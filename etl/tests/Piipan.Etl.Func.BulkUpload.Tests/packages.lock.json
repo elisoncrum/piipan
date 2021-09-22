@@ -2265,7 +2265,8 @@
           "Dapper": "2.0.90",
           "Microsoft.Extensions.DependencyInjection": "3.1.19",
           "Microsoft.Extensions.Logging": "3.1.19",
-          "Piipan.Participants.Api": "1.0.0"
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.shared": {
@@ -2276,8 +2277,10 @@
           "Microsoft.AspNetCore.Authorization": "3.1.19",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
+          "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Extensions.Logging": "3.1.19",
-          "Microsoft.Extensions.Options": "3.1.19"
+          "Microsoft.Extensions.Options": "3.1.19",
+          "Npgsql": "5.0.10"
         }
       }
     }

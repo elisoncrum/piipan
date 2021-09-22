@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
