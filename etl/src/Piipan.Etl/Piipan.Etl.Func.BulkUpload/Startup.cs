@@ -14,6 +14,7 @@ namespace Piipan.Etl.Func.BulkUpload
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            builder.Services.AddLogging();
             builder.Services.AddTransient<IDbConnection>(c =>
             {
                 // Environment variables (and placeholder) established
