@@ -1,6 +1,8 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Microsoft.Azure.Services.AppAuthentication;
 using Npgsql;
 
@@ -8,22 +10,33 @@ namespace Piipan.Shared
 {
     public class AzurePgConnectionFactory : IDbConnectionFactory
     {
-        [ExcludeFromCodeCoverage]
-        public IDbConnection Build()
+        // Environment variables (and placeholder) established
+        // during initial function app provisioning in IaC
+        public const string CloudName = "CloudName";
+        public const string DatabaseConnectionString = "DatabaseConnectionString";
+        public const string PasswordPlaceholder = "{password}";
+        public const string DatabasePlaceholder = "{database}";
+        public const string GovernmentCloud = "AzureUSGovernment";
+
+        // Resource ids for open source software databases in the public and
+        // US government clouds. Set the desired active cloud, then see:
+        // `az cloud show --query endpoints.ossrdbmsResourceId`
+        public const string CommercialId = "https://ossrdbms-aad.database.windows.net";
+        public const string GovermentId = "https://ossrdbms-aad.database.usgovcloudapi.net";
+
+        private readonly AzureServiceTokenProvider _tokenProvider;
+        private readonly DbProviderFactory _dbProviderFactory;
+
+        public AzurePgConnectionFactory(
+            AzureServiceTokenProvider tokenProvider,
+            DbProviderFactory dbProviderFactory)
         {
-            // Environment variables (and placeholder) established
-            // during initial function app provisioning in IaC
-            const string CloudName = "CloudName";
-            const string DatabaseConnectionString = "DatabaseConnectionString";
-            const string PasswordPlaceholder = "{password}";
-            const string GovernmentCloud = "AzureUSGovernment";
+            _tokenProvider = tokenProvider;
+            _dbProviderFactory = dbProviderFactory;
+        }
 
-            // Resource ids for open source software databases in the public and
-            // US government clouds. Set the desired active cloud, then see:
-            // `az cloud show --query endpoints.ossrdbmsResourceId`
-            const string CommercialId = "https://ossrdbms-aad.database.windows.net";
-            const string GovermentId = "https://ossrdbms-aad.database.usgovcloudapi.net";
-
+        public async Task<IDbConnection> Build()
+        {
             var resourceId = CommercialId;
             var cn = Environment.GetEnvironmentVariable(CloudName);
             if (cn == GovernmentCloud) {
@@ -35,17 +48,15 @@ namespace Piipan.Shared
 
             if (builder.Password == PasswordPlaceholder)
             {
-                var provider = new AzureServiceTokenProvider();
-                var token = provider.GetAccessTokenAsync(resourceId).GetAwaiter().GetResult();
+                var token = await _tokenProvider.GetAccessTokenAsync(resourceId);
                 builder.Password = token;
             }
             
-            var factory = NpgsqlFactory.Instance;
-            var connection = factory.CreateConnection();
+            var connection = _dbProviderFactory.CreateConnection();
 
             connection.ConnectionString = builder.ConnectionString;
-            connection.Open();
-
+            await connection.OpenAsync();
+            
             return connection;
         }
     }

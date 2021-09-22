@@ -8,6 +8,6 @@ namespace Piipan.Shared
 {
     public interface IDbConnectionFactory
     {
-        IDbConnection Build();
+        Task<IDbConnection> Build();
     }
 }
