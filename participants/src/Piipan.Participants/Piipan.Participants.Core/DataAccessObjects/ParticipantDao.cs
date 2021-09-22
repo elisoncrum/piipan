@@ -23,8 +23,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
         public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId)
         {
-            return await _dbConnectionFactory
-                .Build()
+            var connection = await _dbConnectionFactory.Build();
+            return await connection
                 .QueryAsync<ParticipantDbo>(@"
                     SELECT 
                         lds_hash LdsHash,
@@ -70,14 +70,13 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 )
             ";
 
+            var connection = await _dbConnectionFactory.Build();
             foreach (var participant in participants)
             {
                 _logger.LogDebug(
                     $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
 
-                await _dbConnectionFactory
-                    .Build()
-                    .ExecuteAsync(sql, participant);
+                await connection.ExecuteAsync(sql, participant);
             }
         }
     }

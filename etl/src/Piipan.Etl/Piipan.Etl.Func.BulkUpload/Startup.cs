@@ -17,8 +17,14 @@ namespace Piipan.Etl.Func.BulkUpload
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddLogging();
-            
-            builder.Services.AddTransient<IDbConnectionFactory, AzurePgConnectionFactory>();
+
+            builder.Services.AddTransient<IDbConnectionFactory>(s =>
+            {
+                return new AzurePgConnectionFactory(
+                    new AzureServiceTokenProvider(),
+                    NpgsqlFactory.Instance
+                );
+            });
             builder.Services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
 
             builder.Services.RegisterParticipantsServices();

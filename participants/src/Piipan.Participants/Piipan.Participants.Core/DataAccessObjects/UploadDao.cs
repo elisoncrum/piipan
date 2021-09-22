@@ -1,4 +1,3 @@
-using System.Data;
 using System.Threading.Tasks;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.Models;
@@ -18,8 +17,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
         public async Task<IUpload> GetLatestUpload()
         {
-            return await _dbConnectionFactory
-                .Build()
+            var connection = await _dbConnectionFactory.Build();
+            return await connection
                 .QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
                     FROM uploads
@@ -29,7 +28,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
         public async Task<IUpload> AddUpload()
         {
-            var connection = _dbConnectionFactory.Build();
+            var connection = await _dbConnectionFactory.Build();
             var tx = connection.BeginTransaction();
 
             await connection.ExecuteAsync(@"
