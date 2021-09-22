@@ -21,7 +21,7 @@ COMMENT ON TABLE matches IS 'Match records';
 COMMENT ON COLUMN matches.match_id IS 'Match record''s human-readable unique identifier.';
 COMMENT ON COLUMN matches.created_at IS 'Match record''s creation date/time.';
 COMMENT ON COLUMN matches.initator IS 'Match record''s initiating entity.';
-COMMENT ON COLUMN matches.states IS 'States/territories involved in match.';
+COMMENT ON COLUMN matches.states IS 'State/territory pair involved in match.';
 COMMENT ON COLUMN matches.hash IS 'Value of hash used to identify match.';
 COMMENT ON COLUMN matches.hash_type IS 'Type of hash used to identify match.';
 COMMENT ON COLUMN matches.input IS 'Incoming data from real-time match request.';
