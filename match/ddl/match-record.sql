@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS matches(
     match_id text UNIQUE NOT NULL,
     created_at timestamp NOT NULL,
     initator text NOT NULL,
+    states text[2] NOT NULL,
     hash text NOT NULL,
     hash_type hash_type NOT NULL default 'ldshash';
     input jsonb,
@@ -20,8 +21,9 @@ COMMENT ON TABLE matches IS 'Match records';
 COMMENT ON COLUMN matches.match_id IS 'Match record''s human-readable unique identifier.';
 COMMENT ON COLUMN matches.created_at IS 'Match record''s creation date/time.';
 COMMENT ON COLUMN matches.initator IS 'Match record''s initiating entity.';
+COMMENT ON COLUMN matches.states IS 'States/territories involved in match.';
 COMMENT ON COLUMN matches.hash IS 'Value of hash used to identify match.';
-COMMENT ON COLUMN matches.hash_type IS 'Type of hash used to identify match.'
+COMMENT ON COLUMN matches.hash_type IS 'Type of hash used to identify match.';
 COMMENT ON COLUMN matches.input IS 'Incoming data from real-time match request.';
 COMMENT ON COLUMN matches.data IS 'Response data from match request.';
 COMMENT ON COLUMN matches.invalid IS 'Indicator used for designating match as invalid.';
