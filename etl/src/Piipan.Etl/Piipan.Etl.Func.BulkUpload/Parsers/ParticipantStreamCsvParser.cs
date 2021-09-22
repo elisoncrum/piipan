@@ -40,40 +40,40 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             Map(m => m.BenefitsEndDate)
                 .Name("benefits_end_month")
                 .Validate(field => {
-                  if (String.IsNullOrEmpty(field.Field)) return true;
+                    if (String.IsNullOrEmpty(field.Field)) return true;
 
-                  string[] formats={"yyyy-MM", "yyyy-M"};
-                  DateTime dateValue;
+                    string[] formats={"yyyy-MM", "yyyy-M"};
+                    DateTime dateValue;
                     var result = DateTime.TryParseExact(
-                      field.Field,
-                      formats,
-                      new CultureInfo("en-US"),
-                      DateTimeStyles.None,
-                      out dateValue);
+                        field.Field,
+                        formats,
+                        new CultureInfo("en-US"),
+                        DateTimeStyles.None,
+                        out dateValue);
                     if (!result) return false;
-                  return true;
+                    return true;
                 })
                 .TypeConverter<ToMonthEndConverter>().Optional();
 
             Map(m => m.RecentBenefitMonths)
                 .Name("recent_benefit_months")
                 .Validate(field => {
-                  if (String.IsNullOrEmpty(field.Field)) return true;
+                    if (String.IsNullOrEmpty(field.Field)) return true;
 
-                  string[] formats={"yyyy-MM", "yyyy-M"};
-                  string[] dates = field.Field.Split(' ');
-                  foreach (string date in dates)
-                  {
-                    DateTime dateValue;
-                    var result = DateTime.TryParseExact(
-                      date,
-                      formats,
-                      new CultureInfo("en-US"),
-                      DateTimeStyles.None,
-                      out dateValue);
-                    if (!result) return false;
-                  }
-                  return true;
+                    string[] formats={"yyyy-MM", "yyyy-M"};
+                    string[] dates = field.Field.Split(' ');
+                    foreach (string date in dates)
+                    {
+                        DateTime dateValue;
+                        var result = DateTime.TryParseExact(
+                            date,
+                            formats,
+                            new CultureInfo("en-US"),
+                            DateTimeStyles.None,
+                            out dateValue);
+                        if (!result) return false;
+                    }
+                    return true;
                 })
                 .TypeConverter<ToMonthEndArrayConverter>().Optional();
 
