@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
@@ -11,6 +12,7 @@ using Piipan.Participants.Core.Services;
 using Dapper;
 using Npgsql;
 using Xunit;
+using Moq;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
@@ -69,7 +71,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.Open();
                 ClearParticipants();
 
-                var dao = new ParticipantDao(conn);
+                var logger = Mock.Of<ILogger<ParticipantDao>>();
+                var dao = new ParticipantDao(conn, logger);
                 var participants = RandomParticipants(nParticipants);
 
                 // Act
@@ -113,7 +116,8 @@ namespace Piipan.Participants.Core.IntegrationTests
 
                 participants.ToList().ForEach(p => Insert(p));
 
-                var dao = new ParticipantDao(conn);
+                var logger = Mock.Of<ILogger<ParticipantDao>>();
+                var dao = new ParticipantDao(conn, logger);
 
                 // Act
                 var matches = await dao.GetParticipants(randoms.First().LdsHash, randoms.First().UploadId);
