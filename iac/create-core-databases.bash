@@ -9,7 +9,7 @@ set_constants () {
   SUPERUSER=$DB_ADMIN_NAME
 
   METRICS_DB_NAME=metrics
-  MATCH_RECORDS_DB_NAME=matches
+  COLLAB_DB_NAME=collaboration
 
   VAULT_NAME=$PREFIX-kv-core-$ENV
   PG_SECRET_NAME=core-pg-admin
@@ -68,9 +68,9 @@ main () {
   db_init "$METRICS_DB_NAME" "$SUPERUSER"
   db_apply_ddl "$METRICS_DB_NAME" ../metrics/ddl/metrics.sql
 
-  echo "Creating $MATCH_RECORDS_DB_NAME database and applying DDL"
-  db_init "$MATCH_RECORDS_DB_NAME" "$SUPERUSER"
-  db_apply_ddl "$MATCH_RECORDS_DB_NAME" ../match/ddl/match-record.sql
+  echo "Creating $COLLAB_DB_NAME database and applying DDL"
+  db_init "$COLLAB_DB_NAME" "$SUPERUSER"
+  db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/match-record.sql
 
   db_config_aad "$RESOURCE_GROUP" "$DB_SERVER_NAME" "$PG_AAD_ADMIN"
   db_use_aad "$DB_SERVER_NAME" "$PG_AAD_ADMIN"
@@ -87,10 +87,10 @@ main () {
 
   local orchestrator
   orchestrator=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
-  echo "Configuring $MATCH_RECORDS_DB_NAME access for $orchestrator"
-  db_create_managed_role "$MATCH_RECORDS_DB_NAME" "$orchestrator" "$MATCH_RESOURCE_GROUP"
-  db_config_managed_role "$MATCH_RECORDS_DB_NAME" "$orchestrator"
-  db_grant_readwrite "$MATCH_RECORDS_DB_NAME" "$orchestrator"
+  echo "Configuring $COLLAB_DB_NAME access for $orchestrator"
+  db_create_managed_role "$COLLAB_DB_NAME" "$orchestrator" "$MATCH_RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "$orchestrator"
+  db_grant_readwrite "$COLLAB_DB_NAME" "$orchestrator"
 
   db_leave_aad $PG_AAD_ADMIN
 
