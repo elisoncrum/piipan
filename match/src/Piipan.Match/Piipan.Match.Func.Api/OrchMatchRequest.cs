@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Piipan.Match.Shared;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
     /// <summary>
     /// Represents the full API request from a client when using de-identified data

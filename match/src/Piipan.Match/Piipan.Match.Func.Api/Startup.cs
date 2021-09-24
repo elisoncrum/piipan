@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Piipan.Shared.Authentication;
 
-[assembly: FunctionsStartup(typeof(Piipan.Match.Orchestrator.Startup))]
-namespace Piipan.Match.Orchestrator
+[assembly: FunctionsStartup(typeof(Piipan.Match.Func.Api.Startup))]
+namespace Piipan.Match.Func.Api
 {
     public class Startup : FunctionsStartup
     {

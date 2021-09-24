@@ -11,7 +11,7 @@ using Piipan.Shared.Authentication;
 using Xunit;
 
 
-namespace Piipan.Match.Orchestrator.IntegrationTests
+namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {

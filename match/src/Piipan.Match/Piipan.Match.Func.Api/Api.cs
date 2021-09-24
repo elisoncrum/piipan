@@ -13,11 +13,11 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Npgsql;
-using Piipan.Match.Orchestrator.DataTypeHandlers;
+using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
     /// <summary>
     /// Azure Function implementing orchestrator matching API.

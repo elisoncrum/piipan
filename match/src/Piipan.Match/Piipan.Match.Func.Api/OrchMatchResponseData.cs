@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
     /// <summary>
     /// Represents the top-level data object in a successful API response

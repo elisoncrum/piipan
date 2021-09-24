@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
     /// <summary>
     /// Represents the item-level error object for a person in an API request

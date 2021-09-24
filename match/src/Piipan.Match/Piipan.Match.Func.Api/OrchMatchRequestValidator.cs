@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
     /// <summary>
     /// Validates the whole API match request from a client

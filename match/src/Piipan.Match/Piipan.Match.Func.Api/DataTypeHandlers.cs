@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using Dapper;
 
-namespace Piipan.Match.Orchestrator.DataTypeHandlers
+namespace Piipan.Match.Func.Api.DataTypeHandlers
 {
     /// <summary>
     /// Custom handlers for converting sql columns to C# properties

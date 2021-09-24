@@ -21,7 +21,7 @@ using Piipan.Match.Shared;
 using Piipan.Shared.Authentication;
 using Xunit;
 
-namespace Piipan.Match.Orchestrator.Tests
+namespace Piipan.Match.Func.Api.Tests
 {
     public class ApiTests
     {

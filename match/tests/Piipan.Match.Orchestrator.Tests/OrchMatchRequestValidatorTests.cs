@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using FluentValidation.TestHelper;
-using Piipan.Match.Orchestrator;
+using Piipan.Match.Func.Api;
 using Xunit;
 
 public class OrchMatchRequestValidatorTests

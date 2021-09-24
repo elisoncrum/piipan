@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
 
     /// <summary>

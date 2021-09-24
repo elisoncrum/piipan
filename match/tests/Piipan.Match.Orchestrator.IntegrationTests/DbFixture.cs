@@ -3,7 +3,7 @@ using System.Threading;
 using Dapper;
 using Npgsql;
 
-namespace Piipan.Match.Orchestrator.IntegrationTests
+namespace Piipan.Match.Func.Api.IntegrationTests
 {
     /// <summary>
     /// Test fixture for per-state match API database integration testing.

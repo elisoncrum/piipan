@@ -2134,7 +2134,16 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
-      "piipan.match.orchestrator": {
+      "piipan.match.api": {
+        "type": "Project"
+      },
+      "piipan.match.core": {
+        "type": "Project",
+        "dependencies": {
+          "Piipan.Match.Api": "1.0.0"
+        }
+      },
+      "piipan.match.func.api": {
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.90",
@@ -2146,6 +2155,8 @@
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10",
+          "Piipan.Match.Api": "1.0.0",
+          "Piipan.Match.Core": "1.0.0",
           "Piipan.Match.Shared": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }

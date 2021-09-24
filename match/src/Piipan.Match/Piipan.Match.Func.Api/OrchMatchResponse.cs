@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Orchestrator
+namespace Piipan.Match.Func.Api
 {
     /// <summary>
     /// Represents the top-level response body for a successful API response

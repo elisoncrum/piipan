@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.Match.Orchestrator\Piipan.Match.Orchestrator.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Match\Piipan.Match.Func.Api\Piipan.Match.Func.Api.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
   </ItemGroup>
 
