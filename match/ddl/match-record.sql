@@ -1,7 +1,18 @@
 BEGIN;
 
-CREATE TYPE hash_type AS ENUM ('ldshash');
-CREATE TYPE status AS ENUM ('open', 'closed');
+DO $$ BEGIN
+    CREATE TYPE hash_type AS ENUM ('ldshash');
+EXCEPTION
+    WHEN duplicate_object THEN
+        RAISE NOTICE 'hash_type ENUM already exists, skipping';
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE status AS ENUM ('open', 'closed');
+EXCEPTION
+    WHEN duplicate_object THEN
+        RAISE NOTICE 'status ENUM already exists, skipping';
+END $$;
 
 CREATE TABLE IF NOT EXISTS matches(
     id serial PRIMARY KEY,
@@ -10,7 +21,7 @@ CREATE TABLE IF NOT EXISTS matches(
     initator text NOT NULL,
     states text[2] NOT NULL,
     hash text NOT NULL,
-    hash_type hash_type NOT NULL default 'ldshash';
+    hash_type hash_type NOT NULL default 'ldshash',
     input jsonb,
     data jsonb NOT NULL,
     invalid bool NOT NULL default FALSE,

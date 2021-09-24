@@ -109,12 +109,13 @@ EOF
 db_create_managed_role () {
   local db=$1
   local func=$2
+  local group=$3
   local role=${func//-/_}
 
   principal_id=$(\
     az webapp identity show \
       -n "$func" \
-      -g "$RESOURCE_GROUP" \
+      -g "$group" \
       --query principalId \
       -o tsv)
   app_id=$(\
