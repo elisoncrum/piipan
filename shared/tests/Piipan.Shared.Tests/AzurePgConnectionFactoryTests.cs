@@ -14,6 +14,8 @@ namespace Piipan.Shared.Tests
 {
     public class AzurePgConnectionFactoryTests
     {
+        private string _connectionString;
+
         private void SetDatabaseConnectionString()
         {
             Environment.SetEnvironmentVariable(
@@ -22,18 +24,25 @@ namespace Piipan.Shared.Tests
             );
         }
 
-        private Mock<AzureServiceTokenProvider> MockTokenProvider()
+        private Mock<AzureServiceTokenProvider> MockTokenProvider(string token = "token")
         {
-            return new Mock<AzureServiceTokenProvider>(() =>
+            var mockProvider = new Mock<AzureServiceTokenProvider>(() =>
                 new AzureServiceTokenProvider(null, "https://tts.test")
             );
+
+            mockProvider
+                .Setup(m => m.GetAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(token);
+
+            return mockProvider;
         }
 
         private Mock<DbProviderFactory> MockDbProviderFactory()
         {
             var connection = new Mock<DbConnection>();
             connection
-                .SetupSet(m => m.ConnectionString = It.IsAny<string>());
+                .SetupSet(m => m.ConnectionString = It.IsAny<string>())
+                .Callback<string>(v => _connectionString = v);
 
             var factory = new Mock<DbProviderFactory>();
             factory
@@ -107,6 +116,41 @@ namespace Piipan.Shared.Tests
 
             // Tear down
             Environment.SetEnvironmentVariable(AzurePgConnectionFactory.CloudName, null);
+        }
+
+        [Fact]
+        public async Task Build_UsesTokenAsPassword()
+        {
+            // Arrange
+            var expectedPassword = Guid.NewGuid().ToString();
+            var tokenProvider = MockTokenProvider(expectedPassword);
+            var npgsqlFactory = MockDbProviderFactory().Object;
+            var factory = new AzurePgConnectionFactory(tokenProvider.Object, npgsqlFactory);
+            var databaseName = Guid.NewGuid().ToString();
+            SetDatabaseConnectionString();
+            
+            // Act
+            var connection = await factory.Build(databaseName);
+
+            // Assert
+            Assert.Contains($"Password={expectedPassword}", _connectionString);
+        }
+
+        [Fact]
+        public async Task Build_UsesDatabaseOverride()
+        {
+            // Arrange
+            var tokenProvider = MockTokenProvider();
+            var npgsqlFactory = MockDbProviderFactory().Object;
+            var factory = new AzurePgConnectionFactory(tokenProvider.Object, npgsqlFactory);
+            var databaseName = Guid.NewGuid().ToString();
+            SetDatabaseConnectionString();
+            
+            // Act
+            var connection = await factory.Build(databaseName);
+
+            // Assert
+            Assert.Contains($"Database={databaseName}", _connectionString);
         }
     }
 }
