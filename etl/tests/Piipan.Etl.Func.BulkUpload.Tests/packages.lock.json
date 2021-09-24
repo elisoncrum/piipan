@@ -110,6 +110,14 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "Dapper": {
+        "type": "Transitive",
+        "resolved": "2.0.90",
+        "contentHash": "e4YjOLJptnpwHIbP8HxjaYf7So9lhUC43rvvGMEkH4Q4CiVlm4rOxYDo0HyuHlMQKj0U5Ob/nCMm52TUhTaZQg==",
+        "dependencies": {
+          "System.Reflection.Emit.Lightweight": "4.7.0"
+        }
+      },
       "Microsoft.AspNet.WebApi.Client": {
         "type": "Transitive",
         "resolved": "5.2.4",
@@ -367,6 +375,15 @@
         "type": "Transitive",
         "resolved": "1.0.0",
         "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
+      },
+      "Microsoft.Azure.Functions.Extensions": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "zYKtQQoS1fdzufxFApuMFiFtoi9QAGH6McXxntpylwLKgKjmCMWdgUd1dcekzTKNR9DPSDPRLiulvukqXnpWrQ==",
+        "dependencies": {
+          "Microsoft.Azure.WebJobs": "3.0.18",
+          "Microsoft.Extensions.DependencyInjection": "2.1.0"
+        }
       },
       "Microsoft.Azure.KeyVault.Core": {
         "type": "Transitive",
@@ -1620,14 +1637,8 @@
       },
       "System.Reflection.Emit.Lightweight": {
         "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "oadVHGSMsTmZsAF864QYN1t1QzZjIcuKU3l2S9cZOwDdDueNTrqq1yRj7koFfIGEnKpt6NjpL3rOzRhs4ryOgA==",
-        "dependencies": {
-          "System.Reflection": "4.3.0",
-          "System.Reflection.Emit.ILGeneration": "4.3.0",
-          "System.Reflection.Primitives": "4.3.0",
-          "System.Runtime": "4.3.0"
-        }
+        "resolved": "4.7.0",
+        "contentHash": "a4OLB4IITxAXJeV74MDx49Oq2+PsF6Sml54XAFv+2RyWwtDBcabzoxiiJRhdhx+gaohLh4hEGCLQyBozXoQPqA=="
       },
       "System.Reflection.Extensions": {
         "type": "Transitive",
@@ -2228,15 +2239,33 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
-      "piipan.etl": {
+      "piipan.etl.func.bulkupload": {
         "type": "Project",
         "dependencies": {
           "CsvHelper": "27.1.1",
+          "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "4.0.5",
+          "Microsoft.Extensions.DependencyInjection": "3.1.19",
+          "Microsoft.Extensions.Logging": "3.1.19",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Npgsql": "5.0.10",
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Participants.Core": "1.0.0",
+          "Piipan.Shared": "1.0.0"
+        }
+      },
+      "piipan.participants.api": {
+        "type": "Project"
+      },
+      "piipan.participants.core": {
+        "type": "Project",
+        "dependencies": {
+          "Dapper": "2.0.90",
+          "Microsoft.Extensions.DependencyInjection": "3.1.19",
+          "Microsoft.Extensions.Logging": "3.1.19",
+          "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
       },
@@ -2248,8 +2277,10 @@
           "Microsoft.AspNetCore.Authorization": "3.1.19",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
+          "Microsoft.Azure.Services.AppAuthentication": "1.6.1",
           "Microsoft.Extensions.Logging": "3.1.19",
-          "Microsoft.Extensions.Options": "3.1.19"
+          "Microsoft.Extensions.Options": "3.1.19",
+          "Npgsql": "5.0.10"
         }
       }
     }

@@ -20,7 +20,7 @@ run_deploy () {
   for app in "${etl_function_apps[@]}"
   do
     echo "Publish ${app} to Azure Environment ${azure_env}"
-    pushd ./src/Piipan.Etl
+    pushd ./src/Piipan.Etl/Piipan.Etl.Func.BulkUpload
       func azure functionapp publish "$app" --dotnet
     popd
   done

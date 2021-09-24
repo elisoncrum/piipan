@@ -472,7 +472,7 @@ main () {
       --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
 
     # Create Function endpoint before setting up event subscription
-    pushd ../etl/src/Piipan.Etl
+    pushd ../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload
     func azure functionapp publish "$func_app" --dotnet
     popd
 

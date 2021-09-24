@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
-using System;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -13,13 +13,16 @@ namespace Piipan.Participants.Core.Services
     {
         private readonly IParticipantDao _participantDao;
         private readonly IUploadDao _uploadDao;
+        private readonly ILogger<ParticipantService> _logger;
 
         public ParticipantService(
             IParticipantDao participantDao,
-            IUploadDao uploadDao)
+            IUploadDao uploadDao,
+            ILogger<ParticipantService> logger)
         {
             _participantDao = participantDao;
             _uploadDao = uploadDao;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<IParticipant>> GetParticipants(string ldsHash)
@@ -30,11 +33,6 @@ namespace Piipan.Participants.Core.Services
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)
         {
-            if (!participants.Any())
-            {
-                throw new ArgumentException("participants cannot be empty!");
-            }
-
             var upload = await _uploadDao.AddUpload();
 
             var participantDbos = participants.Select((p) => 
