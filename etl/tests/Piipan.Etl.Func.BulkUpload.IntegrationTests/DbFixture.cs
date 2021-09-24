@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Piipan.Etl.Func.BulkUpload.Models;
 using Npgsql;
+using Piipan.Participants.Api.Models;
 
-namespace Piipan.Etl.IntegrationTests
+namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
     /// <summary>
     /// Test fixture for per-state match API database integration testing.
@@ -119,10 +121,9 @@ namespace Piipan.Etl.IntegrationTests
             }
         }
 
-        public List<PiiRecord> QueryParticipants(string sql)
+        public IEnumerable<IParticipant> QueryParticipants(string sql)
         {
-
-            List<PiiRecord> records = new List<PiiRecord>();
+            var records = new List<IParticipant>();
 
             using (var conn = Factory.CreateConnection())
             {
@@ -138,7 +139,7 @@ namespace Piipan.Etl.IntegrationTests
                     var reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        var record = new PiiRecord
+                        var record = new Participant
                         {
                             LdsHash = reader[1].ToString(),
                             CaseId = reader[3].ToString(),

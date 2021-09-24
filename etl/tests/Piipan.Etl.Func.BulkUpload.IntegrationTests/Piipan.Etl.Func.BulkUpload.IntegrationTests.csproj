@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Piipan.Etl\Piipan.Etl.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Etl\Piipan.Etl.Func.BulkUpload\Piipan.Etl.Func.BulkUpload.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
   </ItemGroup>
 
