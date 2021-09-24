@@ -164,21 +164,21 @@ namespace Piipan.Match.Func.Api.Tests
             return mockTokenProvider;
         }
 
-        static Api Construct()
+        static MatchApi Construct()
         {
             var factory = NpgsqlFactory.Instance;
             var tokenProvider = new EasyAuthTokenProvider();
-            var api = new Api(factory, tokenProvider);
+            var api = new MatchApi(factory, tokenProvider);
 
             return api;
         }
 
-        static Api ConstructMocked(Mock<HttpMessageHandler> handler)
+        static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
             var factory = NpgsqlFactory.Instance;
             var mockTokenProvider = MockTokenProvider("|token|");
 
-            var api = new Api(factory, mockTokenProvider.Object);
+            var api = new MatchApi(factory, mockTokenProvider.Object);
 
             return api;
         }

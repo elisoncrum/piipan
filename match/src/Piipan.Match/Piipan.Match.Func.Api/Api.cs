@@ -22,12 +22,12 @@ namespace Piipan.Match.Func.Api
     /// <summary>
     /// Azure Function implementing orchestrator matching API.
     /// </summary>
-    public class Api
+    public class MatchApi
     {
         private readonly DbProviderFactory _dbFactory;
         private readonly ITokenProvider _tokenProvider;
 
-        public Api(DbProviderFactory factory, ITokenProvider provider)
+        public MatchApi(DbProviderFactory factory, ITokenProvider provider)
         {
             _dbFactory = factory;
             _tokenProvider = provider;

@@ -59,11 +59,11 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             return mockRequest;
         }
 
-        static Api Construct()
+        static MatchApi Construct()
         {
             var factory = NpgsqlFactory.Instance;
             var tokenProvider = new EasyAuthTokenProvider();
-            var api = new Api(factory, tokenProvider);
+            var api = new MatchApi(factory, tokenProvider);
 
             return api;
         }
