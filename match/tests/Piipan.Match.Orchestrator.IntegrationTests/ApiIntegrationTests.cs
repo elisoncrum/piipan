@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Npgsql;
+using Piipan.Participants.Api;
 using Piipan.Shared.Authentication;
 using Xunit;
 
@@ -63,7 +64,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         {
             var factory = NpgsqlFactory.Instance;
             var tokenProvider = new EasyAuthTokenProvider();
-            var api = new MatchApi(factory, tokenProvider);
+            var participantApi = Mock.Of<IParticipantApi>();
+            var api = new MatchApi(factory, tokenProvider, participantApi);
 
             return api;
         }

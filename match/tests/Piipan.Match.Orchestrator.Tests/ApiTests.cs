@@ -18,6 +18,7 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Shared;
+using Piipan.Participants.Api;
 using Piipan.Shared.Authentication;
 using Xunit;
 
@@ -168,7 +169,8 @@ namespace Piipan.Match.Func.Api.Tests
         {
             var factory = NpgsqlFactory.Instance;
             var tokenProvider = new EasyAuthTokenProvider();
-            var api = new MatchApi(factory, tokenProvider);
+            var participantApi = Mock.Of<IParticipantApi>();
+            var api = new MatchApi(factory, tokenProvider, participantApi);
 
             return api;
         }
@@ -177,8 +179,9 @@ namespace Piipan.Match.Func.Api.Tests
         {
             var factory = NpgsqlFactory.Instance;
             var mockTokenProvider = MockTokenProvider("|token|");
+            var participantApi = Mock.Of<IParticipantApi>();
 
-            var api = new MatchApi(factory, mockTokenProvider.Object);
+            var api = new MatchApi(factory, mockTokenProvider.Object, participantApi);
 
             return api;
         }

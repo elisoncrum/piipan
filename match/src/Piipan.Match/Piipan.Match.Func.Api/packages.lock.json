@@ -1963,6 +1963,16 @@
           "Piipan.Shared": "1.0.0"
         }
       },
+      "piipan.participants.api": {
+        "type": "Project"
+      },
+      "piipan.participants.core": {
+        "type": "Project",
+        "dependencies": {
+          "Dapper": "2.0.90",
+          "Piipan.Participants.Api": "1.0.0"
+        }
+      },
       "piipan.shared": {
         "type": "Project",
         "dependencies": {

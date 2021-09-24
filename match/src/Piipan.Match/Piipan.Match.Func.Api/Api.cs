@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Shared;
+using Piipan.Participants.Api;
 using Piipan.Shared.Authentication;
 
 namespace Piipan.Match.Func.Api
@@ -26,11 +27,16 @@ namespace Piipan.Match.Func.Api
     {
         private readonly DbProviderFactory _dbFactory;
         private readonly ITokenProvider _tokenProvider;
+        private readonly IParticipantApi _participantApi;
 
-        public MatchApi(DbProviderFactory factory, ITokenProvider provider)
+        public MatchApi(
+            DbProviderFactory factory,
+            ITokenProvider provider,
+            IParticipantApi participantApi)
         {
             _dbFactory = factory;
             _tokenProvider = provider;
+            _participantApi = participantApi;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;

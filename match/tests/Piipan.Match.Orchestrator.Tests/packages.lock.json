@@ -2158,6 +2158,8 @@
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Match.Core": "1.0.0",
           "Piipan.Match.Shared": "1.0.0",
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Participants.Core": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
       },
@@ -2166,6 +2168,16 @@
         "dependencies": {
           "Newtonsoft.Json.Schema": "3.0.14",
           "Piipan.Shared": "1.0.0"
+        }
+      },
+      "piipan.participants.api": {
+        "type": "Project"
+      },
+      "piipan.participants.core": {
+        "type": "Project",
+        "dependencies": {
+          "Dapper": "2.0.90",
+          "Piipan.Participants.Api": "1.0.0"
         }
       },
       "piipan.shared": {
