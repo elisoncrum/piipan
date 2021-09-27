@@ -8,6 +8,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
+    <ProjectReference Include="..\..\Piipan.Match.Orchestrator\Piipan.Match.Orchestrator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.90" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.19" />
+    <PackageReference Include="Nanoid" Version="2.1.0" />
+    <PackageReference Include="Npgsql" Version="5.0.10" />
   </ItemGroup>
 
 </Project>
