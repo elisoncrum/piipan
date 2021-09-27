@@ -8,5 +8,6 @@ namespace Piipan.Participants.Api
     {
         Task<IEnumerable<IParticipant>> GetParticipants(string ldsHash);
         Task AddParticipants(IEnumerable<IParticipant> participants);
+        Task<IEnumerable<string>> GetStates();
     }
 }

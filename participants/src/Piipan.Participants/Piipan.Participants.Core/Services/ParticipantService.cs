@@ -13,15 +13,18 @@ namespace Piipan.Participants.Core.Services
     {
         private readonly IParticipantDao _participantDao;
         private readonly IUploadDao _uploadDao;
+        private readonly IStateService _stateService;
         private readonly ILogger<ParticipantService> _logger;
 
         public ParticipantService(
             IParticipantDao participantDao,
             IUploadDao uploadDao,
+            IStateService stateService,
             ILogger<ParticipantService> logger)
         {
             _participantDao = participantDao;
             _uploadDao = uploadDao;
+            _stateService = stateService;
             _logger = logger;
         }
 
@@ -50,6 +53,11 @@ namespace Piipan.Participants.Core.Services
             });
 
             await _participantDao.AddParticipants(participantDbos);
+        }
+
+        public async Task<IEnumerable<string>> GetStates()
+        {
+            return await _stateService.GetStates();
         }
     }
 }

@@ -57,7 +57,13 @@ namespace Piipan.Participants.Core.Tests.Services
                     Publisher = "someone"
                 });
 
-            var service = new ParticipantService(participantDao.Object, uploadDao.Object, logger);
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
 
             // Act
             var result = await service.GetParticipants("something");
@@ -87,7 +93,13 @@ namespace Piipan.Participants.Core.Tests.Services
                     Publisher = "someone"
                 });
 
-            var service = new ParticipantService(participantDao.Object, uploadDao.Object, logger);
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
 
             // Act
             var result = await service.GetParticipants("something");
@@ -119,7 +131,13 @@ namespace Piipan.Participants.Core.Tests.Services
                     Publisher = "me"
                 });
 
-            var service = new ParticipantService(participantDao.Object, uploadDao.Object, logger);
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
 
             // Act
             await service.AddParticipants(participants);
