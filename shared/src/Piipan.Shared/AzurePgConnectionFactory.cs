@@ -36,6 +36,11 @@ namespace Piipan.Shared
 
         public async Task<IDbConnection> Build(string database = null)
         {
+            if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable(DatabaseConnectionString)))
+            {
+                throw new ArgumentException($"{DatabaseConnectionString} env variable must be set!");
+            }
+
             var resourceId = CommercialId;
             var cn = Environment.GetEnvironmentVariable(CloudName);
             if (cn == GovernmentCloud) {

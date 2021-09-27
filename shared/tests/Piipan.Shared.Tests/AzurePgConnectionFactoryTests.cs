@@ -12,6 +12,7 @@ using Moq;
 
 namespace Piipan.Shared.Tests
 {
+    [Collection("Piipan.Shared.ConnectionFactories")]
     public class AzurePgConnectionFactoryTests
     {
         private string _connectionString;
@@ -22,6 +23,16 @@ namespace Piipan.Shared.Tests
                 AzurePgConnectionFactory.DatabaseConnectionString,
                 "Server=statedb;Database=ea;Port=5432;User Id=postgres;Password={password};"
             );
+        }
+
+        private void ClearEnvironmentVariables()
+        {
+            Environment.SetEnvironmentVariable(
+                BasicPgConnectionFactory.DatabaseConnectionString,
+                null
+            );
+
+            Environment.SetEnvironmentVariable(AzurePgConnectionFactory.CloudName, null);
         }
 
         private Mock<AzureServiceTokenProvider> MockTokenProvider(string token = "token")
@@ -62,6 +73,9 @@ namespace Piipan.Shared.Tests
 
             // Act / Assert
             await Assert.ThrowsAsync<ArgumentException>(() => factory.Build());
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -75,6 +89,9 @@ namespace Piipan.Shared.Tests
 
             // Act / Assert
             await Assert.ThrowsAsync<ArgumentException>(() => factory.Build());
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -92,6 +109,9 @@ namespace Piipan.Shared.Tests
             // Assert
             tokenProvider.Verify(m => 
                 m.GetAccessTokenAsync(AzurePgConnectionFactory.CommercialId, null, default(CancellationToken)), Times.Once);
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -115,7 +135,7 @@ namespace Piipan.Shared.Tests
                 m.GetAccessTokenAsync(AzurePgConnectionFactory.GovermentId, null, default(CancellationToken)), Times.Once);
 
             // Tear down
-            Environment.SetEnvironmentVariable(AzurePgConnectionFactory.CloudName, null);
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -134,6 +154,9 @@ namespace Piipan.Shared.Tests
 
             // Assert
             Assert.Contains($"Password={expectedPassword}", _connectionString);
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -151,6 +174,9 @@ namespace Piipan.Shared.Tests
 
             // Assert
             Assert.Contains($"Database={databaseName}", _connectionString);
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
     }
 }
