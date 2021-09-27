@@ -28,10 +28,10 @@ namespace Piipan.Participants.Core.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<IParticipant>> GetParticipants(string ldsHash)
+        public async Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash)
         {
             var upload = await _uploadDao.GetLatestUpload();
-            return await _participantDao.GetParticipants(ldsHash, upload.Id);
+            return await _participantDao.GetParticipants(state, ldsHash, upload.Id);
         }
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)

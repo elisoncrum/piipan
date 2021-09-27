@@ -21,9 +21,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _logger = logger;
         }
 
-        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId)
+        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId)
         {
-            var connection = await _dbConnectionFactory.Build();
+            var connection = await _dbConnectionFactory.Build(state);
             return await connection
                 .QueryAsync<ParticipantDbo>(@"
                     SELECT 

@@ -40,11 +40,14 @@ namespace Piipan.Participants.Core.Tests.Services
         public async void GetParticipants_AllMatchesReturned(int nMatches)
         {
             // Arrange
+            var randomLdsHash = Guid.NewGuid().ToString();
+            var randomState = Guid.NewGuid().ToString().Substring(0, 2);
+
             var logger = Mock.Of<ILogger<ParticipantService>>();
             var participants = RandomParticipants(nMatches);
             var participantDao = new Mock<IParticipantDao>();
             participantDao
-                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<Int64>()))
+                .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(participants);
             
             var uploadDao = new Mock<IUploadDao>();
@@ -66,7 +69,7 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger);
 
             // Act
-            var result = await service.GetParticipants("something");
+            var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
             Assert.Equal(result, participants);
@@ -76,10 +79,13 @@ namespace Piipan.Participants.Core.Tests.Services
         public async void GetParticipants_UsesLatestUploadId()
         {
             // Arrange
+            var randomLdsHash = Guid.NewGuid().ToString();
+            var randomState = Guid.NewGuid().ToString().Substring(0, 2);
+
             var logger = Mock.Of<ILogger<ParticipantService>>();
             var participantDao = new Mock<IParticipantDao>();
             participantDao
-                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<Int64>()))
+                .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
             
             var uploadId = (new Random()).Next();
@@ -102,11 +108,11 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger);
 
             // Act
-            var result = await service.GetParticipants("something");
+            var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
             uploadDao.Verify(m => m.GetLatestUpload(), Times.Once);
-            participantDao.Verify(m => m.GetParticipants("something", uploadId), Times.Once);
+            participantDao.Verify(m => m.GetParticipants(randomState, randomLdsHash, uploadId), Times.Once);
         }
 
         [Theory]
