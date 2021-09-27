@@ -28,7 +28,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             {
                 var factory = new Mock<IDbConnectionFactory>();
                 factory
-                    .Setup(m => m.Build())
+                    .Setup(m => m.Build(It.IsAny<string>()))
                     .ReturnsAsync(() =>
                 {
                     var connection = Factory.CreateConnection();
