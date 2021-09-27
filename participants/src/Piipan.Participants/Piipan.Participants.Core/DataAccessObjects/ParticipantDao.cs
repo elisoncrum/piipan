@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Piipan.Participants.Core.Models;
-using Dapper;
 using Microsoft.Extensions.Logging;
+using Piipan.Participants.Core.Models;
 using Piipan.Shared;
+using Dapper;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
