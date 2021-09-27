@@ -62,7 +62,7 @@ namespace Piipan.Participants.Core.IntegrationTests
         {
             var factory = new Mock<IDbConnectionFactory>();
             factory
-                .Setup(m => m.Build())
+                .Setup(m => m.Build(It.IsAny<string>()))
                 .ReturnsAsync(() => 
                 {
                     var conn = Factory.CreateConnection();
@@ -122,6 +122,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                     {
                         // make the hashes and upload id match for all of them
                         LdsHash = randoms.First().LdsHash,
+                        State = randoms.First().State,
                         CaseId = p.CaseId,
                         ParticipantId = p.ParticipantId,
                         BenefitsEndDate = p.BenefitsEndDate,
@@ -137,7 +138,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var dao = new ParticipantDao(DbConnFactory(), logger);
 
                 // Act
-                var matches = await dao.GetParticipants(randoms.First().LdsHash, randoms.First().UploadId);
+                var matches = await dao.GetParticipants("ea", randoms.First().LdsHash, randoms.First().UploadId);
 
                 // Assert
                 Assert.True(participants.OrderBy(p => p.CaseId).SequenceEqual(matches.OrderBy(p => p.CaseId)));
