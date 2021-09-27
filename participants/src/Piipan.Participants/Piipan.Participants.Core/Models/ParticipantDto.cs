@@ -5,7 +5,7 @@ using Piipan.Participants.Api.Models;
 
 namespace Piipan.Participants.Core.Models
 {
-    public class ParticipantDbo : IParticipant
+    public class ParticipantDto : IParticipant
     {
         public string LdsHash { get; set; }
         public string State { get; set; }
@@ -14,14 +14,12 @@ namespace Piipan.Participants.Core.Models
         public DateTime? BenefitsEndDate { get; set; }
         public IEnumerable<DateTime> RecentBenefitMonths { get; set; }
         public bool? ProtectLocation { get; set; }
-        public Int64 UploadId { get; set; }
 
-        public ParticipantDbo()
+        public ParticipantDto()
         {
-
         }
 
-        public ParticipantDbo(IParticipant participant)
+        public ParticipantDto(IParticipant participant)
         {
             LdsHash = participant.LdsHash;
             State = participant.State;
@@ -39,7 +37,7 @@ namespace Piipan.Participants.Core.Models
                 return false;
             }
 
-            ParticipantDbo p = obj as ParticipantDbo;
+            ParticipantDto p = obj as ParticipantDto;
             if (p == null)
             {
                 return false;
@@ -52,8 +50,7 @@ namespace Piipan.Participants.Core.Models
                 ParticipantId == p.ParticipantId &&
                 BenefitsEndDate.Value.Date == p.BenefitsEndDate.Value.Date &&
                 RecentBenefitMonths.SequenceEqual(p.RecentBenefitMonths) &&
-                ProtectLocation == p.ProtectLocation &&
-                UploadId == p.UploadId;
+                ProtectLocation == p.ProtectLocation;
         }
 
         public override int GetHashCode()
@@ -65,8 +62,7 @@ namespace Piipan.Participants.Core.Models
                 ParticipantId,
                 BenefitsEndDate,
                 RecentBenefitMonths,
-                ProtectLocation,
-                UploadId
+                ProtectLocation
             );
         }
     }

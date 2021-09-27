@@ -31,25 +31,19 @@ namespace Piipan.Participants.Core.Services
         public async Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash)
         {
             var upload = await _uploadDao.GetLatestUpload();
-            return await _participantDao.GetParticipants(state, ldsHash, upload.Id);
+            var participants = await _participantDao.GetParticipants(state, ldsHash, upload.Id);
+            
+            // Set the participant State before returning
+            return participants.Select(p => new ParticipantDto(p) { State = state });
         }
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)
         {
             var upload = await _uploadDao.AddUpload();
 
-            var participantDbos = participants.Select((p) => 
+            var participantDbos = participants.Select(p => new ParticipantDbo(p)
             {
-                return new ParticipantDbo
-                {
-                    LdsHash = p.LdsHash,
-                    CaseId = p.CaseId,
-                    ParticipantId = p.ParticipantId,
-                    BenefitsEndDate = p.BenefitsEndDate,
-                    RecentBenefitMonths = p.RecentBenefitMonths,
-                    ProtectLocation = p.ProtectLocation,
-                    UploadId = upload.Id
-                };
+                UploadId = upload.Id
             });
 
             await _participantDao.AddParticipants(participantDbos);

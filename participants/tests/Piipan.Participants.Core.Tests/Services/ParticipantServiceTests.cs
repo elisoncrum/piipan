@@ -72,7 +72,9 @@ namespace Piipan.Participants.Core.Tests.Services
             var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
-            Assert.Equal(result, participants);
+            // results should have the State set
+            var expected = participants.Select(p => new ParticipantDto(p) { State = randomState });
+            Assert.Equal(expected, result);
         }
 
         [Fact]

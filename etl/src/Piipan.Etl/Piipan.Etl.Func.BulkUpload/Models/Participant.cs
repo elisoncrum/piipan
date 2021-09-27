@@ -8,6 +8,7 @@ namespace Piipan.Etl.Func.BulkUpload.Models
     public class Participant : IParticipant
     {
         public string LdsHash { get; set; } = null!;
+        public string State { get; set; }
         public string CaseId { get; set; } = null!;
         public string ParticipantId { get; set; } = null!;
         public DateTime? BenefitsEndDate { get; set; }
