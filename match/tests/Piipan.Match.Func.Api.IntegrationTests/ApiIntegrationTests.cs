@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Npgsql;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
@@ -21,15 +23,15 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {
-        static ParticipantRecord FullRecord()
+        static Participant FullRecord()
         {
-            return new ParticipantRecord
+            return new Participant
             {
                 // farrington,1931-10-13,000-12-3456
                 LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
-                BenefitsEndMonth = new DateTime(1970, 1, 31),
+                BenefitsEndDate = new DateTime(1970, 1, 31),
                 RecentBenefitMonths = new List<DateTime>() {
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
@@ -104,13 +106,13 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             // Assert
             Assert.Single(resultObject.Data.Results);
 
-            var person = resultObject.Data.Results[0];
-            Assert.Equal(record.CaseId, person.Matches[0].CaseId);
-            Assert.Equal(record.ParticipantId, person.Matches[0].ParticipantId);
-            Assert.Equal(state[0], person.Matches[0].State);
-            Assert.Equal(record.BenefitsEndMonth, person.Matches[0].BenefitsEndMonth);
-            Assert.Equal(record.RecentBenefitMonths, person.Matches[0].RecentBenefitMonths);
-            Assert.Equal(record.ProtectLocation, person.Matches[0].ProtectLocation);
+            var person = resultObject.Data.Results.First();
+            Assert.Equal(record.CaseId, person.Matches.First().CaseId);
+            Assert.Equal(record.ParticipantId, person.Matches.First().ParticipantId);
+            Assert.Equal(state[0], person.Matches.First().State);
+            Assert.Equal(record.BenefitsEndDate, person.Matches.First().BenefitsEndDate);
+            Assert.Equal(record.RecentBenefitMonths, person.Matches.First().RecentBenefitMonths);
+            Assert.Equal(record.ProtectLocation, person.Matches.First().ProtectLocation);
         }
 
         [Fact]
@@ -186,8 +188,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var resultA = resultObject.Data.Results.Find(p => p.Index == 0);
             var resultB = resultObject.Data.Results.Find(p => p.Index == 1);
 
-            Assert.Equal(resultA.Matches[0].ParticipantId, recordA.ParticipantId);
-            Assert.Equal(resultB.Matches[0].ParticipantId, recordB.ParticipantId);
+            Assert.Equal(resultA.Matches.First().ParticipantId, recordA.ParticipantId);
+            Assert.Equal(resultB.Matches.First().ParticipantId, recordB.ParticipantId);
         }
     }
 }

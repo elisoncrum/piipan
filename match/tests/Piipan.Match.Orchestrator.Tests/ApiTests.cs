@@ -17,6 +17,7 @@ using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using Npgsql;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Shared;
 using Piipan.Participants.Api;
 using Piipan.Shared.Authentication;
@@ -26,12 +27,12 @@ namespace Piipan.Match.Func.Api.Tests
 {
     public class ApiTests
     {
-        static ParticipantRecord FullRecord()
+        static Participant FullRecord()
         {
-            return new ParticipantRecord
+            return new Participant
             {
                 CaseId = "CaseIdExample",
-                BenefitsEndMonth = new DateTime(1970, 1, 31),
+                BenefitsEndDate = new DateTime(1970, 1, 31),
                 RecentBenefitMonths = new List<DateTime>() {
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
@@ -93,7 +94,7 @@ namespace Piipan.Match.Func.Api.Tests
             var stateResponse = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<ParticipantRecord> { FullRecord() }
+                Matches = new List<Participant> { FullRecord() }
             };
             return stateResponse;
         }
@@ -194,7 +195,7 @@ namespace Piipan.Match.Func.Api.Tests
         public void ParticipantRecordJson()
         {
             var json = @"{participant_id: 'baz', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
-            var record = JsonConvert.DeserializeObject<ParticipantRecord>(json);
+            var record = JsonConvert.DeserializeObject<Participant>(json);
 
             string jsonRecord = record.ToJson();
 

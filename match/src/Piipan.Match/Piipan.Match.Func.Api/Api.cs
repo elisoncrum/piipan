@@ -16,8 +16,10 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Func.Api.Extensions;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Shared;
 using Piipan.Participants.Api;
+using Piipan.Participants.Api.Models;
 using Piipan.Shared.Authentication;
 
 namespace Piipan.Match.Func.Api
@@ -174,35 +176,6 @@ namespace Piipan.Match.Func.Api
             };
         }
 
-        private async Task<List<ParticipantRecord>> PerStateMatch(string state, RequestPerson person, ILogger log)
-        {
-            List<ParticipantRecord> records;
-
-            using (var conn = _dbFactory.CreateConnection())
-            {
-                conn.ConnectionString = await ConnectionString(state);
-                conn.Open();
-
-                records = conn.Query<ParticipantRecord>(@"
-                    SELECT participant_id,
-                        case_id,
-                        benefits_end_date BenefitsEndMonth,
-                        recent_benefit_months,
-                        protect_location
-                    FROM participants
-                    WHERE lds_hash=@LdsHash
-                        AND upload_id=(SELECT id FROM uploads ORDER BY id DESC LIMIT 1)",
-                    person).AsList();
-
-                conn.Close();
-            }
-
-            // Inject state into ParticipantRecord
-            records.ForEach(r => r.State = state);
-
-            return records;
-        }
-
         private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index, ILogger log)
         {
             // Person-level validation is handled here, and exception
@@ -215,26 +188,11 @@ namespace Piipan.Match.Func.Api
             var matches = await states
                 .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash));
 
-            var stateResults = new List<Task<List<ParticipantRecord>>>();
-            var personResult = new OrchMatchResult
+            return new OrchMatchResult
             {
                 Index = index,
-                Matches = matches.Select(m => 
-                {
-                    return new ParticipantRecord
-                    {
-                        LdsHash = m.LdsHash,
-                        State = m.State,
-                        CaseId = m.CaseId,
-                        ParticipantId = m.ParticipantId,
-                        BenefitsEndMonth = m.BenefitsEndDate,
-                        RecentBenefitMonths = m.RecentBenefitMonths.ToList(),
-                        ProtectLocation = m.ProtectLocation
-                    };
-                }).ToList()
+                Matches = matches
             };
-
-            return personResult;
         }
 
         private async Task<string> ConnectionString(string database)

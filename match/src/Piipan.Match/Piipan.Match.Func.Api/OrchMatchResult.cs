@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Piipan.Participants.Api.Models;
 using Newtonsoft.Json;
 
 namespace Piipan.Match.Func.Api
@@ -15,6 +16,6 @@ namespace Piipan.Match.Func.Api
         public int Index { get; set; }
 
         [JsonProperty("matches")]
-        public List<ParticipantRecord> Matches { get; set; }
+        public IEnumerable<IParticipant> Matches { get; set; }
     }
 }

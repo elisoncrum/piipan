@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Piipan.Match.Func.Api.Models;
 using Dapper;
 using Npgsql;
 
@@ -100,7 +101,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             }
         }
 
-        public void Insert(ParticipantRecord record)
+        public void Insert(Participant record)
         {
             var factory = NpgsqlFactory.Instance;
 
@@ -115,7 +116,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
                 conn.Execute(@"
                     INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location)
-                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @BenefitsEndMonth, @RecentBenefitMonths::date[], @ProtectLocation)",
+                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @BenefitsEndDate, @RecentBenefitMonths::date[], @ProtectLocation)",
                     parameters);
 
                 conn.Close();

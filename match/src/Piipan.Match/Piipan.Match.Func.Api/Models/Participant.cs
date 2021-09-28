@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Piipan.Participants.Api.Models;
 using Piipan.Match.Shared;
 
-namespace Piipan.Match.Func.Api
+namespace Piipan.Match.Func.Api.Models
 {
-    public class ParticipantRecord
+    public class Participant : IParticipant
     {
         [JsonProperty("lds_hash",
             NullValueHandling = NullValueHandling.Ignore)]
@@ -22,11 +23,11 @@ namespace Piipan.Match.Func.Api
 
         [JsonProperty("benefits_end_month")]
         [JsonConverter(typeof(JsonConverters.MonthEndConverter))]
-        public DateTime? BenefitsEndMonth { get; set; }
+        public DateTime? BenefitsEndDate { get; set; }
 
         [JsonProperty("recent_benefit_months")]
         [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
-        public List<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
+        public IEnumerable<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
 
         [JsonProperty("protect_location")]
         public bool? ProtectLocation { get; set; }
