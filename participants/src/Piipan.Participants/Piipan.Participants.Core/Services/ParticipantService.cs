@@ -6,6 +6,7 @@ using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
+using System;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -30,11 +31,18 @@ namespace Piipan.Participants.Core.Services
 
         public async Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash)
         {
-            var upload = await _uploadDao.GetLatestUpload();
-            var participants = await _participantDao.GetParticipants(state, ldsHash, upload.Id);
-            
-            // Set the participant State before returning
-            return participants.Select(p => new ParticipantDto(p) { State = state });
+            try
+            {
+                var upload = await _uploadDao.GetLatestUpload(state);
+                var participants = await _participantDao.GetParticipants(state, ldsHash, upload.Id);
+    
+                // Set the participant State before returning
+                return participants.Select(p => new ParticipantDto(p) { State = state });
+            }
+            catch (InvalidOperationException)
+            {
+                return Enumerable.Empty<IParticipant>();
+            }
         }
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)

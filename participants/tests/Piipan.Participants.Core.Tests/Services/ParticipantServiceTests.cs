@@ -52,7 +52,7 @@ namespace Piipan.Participants.Core.Tests.Services
             
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
-                .Setup(m => m.GetLatestUpload())
+                .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
                 .ReturnsAsync(new UploadDbo
                 {
                     Id = 1,
@@ -93,7 +93,7 @@ namespace Piipan.Participants.Core.Tests.Services
             var uploadId = (new Random()).Next();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
-                .Setup(m => m.GetLatestUpload())
+                .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
                 .ReturnsAsync(new UploadDbo
                 {
                     Id = uploadId,
@@ -113,7 +113,7 @@ namespace Piipan.Participants.Core.Tests.Services
             var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
-            uploadDao.Verify(m => m.GetLatestUpload(), Times.Once);
+            uploadDao.Verify(m => m.GetLatestUpload(It.IsAny<string>()), Times.Once);
             participantDao.Verify(m => m.GetParticipants(randomState, randomLdsHash, uploadId), Times.Once);
         }
 

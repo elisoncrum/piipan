@@ -15,9 +15,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public async Task<IUpload> GetLatestUpload()
+        public async Task<IUpload> GetLatestUpload(string state = null)
         {
-            var connection = await _dbConnectionFactory.Build();
+            var connection = await _dbConnectionFactory.Build(state);
             return await connection
                 .QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
