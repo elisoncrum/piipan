@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -121,6 +121,7 @@ namespace Piipan.Match.Func.Api.Tests
 
             var mockRequest = new Mock<HttpRequest>();
             mockRequest.Setup(x => x.Body).Returns(ms);
+
             var headers = new HeaderDictionary(new Dictionary<String, StringValues>
             {
                 { "From", "foobar"}
@@ -157,8 +158,10 @@ namespace Piipan.Match.Func.Api.Tests
 
         static MatchApi Construct()
         {
-            var participantApi = Mock.Of<IParticipantApi>();
-            var api = new MatchApi(participantApi);
+            var participantApi = new Mock<IParticipantApi>();
+            var requestValidator = new OrchMatchRequestValidator();
+
+            var api = new MatchApi(participantApi.Object, requestValidator);
 
             return api;
         }
@@ -166,8 +169,9 @@ namespace Piipan.Match.Func.Api.Tests
         static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
             var participantApi = Mock.Of<IParticipantApi>();
+            var requestValidator = new OrchMatchRequestValidator();
 
-            var api = new MatchApi(participantApi);
+            var api = new MatchApi(participantApi, requestValidator);
 
             return api;
         }
@@ -265,9 +269,9 @@ namespace Piipan.Match.Func.Api.Tests
 
             var res = result.Value as OrchMatchResponse;
             var data = res.Data;
-            Assert.Equal(1, (int)data.Errors.Count);
-            Assert.NotEmpty(data.Errors[0].Code);
-            Assert.NotEmpty(data.Errors[0].Detail);
+            Assert.Single(data.Errors);
+            Assert.NotEmpty(data.Errors.First().Code);
+            Assert.NotEmpty(data.Errors.First().Detail);
         }
 
         // Incomplete person-level results in top-level bad request response
@@ -340,6 +344,34 @@ namespace Piipan.Match.Func.Api.Tests
             Assert.Equal("500", error.Status);
             Assert.NotNull(error.Title);
             Assert.NotNull(error.Detail);
+        }
+
+        [Fact]
+        public async void LogsApimSubscriptionIfPresent()
+        {
+            // Arrange
+            var api = Construct();
+            var mockRequest = MockRequest("foobar");
+            mockRequest
+                .Setup(x => x.Headers)
+                .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
+                {
+                    { "Ocp-Apim-Subscription-Name", "sub-name" }
+                }));
+
+            var logger = new Mock<ILogger>();
+
+            // Act
+            await api.Find(mockRequest.Object, logger.Object);
+
+            // Assert
+            logger.Verify(x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Information),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Using APIM subscription sub-name")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+            ));
         }
     }
 }

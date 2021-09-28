@@ -30,11 +30,14 @@ namespace Piipan.Match.Func.Api
     public class MatchApi
     {
         private readonly IParticipantApi _participantApi;
+        private readonly IValidator<OrchMatchRequest> _requestValidator;
 
         public MatchApi(
-            IParticipantApi participantApi)
+            IParticipantApi participantApi,
+            IValidator<OrchMatchRequest> requestValidator)
         {
             _participantApi = participantApi;
+            _requestValidator = requestValidator;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -59,13 +62,13 @@ namespace Piipan.Match.Func.Api
             {
                 log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
 
-                string subscription = req.Headers?["Ocp-Apim-Subscription-Name"];
+                string subscription = req.Headers["Ocp-Apim-Subscription-Name"];
                 if (subscription != null)
                 {
                     log.LogInformation("Using APIM subscription {Subscription}", subscription);
                 }
 
-                string username = req.Headers?["From"];
+                string username = req.Headers["From"];
                 if (username != null)
                 {
                     log.LogInformation("on behalf of {Username}", username);
@@ -74,8 +77,7 @@ namespace Piipan.Match.Func.Api
                 var incoming = await new StreamReader(req.Body).ReadToEndAsync();
                 var request = Parse(incoming, log);
 
-                // Top-level request validation
-                (new OrchMatchRequestValidator()).ValidateAndThrow(request);
+                _requestValidator.ValidateAndThrow(request);
 
                 return await FindMatches(request, log);
             }

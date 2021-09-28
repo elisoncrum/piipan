@@ -1,4 +1,5 @@
 using System.Data.Common;
+using FluentValidation;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,10 @@ namespace Piipan.Match.Func.Api
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var configuration = builder.GetContext().Configuration;
+
+            builder.Services.AddLogging();
+
+            builder.Services.AddScoped<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
 
             builder.Services.AddSingleton<ITokenProvider>((s) =>
             {
