@@ -31,13 +31,16 @@ namespace Piipan.Match.Func.Api
     {
         private readonly IParticipantApi _participantApi;
         private readonly IValidator<OrchMatchRequest> _requestValidator;
+        private readonly IValidator<RequestPerson> _requestPersonValidator;
 
         public MatchApi(
             IParticipantApi participantApi,
-            IValidator<OrchMatchRequest> requestValidator)
+            IValidator<OrchMatchRequest> requestValidator,
+            IValidator<RequestPerson> requestPersonValidator)
         {
             _participantApi = participantApi;
             _requestValidator = requestValidator;
+            _requestPersonValidator = requestPersonValidator;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -176,8 +179,7 @@ namespace Piipan.Match.Func.Api
         {
             // Person-level validation is handled here, and exception
             // is caught by app's entry point method
-            var personValidator = new PersonValidator();
-            personValidator.ValidateAndThrow(person);
+            _requestPersonValidator.ValidateAndThrow(person);
 
             var states = await _participantApi.GetStates();
 

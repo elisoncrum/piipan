@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using Newtonsoft.Json;
 using Npgsql;
@@ -17,6 +18,7 @@ using Piipan.Participants.Core.Services;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
 using Xunit;
+using FluentValidation;
 
 
 namespace Piipan.Match.Func.Api.IntegrationTests
@@ -64,6 +66,14 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var mockRequest = new Mock<HttpRequest>();
             mockRequest.Setup(x => x.Body).Returns(ms);
 
+            mockRequest
+                .Setup(x => x.Headers)
+                .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
+                {
+                    { "From", "a user" },
+                    { "Ocp-Apim-Subscription-Name", "sub-name" }
+                }));
+
             return mockRequest;
         }
 
@@ -73,6 +83,10 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             var services = new ServiceCollection();
             services.AddLogging();
+
+            services.AddTransient<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
+            services.AddTransient<IValidator<RequestPerson>, PersonValidator>();
+
             services.AddTransient<IDbConnectionFactory>(s => 
             {
                 return new BasicPgConnectionFactory(NpgsqlFactory.Instance);
@@ -80,7 +94,11 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             services.RegisterParticipantsServices();
             var provider = services.BuildServiceProvider();  
 
-            var api = new MatchApi(provider.GetService<IParticipantApi>());
+            var api = new MatchApi(
+                provider.GetService<IParticipantApi>(),
+                provider.GetService<IValidator<OrchMatchRequest>>(),
+                provider.GetService<IValidator<RequestPerson>>()
+            );
 
             return api;
         }

@@ -160,8 +160,9 @@ namespace Piipan.Match.Func.Api.Tests
         {
             var participantApi = new Mock<IParticipantApi>();
             var requestValidator = new OrchMatchRequestValidator();
+            var requestPersonValidator = new PersonValidator();
 
-            var api = new MatchApi(participantApi.Object, requestValidator);
+            var api = new MatchApi(participantApi.Object, requestValidator, requestPersonValidator);
 
             return api;
         }
@@ -170,8 +171,9 @@ namespace Piipan.Match.Func.Api.Tests
         {
             var participantApi = Mock.Of<IParticipantApi>();
             var requestValidator = new OrchMatchRequestValidator();
+            var requestPersonValidator = new PersonValidator();
 
-            var api = new MatchApi(participantApi, requestValidator);
+            var api = new MatchApi(participantApi, requestValidator, requestPersonValidator);
 
             return api;
         }

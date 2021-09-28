@@ -19,7 +19,8 @@ namespace Piipan.Match.Func.Api
 
             builder.Services.AddLogging();
 
-            builder.Services.AddScoped<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
+            builder.Services.AddTransient<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
+            builder.Services.AddTransient<IValidator<RequestPerson>, PersonValidator>();
 
             builder.Services.AddSingleton<ITokenProvider>((s) =>
             {
