@@ -155,34 +155,19 @@ namespace Piipan.Match.Func.Api.Tests
             return mockHttpMessageHandler;
         }
 
-        static Mock<ITokenProvider> MockTokenProvider(string value)
-        {
-            var token = new AccessToken(value, DateTimeOffset.Now);
-            var mockTokenProvider = new Mock<ITokenProvider>();
-            mockTokenProvider
-                .Setup(t => t.RetrieveAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult(token));
-
-            return mockTokenProvider;
-        }
-
         static MatchApi Construct()
         {
-            var factory = NpgsqlFactory.Instance;
-            var tokenProvider = new EasyAuthTokenProvider();
             var participantApi = Mock.Of<IParticipantApi>();
-            var api = new MatchApi(factory, tokenProvider, participantApi);
+            var api = new MatchApi(participantApi);
 
             return api;
         }
 
         static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
-            var factory = NpgsqlFactory.Instance;
-            var mockTokenProvider = MockTokenProvider("|token|");
             var participantApi = Mock.Of<IParticipantApi>();
 
-            var api = new MatchApi(factory, mockTokenProvider.Object, participantApi);
+            var api = new MatchApi(participantApi);
 
             return api;
         }

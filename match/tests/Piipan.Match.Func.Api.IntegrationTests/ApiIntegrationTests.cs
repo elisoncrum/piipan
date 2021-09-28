@@ -70,16 +70,17 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         static MatchApi Construct()
         {
             Environment.SetEnvironmentVariable("States", "ea");
-            var factory = NpgsqlFactory.Instance;
-            var tokenProvider = new EasyAuthTokenProvider();
 
             var services = new ServiceCollection();
             services.AddLogging();
-            services.AddTransient<IDbConnectionFactory>(s => new BasicPgConnectionFactory(factory));
+            services.AddTransient<IDbConnectionFactory>(s => 
+            {
+                return new BasicPgConnectionFactory(NpgsqlFactory.Instance);
+            });
             services.RegisterParticipantsServices();
             var provider = services.BuildServiceProvider();  
 
-            var api = new MatchApi(factory, tokenProvider, provider.GetService<IParticipantApi>());
+            var api = new MatchApi(provider.GetService<IParticipantApi>());
 
             return api;
         }

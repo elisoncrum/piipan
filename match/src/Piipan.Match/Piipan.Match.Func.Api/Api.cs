@@ -29,17 +29,11 @@ namespace Piipan.Match.Func.Api
     /// </summary>
     public class MatchApi
     {
-        private readonly DbProviderFactory _dbFactory;
-        private readonly ITokenProvider _tokenProvider;
         private readonly IParticipantApi _participantApi;
 
         public MatchApi(
-            DbProviderFactory factory,
-            ITokenProvider provider,
             IParticipantApi participantApi)
         {
-            _dbFactory = factory;
-            _tokenProvider = provider;
             _participantApi = participantApi;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
@@ -193,46 +187,6 @@ namespace Piipan.Match.Func.Api
                 Index = index,
                 Matches = matches
             };
-        }
-
-        private async Task<string> ConnectionString(string database)
-        {
-            // Environment variables (and placeholder) established
-            // during initial function app provisioning in IaC
-            const string CloudName = "CloudName";
-            const string DatabaseConnectionString = "DatabaseConnectionString";
-            const string PasswordPlaceholder = "{password}";
-            const string DatabasePlaceholder = "{database}";
-            const string GovernmentCloud = "AzureUSGovernment";
-
-            // Resource ids for open source software databases in the public and
-            // US government clouds. Set the desired active cloud, then see:
-            // `az cloud show --query endpoints.ossrdbmsResourceId`
-            const string CommercialId = "https://ossrdbms-aad.database.windows.net";
-            const string GovermentId = "https://ossrdbms-aad.database.usgovcloudapi.net";
-
-            var resourceId = CommercialId;
-            var cn = Environment.GetEnvironmentVariable(CloudName);
-            if (cn == GovernmentCloud)
-            {
-                resourceId = GovermentId;
-            }
-
-            var builder = new NpgsqlConnectionStringBuilder(
-                Environment.GetEnvironmentVariable(DatabaseConnectionString));
-
-            if (builder.Password == PasswordPlaceholder)
-            {
-                var token = await _tokenProvider.RetrieveAsync(resourceId);
-                builder.Password = token.Token;
-            }
-
-            if (builder.Database == DatabasePlaceholder)
-            {
-                builder.Database = database;
-            }
-
-            return builder.ConnectionString;
         }
 
         private List<OrchMatchError> HandlePersonValidationFailure(ValidationException exception, int index)
