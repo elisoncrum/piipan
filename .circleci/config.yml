@@ -71,7 +71,7 @@ jobs:
           name: Run All Unit Tests
           command: ./build.bash test -c
       - run:
-          working_directory: match/tests/Piipan.Match.Orchestrator.IntegrationTests
+          working_directory: match/tests/Piipan.Match.Func.Api.IntegrationTests
           name: Test Orchestrator Match integration
           environment:
             DatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
