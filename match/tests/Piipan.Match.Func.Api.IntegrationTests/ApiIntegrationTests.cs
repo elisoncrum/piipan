@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Participants.Api;
+using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Participants.Core.Extensions;
+using Piipan.Participants.Core.Services;
+using Piipan.Shared;
 using Piipan.Shared.Authentication;
 using Xunit;
 
@@ -62,10 +67,17 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
         static MatchApi Construct()
         {
+            Environment.SetEnvironmentVariable("States", "ea");
             var factory = NpgsqlFactory.Instance;
             var tokenProvider = new EasyAuthTokenProvider();
-            var participantApi = Mock.Of<IParticipantApi>();
-            var api = new MatchApi(factory, tokenProvider, participantApi);
+
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddTransient<IDbConnectionFactory>(s => new BasicPgConnectionFactory(factory));
+            services.RegisterParticipantsServices();
+            var provider = services.BuildServiceProvider();  
+
+            var api = new MatchApi(factory, tokenProvider, provider.GetService<IParticipantApi>());
 
             return api;
         }

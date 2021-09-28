@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Dapper;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.DataTypeHandlers;
+using Piipan.Match.Func.Api.Extensions;
 using Piipan.Match.Shared;
 using Piipan.Participants.Api;
 using Piipan.Shared.Authentication;
@@ -203,33 +205,34 @@ namespace Piipan.Match.Func.Api
 
         private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index, ILogger log)
         {
-            // Environment variables established during initial function
-            // app provisioning in IaC
-            const string States = "States";
-
             // Person-level validation is handled here, and exception
             // is caught by app's entry point method
             var personValidator = new PersonValidator();
             personValidator.ValidateAndThrow(person);
 
-            var states = Environment.GetEnvironmentVariable(States).Split(',');
+            var states = await _participantApi.GetStates();
+
+            var matches = await states
+                .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash));
+
             var stateResults = new List<Task<List<ParticipantRecord>>>();
             var personResult = new OrchMatchResult
             {
                 Index = index,
-                Matches = new List<ParticipantRecord>()
+                Matches = matches.Select(m => 
+                {
+                    return new ParticipantRecord
+                    {
+                        LdsHash = m.LdsHash,
+                        State = m.State,
+                        CaseId = m.CaseId,
+                        ParticipantId = m.ParticipantId,
+                        BenefitsEndMonth = m.BenefitsEndDate,
+                        RecentBenefitMonths = m.RecentBenefitMonths.ToList(),
+                        ProtectLocation = m.ProtectLocation
+                    };
+                }).ToList()
             };
-
-            foreach (var state in states)
-            {
-                stateResults.Add(PerStateMatch(state, person, log));
-            }
-
-            await Task.WhenAll(stateResults.ToArray());
-            foreach (var stateResult in stateResults)
-            {
-                personResult.Matches.AddRange(stateResult.Result);
-            }
 
             return personResult;
         }
