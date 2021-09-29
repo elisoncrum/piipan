@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -189,36 +190,22 @@ namespace Piipan.Match.Func.Api.Tests
         // Tests
         ////
 
-        [Fact]
-        public void ParticipantRecordJson()
-        {
-            var json = @"{participant_id: 'baz', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
-            var record = JsonConvert.DeserializeObject<Participant>(json);
-
-            string jsonRecord = record.ToJson();
-
-            Assert.Contains("\"state\": null", jsonRecord);
-            Assert.Contains("\"participant_id\": \"baz\"", jsonRecord);
-            Assert.Contains("\"case_id\": \"foo\"", jsonRecord);
-            Assert.Contains("\"benefits_end_month\": \"2020-01\"", jsonRecord);
-            Assert.Contains("\"recent_benefit_months\": [", jsonRecord);
-            Assert.Contains("\"2019-12\",", jsonRecord);
-            Assert.Contains("\"2019-11\",", jsonRecord);
-            Assert.Contains("\"2019-10\"", jsonRecord);
-            Assert.Contains("\"protect_location\": true", jsonRecord);
-        }
-
         // Malformed request results in BadRequest
-        [Theory]
-        [InlineData("")]
-        [InlineData("{{")]
-        [InlineData("<xml>")]
-        public async void ExpectMalformedRequestResultsInBadRequest(string query)
+        [Fact]
+        public async void ParserExceptionResultsInBadRequest()
         {
             // Arrange
-            var api = Construct();
-            Mock<HttpRequest> mockRequest = MockRequest(query);
+            var participantApi = Mock.Of<IParticipantApi>();
+            var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
+            var requestPersonValidator = Mock.Of<IValidator<RequestPerson>>();
             var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest("");
+
+            requestParser
+                .Setup(m => m.Parse(It.IsAny<Stream>()))
+                .ThrowsAsync(new StreamParserException("failed to parse"));
+
+            var api = new MatchApi(participantApi, requestParser.Object, requestPersonValidator);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);

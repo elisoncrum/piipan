@@ -82,17 +82,13 @@ namespace Piipan.Match.Func.Api
 
                 return await FindMatches(request, log);
             }
+            catch (StreamParserException ex)
+            {
+                return DeserializationErrorResponse(ex);
+            }
             catch (ValidationException ex)
             {
                 return ValidationErrorResponse(ex);
-            }
-            catch (JsonSerializationException ex)
-            {
-                return DeserializationErrorResponse(ex);
-            }
-            catch (JsonReaderException ex)
-            {
-                return DeserializationErrorResponse(ex);
             }
             catch (System.FormatException ex)
             {
