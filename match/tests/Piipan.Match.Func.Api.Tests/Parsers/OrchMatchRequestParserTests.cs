@@ -30,6 +30,9 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
         [InlineData("{{")]
         [InlineData("<xml>")]
         [InlineData("{ data: 'foobar' }")]
+        [InlineData("{ data: []}")]
+        [InlineData("{ data: [{}]}")]
+        [InlineData("{ data: [{ssn: '000-00-0000'}]}")]
         public async Task MalformedStreamThrows(string s)
         {
             // Arrange
@@ -42,6 +45,8 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
         }
 
         [Theory]
+        [InlineData(@"{ data: [{ lds_hash: 'abc' }]}", 1)] // invalid hash, but valid request
+        [InlineData(@"{ data: [{ lds_hash: '' }]}", 1)] // empty hash, but valid request
         [InlineData(@"{'data':[
             { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458' }
         ]}", 1)]
@@ -66,11 +71,6 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
             // Assert
             Assert.NotNull(request);
             Assert.Equal(count, request.Data.Count());
-            request.Data.ForEach(d =>
-            {
-                Assert.NotNull(d.LdsHash);
-                Assert.Equal(128, d.LdsHash.Length);
-            });
         }
 
         [Fact]

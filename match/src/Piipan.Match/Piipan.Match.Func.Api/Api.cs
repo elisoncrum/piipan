@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Dapper;
@@ -12,16 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Npgsql;
 using Piipan.Match.Func.Api.DataTypeHandlers;
-using Piipan.Match.Func.Api.Extensions;
-using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
+using Piipan.Match.Func.Api.Resolvers;
 using Piipan.Match.Shared;
-using Piipan.Participants.Api;
-using Piipan.Participants.Api.Models;
-using Piipan.Shared.Authentication;
 
 namespace Piipan.Match.Func.Api
 {
@@ -30,18 +20,15 @@ namespace Piipan.Match.Func.Api
     /// </summary>
     public class MatchApi
     {
-        private readonly IParticipantApi _participantApi;
+        private readonly IMatchResolver _matchResolver;
         private readonly IStreamParser<OrchMatchRequest> _requestParser;
-        private readonly IValidator<RequestPerson> _requestPersonValidator;
 
         public MatchApi(
-            IParticipantApi participantApi,
-            IStreamParser<OrchMatchRequest> requestParser,
-            IValidator<RequestPerson> requestPersonValidator)
+            IMatchResolver matchResolver,
+            IStreamParser<OrchMatchRequest> requestParser)
         {
-            _participantApi = participantApi;
+            _matchResolver = matchResolver;
             _requestParser = requestParser;
-            _requestPersonValidator = requestPersonValidator;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -79,8 +66,12 @@ namespace Piipan.Match.Func.Api
                 }
                 
                 var request = await _requestParser.Parse(req.Body);
+                var response = await _matchResolver.ResolveMatches(request);
 
-                return await FindMatches(request, log);
+                return (ActionResult)new JsonResult(response)
+                {
+                    StatusCode = (int)HttpStatusCode.OK
+                };
             }
             catch (StreamParserException ex)
             {
@@ -89,10 +80,6 @@ namespace Piipan.Match.Func.Api
             catch (ValidationException ex)
             {
                 return ValidationErrorResponse(ex);
-            }
-            catch (System.FormatException ex)
-            {
-                return DeserializationErrorResponse(ex);
             }
             catch (Exception ex)
             {
@@ -116,70 +103,6 @@ namespace Piipan.Match.Func.Api
         {
             // xxx Implement parsing, validating, and hashing of PII
             return (ActionResult)new NoContentResult();
-        }
-
-        private async Task<IActionResult> FindMatches(OrchMatchRequest request, ILogger log)
-        {
-            var response = new OrchMatchResponse();
-            for (int i = 0; i < request.Data.Count; i++)
-            {
-                try
-                {
-                    var result = await PersonMatch(request.Data[i], i, log);
-                    response.Data.Results.Add(result);
-                }
-                catch (ValidationException ex)
-                {
-                    // Person-level validation errors are returned in the
-                    // response rather than triggering a 4xx error
-                    response.Data.Errors.AddRange(HandlePersonValidationFailure(ex, i));
-                }
-                catch (Exception ex)
-                {
-                    log.LogInformation(ex.Message);
-                }
-            }
-
-            return (ActionResult)new JsonResult(response)
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
-        }
-
-        private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index, ILogger log)
-        {
-            // Person-level validation is handled here, and exception
-            // is caught by app's entry point method
-            _requestPersonValidator.ValidateAndThrow(person);
-
-            var states = await _participantApi.GetStates();
-
-            var matches = await states
-                .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash));
-
-            return new OrchMatchResult
-            {
-                Index = index,
-                Matches = matches
-            };
-        }
-
-        private List<OrchMatchError> HandlePersonValidationFailure(ValidationException exception, int index)
-        {
-            var errors = new List<OrchMatchError>();
-
-            foreach (var failure in exception.Errors)
-            {
-                // Person-level validation can result in multiple errors/failures
-                errors.Add(new OrchMatchError()
-                {
-                    Index = index,
-                    Code = failure.ErrorCode,
-                    Detail = failure.ErrorMessage
-                });
-            }
-
-            return errors;
         }
 
         private ActionResult ValidationErrorResponse(ValidationException exception)

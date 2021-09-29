@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +21,11 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
+using Piipan.Match.Func.Api.Resolvers;
 using Piipan.Match.Func.Api.Validators;
 using Piipan.Match.Shared;
 using Piipan.Participants.Api;
+using Piipan.Participants.Api.Models;
 using Piipan.Shared.Authentication;
 using Xunit;
 
@@ -161,29 +164,26 @@ namespace Piipan.Match.Func.Api.Tests
 
         static MatchApi Construct()
         {
-            var participantApi = new Mock<IParticipantApi>();
+            var matchResolver = new Mock<IMatchResolver>();
             var requestParser = new OrchMatchRequestParser(
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
-            var requestPersonValidator = new RequestPersonValidator();
 
-            var api = new MatchApi(participantApi.Object, requestParser, requestPersonValidator);
+            var api = new MatchApi(matchResolver.Object, requestParser);
 
             return api;
         }
 
         static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
-            var participantApi = Mock.Of<IParticipantApi>();
-
+            var matchResolver = new Mock<IMatchResolver>();
             var requestParser = new OrchMatchRequestParser(
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
-            var requestPersonValidator = new RequestPersonValidator();
 
-            var api = new MatchApi(participantApi, requestParser, requestPersonValidator);
+            var api = new MatchApi(matchResolver.Object, requestParser);
 
             return api;
         }
@@ -196,9 +196,8 @@ namespace Piipan.Match.Func.Api.Tests
         public async void ParserExceptionResultsInBadRequest()
         {
             // Arrange
-            var participantApi = Mock.Of<IParticipantApi>();
+            var matchResolver = Mock.Of<IMatchResolver>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
-            var requestPersonValidator = Mock.Of<IValidator<RequestPerson>>();
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest("");
 
@@ -206,7 +205,7 @@ namespace Piipan.Match.Func.Api.Tests
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
                 .ThrowsAsync(new StreamParserException("failed to parse"));
 
-            var api = new MatchApi(participantApi, requestParser.Object, requestPersonValidator);
+            var api = new MatchApi(matchResolver, requestParser.Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -218,19 +217,27 @@ namespace Piipan.Match.Func.Api.Tests
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal("400", errorResponse.Errors[0].Status);
-            Assert.NotEmpty(errorResponse.Errors[0].Title);
-            Assert.NotEmpty(errorResponse.Errors[0].Detail);
+            Assert.Equal("failed to parse", errorResponse.Errors[0].Detail);
+            Assert.Contains("StreamParserException", errorResponse.Errors[0].Title);
         }
 
-        [Theory]
-        [InlineData("{ data: 'foobar' }")]
-        [InlineData("{ data: [] }")]
-        public async void ExpectMalformedDataResultsInBadRequest(string query)
+        [Fact]
+        public async void ValidationExceptionResultsInBadRequest()
         {
             // Arrange
-            var api = Construct();
-            Mock<HttpRequest> mockRequest = MockRequest(query);
+            var matchResolver = Mock.Of<IMatchResolver>();
+            var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest("");
+
+            requestParser
+                .Setup(m => m.Parse(It.IsAny<Stream>()))
+                .ThrowsAsync(new ValidationException("failed to validate", new List<ValidationFailure>
+                {
+                    new ValidationFailure("property", "property missing")
+                }));
+
+            var api = new MatchApi(matchResolver, requestParser.Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -242,59 +249,40 @@ namespace Piipan.Match.Func.Api.Tests
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal("400", errorResponse.Errors[0].Status);
-            Assert.NotEmpty(errorResponse.Errors[0].Title);
-            Assert.NotEmpty(errorResponse.Errors[0].Detail);
+            Assert.Equal("property missing", errorResponse.Errors[0].Detail);
         }
 
         // Invalid person-level results in item-level validation errors
-        [Theory]
-        [InlineData(@"[{lds_hash: 'abc'}]")] // Invalid hash
-        [InlineData(@"[{lds_hash: ''}]")] // Empty hash
-        public async void ExpectBadResultFromInvalidPersonData(string query)
-        {
-            // Arrange
-            var api = Construct();
-            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
-            var logger = Mock.Of<ILogger>();
+        // [Fact]
+        // public async void ExpectBadResultFromInvalidPersonData(string query)
+        // {
+        //     // Arrange
+        //     var participantApi = Mock.Of<IParticipantApi>();
+        //     var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
+            
+        //     var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
+        //     requestPersonValidator
+        //         .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
+        //         .ReturnsAsync(new ValidationResult());
 
-            // Act
-            var response = await api.Find(mockRequest.Object, logger);
+        //     var logger = Mock.Of<ILogger>();
+        //     var mockRequest = MockRequest("");
 
-            // Assert
-            var result = response as JsonResult;
-            Assert.Equal(200, result.StatusCode);
+        //     var api = new MatchApi(participantApi, requestParser.Object, requestPersonValidator.Object);
 
-            var res = result.Value as OrchMatchResponse;
-            var data = res.Data;
-            Assert.Single(data.Errors);
-            Assert.NotEmpty(data.Errors.First().Code);
-            Assert.NotEmpty(data.Errors.First().Detail);
-        }
+        //     // Act
+        //     var response = await api.Find(mockRequest.Object, logger);
 
-        // Incomplete person-level results in top-level bad request response
-        [Theory]
-        [InlineData(@"[{ssn: '000-00-0000'}]")] // Missing hash
-        [InlineData(@"[{}]")] // Empty record
-        public async void ExpectBadResultFromIncompleteData(string query)
-        {
-            // Arrange
-            var api = Construct();
-            Mock<HttpRequest> mockRequest = MockRequest(JsonBody(query));
-            var logger = Mock.Of<ILogger>();
+        //     // Assert
+        //     var result = response as JsonResult;
+        //     Assert.Equal(200, result.StatusCode);
 
-            // Act
-            var response = await api.Find(mockRequest.Object, logger);
-
-            // Assert
-            var result = response as BadRequestObjectResult;
-            Assert.Equal(400, result.StatusCode);
-
-            var errorResponse = result.Value as ApiErrorResponse;
-            Assert.Equal(1, (int)errorResponse.Errors.Count);
-            Assert.Equal("400", errorResponse.Errors[0].Status);
-            Assert.NotEmpty(errorResponse.Errors[0].Title);
-            Assert.NotEmpty(errorResponse.Errors[0].Detail);
-        }
+        //     var res = result.Value as OrchMatchResponse;
+        //     var data = res.Data;
+        //     Assert.Single(data.Errors);
+        //     Assert.NotEmpty(data.Errors.First().Code);
+        //     Assert.NotEmpty(data.Errors.First().Detail);
+        // }
 
         // Required services are passed to Api on startup
         [Fact]
@@ -369,6 +357,73 @@ namespace Piipan.Match.Func.Api.Tests
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
             ));
+        }
+
+        [Fact]
+        public async Task Returns()
+        {
+            // Arrange
+            var response = new OrchMatchResponse
+            {
+                Data = new OrchMatchResponseData
+                {
+                    Results = new List<OrchMatchResult>
+                    {
+                        new OrchMatchResult
+                        {
+                            Index = 0,
+                            Matches = new IParticipant[] { new Participant { LdsHash = "asdf" } }
+                        }
+                    },
+                    Errors = new List<OrchMatchError>
+                    {
+                        new OrchMatchError
+                        {
+                            Index = 1,
+                            Code = "code",
+                            Title = "title",
+                            Detail = "detail"
+                        }
+                    }
+                }
+            };
+
+            var matchResolver = new Mock<IMatchResolver>();
+            matchResolver
+                .Setup(m => m.ResolveMatches(It.IsAny<OrchMatchRequest>()))
+                .ReturnsAsync(response);
+
+            var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
+            var logger = Mock.Of<ILogger>();
+            var mockRequest = MockRequest("");
+
+            var api = new MatchApi(matchResolver.Object, requestParser.Object);
+
+            // Act
+            var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;
+
+            // Assert
+            Assert.NotNull(apiResponse);
+            Assert.Equal(200, apiResponse.StatusCode);
+
+            var matchResponse = apiResponse.Value as OrchMatchResponse;
+            Assert.NotNull(matchResponse);
+            Assert.Equal(response, matchResponse);
+        }
+
+        [Fact]
+        public void FindPiiReturnsNoContent()
+        {
+            // Arrange
+            var api = Construct();
+            var mockRequest = MockRequest("foobar");
+            var logger = new Mock<ILogger>();
+
+            // Act
+            var response = api.FindPii(mockRequest.Object, logger.Object) as NoContentResult;
+
+            // Assert
+            Assert.NotNull(response);
         }
     }
 }
