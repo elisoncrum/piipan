@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Piipan.Match.Func.Api.Models;
 using FluentValidation.TestHelper;
-using Piipan.Match.Func.Api;
 using Xunit;
 
 

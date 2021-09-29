@@ -1,14 +1,15 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
 using Moq;
 using Xunit;
 using FluentValidation;
 using FluentValidation.Results;
-using System.Linq;
-using System.Threading;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 
 namespace Piipan.Match.Func.Api.Tests.Parsers
 {

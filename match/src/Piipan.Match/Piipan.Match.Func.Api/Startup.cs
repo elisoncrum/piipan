@@ -1,15 +1,16 @@
 using System.Data.Common;
-using FluentValidation;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
 using Piipan.Match.Func.Api.Resolvers;
 using Piipan.Match.Func.Api.Validators;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
+using FluentValidation;
+using Npgsql;
 
 [assembly: FunctionsStartup(typeof(Piipan.Match.Func.Api.Startup))]
 namespace Piipan.Match.Func.Api

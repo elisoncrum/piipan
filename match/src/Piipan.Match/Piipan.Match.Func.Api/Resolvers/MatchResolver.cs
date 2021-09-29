@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using Piipan.Match.Func.Api.Extensions;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Api;
 
 namespace Piipan.Match.Func.Api.Resolvers

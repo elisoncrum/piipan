@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Piipan.Match.Func.Api.Models;
 using Newtonsoft.Json;
+using FluentValidation;
 
 namespace Piipan.Match.Func.Api.Parsers
 {

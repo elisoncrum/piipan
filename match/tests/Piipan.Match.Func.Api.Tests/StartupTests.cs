@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentValidation;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Moq;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
 using Piipan.Match.Func.Api.Resolvers;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
+using FluentValidation;
+using Moq;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests
