@@ -163,7 +163,8 @@ namespace Piipan.Match.Func.Api.Tests
         {
             var participantApi = new Mock<IParticipantApi>();
             var requestParser = new OrchMatchRequestParser(
-                new OrchMatchRequestValidator()
+                new OrchMatchRequestValidator(),
+                Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
             var requestPersonValidator = new RequestPersonValidator();
 
@@ -177,7 +178,8 @@ namespace Piipan.Match.Func.Api.Tests
             var participantApi = Mock.Of<IParticipantApi>();
 
             var requestParser = new OrchMatchRequestParser(
-                new OrchMatchRequestValidator()
+                new OrchMatchRequestValidator(),
+                Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
             var requestPersonValidator = new RequestPersonValidator();
 

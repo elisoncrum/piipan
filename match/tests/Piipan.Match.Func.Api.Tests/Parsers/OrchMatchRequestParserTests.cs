@@ -8,6 +8,7 @@ using FluentValidation.Results;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Piipan.Match.Func.Api.Tests.Parsers
 {
@@ -17,8 +18,9 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
         public async Task EmptyStreamThrows()
         {
             // Arrange
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
             var validator = Mock.Of<IValidator<OrchMatchRequest>>();
-            var parser = new OrchMatchRequestParser(validator);
+            var parser = new OrchMatchRequestParser(validator, logger);
 
             // Act / Assert
             await Assert.ThrowsAsync<StreamParserException>(() => parser.Parse(BuildStream("")));
@@ -31,8 +33,9 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
         public async Task MalformedStreamThrows(string s)
         {
             // Arrange
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
             var validator = Mock.Of<IValidator<OrchMatchRequest>>();
-            var parser = new OrchMatchRequestParser(validator);
+            var parser = new OrchMatchRequestParser(validator, logger);
 
             // Act / Assert
             await Assert.ThrowsAsync<StreamParserException>(() => parser.Parse(BuildStream(s)));
@@ -49,12 +52,13 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
         public async Task WellFormedStreamReturnsObject(string body, int count)
         {
             // Arrange
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
             var validator = new Mock<IValidator<OrchMatchRequest>>();
             validator
                 .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var parser = new OrchMatchRequestParser(validator.Object);
+            var parser = new OrchMatchRequestParser(validator.Object, logger);
 
             // Act
             var request = await parser.Parse(BuildStream(body));
@@ -77,6 +81,7 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
                 { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458' }
             ]}";
         
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
             var validator = new Mock<IValidator<OrchMatchRequest>>();
             validator
                 .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
@@ -85,10 +90,10 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
                         new ValidationFailure("property", "missing")
                     }));
 
-            var parser = new OrchMatchRequestParser(validator.Object);
+            var parser = new OrchMatchRequestParser(validator.Object, logger);
 
             // Act / Assert
-            await Assert.ThrowsAsync<StreamParserException>(() => parser.Parse(BuildStream(body)));
+            await Assert.ThrowsAsync<ValidationException>(() => parser.Parse(BuildStream(body)));
         }
 
         private Stream BuildStream(string s)

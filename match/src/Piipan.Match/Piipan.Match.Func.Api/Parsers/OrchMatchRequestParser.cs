@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Piipan.Match.Func.Api.Parsers
@@ -9,10 +10,14 @@ namespace Piipan.Match.Func.Api.Parsers
     public class OrchMatchRequestParser : IStreamParser<OrchMatchRequest>
     {
         private readonly IValidator<OrchMatchRequest> _validator;
+        private readonly ILogger<OrchMatchRequestParser> _logger;
         
-        public OrchMatchRequestParser(IValidator<OrchMatchRequest> validator)
+        public OrchMatchRequestParser(
+            IValidator<OrchMatchRequest> validator,
+            ILogger<OrchMatchRequestParser> logger)
         {
             _validator = validator;
+            _logger = logger;
         }
         
         public async Task<OrchMatchRequest> Parse(Stream stream)
@@ -38,7 +43,12 @@ namespace Piipan.Match.Func.Api.Parsers
                 }
                 
                 return request;
-            } 
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogError($"Found validation errors while parsing: {ex.Errors.ToString()}");
+                throw ex;
+            }
             catch (Exception ex)
             {
                 throw new StreamParserException(ex.Message, ex);
