@@ -17,6 +17,7 @@ using Npgsql;
 using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Func.Api.Extensions;
 using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Func.Api.Parsers;
 using Piipan.Match.Shared;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
@@ -30,16 +31,16 @@ namespace Piipan.Match.Func.Api
     public class MatchApi
     {
         private readonly IParticipantApi _participantApi;
-        private readonly IValidator<OrchMatchRequest> _requestValidator;
+        private readonly IStreamParser<OrchMatchRequest> _requestParser;
         private readonly IValidator<RequestPerson> _requestPersonValidator;
 
         public MatchApi(
             IParticipantApi participantApi,
-            IValidator<OrchMatchRequest> requestValidator,
+            IStreamParser<OrchMatchRequest> requestParser,
             IValidator<RequestPerson> requestPersonValidator)
         {
             _participantApi = participantApi;
-            _requestValidator = requestValidator;
+            _requestParser = requestParser;
             _requestPersonValidator = requestPersonValidator;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
@@ -76,11 +77,8 @@ namespace Piipan.Match.Func.Api
                 {
                     log.LogInformation("on behalf of {Username}", username);
                 }
-
-                var incoming = await new StreamReader(req.Body).ReadToEndAsync();
-                var request = Parse(incoming, log);
-
-                _requestValidator.ValidateAndThrow(request);
+                
+                var request = await _requestParser.Parse(req.Body);
 
                 return await FindMatches(request, log);
             }
@@ -122,29 +120,6 @@ namespace Piipan.Match.Func.Api
         {
             // xxx Implement parsing, validating, and hashing of PII
             return (ActionResult)new NoContentResult();
-        }
-
-        private OrchMatchRequest Parse(string requestBody, ILogger log)
-        {
-            OrchMatchRequest request;
-
-            try
-            {
-                request = JsonConvert.DeserializeObject<OrchMatchRequest>(requestBody);
-
-                // An empty request body will deserialze to a null object.
-                if (request is null)
-                {
-                    throw new JsonSerializationException("Request body must not be empty.");
-                }
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex.Message);
-                throw ex;
-            }
-
-            return request;
         }
 
         private async Task<IActionResult> FindMatches(OrchMatchRequest request, ILogger log)

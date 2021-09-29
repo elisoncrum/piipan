@@ -18,6 +18,8 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Func.Api.Parsers;
+using Piipan.Match.Func.Api.Validators;
 using Piipan.Match.Shared;
 using Piipan.Participants.Api;
 using Piipan.Shared.Authentication;
@@ -159,10 +161,12 @@ namespace Piipan.Match.Func.Api.Tests
         static MatchApi Construct()
         {
             var participantApi = new Mock<IParticipantApi>();
-            var requestValidator = new OrchMatchRequestValidator();
-            var requestPersonValidator = new PersonValidator();
+            var requestParser = new OrchMatchRequestParser(
+                new OrchMatchRequestValidator()
+            );
+            var requestPersonValidator = new RequestPersonValidator();
 
-            var api = new MatchApi(participantApi.Object, requestValidator, requestPersonValidator);
+            var api = new MatchApi(participantApi.Object, requestParser, requestPersonValidator);
 
             return api;
         }
@@ -170,10 +174,13 @@ namespace Piipan.Match.Func.Api.Tests
         static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
             var participantApi = Mock.Of<IParticipantApi>();
-            var requestValidator = new OrchMatchRequestValidator();
-            var requestPersonValidator = new PersonValidator();
 
-            var api = new MatchApi(participantApi, requestValidator, requestPersonValidator);
+            var requestParser = new OrchMatchRequestParser(
+                new OrchMatchRequestValidator()
+            );
+            var requestPersonValidator = new RequestPersonValidator();
+
+            var api = new MatchApi(participantApi, requestParser, requestPersonValidator);
 
             return api;
         }
@@ -349,7 +356,7 @@ namespace Piipan.Match.Func.Api.Tests
         }
 
         [Fact]
-        public async void LogsApimSubscriptionIfPresent()
+        public async Task LogsApimSubscriptionIfPresent()
         {
             // Arrange
             var api = Construct();

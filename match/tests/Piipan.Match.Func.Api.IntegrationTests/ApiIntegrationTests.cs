@@ -87,6 +87,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             services.AddTransient<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
             services.AddTransient<IValidator<RequestPerson>, PersonValidator>();
 
+            services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
+
             services.AddTransient<IDbConnectionFactory>(s => 
             {
                 return new BasicPgConnectionFactory(NpgsqlFactory.Instance);
@@ -96,7 +98,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             var api = new MatchApi(
                 provider.GetService<IParticipantApi>(),
-                provider.GetService<IValidator<OrchMatchRequest>>(),
+                provider.GetService<IStreamParser<OrchMatchRequest>>(),
                 provider.GetService<IValidator<RequestPerson>>()
             );
 

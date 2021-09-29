@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Piipan.Match.Func.Api
+namespace Piipan.Match.Func.Api.Validators
 {
     /// <summary>
     /// Validates the whole API match request from a client
@@ -15,19 +15,6 @@ namespace Piipan.Match.Func.Api
                 .NotEmpty()
                 .Must(data => data.Count <= MaxPersonsInRequest)
                 .WithMessage($"Data count cannot exceed {MaxPersonsInRequest}");
-        }
-    }
-
-    /// <summary>
-    /// Validates each person in an API request
-    /// </summary>
-    public class PersonValidator : AbstractValidator<RequestPerson>
-    {
-        public PersonValidator()
-        {
-            const string HashRegex = "^[a-z0-9]{128}$";
-
-            RuleFor(q => q.LdsHash).Matches(HashRegex);
         }
     }
 
