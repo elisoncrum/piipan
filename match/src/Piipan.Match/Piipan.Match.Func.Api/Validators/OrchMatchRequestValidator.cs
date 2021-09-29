@@ -17,17 +17,4 @@ namespace Piipan.Match.Func.Api.Validators
                 .WithMessage($"Data count cannot exceed {MaxPersonsInRequest}");
         }
     }
-
-    /// <summary>
-    /// Validates each person in an API request
-    /// </summary>
-    public class PersonWithPiiValidator : AbstractValidator<RequestPersonWithPii>
-    {
-        public PersonWithPiiValidator()
-        {
-            RuleFor(q => q.First).NotEmpty();
-            RuleFor(q => q.Last).NotEmpty();
-            RuleFor(q => q.Ssn).Matches(@"^[0-9]{3}-[0-9]{2}-[0-9]{4}$");
-        }
-    }
 }
