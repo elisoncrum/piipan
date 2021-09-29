@@ -190,7 +190,6 @@ namespace Piipan.Match.Func.Api.Tests
         // Tests
         ////
 
-        // Malformed request results in BadRequest
         [Fact]
         public async void ParserExceptionResultsInBadRequest()
         {
