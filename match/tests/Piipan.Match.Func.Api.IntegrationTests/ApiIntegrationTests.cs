@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
+using Piipan.Match.Func.Api.Resolvers;
 using Piipan.Match.Func.Api.Validators;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
@@ -96,12 +97,14 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 return new BasicPgConnectionFactory(NpgsqlFactory.Instance);
             });
             services.RegisterParticipantsServices();
+
+            services.AddTransient<IMatchResolver, MatchResolver>();
+
             var provider = services.BuildServiceProvider();  
 
             var api = new MatchApi(
-                provider.GetService<IParticipantApi>(),
-                provider.GetService<IStreamParser<OrchMatchRequest>>(),
-                provider.GetService<IValidator<RequestPerson>>()
+                provider.GetService<IMatchResolver>(),
+                provider.GetService<IStreamParser<OrchMatchRequest>>()
             );
 
             return api;
