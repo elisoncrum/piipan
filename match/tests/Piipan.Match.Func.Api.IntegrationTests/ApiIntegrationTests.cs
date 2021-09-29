@@ -11,6 +11,8 @@ using Moq;
 using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Func.Api.Parsers;
+using Piipan.Match.Func.Api.Validators;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
@@ -85,7 +87,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             services.AddLogging();
 
             services.AddTransient<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
-            services.AddTransient<IValidator<RequestPerson>, PersonValidator>();
+            services.AddTransient<IValidator<RequestPerson>, RequestPersonValidator>();
 
             services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
