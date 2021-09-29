@@ -284,20 +284,6 @@ namespace Piipan.Match.Func.Api.Tests
         //     Assert.NotEmpty(data.Errors.First().Detail);
         // }
 
-        // Required services are passed to Api on startup
-        [Fact]
-        public void DependencyInjection()
-        {
-            var startup = new Startup();
-            var host = new HostBuilder()
-                .ConfigureWebJobs(startup.Configure)
-                .Build();
-
-            Assert.NotNull(host);
-            Assert.NotNull(host.Services.GetRequiredService<ITokenProvider>());
-            Assert.NotNull(host.Services.GetRequiredService<DbProviderFactory>());
-        }
-
         // Whole thing blows up and returns a top-level error
         [Fact]
         public async void ReturnsInternalServerError()
