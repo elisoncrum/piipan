@@ -8,10 +8,6 @@ namespace Piipan.Match.Func.Api.Parsers
 {
     public class StreamParserException : Exception
     {
-        public StreamParserException() 
-        {
-        }
-
         public StreamParserException(string? message)
             : base(message)
         {

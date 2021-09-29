@@ -19,6 +19,7 @@ namespace Piipan.Match.Func.Api.Validators.Tests
             var model = new RequestPersonWithPii()
             {
                 First = "",
+                Middle = "middle",
                 Last = "last",
                 Dob = DateTime.Now,
                 Ssn = "000-00-0000"
@@ -33,6 +34,7 @@ namespace Piipan.Match.Func.Api.Validators.Tests
             var model = new RequestPersonWithPii()
             {
                 First = "first",
+                Middle = "middle",
                 Last = "",
                 Dob = DateTime.Now,
                 Ssn = "000-00-0000"
@@ -47,6 +49,7 @@ namespace Piipan.Match.Func.Api.Validators.Tests
             var model = new RequestPersonWithPii()
             {
                 First = "first",
+                Middle = "middle",
                 Last = "last",
                 Dob = DateTime.Now,
                 Ssn = "000-00-000"
@@ -61,6 +64,7 @@ namespace Piipan.Match.Func.Api.Validators.Tests
             var model = new RequestPersonWithPii()
             {
                 First = "first",
+                Middle = "middle",
                 Last = "last",
                 Dob = DateTime.Now,
                 Ssn = "000-00-0000"

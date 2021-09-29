@@ -107,6 +107,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 new Participant
                 {
                     LdsHash = Guid.NewGuid().ToString(),
+                    State = Guid.NewGuid().ToString(),
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
                     BenefitsEndDate = DateTime.UtcNow,
