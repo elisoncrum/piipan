@@ -1,19 +1,25 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using Piipan.Match.Api;
 using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 
 namespace Piipan.Match.Core.Services
 {
+    /// <summary>
+    /// Service layer for interacting with match records.
+    /// </summary>
     public class MatchRecordService : IMatchRecordApi
     {
         private readonly IMatchRecordDao _matchRecordDao;
         private readonly IMatchIdService _matchIdService;
         private readonly ILogger<MatchRecordService> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of MatchRecordService
+        /// </summary>
         public MatchRecordService(
             IMatchRecordDao matchRecordDao,
             IMatchIdService matchIdService,
@@ -24,6 +30,14 @@ namespace Piipan.Match.Core.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Adds a new match record to the underlying datastore.
+        /// </summary>
+        /// <remarks>
+        /// Throws `InvalidOperationException` in the rare case of repeated match ID collisions.
+        /// </remarks>
+        /// <param name="record">The match record object that will be added to the datastore.</param>
+        /// <returns>Match ID for inserted record</returns>
         public async Task<string> AddRecord(IMatchRecord record)
         {
             const int InsertRetries = 10;
@@ -49,27 +63,20 @@ namespace Piipan.Match.Core.Services
                 {
                     return await _matchRecordDao.AddRecord(matchRecordDbo);
                 }
-                catch (PostgresException ex)
+                catch (DuplicateMatchIdException)
                 {
-                    if (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+                    if (retries > 1)
                     {
-                        if (retries > 1)
-                        {
-                            _logger.LogWarning($"{retries} connsecutive match ID collisions.");
-                        }
-
-
-                        matchRecordDbo.MatchId = _matchIdService.GenerateId();
-                        retries++;
+                        _logger.LogWarning($"{retries} connsecutive match ID collisions.");
                     }
-                    else
-                    {
-                        throw (ex);
-                    }
+
+                    matchRecordDbo.MatchId = _matchIdService.GenerateId();
+                    retries++;
                 }
             }
 
-            throw new Exception($"Match record table insert failed after {InsertRetries} retries.");
+            throw new InvalidOperationException(
+                $"Match record table insert failed after {InsertRetries} retries.");
         }
     }
 }

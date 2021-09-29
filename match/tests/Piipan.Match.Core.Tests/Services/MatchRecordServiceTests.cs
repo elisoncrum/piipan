@@ -1,8 +1,10 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Npgsql;
 using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Xunit;
@@ -12,7 +14,7 @@ namespace Piipan.Match.Core.Tests.Services
     public class MatchServiceTests
     {
         [Fact]
-        public void AddRecord_FailsAfterRetryLimit()
+        public async Task AddRecord_FailsAfterRetryLimit()
         {
             // Arrange
             const int retries = 10;
@@ -20,22 +22,21 @@ namespace Piipan.Match.Core.Tests.Services
             var logger = Mock.Of<ILogger<MatchRecordService>>();
             var matchIdService = Mock.Of<IMatchIdService>();
             var matchRecordDao = new Mock<IMatchRecordDao>();
-            var uniqueException = new PostgresException("foo", "bar", "baz", PostgresErrorCodes.UniqueViolation);
             var record = new MatchRecordDbo();
 
             matchRecordDao
                 .Setup(m => m.AddRecord(It.IsAny<MatchRecordDbo>()))
-                .ThrowsAsync(uniqueException);
+                .ThrowsAsync(new DuplicateMatchIdException());
 
             var service = new MatchRecordService(matchRecordDao.Object, matchIdService, logger);
 
             // Act + Assert
-            Assert.ThrowsAsync<PostgresException>(() => service.AddRecord(record));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => service.AddRecord(record));
             matchRecordDao.Verify(m => m.AddRecord(It.IsAny<MatchRecordDbo>()), Times.Exactly(retries));
         }
 
         [Fact]
-        public void AddRecord_ThrowsOtherPostgresExceptions()
+        public async Task AddRecord_ThrowsOtherPostgresExceptions()
         {
             var logger = Mock.Of<ILogger<MatchRecordService>>();
             var matchIdService = Mock.Of<IMatchIdService>();
@@ -50,7 +51,7 @@ namespace Piipan.Match.Core.Tests.Services
             var service = new MatchRecordService(matchRecordDao.Object, matchIdService, logger);
 
             // Act + Assert
-            Assert.ThrowsAsync<PostgresException>(() => service.AddRecord(record));
+            await Assert.ThrowsAsync<PostgresException>(() => service.AddRecord(record));
             matchRecordDao.Verify(m => m.AddRecord(It.IsAny<MatchRecordDbo>()), Times.Once);
         }
 

@@ -1,16 +1,24 @@
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Shared;
 
 namespace Piipan.Match.Core.DataAccessObjects
 {
+    /// <summary>
+    /// Data Access Object for match records
+    /// </summary>
     public class MatchRecordDao : IMatchRecordDao
     {
         private readonly IDbConnectionFactory _dbConnectionFactory;
         private readonly ILogger<MatchRecordDao> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of MatchRecordDao
+        /// </summary>
         public MatchRecordDao(
             IDbConnectionFactory dbConnectionFactory,
             ILogger<MatchRecordDao> logger)
@@ -19,6 +27,14 @@ namespace Piipan.Match.Core.DataAccessObjects
             _logger = logger;
         }
 
+        /// <summary>
+        /// Adds a new match record to the database.
+        /// </summary>
+        /// <remarks>
+        /// Throws `DuplicateMatchIdException` if a record with the incoming match ID already exists.
+        /// </remarks>
+        /// <param name="record">The MatchRecordDbo object that will be added to the database.</param>
+        /// <returns>Match ID for inserted record</returns>
         public async Task<string> AddRecord(MatchRecordDbo record)
         {
             const string sql = @"
@@ -48,7 +64,24 @@ namespace Piipan.Match.Core.DataAccessObjects
             ";
 
             var connection = await _dbConnectionFactory.Build();
-            return await connection.ExecuteScalarAsync<string>(sql, record);
+
+            // Match IDs are randomly generated at the service level and may result
+            // in unique constraint violations in the rare case of a collision.
+            try
+            {
+                return await connection.ExecuteScalarAsync<string>(sql, record);
+            }
+            catch (PostgresException ex)
+            {
+                if (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+                {
+                    throw new DuplicateMatchIdException(
+                        "A record with the same Match ID already exists.",
+                        ex);
+                }
+
+                throw ex;
+            }
         }
     }
 }

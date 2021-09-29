@@ -5,6 +5,9 @@ using Piipan.Match.Api;
 
 namespace Piipan.Match.Core.Models
 {
+    /// <summary>
+    /// Implementation of IMatchRecord for database interactions
+    /// </summary>
     public class MatchRecordDbo : IMatchRecord
     {
         public string MatchId { get; set; }

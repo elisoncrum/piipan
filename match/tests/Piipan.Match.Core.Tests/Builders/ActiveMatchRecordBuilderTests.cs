@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Core.Builders;
 using Piipan.Match.Orchestrator;
 using Xunit;
 
-namespace Piipan.Match.Core.Tests.Models
+namespace Piipan.Match.Core.Tests.Builders
 {
     public class ActiveMatchRecordBuilderTests
     {

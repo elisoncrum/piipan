@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Piipan.Match.Core.Models;
 using Xunit;
 
@@ -74,7 +73,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Invalid = record.Invalid
             };
 
-
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
             Assert.NotEqual(record.GetHashCode(), recordMismatch.GetHashCode());
@@ -104,7 +102,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Status = record.Status,
                 Invalid = record.Invalid
             };
-
 
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
@@ -136,7 +133,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Invalid = record.Invalid
             };
 
-
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
             Assert.NotEqual(record.GetHashCode(), recordMismatch.GetHashCode());
@@ -166,7 +162,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Status = record.Status,
                 Invalid = record.Invalid
             };
-
 
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
@@ -198,7 +193,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Invalid = record.Invalid
             };
 
-
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
             Assert.NotEqual(record.GetHashCode(), recordMismatch.GetHashCode());
@@ -229,7 +223,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Invalid = record.Invalid
             };
 
-
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
             Assert.NotEqual(record.GetHashCode(), recordMismatch.GetHashCode());
@@ -259,7 +252,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Status = record.Status,
                 Invalid = !record.Invalid
             };
-
 
             // Act / Assert
             Assert.False(record.Equals(recordMismatch));
@@ -293,7 +285,6 @@ namespace Piipan.Match.Core.Tests.Models
                 Invalid = record.Invalid
             };
 
-
             // Act / Assert
             Assert.True(record.Equals(recordMatch));
             Assert.Equal(record.GetHashCode(), recordMatch.GetHashCode());
@@ -326,6 +317,38 @@ namespace Piipan.Match.Core.Tests.Models
                 Invalid = record.Invalid
             };
 
+            // Act / Assert
+            Assert.True(record.Equals(recordMatch));
+            Assert.Equal(record.GetHashCode(), recordMatch.GetHashCode());
+        }
+
+        [Fact]
+        public void Equals_HashCode_CreatedAtMatch()
+        {
+            // Arrange
+            var record = new MatchRecordDbo
+            {
+                MatchId = "m",
+                CreatedAt = DateTime.Now,
+                Initiator = "i",
+                States = new string[] { "a", "b" },
+                Hash = "h",
+                HashType = "t",
+                Status = "s",
+                Invalid = false
+            };
+            var a = DateTime.Now.AddDays(1);
+            var recordMatch = new MatchRecordDbo
+            {
+                MatchId = record.MatchId,
+                CreatedAt = ((DateTime)record.CreatedAt).AddDays(1),
+                Initiator = record.Initiator,
+                States = record.States,
+                Hash = record.Hash,
+                HashType = record.HashType,
+                Status = record.Status,
+                Invalid = record.Invalid
+            };
 
             // Act / Assert
             Assert.True(record.Equals(recordMatch));
