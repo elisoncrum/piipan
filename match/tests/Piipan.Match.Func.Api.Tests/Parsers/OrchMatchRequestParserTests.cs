@@ -4,7 +4,10 @@ using Piipan.Match.Func.Api.Parsers;
 using Moq;
 using Xunit;
 using FluentValidation;
+using FluentValidation.Results;
 using System.Linq;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace Piipan.Match.Func.Api.Tests.Parsers
 {
@@ -46,8 +49,12 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
         public async Task WellFormedStreamReturnsObject(string body, int count)
         {
             // Arrange
-            var validator = Mock.Of<IValidator<OrchMatchRequest>>();
-            var parser = new OrchMatchRequestParser(validator);
+            var validator = new Mock<IValidator<OrchMatchRequest>>();
+            validator
+                .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var parser = new OrchMatchRequestParser(validator.Object);
 
             // Act
             var request = await parser.Parse(BuildStream(body));
@@ -60,6 +67,28 @@ namespace Piipan.Match.Func.Api.Tests.Parsers
                 Assert.NotNull(d.LdsHash);
                 Assert.Equal(128, d.LdsHash.Length);
             });
+        }
+
+        [Fact]
+        public async Task ThrowsWhenValidatorThrows()
+        {
+            // Arrange
+            var body = @"{'data':[
+                { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458' }
+            ]}";
+        
+            var validator = new Mock<IValidator<OrchMatchRequest>>();
+            validator
+                .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult(new List<ValidationFailure>
+                    {
+                        new ValidationFailure("property", "missing")
+                    }));
+
+            var parser = new OrchMatchRequestParser(validator.Object);
+
+            // Act / Assert
+            await Assert.ThrowsAsync<StreamParserException>(() => parser.Parse(BuildStream(body)));
         }
 
         private Stream BuildStream(string s)

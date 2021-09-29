@@ -17,10 +17,10 @@ namespace Piipan.Match.Func.Api.Parsers
         
         public async Task<OrchMatchRequest> Parse(Stream stream)
         {
-            OrchMatchRequest request = null;
-
             try
             {
+                OrchMatchRequest request = null;
+
                 var reader = new StreamReader(stream);
                 var serialized = await reader.ReadToEndAsync();
 
@@ -30,15 +30,19 @@ namespace Piipan.Match.Func.Api.Parsers
                 {
                     throw new JsonSerializationException("stream must not be empty.");
                 }
+                
+                var validationResult = await _validator.ValidateAsync(request);
+                if (!validationResult.IsValid)
+                {
+                    throw new ValidationException("request validation failed", validationResult.Errors);
+                }
+                
+                return request;
             } 
             catch (Exception ex)
             {
                 throw new StreamParserException(ex.Message, ex);
             }
-
-            await _validator.ValidateAndThrowAsync(request);
-            
-            return request;
         }
     }
 }
