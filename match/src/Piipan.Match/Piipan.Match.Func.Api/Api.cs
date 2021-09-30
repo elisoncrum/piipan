@@ -40,7 +40,7 @@ namespace Piipan.Match.Func.Api
         /// using de-identified data
         /// </summary>
         /// <param name="req">incoming HTTP request</param>
-        /// <param name="log">handle to the function log</param>
+        /// <param name="logger">handle to the function log</param>
         /// <remarks>
         /// This function is expected to be executing as a resource with read
         /// access to the per-state participant databases.
@@ -48,31 +48,16 @@ namespace Piipan.Match.Func.Api
         [FunctionName("find_matches")]
         public async Task<IActionResult> Find(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            ILogger log)
+            ILogger logger)
         {
             try
             {
-                log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
-
-                string subscription = req.Headers["Ocp-Apim-Subscription-Name"];
-                if (subscription != null)
-                {
-                    log.LogInformation("Using APIM subscription {Subscription}", subscription);
-                }
-
-                string username = req.Headers["From"];
-                if (username != null)
-                {
-                    log.LogInformation("on behalf of {Username}", username);
-                }
+                LogRequest(logger, req);
                 
                 var request = await _requestParser.Parse(req.Body);
                 var response = await _matchResolver.ResolveMatches(request);
 
-                return (ActionResult)new JsonResult(response)
-                {
-                    StatusCode = (int)HttpStatusCode.OK
-                };
+                return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
             catch (StreamParserException ex)
             {
@@ -104,6 +89,23 @@ namespace Piipan.Match.Func.Api
         {
             // xxx Implement parsing, validating, and hashing of PII
             return (ActionResult)new NoContentResult();
+        }
+
+        private void LogRequest(ILogger logger, HttpRequest request)
+        {
+            logger.LogInformation("Executing request from user {User}", request.HttpContext?.User.Identity.Name);
+
+            string subscription = request.Headers["Ocp-Apim-Subscription-Name"];
+            if (subscription != null)
+            {
+                logger.LogInformation("Using APIM subscription {Subscription}", subscription);
+            }
+
+            string username = request.Headers["From"];
+            if (username != null)
+            {
+                logger.LogInformation("on behalf of {Username}", username);
+            }
         }
 
         private ActionResult ValidationErrorResponse(ValidationException exception)

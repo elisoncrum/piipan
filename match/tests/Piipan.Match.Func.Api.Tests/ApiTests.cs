@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -11,22 +9,17 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
-using Npgsql;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Match.Func.Api.Parsers;
 using Piipan.Match.Func.Api.Resolvers;
 using Piipan.Match.Func.Api.Validators;
 using Piipan.Match.Shared;
-using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Authentication;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests
@@ -251,38 +244,6 @@ namespace Piipan.Match.Func.Api.Tests
             Assert.Equal("400", errorResponse.Errors[0].Status);
             Assert.Equal("property missing", errorResponse.Errors[0].Detail);
         }
-
-        // Invalid person-level results in item-level validation errors
-        // [Fact]
-        // public async void ExpectBadResultFromInvalidPersonData(string query)
-        // {
-        //     // Arrange
-        //     var participantApi = Mock.Of<IParticipantApi>();
-        //     var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
-            
-        //     var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
-        //     requestPersonValidator
-        //         .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
-        //         .ReturnsAsync(new ValidationResult());
-
-        //     var logger = Mock.Of<ILogger>();
-        //     var mockRequest = MockRequest("");
-
-        //     var api = new MatchApi(participantApi, requestParser.Object, requestPersonValidator.Object);
-
-        //     // Act
-        //     var response = await api.Find(mockRequest.Object, logger);
-
-        //     // Assert
-        //     var result = response as JsonResult;
-        //     Assert.Equal(200, result.StatusCode);
-
-        //     var res = result.Value as OrchMatchResponse;
-        //     var data = res.Data;
-        //     Assert.Single(data.Errors);
-        //     Assert.NotEmpty(data.Errors.First().Code);
-        //     Assert.NotEmpty(data.Errors.First().Detail);
-        // }
 
         // Whole thing blows up and returns a top-level error
         [Fact]
