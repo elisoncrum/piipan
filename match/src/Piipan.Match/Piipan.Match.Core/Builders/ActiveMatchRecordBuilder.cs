@@ -21,7 +21,7 @@ namespace Piipan.Match.Core.Builders
         }
 
         /// <summary>
-        /// Reset the builder's internal record reference to a new instance of MatchRecordDbo
+        /// Reset the builder's internal record reference
         /// </summary>
         public void Reset()
         {
@@ -35,7 +35,7 @@ namespace Piipan.Match.Core.Builders
         /// Currently only supports the "ldshash" hash type.
         /// </remarks>
         /// <param name="input">The RequestPerson object received as input to the active match API request.</param>
-        /// <param name="innerException">The ParticipantRecord object received as output from active match API response.</param>
+        /// <param name="match">The ParticipantRecord object received as output from active match API response.</param>
         /// <returns>`this` to allow for method chanining.</returns>
         public IActiveMatchRecordBuilder SetMatch(RequestPerson input, ParticipantRecord match)
         {
