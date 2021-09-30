@@ -55,7 +55,7 @@ namespace Piipan.Match.Func.Api
                 LogRequest(logger, req);
                 
                 var request = await _requestParser.Parse(req.Body);
-                var response = await _matchApi.ResolveMatches(request);
+                var response = await _matchApi.FindMatches(request);
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }

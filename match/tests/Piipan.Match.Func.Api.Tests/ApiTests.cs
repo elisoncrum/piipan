@@ -338,7 +338,7 @@ namespace Piipan.Match.Func.Api.Tests
 
             var matchService = new Mock<IMatchApi>();
             matchService
-                .Setup(m => m.ResolveMatches(It.IsAny<OrchMatchRequest>()))
+                .Setup(m => m.FindMatches(It.IsAny<OrchMatchRequest>()))
                 .ReturnsAsync(response);
 
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();

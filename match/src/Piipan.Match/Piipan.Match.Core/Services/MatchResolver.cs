@@ -8,11 +8,17 @@ using FluentValidation;
 
 namespace Piipan.Match.Core.Services
 {
+    /// <summary>
+    /// Service layer for discovering participant matches between states
+    /// </summary>
     public class MatchService : IMatchApi
     {
         private readonly IParticipantApi _participantApi;
         private readonly IValidator<RequestPerson> _requestPersonValidator;
 
+        /// <summary>
+        /// Initializes a new instance of MatchService
+        /// </summary>
         public MatchService(
             IParticipantApi participantApi,
             IValidator<RequestPerson> requestPersonValidator)
@@ -21,7 +27,12 @@ namespace Piipan.Match.Core.Services
             _requestPersonValidator = requestPersonValidator;
         }
 
-        public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request)
+        /// <summary>
+        /// Finds and returns matches for each participant in the request
+        /// </summary>
+        /// <param name="request">A collection of participants to attempt to find matches for</param>
+        /// <returns>A collection of match results and inline errors for malformed participant requests</returns>
+        public async Task<OrchMatchResponse> FindMatches(OrchMatchRequest request)
         {
             var response = new OrchMatchResponse();
             for (int i = 0; i < request.Data.Count; i++)

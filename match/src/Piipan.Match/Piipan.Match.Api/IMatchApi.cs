@@ -5,6 +5,6 @@ namespace Piipan.Match.Api
 {
     public interface IMatchApi
     {
-        Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request);
+        Task<OrchMatchResponse> FindMatches(OrchMatchRequest request);
     }
 }

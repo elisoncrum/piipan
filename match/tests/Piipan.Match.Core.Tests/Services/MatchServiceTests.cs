@@ -28,7 +28,7 @@ namespace Piipan.Match.Core.Tests.Services
             var request = new OrchMatchRequest();
 
             // Act
-            var response = await service.ResolveMatches(request);
+            var response = await service.FindMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -61,7 +61,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act
-            var response = await service.ResolveMatches(request);
+            var response = await service.FindMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -93,7 +93,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act
-            var response = await service.ResolveMatches(request);
+            var response = await service.FindMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -135,7 +135,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act
-            var response = await service.ResolveMatches(request);
+            var response = await service.FindMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -171,7 +171,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => service.ResolveMatches(request));
+            await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request));
         }
 
         [Fact]
@@ -202,7 +202,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => service.ResolveMatches(request));
+            await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request));
         }
     }
 }
