@@ -73,7 +73,7 @@ namespace Piipan.Participants.Core.Tests.Services
 
             // Assert
             // results should have the State set
-            var expected = participants.Select(p => new ParticipantDto(p) { State = randomState });
+            var expected = participants.Select(p => new ParticipantDbo(p) { State = randomState });
             Assert.Equal(expected, result);
         }
 
