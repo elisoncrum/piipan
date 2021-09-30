@@ -11,7 +11,7 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
-using Piipan.Match.Core.Resolvers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
@@ -100,7 +100,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             });
             services.RegisterParticipantsServices();
 
-            services.AddTransient<IMatchApi, MatchResolver>();
+            services.AddTransient<IMatchApi, MatchService>();
 
             var provider = services.BuildServiceProvider();  
 

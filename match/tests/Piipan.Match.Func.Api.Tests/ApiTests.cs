@@ -158,26 +158,26 @@ namespace Piipan.Match.Func.Api.Tests
 
         static MatchApi Construct()
         {
-            var matchResolver = new Mock<IMatchApi>();
+            var matchService = new Mock<IMatchApi>();
             var requestParser = new OrchMatchRequestParser(
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
 
-            var api = new MatchApi(matchResolver.Object, requestParser);
+            var api = new MatchApi(matchService.Object, requestParser);
 
             return api;
         }
 
         static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
-            var matchResolver = new Mock<IMatchApi>();
+            var matchService = new Mock<IMatchApi>();
             var requestParser = new OrchMatchRequestParser(
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
 
-            var api = new MatchApi(matchResolver.Object, requestParser);
+            var api = new MatchApi(matchService.Object, requestParser);
 
             return api;
         }
@@ -190,7 +190,7 @@ namespace Piipan.Match.Func.Api.Tests
         public async void ParserExceptionResultsInBadRequest()
         {
             // Arrange
-            var matchResolver = Mock.Of<IMatchApi>();
+            var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest("");
@@ -199,7 +199,7 @@ namespace Piipan.Match.Func.Api.Tests
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
                 .ThrowsAsync(new StreamParserException("failed to parse"));
 
-            var api = new MatchApi(matchResolver, requestParser.Object);
+            var api = new MatchApi(matchService, requestParser.Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -219,7 +219,7 @@ namespace Piipan.Match.Func.Api.Tests
         public async void ValidationExceptionResultsInBadRequest()
         {
             // Arrange
-            var matchResolver = Mock.Of<IMatchApi>();
+            var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest("");
@@ -231,7 +231,7 @@ namespace Piipan.Match.Func.Api.Tests
                     new ValidationFailure("property", "property missing")
                 }));
 
-            var api = new MatchApi(matchResolver, requestParser.Object);
+            var api = new MatchApi(matchService, requestParser.Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -336,8 +336,8 @@ namespace Piipan.Match.Func.Api.Tests
                 }
             };
 
-            var matchResolver = new Mock<IMatchApi>();
-            matchResolver
+            var matchService = new Mock<IMatchApi>();
+            matchService
                 .Setup(m => m.ResolveMatches(It.IsAny<OrchMatchRequest>()))
                 .ReturnsAsync(response);
 
@@ -345,7 +345,7 @@ namespace Piipan.Match.Func.Api.Tests
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest("");
 
-            var api = new MatchApi(matchResolver.Object, requestParser.Object);
+            var api = new MatchApi(matchService.Object, requestParser.Object);
 
             // Act
             var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;

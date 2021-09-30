@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
-using Piipan.Match.Core.Resolvers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared;
@@ -29,7 +29,7 @@ namespace Piipan.Match.Func.Api
 
             builder.Services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
-            builder.Services.AddTransient<IMatchApi, MatchResolver>();
+            builder.Services.AddTransient<IMatchApi, MatchService>();
 
             builder.Services.AddSingleton<ITokenProvider>((s) =>
             {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
-using Piipan.Match.Core.Resolvers;
+using Piipan.Match.Core.Services;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using FluentValidation;
@@ -13,9 +13,9 @@ using FluentValidation.Results;
 using Moq;
 using Xunit;
 
-namespace Piipan.Match.Core.Tests.Resolvers
+namespace Piipan.Match.Core.Tests.Services
 {
-    public class MatchResolverTests
+    public class MatchServiceTests
     {
         [Fact]
         public async Task ReturnsEmptyResponseForEmptyRequest()
@@ -23,12 +23,12 @@ namespace Piipan.Match.Core.Tests.Resolvers
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
             var requestPersonValidator = Mock.Of<IValidator<RequestPerson>>();
-            var resolver = new MatchResolver(participantApi, requestPersonValidator);
+            var service = new MatchService(participantApi, requestPersonValidator);
 
             var request = new OrchMatchRequest();
 
             // Act
-            var response = await resolver.ResolveMatches(request);
+            var response = await service.ResolveMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -50,7 +50,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
                     new ValidationFailure("property", "invalid value")
                 }));
 
-            var resolver = new MatchResolver(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -61,7 +61,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
             };
 
             // Act
-            var response = await resolver.ResolveMatches(request);
+            var response = await service.ResolveMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -82,7 +82,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var resolver = new MatchResolver(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -93,7 +93,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
             };
 
             // Act
-            var response = await resolver.ResolveMatches(request);
+            var response = await service.ResolveMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -124,7 +124,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var resolver = new MatchResolver(participantApi.Object, requestPersonValidator.Object);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -135,7 +135,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
             };
 
             // Act
-            var response = await resolver.ResolveMatches(request);
+            var response = await service.ResolveMatches(request);
 
             // Assert
             Assert.NotNull(response);
@@ -160,7 +160,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("validator failed"));
 
-            var resolver = new MatchResolver(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -171,7 +171,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
             };
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => resolver.ResolveMatches(request));
+            await Assert.ThrowsAsync<Exception>(() => service.ResolveMatches(request));
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var resolver = new MatchResolver(participantApi.Object, requestPersonValidator.Object);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -202,7 +202,7 @@ namespace Piipan.Match.Core.Tests.Resolvers
             };
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => resolver.ResolveMatches(request));
+            await Assert.ThrowsAsync<Exception>(() => service.ResolveMatches(request));
         }
     }
 }

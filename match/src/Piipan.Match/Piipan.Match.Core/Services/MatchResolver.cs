@@ -6,14 +6,14 @@ using Piipan.Match.Core.Extensions;
 using Piipan.Participants.Api;
 using FluentValidation;
 
-namespace Piipan.Match.Core.Resolvers
+namespace Piipan.Match.Core.Services
 {
-    public class MatchResolver : IMatchApi
+    public class MatchService : IMatchApi
     {
         private readonly IParticipantApi _participantApi;
         private readonly IValidator<RequestPerson> _requestPersonValidator;
 
-        public MatchResolver(
+        public MatchService(
             IParticipantApi participantApi,
             IValidator<RequestPerson> requestPersonValidator)
         {
