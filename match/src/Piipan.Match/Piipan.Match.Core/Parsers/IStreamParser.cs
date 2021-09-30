@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace Piipan.Match.Func.Api.Parsers
+namespace Piipan.Match.Core.Parsers
 {
     public class StreamParserException : Exception
     {

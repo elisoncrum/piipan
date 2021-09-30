@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Func.Api.Models
+namespace Piipan.Match.Core.Models
 {
     /// <summary>
     /// Represents the top-level response body for a successful API response

@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
+using Piipan.Match.Core.Resolvers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Xunit;
 
-namespace Piipan.Match.Func.Api.Resolvers.Tests
+namespace Piipan.Match.Core.Resolvers.Tests
 {
     public class MatchResolverTests
     {

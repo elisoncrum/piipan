@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Piipan.Match.Core.Builders;
-using Piipan.Match.Orchestrator;
+using Piipan.Match.Core.Models;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Builders
@@ -18,7 +18,7 @@ namespace Piipan.Match.Core.Tests.Builders
             {
                 LdsHash = hash
             };
-            var match = new ParticipantRecord
+            var match = new Participant
             {
                 LdsHash = hash
             };

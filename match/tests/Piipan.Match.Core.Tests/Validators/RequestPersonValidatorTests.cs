@@ -1,8 +1,9 @@
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
+using Piipan.Match.Core.Validators;
 using FluentValidation.TestHelper;
 using Xunit;
 
-namespace Piipan.Match.Func.Api.Validators.Tests
+namespace Piipan.Match.Core.Tests.Validators
 {
     public class RequestPersonValidatorTests
     {

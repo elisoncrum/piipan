@@ -11,15 +11,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Piipan.Match.Core.Models;
+using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Resolvers;
+using Piipan.Match.Core.Validators;
+using Piipan.Match.Shared;
+using Piipan.Participants.Api.Models;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
-using Piipan.Match.Func.Api.Models;
-using Piipan.Match.Func.Api.Parsers;
-using Piipan.Match.Func.Api.Resolvers;
-using Piipan.Match.Func.Api.Validators;
-using Piipan.Match.Shared;
-using Piipan.Participants.Api.Models;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests

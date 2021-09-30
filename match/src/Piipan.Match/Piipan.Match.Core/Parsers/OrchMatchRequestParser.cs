@@ -2,11 +2,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
 using Newtonsoft.Json;
 using FluentValidation;
 
-namespace Piipan.Match.Func.Api.Parsers
+namespace Piipan.Match.Core.Parsers
 {
     public class OrchMatchRequestParser : IStreamParser<OrchMatchRequest>
     {

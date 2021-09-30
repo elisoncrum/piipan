@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Piipan.Match.Func.Api.Extensions
+namespace Piipan.Match.Core.Extensions
 {
     public static class LinqExtensions
     {

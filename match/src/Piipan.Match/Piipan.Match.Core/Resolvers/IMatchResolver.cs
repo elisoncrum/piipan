@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
 
-namespace Piipan.Match.Func.Api.Resolvers
+namespace Piipan.Match.Core.Resolvers
 {
     public interface IMatchResolver
     {

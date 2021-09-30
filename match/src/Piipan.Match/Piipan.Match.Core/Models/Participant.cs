@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Piipan.Participants.Api.Models;
 using Piipan.Match.Shared;
 
-namespace Piipan.Match.Func.Api.Models
+namespace Piipan.Match.Core.Models
 {
     public class Participant : IParticipant
     {

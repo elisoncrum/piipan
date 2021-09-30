@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Piipan.Match.Func.Api.Models;
-using Piipan.Match.Func.Api.Parsers;
+using Piipan.Match.Core.Models;
+using Piipan.Match.Core.Parsers;
 using Moq;
 using Xunit;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Piipan.Match.Func.Api.Tests.Parsers
+namespace Piipan.Match.Core.Tests.Parsers
 {
     public class OrchMatchRequestParserTests
     {

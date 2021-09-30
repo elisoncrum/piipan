@@ -2169,10 +2169,13 @@
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.90",
+          "FluentValidation": "10.3.3",
           "Microsoft.Extensions.Logging": "3.1.19",
           "Nanoid": "2.1.0",
+          "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10",
           "Piipan.Match.Api": "1.0.0",
+          "Piipan.Match.Shared": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }

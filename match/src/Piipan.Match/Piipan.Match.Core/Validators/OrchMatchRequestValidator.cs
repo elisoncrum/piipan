@@ -1,7 +1,7 @@
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
 using FluentValidation;
 
-namespace Piipan.Match.Func.Api.Validators
+namespace Piipan.Match.Core.Validators
 {
     /// <summary>
     /// Validates the whole API match request from a client

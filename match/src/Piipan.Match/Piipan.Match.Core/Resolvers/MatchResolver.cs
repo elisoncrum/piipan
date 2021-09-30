@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
-using Piipan.Match.Func.Api.Extensions;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Extensions;
+using Piipan.Match.Core.Models;
 using Piipan.Participants.Api;
 
-namespace Piipan.Match.Func.Api.Resolvers
+namespace Piipan.Match.Core.Resolvers
 {
     public class MatchResolver : IMatchResolver
     {

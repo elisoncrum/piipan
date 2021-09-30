@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace Piipan.Match.Func.Api.Tests.Models
+namespace Piipan.Match.Core.Tests.Models
 {
     public class ParticipantTests
     {
