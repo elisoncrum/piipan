@@ -8,11 +8,17 @@ using FluentValidation;
 
 namespace Piipan.Match.Core.Parsers
 {
+    /// <summary>
+    /// Parser for deserializing OrchMatchRequest objects from a Stream
+    /// </summary>
     public class OrchMatchRequestParser : IStreamParser<OrchMatchRequest>
     {
         private readonly IValidator<OrchMatchRequest> _validator;
         private readonly ILogger<OrchMatchRequestParser> _logger;
         
+        /// <summary>
+        /// Initializes a new instance of OrchMatchRequestParser
+        /// </summary>
         public OrchMatchRequestParser(
             IValidator<OrchMatchRequest> validator,
             ILogger<OrchMatchRequestParser> logger)
@@ -20,7 +26,15 @@ namespace Piipan.Match.Core.Parsers
             _validator = validator;
             _logger = logger;
         }
-        
+
+        /// <summary>
+        /// Deserializes and validates an OrchMatchRequest from a Stream
+        /// </summary>
+        /// <remarks>
+        /// Throws ValidationException if FluentValidation fails; throws StreamParserException for all other failures
+        /// </remarks>
+        /// <param name="stream">A Stream from which a serialized OrchMatchRequest can be read</param>
+        /// <returns>A validated instance of OrchMatchRequest</returns>
         public async Task<OrchMatchRequest> Parse(Stream stream)
         {
             try
