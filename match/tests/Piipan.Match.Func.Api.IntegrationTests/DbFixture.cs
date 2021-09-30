@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Match.Core.Models;
 using Dapper;
 using Npgsql;
 

@@ -18,7 +18,7 @@ namespace Piipan.Match.Core.IntegrationTests
         {
             var factory = new Mock<IDbConnectionFactory>();
             factory
-                .Setup(m => m.Build())
+                .Setup(m => m.Build(It.IsAny<string>()))
                 .ReturnsAsync(() =>
                 {
                     var conn = Factory.CreateConnection();
