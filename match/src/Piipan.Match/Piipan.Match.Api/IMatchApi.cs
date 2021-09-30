@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Piipan.Match.Api.Models;
 
-namespace Piipan.Match.Core.Resolvers
+namespace Piipan.Match.Api
 {
-    public interface IMatchResolver
+    public interface IMatchApi
     {
         Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request);
     }

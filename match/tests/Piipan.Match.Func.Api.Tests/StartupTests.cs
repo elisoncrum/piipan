@@ -1,8 +1,8 @@
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
-using Piipan.Match.Core.Resolvers;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
 using FluentValidation;
@@ -30,7 +30,7 @@ namespace Piipan.Match.Func.Api.Tests
             var provider = services.BuildServiceProvider();
 
             // Assert
-            Assert.NotNull(provider.GetService<IMatchResolver>());
+            Assert.NotNull(provider.GetService<IMatchApi>());
             Assert.NotNull(provider.GetService<IValidator<OrchMatchRequest>>());
             Assert.NotNull(provider.GetService<IValidator<RequestPerson>>());
             Assert.NotNull(provider.GetService<IStreamParser<OrchMatchRequest>>());

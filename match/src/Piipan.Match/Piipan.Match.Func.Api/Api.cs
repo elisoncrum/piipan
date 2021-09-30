@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
-using Piipan.Match.Core.Resolvers;
 using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Func.Api.Models;
 using Dapper;
@@ -21,14 +21,14 @@ namespace Piipan.Match.Func.Api
     /// </summary>
     public class MatchApi
     {
-        private readonly IMatchResolver _matchResolver;
+        private readonly IMatchApi _matchApi;
         private readonly IStreamParser<OrchMatchRequest> _requestParser;
 
         public MatchApi(
-            IMatchResolver matchResolver,
+            IMatchApi matchApi,
             IStreamParser<OrchMatchRequest> requestParser)
         {
-            _matchResolver = matchResolver;
+            _matchApi = matchApi;
             _requestParser = requestParser;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
@@ -55,7 +55,7 @@ namespace Piipan.Match.Func.Api
                 LogRequest(logger, req);
                 
                 var request = await _requestParser.Parse(req.Body);
-                var response = await _matchResolver.ResolveMatches(request);
+                var response = await _matchApi.ResolveMatches(request);
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
@@ -71,24 +71,6 @@ namespace Piipan.Match.Func.Api
             {
                 return InternalServerErrorResponse(ex);
             }
-        }
-
-        /// <summary>
-        /// API endpoint for conducting a PII match across all participating states
-        /// </summary>
-        /// <param name="req">incoming HTTP request</param>
-        /// <param name="log">handle to the function log</param>
-        /// <remarks>
-        /// This function is expected to be executing as a resource with read
-        /// access to the individual per-state participant databases.
-        /// </remarks>
-        [FunctionName("find_matches_by_pii")]
-        public IActionResult FindPii(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            // xxx Implement parsing, validating, and hashing of PII
-            return (ActionResult)new NoContentResult();
         }
 
         private void LogRequest(ILogger logger, HttpRequest request)

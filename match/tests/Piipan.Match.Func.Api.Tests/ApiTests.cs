@@ -11,10 +11,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
-using Piipan.Match.Core.Resolvers;
 using Piipan.Match.Core.Validators;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Api.Models;
@@ -158,7 +158,7 @@ namespace Piipan.Match.Func.Api.Tests
 
         static MatchApi Construct()
         {
-            var matchResolver = new Mock<IMatchResolver>();
+            var matchResolver = new Mock<IMatchApi>();
             var requestParser = new OrchMatchRequestParser(
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
@@ -171,7 +171,7 @@ namespace Piipan.Match.Func.Api.Tests
 
         static MatchApi ConstructMocked(Mock<HttpMessageHandler> handler)
         {
-            var matchResolver = new Mock<IMatchResolver>();
+            var matchResolver = new Mock<IMatchApi>();
             var requestParser = new OrchMatchRequestParser(
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
@@ -190,7 +190,7 @@ namespace Piipan.Match.Func.Api.Tests
         public async void ParserExceptionResultsInBadRequest()
         {
             // Arrange
-            var matchResolver = Mock.Of<IMatchResolver>();
+            var matchResolver = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest("");
@@ -219,7 +219,7 @@ namespace Piipan.Match.Func.Api.Tests
         public async void ValidationExceptionResultsInBadRequest()
         {
             // Arrange
-            var matchResolver = Mock.Of<IMatchResolver>();
+            var matchResolver = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
             var mockRequest = MockRequest("");
@@ -336,7 +336,7 @@ namespace Piipan.Match.Func.Api.Tests
                 }
             };
 
-            var matchResolver = new Mock<IMatchResolver>();
+            var matchResolver = new Mock<IMatchApi>();
             matchResolver
                 .Setup(m => m.ResolveMatches(It.IsAny<OrchMatchRequest>()))
                 .ReturnsAsync(response);
@@ -357,21 +357,6 @@ namespace Piipan.Match.Func.Api.Tests
             var matchResponse = apiResponse.Value as OrchMatchResponse;
             Assert.NotNull(matchResponse);
             Assert.Equal(response, matchResponse);
-        }
-
-        [Fact]
-        public void FindPiiReturnsNoContent()
-        {
-            // Arrange
-            var api = Construct();
-            var mockRequest = MockRequest("foobar");
-            var logger = new Mock<ILogger>();
-
-            // Act
-            var response = api.FindPii(mockRequest.Object, logger.Object) as NoContentResult;
-
-            // Assert
-            Assert.NotNull(response);
         }
     }
 }

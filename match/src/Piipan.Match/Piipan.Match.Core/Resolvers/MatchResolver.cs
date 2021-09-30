@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
 using Piipan.Participants.Api;
@@ -7,7 +8,7 @@ using FluentValidation;
 
 namespace Piipan.Match.Core.Resolvers
 {
-    public class MatchResolver : IMatchResolver
+    public class MatchResolver : IMatchApi
     {
         private readonly IParticipantApi _participantApi;
         private readonly IValidator<RequestPerson> _requestPersonValidator;

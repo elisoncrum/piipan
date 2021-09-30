@@ -2,6 +2,7 @@ using System.Data.Common;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
+using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
@@ -28,7 +29,7 @@ namespace Piipan.Match.Func.Api
 
             builder.Services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
-            builder.Services.AddTransient<IMatchResolver, MatchResolver>();
+            builder.Services.AddTransient<IMatchApi, MatchResolver>();
 
             builder.Services.AddSingleton<ITokenProvider>((s) =>
             {

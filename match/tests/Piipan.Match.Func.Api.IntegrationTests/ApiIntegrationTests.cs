@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
@@ -99,12 +100,12 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             });
             services.RegisterParticipantsServices();
 
-            services.AddTransient<IMatchResolver, MatchResolver>();
+            services.AddTransient<IMatchApi, MatchResolver>();
 
             var provider = services.BuildServiceProvider();  
 
             var api = new MatchApi(
-                provider.GetService<IMatchResolver>(),
+                provider.GetService<IMatchApi>(),
                 provider.GetService<IStreamParser<OrchMatchRequest>>()
             );
 
