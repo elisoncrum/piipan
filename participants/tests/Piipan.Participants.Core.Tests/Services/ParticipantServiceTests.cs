@@ -7,6 +7,7 @@ using Piipan.Participants.Core.Services;
 using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Piipan.Participants.Core.Tests.Services
 {
@@ -117,6 +118,37 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao.Verify(m => m.GetParticipants(randomState, randomLdsHash, uploadId), Times.Once);
         }
 
+        [Fact]
+        public async Task GetParticipants_ReturnsEmptyWhenNoUploads()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<ParticipantService>>();
+            var participantDao = new Mock<IParticipantDao>();
+            participantDao
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Int64>()))
+                .ReturnsAsync(new List<ParticipantDbo>());
+            
+            var uploadId = (new Random()).Next();
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
+                .ThrowsAsync(new InvalidOperationException());
+
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
+
+            // Act
+            var participants = await service.GetParticipants("ea", "hash");
+
+            // Assert
+            Assert.Empty(participants);
+        }
+
         [Theory]
         [InlineData(0)]
         [InlineData(1)]
@@ -162,6 +194,37 @@ namespace Piipan.Participants.Core.Tests.Services
                         participants.All(p => p.UploadId == uploadId)
                     ))
                 );
+
+        }
+
+                [Fact]
+        public async void GetStates_ReturnsDaoResult()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<ParticipantService>>();
+            var participantDao = Mock.Of<IParticipantDao>();
+            var uploadDao = Mock.Of<IUploadDao>();
+            
+            var stateService = new Mock<IStateService>();
+            stateService
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string>{ "ea", "eb", "ec" });
+
+            var service = new ParticipantService(
+                participantDao, 
+                uploadDao, 
+                stateService.Object,
+                logger);
+
+            // Act
+            var result = await service.GetStates();
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Collection(result,
+                s => Assert.Equal("ea", s),
+                s => Assert.Equal("eb", s),
+                s => Assert.Equal("ec", s));
 
         }
     }
