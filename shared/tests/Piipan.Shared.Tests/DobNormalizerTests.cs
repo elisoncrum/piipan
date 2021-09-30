@@ -7,46 +7,46 @@ namespace Piipan.Shared.Tests
 {
     public class DobNormalizerTests
     {
+        private DobNormalizer _dobNormalizer;
 
-        public class RunTests
+        public DobNormalizerTests()
         {
-            private DobNormalizer _dobNormalizer;
+            _dobNormalizer = new DobNormalizer();
+        }
 
-            public RunTests()
-            {
-                _dobNormalizer = new DobNormalizer();
-            }
+        [Theory]
+        [InlineData("98-08-14")] // year is not fully specified
+        [InlineData("5/15/2002")] // wrong value order, wrong separator character, value is not zero-padded
+        [InlineData("2000-11-2")] // day is not zero-padded
+        public void Run_ThrowsOnNonISO8601Dates(string date)
+        {
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
+            Assert.Equal("dates must be in ISO 8601 format using a 4-digit year, a zero-padded month, and zero-padded day. Date must exist on Gregorian calendar.", exception.Message);
+        }
 
-            [Theory]
-            [InlineData("98-08-14")] // year is not fully specified
-            [InlineData("5/15/2002")] // wrong value order, wrong separator character, value is not zero-padded
-            [InlineData("2000-11-2")] // day is not zero-padded
-            public void throwsExOnNonISO8601Dates(string date)
-            {
-                Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
-            }
+        [Theory]
+        [InlineData("2001-02-29")] // invalid date, 2001 is not a leap year
+        [InlineData("1991-09-31")] // sept has 30 days
+        public void Run_ThrowsOnNonGregorianDates(string date)
+        {
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
+            Assert.Equal("dates must be in ISO 8601 format using a 4-digit year, a zero-padded month, and zero-padded day. Date must exist on Gregorian calendar.", exception.Message);
+        }
 
-            [Theory (Skip = "not yet implemented")]
-            [InlineData("2001-02-29")] // date does not exist on Gregorian calendar, 2001 is not a leap year
-            public void ThrowsExOnNonGregorianDates(string date)
-            {
-                Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
-            }
+        [Fact]
+        public void Run_ThrowsOnDatesTooOld()
+        {
+            string date = DateTime.Now.AddYears(-131).ToString("yyyy-MM-dd");
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
+            Assert.Equal($"date should be later than {DobNormalizer.MaxYearsAgo} years ago", exception.Message);
+        }
 
-            [Fact (Skip = "not yet implemented")]
-            public void ThrowsExOnDatesTooOld()
-            {
-                string date = DateTime.Now.AddYears(-131).ToString("yyyy-MM-dd");
-                Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
-            }
-
-            [Theory]
-            [InlineData("2000-11-02")]
-            public void allowsISO8601Dates(string date)
-            {
-                var result = _dobNormalizer.Run(date);
-                Assert.Equal(date, result);
-            }
+        [Theory]
+        [InlineData("2000-11-02")]
+        public void Run_AllowsValidDates(string date)
+        {
+            var result = _dobNormalizer.Run(date);
+            Assert.Equal(date, result);
         }
     }
 }

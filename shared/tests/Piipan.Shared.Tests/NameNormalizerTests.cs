@@ -7,106 +7,97 @@ namespace Piipan.Shared.Tests
 {
     public class NameNormalizerTests
     {
-        public class RunTests
+        private readonly NameNormalizer _nameNormalizer;
+
+        public NameNormalizerTests()
         {
-            private readonly NameNormalizer _nameNormalizer;
-
-            public RunTests()
-            {
-                _nameNormalizer = new NameNormalizer();
-            }
-
-            // This is a temporary exception which will be replaced by
-            // a more thorough check of ascii characters in range
-            // as described in /docs/pprl.md#last-name
-            [Fact]
-            public void throwsExceptionOnNonAscii()
-            {
-                Assert.Throws<ArgumentException>(() => _nameNormalizer.Run("garcía"));
-                Assert.Throws<ArgumentException>(() => _nameNormalizer.Run("ståle"));
-            }
-
-            [Theory]
-            [InlineData("Hopper")]
-            [InlineData("FOO")]
-            public void convertsToLowercase(string name)
-            {
-                string result = _nameNormalizer.Run(name);
-                Assert.Matches(@"^[a-z|\s]+$", result);
-            }
-
-            [Theory (Skip = "not yet implemented")]
-            [InlineData("maxwell junior")]
-            [InlineData("two names junior")]
-            [InlineData("maxwell jnr")]
-            [InlineData("maxwell jr")]
-            [InlineData("maxwell jr.")]
-            [InlineData("maxwell iii")]
-            [InlineData("maxwell iv")]
-            [InlineData("maxwell v")]
-            [InlineData("maxwell vi")]
-            [InlineData("maxwell vii")]
-            [InlineData("maxwell viii")]
-            [InlineData("maxwell ix")]
-            [InlineData("maxwell x")]
-            [InlineData("maxwell xi")]
-            [InlineData("maxwell xii")]
-            [InlineData("maxwell xiii")]
-            public void removesSuffixes(string name)
-            {
-                string result = _nameNormalizer.Run(name);
-                Regex romanRgx = new Regex(@"(\s(?:ix|iv|v?i{0,3})$)"); // roman numerals i - ix
-                Assert.DoesNotMatch(romanRgx, result);
-
-                Regex jrRgx = new Regex(@"(\s(?:junior|jr.*|jnr)$)"); // variations of junior
-                Assert.DoesNotMatch(jrRgx, result);
-            }
-
-            [Theory]
-            [InlineData("barrable-tishauer")]
-            [InlineData("barrable-tishauer-khan")]
-            public void replacesHyphensWithSpace(string name)
-            {
-                string result = _nameNormalizer.Run(name);
-                Regex rgx = new Regex(@"[-]");
-                Assert.DoesNotMatch(rgx, result);
-            }
-
-            [Fact]
-            public void replacesMultipleSpacesWithSingleSpace()
-            {
-                string result = _nameNormalizer.Run("quincy  chavez");
-                Assert.Equal("quincy chavez", result);
-
-                string lotsOfSpaces = _nameNormalizer.Run("quincy     chavez");
-                Assert.Equal("quincy chavez", lotsOfSpaces);
-            }
-
-            [Fact]
-            public void trimsWhitespace()
-            {
-                string result = _nameNormalizer.Run("  quincy chavez  ");
-                Assert.Equal("quincy chavez", result);
-            }
-
-            // Remove any character that is not an ASCII space (0x20) or in the range [a-z] (0x61-0x70)
-            [Theory (Skip = "not yet implemented")]
-            [InlineData("foo.")]
-            [InlineData("f'bar")]
-            [InlineData("foobễr")]
-            [InlineData("foo bar")] // non-ascii non-breaking space (on OSX: option + spacebar)
-            public void removeAsciiNotInRange(string name)
-            {
-                string result = _nameNormalizer.Run(name);
-                Regex rgx = new Regex(@"[^a-z|\x20]");
-                Assert.DoesNotMatch(rgx, result);
-            }
-
-            [Fact]
-            public void validatesAtleastOneAsciiChar()
-            {
-                Assert.Throws<ArgumentException>(() => _nameNormalizer.Run(""));
-            }
+            _nameNormalizer = new NameNormalizer();
         }
+
+        [Theory]
+        [InlineData("garcía")]
+        [InlineData("ståle")]
+        [InlineData("foo bar")] // non-ascii non-breaking space (on OSX: option + spacebar)
+        public void throwsExceptionOnNonAscii(string source)
+        {
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => _nameNormalizer.Run(source));
+            Assert.Equal("name must contain only ascii characters", exception.Message);
+        }
+
+        [Theory]
+        [InlineData("Foo", "foo")]
+        [InlineData("FOO", "foo")]
+        [InlineData("fOo", "foo")]
+        public void Run_ConvertsToLowercase(string source, string expected)
+        {
+            Assert.Equal(expected, _nameNormalizer.Run(source));
+        }
+
+        [Theory]
+        [InlineData("maxwell junior", "maxwell")]
+        [InlineData("two names junior", "two names")]
+        [InlineData("maxwell jnr", "maxwell")]
+        [InlineData("maxwell jr", "maxwell")]
+        [InlineData("maxwell jr.", "maxwell")]
+        [InlineData("maxwell senior", "maxwell")]
+        [InlineData("two names senior", "two names")]
+        [InlineData("maxwell snr", "maxwell")]
+        [InlineData("maxwell sr.", "maxwell")]
+        [InlineData("maxwell iii", "maxwell")]
+        [InlineData("maxwell iv", "maxwell")]
+        [InlineData("maxwell v", "maxwell")]
+        [InlineData("maxwell vi", "maxwell")]
+        [InlineData("maxwell vii", "maxwell")]
+        [InlineData("maxwell viii", "maxwell")]
+        [InlineData("maxwell ix", "maxwell")]
+        public void Run_RemovesSuffixes(string source, string expected)
+        {
+            Assert.Equal(expected, _nameNormalizer.Run(source));
+        }
+
+        [Theory]
+        [InlineData("barrable-tishauer", "barrable tishauer")]
+        [InlineData("barrable-tishauer-khan", "barrable tishauer khan")]
+        public void Run_ReplacesHyphensWithSpace(string source, string expected)
+        {
+            Assert.Equal(expected, _nameNormalizer.Run(source));
+        }
+
+        [Theory]
+        [InlineData("foo  bar", "foo bar")]
+        [InlineData("foo      bar", "foo bar")]
+        [InlineData("foo   bar   baz", "foo bar baz")]
+        public void Run_ReplacesMultipleSpacesWithSingleSpace(string source, string expected)
+        {
+            Assert.Equal(expected, _nameNormalizer.Run(source));
+        }
+
+        [Theory]
+        [InlineData("   foo bar   ", "foo bar")]
+        public void Run_TrimsWhitespace(string source, string expected)
+        {
+            Assert.Equal(expected, _nameNormalizer.Run(source));
+        }
+
+        // Throw exception for any character that is not an
+        // ASCII space (0x20) or not in range [a-z] (0x61-0x7a)
+        [Theory ]
+        [InlineData("foobar.", "foobar")]
+        [InlineData("foobar,", "foobar")]
+        [InlineData("foo'bar", "foobar")]
+        public void Run_RemovesAsciiNotInRange(string source, string expected)
+        {
+            string result = _nameNormalizer.Run(source);
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("")]
+        public void Run_ValidatesAtleastOneAsciiChar(string source)
+        {
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => _nameNormalizer.Run(source));
+            Assert.Equal("normalized name must be at least 1 character long", exception.Message);
+        }
+
     }
 }

@@ -11,10 +11,10 @@ namespace Piipan.Shared.Deidentification
         /// <summary>
         /// Public entrypoint for functionality
         /// </summary>
-        /// <param name="lname">last name of individual</param>
+        /// <param name="lname">last name of individual, expects only ASCII characters</param>
         public string Run(string lname)
         {
-            // loud failure of any non-ascii characters
+            // Loud failure for non-ascii chars
             Regex nonasciirgx = new Regex(@"[^\x00-\x7F]");
             if (nonasciirgx.IsMatch(lname))
             {
@@ -22,15 +22,17 @@ namespace Piipan.Shared.Deidentification
             }
             // Convert to lower case
             string result = lname.ToLower();
-            // TODO: Remove any suffixes(e.g.; junior, jnr, jr, jr., iii, etc.)
             // Replace hyphens with a space
             result = result.Replace("-", " ");
-            // TODO: Remove any character that is not an ASCII space(0x20) or in the range[a - z] (0x61 - 0x70)
             // Replace multiple spaces with one space
             result = Regex.Replace(result, @"\s{2,}", " ");
             // Trim any spaces at the start and end of the last name
             char[] charsToTrim = { ' ' };
             result = result.Trim(charsToTrim);
+            // Remove suffixes: roman numerals i-ix, variations of junior/senior
+            result = Regex.Replace(result, @"(\s(?:ix|iv|v?i{0,3}|junior|jr\.|jr|jnr|senior|sr\.|sr|snr)$)", "");
+            // Remove any character not an ASCII space(0x20) or not in range[a - z]
+            result = Regex.Replace(result, @"[^a-z|\s]", "");
             // Validate that the resulting value is at least one ASCII character in length
             if (result.Length < 1) // not at least one char
             {
