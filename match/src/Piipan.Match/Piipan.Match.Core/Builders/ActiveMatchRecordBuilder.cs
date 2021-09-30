@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Participants.Api.Models;
@@ -38,7 +37,7 @@ namespace Piipan.Match.Core.Builders
         /// <param name="input">The RequestPerson object received as input to the active match API request.</param>
         /// <param name="match">The ParticipantRecord object received as output from active match API response.</param>
         /// <returns>`this` to allow for method chanining.</returns>
-        public IActiveMatchRecordBuilder SetMatch(IRequestPerson input, IParticipant match)
+        public IActiveMatchRecordBuilder SetMatch(RequestPerson input, IParticipant match)
         {
             this._record.Input = JsonSerializer.Serialize(input);
             this._record.Data = JsonSerializer.Serialize(match);

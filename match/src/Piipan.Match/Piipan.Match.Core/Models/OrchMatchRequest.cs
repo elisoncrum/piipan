@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Serializers;
+using Newtonsoft.Json;
 
 namespace Piipan.Match.Core.Models
 {
@@ -18,7 +17,7 @@ namespace Piipan.Match.Core.Models
     /// <summary>
     /// Represents each person in an API request using de-identified data
     /// </summary>
-    public class RequestPerson : IRequestPerson
+    public class RequestPerson
     {
         [JsonProperty("lds_hash",
             Required = Required.Always,
