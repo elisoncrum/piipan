@@ -15,7 +15,7 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
 using Piipan.Match.Core.Validators;
-using Piipan.Match.Shared;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Api.Models;
 using Moq;
 using Moq.Protected;

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Piipan.Shared.Helpers;
 
-namespace Piipan.Match.Shared
+namespace Piipan.Match.Core.Serializers
 {
     public class JsonConverters
     {

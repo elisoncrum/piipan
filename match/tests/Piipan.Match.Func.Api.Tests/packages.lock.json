@@ -2306,7 +2306,6 @@
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10",
           "Piipan.Match.Api": "1.0.0",
-          "Piipan.Match.Shared": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
@@ -2325,16 +2324,8 @@
           "Npgsql": "5.0.10",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Match.Core": "1.0.0",
-          "Piipan.Match.Shared": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Participants.Core": "1.0.0",
-          "Piipan.Shared": "1.0.0"
-        }
-      },
-      "piipan.match.shared": {
-        "type": "Project",
-        "dependencies": {
-          "Newtonsoft.Json.Schema": "3.0.14",
           "Piipan.Shared": "1.0.0"
         }
       },

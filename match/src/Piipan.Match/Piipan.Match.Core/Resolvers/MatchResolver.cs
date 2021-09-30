@@ -1,9 +1,9 @@
 using System.Linq;
 using System.Threading.Tasks;
-using FluentValidation;
 using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Models;
 using Piipan.Participants.Api;
+using FluentValidation;
 
 namespace Piipan.Match.Core.Resolvers
 {

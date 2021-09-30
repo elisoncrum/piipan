@@ -1,8 +1,6 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Dapper;
-using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -12,7 +10,9 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
 using Piipan.Match.Func.Api.DataTypeHandlers;
-using Piipan.Match.Shared;
+using Piipan.Match.Func.Api.Models;
+using Dapper;
+using FluentValidation;
 
 namespace Piipan.Match.Func.Api
 {

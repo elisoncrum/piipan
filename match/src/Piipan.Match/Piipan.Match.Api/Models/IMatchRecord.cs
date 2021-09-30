@@ -1,6 +1,6 @@
 using System;
 
-namespace Piipan.Match.Api
+namespace Piipan.Match.Api.Models
 {
     public interface IMatchRecord
     {

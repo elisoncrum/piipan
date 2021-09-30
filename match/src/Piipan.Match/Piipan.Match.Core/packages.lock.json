@@ -1492,13 +1492,6 @@
       "piipan.match.api": {
         "type": "Project"
       },
-      "piipan.match.shared": {
-        "type": "Project",
-        "dependencies": {
-          "Newtonsoft.Json.Schema": "3.0.14",
-          "Piipan.Shared": "1.0.0"
-        }
-      },
       "piipan.participants.api": {
         "type": "Project"
       },

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using Piipan.Match.Core.Serializers;
 using Piipan.Participants.Api.Models;
-using Piipan.Match.Shared;
+using Newtonsoft.Json;
 
 namespace Piipan.Match.Core.Models
 {
