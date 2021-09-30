@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
 using Piipan.Match.Func.Api.DataTypeHandlers;

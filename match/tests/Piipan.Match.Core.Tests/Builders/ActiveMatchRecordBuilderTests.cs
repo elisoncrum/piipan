@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.Models;
 using Xunit;

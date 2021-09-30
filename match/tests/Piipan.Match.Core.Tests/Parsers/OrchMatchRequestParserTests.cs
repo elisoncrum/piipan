@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Moq;
 using Xunit;

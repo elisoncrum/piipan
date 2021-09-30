@@ -1,4 +1,4 @@
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Validators;
 using FluentValidation.TestHelper;
 using Xunit;

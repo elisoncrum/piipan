@@ -2,7 +2,7 @@ using System.Data.Common;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
 using Piipan.Match.Core.Validators;

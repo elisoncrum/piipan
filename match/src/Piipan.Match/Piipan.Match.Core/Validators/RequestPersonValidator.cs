@@ -1,4 +1,4 @@
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using FluentValidation;
 
 namespace Piipan.Match.Core.Validators

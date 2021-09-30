@@ -1,6 +1,6 @@
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
 using Piipan.Shared;

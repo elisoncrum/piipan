@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Moq;
-using Newtonsoft.Json;
-using Npgsql;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Resolvers;
@@ -20,8 +18,11 @@ using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
-using Xunit;
 using FluentValidation;
+using Moq;
+using Newtonsoft.Json;
+using Npgsql;
+using Xunit;
 
 
 namespace Piipan.Match.Func.Api.IntegrationTests

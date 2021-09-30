@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Piipan.Participants.Api.Models;
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Core.Models
+namespace Piipan.Match.Api.Models
 {
 
     /// <summary>

@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 
 namespace Piipan.Match.Core.Resolvers
 {

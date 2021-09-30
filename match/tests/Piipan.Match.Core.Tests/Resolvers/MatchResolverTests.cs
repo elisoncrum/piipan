@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation;
-using FluentValidation.Results;
-using Moq;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Resolvers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
+using FluentValidation;
+using FluentValidation.Results;
+using Moq;
 using Xunit;
 
-namespace Piipan.Match.Core.Resolvers.Tests
+namespace Piipan.Match.Core.Tests.Resolvers
 {
     public class MatchResolverTests
     {
