@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS matches(
     id serial PRIMARY KEY,
     match_id text UNIQUE NOT NULL,
     created_at timestamp NOT NULL,
-    initator text NOT NULL,
+    initiator text NOT NULL,
     states text[2] NOT NULL,
     hash text NOT NULL,
     hash_type hash_type NOT NULL default 'ldshash',
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS matches(
 COMMENT ON TABLE matches IS 'Match records';
 COMMENT ON COLUMN matches.match_id IS 'Match record''s human-readable unique identifier.';
 COMMENT ON COLUMN matches.created_at IS 'Match record''s creation date/time.';
-COMMENT ON COLUMN matches.initator IS 'Match record''s initiating entity.';
+COMMENT ON COLUMN matches.initiator IS 'Match record''s initiating entity.';
 COMMENT ON COLUMN matches.states IS 'State/territory pair involved in match.';
 COMMENT ON COLUMN matches.hash IS 'Value of hash used to identify match.';
 COMMENT ON COLUMN matches.hash_type IS 'Type of hash used to identify match.';

@@ -2299,7 +2299,13 @@
       "piipan.match.core": {
         "type": "Project",
         "dependencies": {
-          "Piipan.Match.Api": "1.0.0"
+          "Dapper": "2.0.90",
+          "Microsoft.Extensions.Logging": "3.1.19",
+          "Nanoid": "2.1.0",
+          "Npgsql": "5.0.10",
+          "Piipan.Match.Api": "1.0.0",
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.match.func.api": {
