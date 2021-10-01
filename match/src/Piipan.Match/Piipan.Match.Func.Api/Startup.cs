@@ -9,11 +9,11 @@ using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared;
-using Piipan.Shared.Authentication;
 using FluentValidation;
 using Npgsql;
 
 [assembly: FunctionsStartup(typeof(Piipan.Match.Func.Api.Startup))]
+
 namespace Piipan.Match.Func.Api
 {
     public class Startup : FunctionsStartup
@@ -30,15 +30,6 @@ namespace Piipan.Match.Func.Api
             builder.Services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
             builder.Services.AddTransient<IMatchApi, MatchService>();
-
-            builder.Services.AddSingleton<ITokenProvider>((s) =>
-            {
-                if (configuration?["DEVELOPMENT"] == "true")
-                {
-                    return new CliTokenProvider();
-                }
-                return new EasyAuthTokenProvider();
-            });
 
             builder.Services.AddSingleton<DbProviderFactory>(NpgsqlFactory.Instance);
             builder.Services.AddTransient<IDbConnectionFactory>(s =>

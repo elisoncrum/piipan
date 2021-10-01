@@ -34,7 +34,6 @@ namespace Piipan.Match.Func.Api.Tests
             Assert.NotNull(provider.GetService<IValidator<OrchMatchRequest>>());
             Assert.NotNull(provider.GetService<IValidator<RequestPerson>>());
             Assert.NotNull(provider.GetService<IStreamParser<OrchMatchRequest>>());
-            Assert.NotNull(provider.GetService<ITokenProvider>());
             Assert.NotNull(provider.GetService<IDbConnectionFactory>());
         }
     }
