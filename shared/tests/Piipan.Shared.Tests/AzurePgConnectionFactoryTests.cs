@@ -12,8 +12,11 @@ using Moq;
 
 namespace Piipan.Shared.Tests
 {
+    [Collection("Piipan.Shared.ConnectionFactories")]
     public class AzurePgConnectionFactoryTests
     {
+        private string _connectionString;
+
         private void SetDatabaseConnectionString()
         {
             Environment.SetEnvironmentVariable(
@@ -22,18 +25,35 @@ namespace Piipan.Shared.Tests
             );
         }
 
-        private Mock<AzureServiceTokenProvider> MockTokenProvider()
+        private void ClearEnvironmentVariables()
         {
-            return new Mock<AzureServiceTokenProvider>(() =>
+            Environment.SetEnvironmentVariable(
+                BasicPgConnectionFactory.DatabaseConnectionString,
+                null
+            );
+
+            Environment.SetEnvironmentVariable(AzurePgConnectionFactory.CloudName, null);
+        }
+
+        private Mock<AzureServiceTokenProvider> MockTokenProvider(string token = "token")
+        {
+            var mockProvider = new Mock<AzureServiceTokenProvider>(() =>
                 new AzureServiceTokenProvider(null, "https://tts.test")
             );
+
+            mockProvider
+                .Setup(m => m.GetAccessTokenAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(token);
+
+            return mockProvider;
         }
 
         private Mock<DbProviderFactory> MockDbProviderFactory()
         {
             var connection = new Mock<DbConnection>();
             connection
-                .SetupSet(m => m.ConnectionString = It.IsAny<string>());
+                .SetupSet(m => m.ConnectionString = It.IsAny<string>())
+                .Callback<string>(v => _connectionString = v);
 
             var factory = new Mock<DbProviderFactory>();
             factory
@@ -53,6 +73,9 @@ namespace Piipan.Shared.Tests
 
             // Act / Assert
             await Assert.ThrowsAsync<ArgumentException>(() => factory.Build());
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -66,6 +89,9 @@ namespace Piipan.Shared.Tests
 
             // Act / Assert
             await Assert.ThrowsAsync<ArgumentException>(() => factory.Build());
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -83,6 +109,9 @@ namespace Piipan.Shared.Tests
             // Assert
             tokenProvider.Verify(m => 
                 m.GetAccessTokenAsync(AzurePgConnectionFactory.CommercialId, null, default(CancellationToken)), Times.Once);
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
 
         [Fact]
@@ -106,7 +135,48 @@ namespace Piipan.Shared.Tests
                 m.GetAccessTokenAsync(AzurePgConnectionFactory.GovermentId, null, default(CancellationToken)), Times.Once);
 
             // Tear down
-            Environment.SetEnvironmentVariable(AzurePgConnectionFactory.CloudName, null);
+            ClearEnvironmentVariables();
+        }
+
+        [Fact]
+        public async Task Build_UsesTokenAsPassword()
+        {
+            // Arrange
+            var expectedPassword = Guid.NewGuid().ToString();
+            var tokenProvider = MockTokenProvider(expectedPassword);
+            var npgsqlFactory = MockDbProviderFactory().Object;
+            var factory = new AzurePgConnectionFactory(tokenProvider.Object, npgsqlFactory);
+            var databaseName = Guid.NewGuid().ToString();
+            SetDatabaseConnectionString();
+            
+            // Act
+            var connection = await factory.Build(databaseName);
+
+            // Assert
+            Assert.Contains($"Password={expectedPassword}", _connectionString);
+
+            // Tear down
+            ClearEnvironmentVariables();
+        }
+
+        [Fact]
+        public async Task Build_UsesDatabaseOverride()
+        {
+            // Arrange
+            var tokenProvider = MockTokenProvider();
+            var npgsqlFactory = MockDbProviderFactory().Object;
+            var factory = new AzurePgConnectionFactory(tokenProvider.Object, npgsqlFactory);
+            var databaseName = Guid.NewGuid().ToString();
+            SetDatabaseConnectionString();
+            
+            // Act
+            var connection = await factory.Build(databaseName);
+
+            // Assert
+            Assert.Contains($"Database={databaseName}", _connectionString);
+
+            // Tear down
+            ClearEnvironmentVariables();
         }
     }
 }

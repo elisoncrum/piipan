@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
 {
-    public class MatchServiceTests
+    public class MatchRecordServiceTests
     {
         [Fact]
         public async Task AddRecord_FailsAfterRetryLimit()

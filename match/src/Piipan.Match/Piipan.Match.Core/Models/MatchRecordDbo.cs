@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Piipan.Match.Api;
+using Piipan.Match.Api.Models;
 
 namespace Piipan.Match.Core.Models
 {

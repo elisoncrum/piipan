@@ -15,7 +15,6 @@ namespace Piipan.Shared
         public const string CloudName = "CloudName";
         public const string DatabaseConnectionString = "DatabaseConnectionString";
         public const string PasswordPlaceholder = "{password}";
-        public const string DatabasePlaceholder = "{database}";
         public const string GovernmentCloud = "AzureUSGovernment";
 
         // Resource ids for open source software databases in the public and
@@ -35,8 +34,13 @@ namespace Piipan.Shared
             _dbProviderFactory = dbProviderFactory;
         }
 
-        public async Task<IDbConnection> Build()
+        public async Task<IDbConnection> Build(string database = null)
         {
+            if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable(DatabaseConnectionString)))
+            {
+                throw new ArgumentException($"{DatabaseConnectionString} env variable must be set!");
+            }
+
             var resourceId = CommercialId;
             var cn = Environment.GetEnvironmentVariable(CloudName);
             if (cn == GovernmentCloud) {
@@ -50,6 +54,11 @@ namespace Piipan.Shared
             {
                 var token = await _tokenProvider.GetAccessTokenAsync(resourceId);
                 builder.Password = token;
+            }
+
+            if (!String.IsNullOrEmpty(database))
+            {
+                builder.Database = database;
             }
             
             var connection = _dbProviderFactory.CreateConnection();

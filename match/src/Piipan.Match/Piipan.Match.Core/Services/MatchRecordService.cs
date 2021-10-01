@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;

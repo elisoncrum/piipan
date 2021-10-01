@@ -11,8 +11,6 @@ servers:
 paths:
   /find_matches:
     $ref: './find.yaml'
-  /find_matches_by_pii:
-    $ref: './find-pii.yaml'
 security:
   - BearerAuth: []
 components:

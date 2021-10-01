@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Piipan.Participants.Core.Models;
-using Dapper;
 using Microsoft.Extensions.Logging;
+using Piipan.Participants.Core.Models;
 using Piipan.Shared;
+using Dapper;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -21,9 +21,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _logger = logger;
         }
 
-        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId)
+        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId)
         {
-            var connection = await _dbConnectionFactory.Build();
+            var connection = await _dbConnectionFactory.Build(state);
             return await connection
                 .QueryAsync<ParticipantDbo>(@"
                     SELECT 

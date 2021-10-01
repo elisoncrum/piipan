@@ -18,6 +18,31 @@
           "Microsoft.TestPlatform.TestHost": "16.11.0"
         }
       },
+      "Moq": {
+        "type": "Direct",
+        "requested": "[4.16.1, )",
+        "resolved": "4.16.1",
+        "contentHash": "bw3R9q8cVNhWXNpnvWb0OGP4HadS4zvClq+T1zf7AF+tLY1haZ2AvbHidQekf4PDv1T40c6brZeT/V0IBq7cEQ==",
+        "dependencies": {
+          "Castle.Core": "4.4.0",
+          "System.Threading.Tasks.Extensions": "4.5.4"
+        }
+      },
+      "Newtonsoft.Json": {
+        "type": "Direct",
+        "requested": "[13.0.1, )",
+        "resolved": "13.0.1",
+        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
+      },
+      "Npgsql": {
+        "type": "Direct",
+        "requested": "[5.0.10, )",
+        "resolved": "5.0.10",
+        "contentHash": "3TB9le3lfu5Hc+LSHqMCVLcA+qUPg1enyM4+u0pMUBmNNGwc0sVPrnfnys2TVZIdkF8Aww/AZlnJHDsnEGqD0g==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
+        }
+      },
       "xunit": {
         "type": "Direct",
         "requested": "[2.4.1, )",
@@ -63,6 +88,23 @@
           "System.Security.Cryptography.ProtectedData": "4.5.0",
           "System.Text.Json": "4.6.0",
           "System.Threading.Tasks.Extensions": "4.5.2"
+        }
+      },
+      "Castle.Core": {
+        "type": "Transitive",
+        "resolved": "4.4.0",
+        "contentHash": "b5rRL5zeaau1y/5hIbI+6mGw3cwun16YjkHZnV9RRT5UyUIFsgLmNXJ0YnIN9p8Hw7K7AbG1q1UclQVU3DinAQ==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "System.Collections.Specialized": "4.3.0",
+          "System.ComponentModel": "4.3.0",
+          "System.ComponentModel.TypeConverter": "4.3.0",
+          "System.Diagnostics.TraceSource": "4.3.0",
+          "System.Dynamic.Runtime": "4.3.0",
+          "System.Reflection": "4.3.0",
+          "System.Reflection.Emit": "4.3.0",
+          "System.Reflection.TypeExtensions": "4.3.0",
+          "System.Xml.XmlDocument": "4.3.0"
         }
       },
       "Dapper": {
@@ -822,11 +864,6 @@
           "System.Xml.XDocument": "4.3.0"
         }
       },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "12.0.3",
-        "contentHash": "6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg=="
-      },
       "Newtonsoft.Json.Bson": {
         "type": "Transitive",
         "resolved": "1.0.1",
@@ -842,14 +879,6 @@
         "contentHash": "Qnu41yEFuMEJMuD1kJgslc4cF981K+hA7SmgXQ/N6pk6Zknvxt4g5Hx7KRykycP3oKyoz3aTFRV/TX+Vp6v7uQ==",
         "dependencies": {
           "Newtonsoft.Json": "12.0.3"
-        }
-      },
-      "Npgsql": {
-        "type": "Transitive",
-        "resolved": "5.0.10",
-        "contentHash": "3TB9le3lfu5Hc+LSHqMCVLcA+qUPg1enyM4+u0pMUBmNNGwc0sVPrnfnys2TVZIdkF8Aww/AZlnJHDsnEGqD0g==",
-        "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
       },
       "NuGet.Frameworks": {
@@ -2098,8 +2127,8 @@
       },
       "System.Threading.Tasks.Extensions": {
         "type": "Transitive",
-        "resolved": "4.5.2",
-        "contentHash": "BG/TNxDFv0svAzx8OiMXDlsHfGw623BZ8tCXw4YLhDFDvDhNUEV58jKYMGRnkbJNm7c3JNNJDiN7JBMzxRBR2w=="
+        "resolved": "4.5.4",
+        "contentHash": "zteT+G8xuGu6mS+mzDzYXbzS7rd3K6Fjb9RiZlYlJPam2/hU7JCBZBVEcywNuR+oZ1ncTvc/cq0faRr3P01OVg=="
       },
       "System.Threading.Thread": {
         "type": "Transitive",
@@ -2265,29 +2294,27 @@
         }
       },
       "piipan.match.api": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1",
+          "Piipan.Participants.Api": "1.0.0"
+        }
       },
       "piipan.match.core": {
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.90",
+          "FluentValidation": "10.3.3",
           "Microsoft.Extensions.Logging": "3.1.19",
           "Nanoid": "2.1.0",
+          "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10",
           "Piipan.Match.Api": "1.0.0",
-          "Piipan.Match.Orchestrator": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.match.func.api": {
-        "type": "Project",
-        "dependencies": {
-          "Piipan.Match.Api": "1.0.0",
-          "Piipan.Match.Core": "1.0.0"
-        }
-      },
-      "piipan.match.orchestrator": {
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.90",
@@ -2299,19 +2326,25 @@
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10",
-          "Piipan.Match.Shared": "1.0.0",
-          "Piipan.Shared": "1.0.0"
-        }
-      },
-      "piipan.match.shared": {
-        "type": "Project",
-        "dependencies": {
-          "Newtonsoft.Json.Schema": "3.0.14",
+          "Piipan.Match.Api": "1.0.0",
+          "Piipan.Match.Core": "1.0.0",
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Participants.Core": "1.0.0",
           "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.participants.api": {
         "type": "Project"
+      },
+      "piipan.participants.core": {
+        "type": "Project",
+        "dependencies": {
+          "Dapper": "2.0.90",
+          "Microsoft.Extensions.DependencyInjection": "3.1.19",
+          "Microsoft.Extensions.Logging": "3.1.19",
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Shared": "1.0.0"
+        }
       },
       "piipan.shared": {
         "type": "Project",

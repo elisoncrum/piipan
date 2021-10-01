@@ -7,6 +7,7 @@ using Piipan.Participants.Core.Services;
 using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Piipan.Participants.Core.Tests.Services
 {
@@ -40,16 +41,19 @@ namespace Piipan.Participants.Core.Tests.Services
         public async void GetParticipants_AllMatchesReturned(int nMatches)
         {
             // Arrange
+            var randomLdsHash = Guid.NewGuid().ToString();
+            var randomState = Guid.NewGuid().ToString().Substring(0, 2);
+
             var logger = Mock.Of<ILogger<ParticipantService>>();
             var participants = RandomParticipants(nMatches);
             var participantDao = new Mock<IParticipantDao>();
             participantDao
-                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<Int64>()))
+                .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(participants);
             
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
-                .Setup(m => m.GetLatestUpload())
+                .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
                 .ReturnsAsync(new UploadDbo
                 {
                     Id = 1,
@@ -57,29 +61,40 @@ namespace Piipan.Participants.Core.Tests.Services
                     Publisher = "someone"
                 });
 
-            var service = new ParticipantService(participantDao.Object, uploadDao.Object, logger);
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
 
             // Act
-            var result = await service.GetParticipants("something");
+            var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
-            Assert.Equal(result, participants);
+            // results should have the State set
+            var expected = participants.Select(p => new ParticipantDto(p) { State = randomState });
+            Assert.Equal(expected, result);
         }
 
         [Fact]
         public async void GetParticipants_UsesLatestUploadId()
         {
             // Arrange
+            var randomLdsHash = Guid.NewGuid().ToString();
+            var randomState = Guid.NewGuid().ToString().Substring(0, 2);
+
             var logger = Mock.Of<ILogger<ParticipantService>>();
             var participantDao = new Mock<IParticipantDao>();
             participantDao
-                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<Int64>()))
+                .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
             
             var uploadId = (new Random()).Next();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
-                .Setup(m => m.GetLatestUpload())
+                .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
                 .ReturnsAsync(new UploadDbo
                 {
                     Id = uploadId,
@@ -87,14 +102,51 @@ namespace Piipan.Participants.Core.Tests.Services
                     Publisher = "someone"
                 });
 
-            var service = new ParticipantService(participantDao.Object, uploadDao.Object, logger);
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
 
             // Act
-            var result = await service.GetParticipants("something");
+            var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
-            uploadDao.Verify(m => m.GetLatestUpload(), Times.Once);
-            participantDao.Verify(m => m.GetParticipants("something", uploadId), Times.Once);
+            uploadDao.Verify(m => m.GetLatestUpload(It.IsAny<string>()), Times.Once);
+            participantDao.Verify(m => m.GetParticipants(randomState, randomLdsHash, uploadId), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetParticipants_ReturnsEmptyWhenNoUploads()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<ParticipantService>>();
+            var participantDao = new Mock<IParticipantDao>();
+            participantDao
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Int64>()))
+                .ReturnsAsync(new List<ParticipantDbo>());
+            
+            var uploadId = (new Random()).Next();
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
+                .ThrowsAsync(new InvalidOperationException());
+
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
+
+            // Act
+            var participants = await service.GetParticipants("ea", "hash");
+
+            // Assert
+            Assert.Empty(participants);
         }
 
         [Theory]
@@ -119,7 +171,13 @@ namespace Piipan.Participants.Core.Tests.Services
                     Publisher = "me"
                 });
 
-            var service = new ParticipantService(participantDao.Object, uploadDao.Object, logger);
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object, 
+                uploadDao.Object, 
+                stateService,
+                logger);
 
             // Act
             await service.AddParticipants(participants);
@@ -136,6 +194,37 @@ namespace Piipan.Participants.Core.Tests.Services
                         participants.All(p => p.UploadId == uploadId)
                     ))
                 );
+
+        }
+
+                [Fact]
+        public async void GetStates_ReturnsDaoResult()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<ParticipantService>>();
+            var participantDao = Mock.Of<IParticipantDao>();
+            var uploadDao = Mock.Of<IUploadDao>();
+            
+            var stateService = new Mock<IStateService>();
+            stateService
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string>{ "ea", "eb", "ec" });
+
+            var service = new ParticipantService(
+                participantDao, 
+                uploadDao, 
+                stateService.Object,
+                logger);
+
+            // Act
+            var result = await service.GetStates();
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.Collection(result,
+                s => Assert.Equal("ea", s),
+                s => Assert.Equal("eb", s),
+                s => Assert.Equal("ec", s));
 
         }
     }

@@ -1,0 +1,18 @@
+using System;
+
+namespace Piipan.Match.Api.Models
+{
+    public interface IMatchRecord
+    {
+        string MatchId { get; set; }
+        DateTime? CreatedAt { get; set; }
+        string Initiator { get; set; }
+        string[] States { get; set; }
+        string Hash { get; set; }
+        string HashType { get; set; }
+        string Input { get; set; }
+        string Data { get; set; }
+        Boolean Invalid { get; set; }
+        string Status { get; set; }
+    }
+}
