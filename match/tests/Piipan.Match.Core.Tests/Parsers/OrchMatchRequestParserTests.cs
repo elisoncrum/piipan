@@ -48,7 +48,9 @@ namespace Piipan.Match.Core.Tests.Parsers
         [Theory]
         [InlineData(@"{ data: [{ lds_hash: 'abc' }]}", 1)] // invalid hash, but valid request
         [InlineData(@"{ data: [{ lds_hash: '' }]}", 1)] // empty hash, but valid request
+        // farrington,1931-10-13,000-12-3456
         [InlineData(@"{'data':[
+
             { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458' }
         ]}", 1)]
         [InlineData(@"{'data':[
