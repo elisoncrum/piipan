@@ -1,6 +1,9 @@
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Dapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -8,11 +11,10 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Func.Api.Models;
-using Dapper;
-using FluentValidation;
 
 namespace Piipan.Match.Func.Api
 {
@@ -23,13 +25,19 @@ namespace Piipan.Match.Func.Api
     {
         private readonly IMatchApi _matchApi;
         private readonly IStreamParser<OrchMatchRequest> _requestParser;
+        private readonly IActiveMatchRecordBuilder _recordBuilder;
+        private readonly IMatchRecordApi _recordApi;
 
         public MatchApi(
             IMatchApi matchApi,
-            IStreamParser<OrchMatchRequest> requestParser)
+            IStreamParser<OrchMatchRequest> requestParser,
+            IActiveMatchRecordBuilder recordBuilder,
+            IMatchRecordApi recordApi)
         {
             _matchApi = matchApi;
             _requestParser = requestParser;
+            _recordBuilder = recordBuilder;
+            _recordApi = recordApi;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -53,9 +61,10 @@ namespace Piipan.Match.Func.Api
             try
             {
                 LogRequest(logger, req);
-                
+
+                var initiatingState = InitiatingState(req);
                 var request = await _requestParser.Parse(req.Body);
-                var response = await _matchApi.FindMatches(request);
+                var response = await _matchApi.FindMatches(request, initiatingState);
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
@@ -66,6 +75,10 @@ namespace Piipan.Match.Func.Api
             catch (ValidationException ex)
             {
                 return ValidationErrorResponse(ex);
+            }
+            catch (HttpRequestException ex)
+            {
+                return BadRequestErrorresponse(ex);
             }
             catch (Exception ex)
             {
@@ -88,6 +101,18 @@ namespace Piipan.Match.Func.Api
             {
                 logger.LogInformation("on behalf of {Username}", username);
             }
+        }
+
+        private string InitiatingState(HttpRequest request)
+        {
+            string state = request.Headers["X-Initiating-State"];
+
+            if (String.IsNullOrEmpty(state))
+            {
+                throw new HttpRequestException("Request is missing required header: X-Inititating-State");
+            }
+
+            return state;
         }
 
         private ActionResult ValidationErrorResponse(ValidationException exception)
@@ -130,6 +155,18 @@ namespace Piipan.Match.Func.Api
             {
                 StatusCode = (int)HttpStatusCode.InternalServerError
             };
+        }
+
+        private ActionResult BadRequestErrorresponse(Exception ex)
+        {
+            var errResponse = new ApiErrorResponse();
+            errResponse.Errors.Add(new ApiHttpError()
+            {
+                Status = Convert.ToString((int)HttpStatusCode.BadRequest),
+                Title = "Bad request",
+                Detail = ex.Message
+            });
+            return (ActionResult)new BadRequestObjectResult(errResponse);
         }
     }
 }

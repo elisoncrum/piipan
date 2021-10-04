@@ -5,10 +5,10 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Parsers;
-using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
@@ -21,6 +21,7 @@ namespace Piipan.Match.Func.Api
     public class Startup : FunctionsStartup
     {
         public const string DatabaseConnectionString = "DatabaseConnectionString";
+        public const string CollaborationDatabaseConnectionString = "CollaborationDatabaseConnectionString";
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
@@ -33,8 +34,6 @@ namespace Piipan.Match.Func.Api
 
             builder.Services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
-            builder.Services.AddTransient<IMatchApi, MatchService>();
-
             builder.Services.AddSingleton<DbProviderFactory>(NpgsqlFactory.Instance);
             builder.Services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(s =>
             {
@@ -44,7 +43,16 @@ namespace Piipan.Match.Func.Api
                     Environment.GetEnvironmentVariable(DatabaseConnectionString)
                 );
             });
+            builder.Services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
+            {
+                return new AzurePgConnectionFactory<CollaborationDb>(
+                    new AzureServiceTokenProvider(),
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(CollaborationDatabaseConnectionString)
+                );
+            });
 
+            builder.Services.RegisterMatchServices();
             builder.Services.RegisterParticipantsServices();
         }
     }

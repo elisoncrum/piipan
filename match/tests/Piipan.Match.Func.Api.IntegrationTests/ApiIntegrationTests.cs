@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Core.Builders;
+using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
@@ -73,7 +75,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
                 {
                     { "From", "a user" },
-                    { "Ocp-Apim-Subscription-Name", "sub-name" }
+                    { "Ocp-Apim-Subscription-Name", "sub-name" },
+                    { "X-Initiating-State", "ea" }
                 }));
 
             return mockRequest;
@@ -101,11 +104,26 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             services.AddTransient<IMatchApi, MatchService>();
 
+            services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<CollaborationDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
+            });
+
+            services.AddTransient<IMatchIdService, MatchIdService>();
+            services.AddTransient<IActiveMatchRecordBuilder, ActiveMatchRecordBuilder>();
+            services.AddTransient<IMatchRecordDao, MatchRecordDao>();
+            services.AddTransient<IMatchRecordApi, MatchRecordService>();
+            services.AddTransient<IMatchEventService, MatchEventService>();
+
             var provider = services.BuildServiceProvider();
 
             var api = new MatchApi(
                 provider.GetService<IMatchApi>(),
-                provider.GetService<IStreamParser<OrchMatchRequest>>()
+                provider.GetService<IStreamParser<OrchMatchRequest>>(),
+                provider.GetService<IActiveMatchRecordBuilder>(),
+                provider.GetService<IMatchRecordApi>()
             );
 
             return api;
@@ -222,6 +240,28 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             Assert.Equal(resultA.Matches.First().ParticipantId, recordA.ParticipantId);
             Assert.Equal(resultB.Matches.First().ParticipantId, recordB.ParticipantId);
+        }
+
+        [Fact]
+        public async void ApiCreatesMatchRecords()
+        {
+            // Arrange
+            var record = FullRecord();
+            var logger = Mock.Of<ILogger>();
+            var body = new object[] { record };
+            var mockRequest = MockRequest(JsonBody(body));
+            var api = Construct();
+            var state = Environment.GetEnvironmentVariable("States").Split(",");
+
+            ClearParticipants();
+            ClearMatchRecords();
+            Insert(record);
+
+            // Act
+            var response = await api.Find(mockRequest.Object, logger);
+
+            // Assert
+            Assert.Equal(1, CountMatchRecords());
         }
     }
 }

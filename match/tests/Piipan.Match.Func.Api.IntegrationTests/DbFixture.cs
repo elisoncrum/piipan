@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
-using Piipan.Match.Core.Models;
 using Dapper;
 using Npgsql;
+using Piipan.Match.Core.Models;
 
 namespace Piipan.Match.Func.Api.IntegrationTests
 {
@@ -14,21 +14,24 @@ namespace Piipan.Match.Func.Api.IntegrationTests
     public class DbFixture : IDisposable
     {
         public readonly string ConnectionString;
+        public readonly string CollabConnectionString;
         public readonly NpgsqlFactory Factory;
 
         public DbFixture()
         {
             ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            CollabConnectionString = Environment.GetEnvironmentVariable("CollaborationDatabaseConnectionString");
             Factory = NpgsqlFactory.Instance;
 
-            Initialize();
+            Initialize(ConnectionString);
+            Initialize(CollabConnectionString);
             ApplySchema();
         }
 
         /// <summary>
         /// Ensure the database is able to receive connections before proceeding.
         /// </summary>
-        public void Initialize()
+        public void Initialize(string connectionString)
         {
             var retries = 10;
             var wait = 2000; // ms
@@ -39,7 +42,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 {
                     using (var conn = Factory.CreateConnection())
                     {
-                        conn.ConnectionString = ConnectionString;
+                        conn.ConnectionString = connectionString;
                         conn.Open();
                         conn.Close();
 
@@ -61,10 +64,16 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-
                 conn.Execute("DROP TABLE IF EXISTS participants");
                 conn.Execute("DROP TABLE IF EXISTS uploads");
+                conn.Close();
+            }
 
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = CollabConnectionString;
+                conn.Open();
+                conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Close();
             }
 
@@ -72,8 +81,10 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
         private void ApplySchema()
         {
-            string sqltext = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
+            string perstateSql = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
+            string matchesSql = System.IO.File.ReadAllText("match-record.sql", System.Text.Encoding.UTF8);
 
+            // Participants DB
             using (var conn = Factory.CreateConnection())
             {
                 conn.ConnectionString = ConnectionString;
@@ -81,8 +92,20 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
                 conn.Execute("DROP TABLE IF EXISTS participants");
                 conn.Execute("DROP TABLE IF EXISTS uploads");
-                conn.Execute(sqltext);
+                conn.Execute(perstateSql);
                 conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now(), current_user)");
+
+                conn.Close();
+            }
+
+            // Collaboration DB
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = CollabConnectionString;
+                conn.Open();
+
+                conn.Execute("DROP TABLE IF EXISTS matches");
+                conn.Execute(matchesSql);
 
                 conn.Close();
             }
@@ -99,6 +122,36 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
                 conn.Close();
             }
+        }
+
+        public void ClearMatchRecords()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = CollabConnectionString;
+                conn.Open();
+
+                conn.Execute("DELETE FROM matches");
+
+                conn.Close();
+            }
+        }
+
+        public int CountMatchRecords()
+        {
+            int count;
+
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = CollabConnectionString;
+                conn.Open();
+
+                count = conn.ExecuteScalar<int>("SELECT COUNT(*) FROM matches");
+
+                conn.Close();
+            }
+
+            return count;
         }
 
         public void Insert(Participant record)
