@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Core.Extensions;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 
 [assembly: FunctionsStartup(typeof(Piipan.Etl.Func.BulkUpload.Startup))]
 

@@ -8,7 +8,7 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Participants.Core.Extensions;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 using FluentValidation;
 using Npgsql;
 
@@ -39,7 +39,7 @@ namespace Piipan.Match.Func.Api
                     NpgsqlFactory.Instance
                 );
             });
-            
+
             builder.Services.RegisterParticipantsServices();
         }
     }

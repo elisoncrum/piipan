@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Services.AppAuthentication;
 using Npgsql;
 
-namespace Piipan.Shared
+namespace Piipan.Shared.Database
 {
     public class AzurePgConnectionFactory : IDbConnectionFactory
     {
@@ -60,12 +60,12 @@ namespace Piipan.Shared
             {
                 builder.Database = database;
             }
-            
+
             var connection = _dbProviderFactory.CreateConnection();
 
             connection.ConnectionString = builder.ConnectionString;
             await connection.OpenAsync();
-            
+
             return connection;
         }
     }

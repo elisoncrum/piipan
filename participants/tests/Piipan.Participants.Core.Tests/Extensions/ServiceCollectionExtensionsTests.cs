@@ -5,7 +5,7 @@ using Moq;
 using Xunit;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Api;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.Tests.Extensions
 {

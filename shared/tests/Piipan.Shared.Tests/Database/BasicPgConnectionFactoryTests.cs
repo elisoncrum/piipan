@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Moq;
 using Xunit;
 
-namespace Piipan.Shared.Tests
+namespace Piipan.Shared.Database.Tests
 {
     [Collection("Piipan.Shared.ConnectionFactories")]
     public class BasicPgConnectionFactoryTests
@@ -53,7 +53,7 @@ namespace Piipan.Shared.Tests
 
             // Act / Assert
             await Assert.ThrowsAsync<ArgumentException>(() => factory.Build());
-            
+
             // Tear down
             ClearDatabaseConnectionString();
         }
@@ -81,7 +81,7 @@ namespace Piipan.Shared.Tests
             var factory = new BasicPgConnectionFactory(npgsqlFactory);
             var databaseName = Guid.NewGuid().ToString();
             SetDatabaseConnectionString();
-            
+
             // Act
             var connection = await factory.Build(databaseName);
 

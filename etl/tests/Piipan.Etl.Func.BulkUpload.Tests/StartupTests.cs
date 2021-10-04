@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests

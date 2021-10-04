@@ -6,7 +6,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 using Xunit;
 
 namespace Piipan.Match.Core.IntegrationTests

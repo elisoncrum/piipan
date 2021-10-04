@@ -10,7 +10,7 @@ using Xunit;
 using System.Data;
 using Piipan.Participants.Api;
 using Piipan.Etl.Func.BulkUpload.Parsers;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {

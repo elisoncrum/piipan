@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.Models;
 using Dapper;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {

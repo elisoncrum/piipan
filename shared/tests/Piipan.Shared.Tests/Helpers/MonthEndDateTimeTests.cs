@@ -1,8 +1,7 @@
 using System;
 using Xunit;
-using Piipan.Shared.Helpers;
 
-namespace Piipan.Shared.Tests
+namespace Piipan.Shared.Helpers.Tests
 {
 	public class MonthEndDateTimeTests
     {

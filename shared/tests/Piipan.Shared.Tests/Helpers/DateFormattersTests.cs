@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using Piipan.Shared.Helpers;
 using Xunit;
-namespace Piipan.Shared.Tests
+
+namespace Piipan.Shared.Helpers.Tests
 {
     public class DateFormattersTests
     {

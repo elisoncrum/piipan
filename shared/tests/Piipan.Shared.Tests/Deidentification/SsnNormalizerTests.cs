@@ -1,9 +1,8 @@
 using System;
 using System.Text.RegularExpressions;
-using Piipan.Shared.Deidentification;
 using Xunit;
 
-namespace Piipan.Shared.Tests
+namespace Piipan.Shared.Deidentification.Tests
 {
     public class SsnNormalizerTests
     {

@@ -13,7 +13,7 @@ using Dapper;
 using Npgsql;
 using Xunit;
 using Moq;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {

@@ -5,6 +5,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Database;
 using FluentValidation;
 using Moq;
 using Xunit;

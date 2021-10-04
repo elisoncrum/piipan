@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Piipan.Shared
+namespace Piipan.Shared.Database
 {
     public interface IDbConnectionFactory
     {

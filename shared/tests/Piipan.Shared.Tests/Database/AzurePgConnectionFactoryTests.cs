@@ -10,7 +10,7 @@ using Npgsql;
 using Xunit;
 using Moq;
 
-namespace Piipan.Shared.Tests
+namespace Piipan.Shared.Database.Tests
 {
     [Collection("Piipan.Shared.ConnectionFactories")]
     public class AzurePgConnectionFactoryTests
@@ -107,7 +107,7 @@ namespace Piipan.Shared.Tests
             await factory.Build();
 
             // Assert
-            tokenProvider.Verify(m => 
+            tokenProvider.Verify(m =>
                 m.GetAccessTokenAsync(AzurePgConnectionFactory.CommercialId, null, default(CancellationToken)), Times.Once);
 
             // Tear down
@@ -131,7 +131,7 @@ namespace Piipan.Shared.Tests
             await factory.Build();
 
             // Assert
-            tokenProvider.Verify(m => 
+            tokenProvider.Verify(m =>
                 m.GetAccessTokenAsync(AzurePgConnectionFactory.GovermentId, null, default(CancellationToken)), Times.Once);
 
             // Tear down
@@ -148,7 +148,7 @@ namespace Piipan.Shared.Tests
             var factory = new AzurePgConnectionFactory(tokenProvider.Object, npgsqlFactory);
             var databaseName = Guid.NewGuid().ToString();
             SetDatabaseConnectionString();
-            
+
             // Act
             var connection = await factory.Build(databaseName);
 
@@ -168,7 +168,7 @@ namespace Piipan.Shared.Tests
             var factory = new AzurePgConnectionFactory(tokenProvider.Object, npgsqlFactory);
             var databaseName = Guid.NewGuid().ToString();
             SetDatabaseConnectionString();
-            
+
             // Act
             var connection = await factory.Build(databaseName);
 

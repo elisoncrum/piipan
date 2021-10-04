@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using Npgsql;
 
-namespace Piipan.Shared
+namespace Piipan.Shared.Database
 {
     public class BasicPgConnectionFactory : IDbConnectionFactory
     {
@@ -22,7 +22,7 @@ namespace Piipan.Shared
             {
                 throw new ArgumentException($"{DatabaseConnectionString} env variable must be set!");
             }
-            
+
             var builder = new NpgsqlConnectionStringBuilder(
                 Environment.GetEnvironmentVariable(DatabaseConnectionString));
 
@@ -35,7 +35,7 @@ namespace Piipan.Shared
 
             connection.ConnectionString = builder.ConnectionString;
             await connection.OpenAsync();
-            
+
             return connection;
         }
     }

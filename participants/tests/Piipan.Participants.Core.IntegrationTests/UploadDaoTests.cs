@@ -1,6 +1,6 @@
 using System;
 using Piipan.Participants.Core.DataAccessObjects;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 using Dapper;
 using Npgsql;
 using Xunit;

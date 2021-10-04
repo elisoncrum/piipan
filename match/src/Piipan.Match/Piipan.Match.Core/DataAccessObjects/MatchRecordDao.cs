@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 
 namespace Piipan.Match.Core.DataAccessObjects
 {

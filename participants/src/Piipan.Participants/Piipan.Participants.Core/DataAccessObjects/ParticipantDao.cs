@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Core.Models;
-using Piipan.Shared;
+using Piipan.Shared.Database;
 using Dapper;
 
 namespace Piipan.Participants.Core.DataAccessObjects
@@ -26,7 +26,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
             var connection = await _dbConnectionFactory.Build(state);
             return await connection
                 .QueryAsync<ParticipantDbo>(@"
-                    SELECT 
+                    SELECT
                         lds_hash LdsHash,
                         participant_id ParticipantId,
                         case_id CaseId,

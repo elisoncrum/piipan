@@ -19,6 +19,7 @@ using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared;
 using Piipan.Shared.Authentication;
+using Piipan.Shared.Database;
 using FluentValidation;
 using Moq;
 using Newtonsoft.Json;
@@ -94,7 +95,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
-            services.AddTransient<IDbConnectionFactory>(s => 
+            services.AddTransient<IDbConnectionFactory>(s =>
             {
                 return new BasicPgConnectionFactory(NpgsqlFactory.Instance);
             });
@@ -102,7 +103,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             services.AddTransient<IMatchApi, MatchService>();
 
-            var provider = services.BuildServiceProvider();  
+            var provider = services.BuildServiceProvider();
 
             var api = new MatchApi(
                 provider.GetService<IMatchApi>(),
