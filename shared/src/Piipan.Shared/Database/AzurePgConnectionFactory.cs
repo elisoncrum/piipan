@@ -1,19 +1,21 @@
 using System;
 using System.Data;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.Azure.Services.AppAuthentication;
 using Npgsql;
 
 namespace Piipan.Shared.Database
 {
-    public class AzurePgConnectionFactory : IDbConnectionFactory
+    /// <summary>
+    /// A factory for creating cloud-specific connections to Azure-hosted
+    /// databases when using a managed identity for authentication.
+    /// </summary>
+    public class AzurePgConnectionFactory<T> : IDbConnectionFactory<T>
     {
         // Environment variables (and placeholder) established
         // during initial function app provisioning in IaC
         public const string CloudName = "CloudName";
-        public const string DatabaseConnectionString = "DatabaseConnectionString";
         public const string PasswordPlaceholder = "{password}";
         public const string GovernmentCloud = "AzureUSGovernment";
 
@@ -25,30 +27,43 @@ namespace Piipan.Shared.Database
 
         private readonly AzureServiceTokenProvider _tokenProvider;
         private readonly DbProviderFactory _dbProviderFactory;
+        private readonly string _connectionString;
 
+        /// <summary>
+        /// Create a new instance of AzurePgConnectionFactory
+        /// </summary>
+        /// <param name="tokenProvider">An instance of AzureServiceTokenProvider</param>
+        /// <param name="dbProviderFactory">An instance of DbProviderFactory</param>
+        /// <param name="connectionString">The connection string used for building connections</param>
         public AzurePgConnectionFactory(
             AzureServiceTokenProvider tokenProvider,
-            DbProviderFactory dbProviderFactory)
+            DbProviderFactory dbProviderFactory,
+            string connectionString)
         {
-            _tokenProvider = tokenProvider;
-            _dbProviderFactory = dbProviderFactory;
-        }
-
-        public async Task<IDbConnection> Build(string database = null)
-        {
-            if (String.IsNullOrEmpty(Environment.GetEnvironmentVariable(DatabaseConnectionString)))
+            if (String.IsNullOrEmpty(connectionString))
             {
-                throw new ArgumentException($"{DatabaseConnectionString} env variable must be set!");
+                throw new ArgumentException($"Connection string must be set to a value.");
             }
 
+            _tokenProvider = tokenProvider;
+            _dbProviderFactory = dbProviderFactory;
+            _connectionString = connectionString;
+        }
+
+        /// <summary>
+        /// Build and return a database connection
+        /// </summary>
+        /// <param name="database">(Optional) The database to connect to. Overrides any existing database value.</param>
+        public async Task<IDbConnection> Build(string database = null)
+        {
             var resourceId = CommercialId;
             var cn = Environment.GetEnvironmentVariable(CloudName);
-            if (cn == GovernmentCloud) {
+            if (cn == GovernmentCloud)
+            {
                 resourceId = GovermentId;
             }
 
-            var builder = new NpgsqlConnectionStringBuilder(
-                Environment.GetEnvironmentVariable(DatabaseConnectionString));
+            var builder = new NpgsqlConnectionStringBuilder(_connectionString);
 
             if (builder.Password == PasswordPlaceholder)
             {

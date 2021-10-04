@@ -1,11 +1,11 @@
 using System.Data;
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Participants.Core.Extensions;
 using Moq;
-using Xunit;
-using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Api;
+using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Database;
+using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Extensions
 {
@@ -17,7 +17,7 @@ namespace Piipan.Participants.Core.Tests.Extensions
             // Arrange
             var services = new ServiceCollection();
             services.AddLogging();
-            services.AddTransient<IDbConnectionFactory>(c => Mock.Of<IDbConnectionFactory>());
+            services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(c => Mock.Of<IDbConnectionFactory<ParticipantsDb>>());
 
             // Act
             services.RegisterParticipantsServices();

@@ -2,28 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Moq;
+using Newtonsoft.Json;
+using Npgsql;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
-using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
-using Piipan.Participants.Core.Services;
-using Piipan.Shared;
-using Piipan.Shared.Authentication;
 using Piipan.Shared.Database;
-using FluentValidation;
-using Moq;
-using Newtonsoft.Json;
-using Npgsql;
 using Xunit;
 
 
@@ -95,9 +91,11 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
 
-            services.AddTransient<IDbConnectionFactory>(s =>
+            services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(s =>
             {
-                return new BasicPgConnectionFactory(NpgsqlFactory.Instance);
+                return new BasicPgConnectionFactory<ParticipantsDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.DatabaseConnectionString));
             });
             services.RegisterParticipantsServices();
 

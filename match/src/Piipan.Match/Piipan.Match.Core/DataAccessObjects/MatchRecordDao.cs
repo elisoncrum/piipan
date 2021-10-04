@@ -13,14 +13,14 @@ namespace Piipan.Match.Core.DataAccessObjects
     /// </summary>
     public class MatchRecordDao : IMatchRecordDao
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IDbConnectionFactory<CollaborationDb> _dbConnectionFactory;
         private readonly ILogger<MatchRecordDao> _logger;
 
         /// <summary>
         /// Initializes a new instance of MatchRecordDao
         /// </summary>
         public MatchRecordDao(
-            IDbConnectionFactory dbConnectionFactory,
+            IDbConnectionFactory<CollaborationDb> dbConnectionFactory,
             ILogger<MatchRecordDao> logger)
         {
             _dbConnectionFactory = dbConnectionFactory;

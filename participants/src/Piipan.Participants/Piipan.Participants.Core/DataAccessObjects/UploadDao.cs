@@ -1,16 +1,16 @@
 using System.Threading.Tasks;
+using Dapper;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.Models;
-using Dapper;
 using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
     public class UploadDao : IUploadDao
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IDbConnectionFactory<ParticipantsDb> _dbConnectionFactory;
 
-        public UploadDao(IDbConnectionFactory dbConnectionFactory)
+        public UploadDao(IDbConnectionFactory<ParticipantsDb> dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory;
         }
