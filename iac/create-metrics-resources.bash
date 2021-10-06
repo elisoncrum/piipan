@@ -132,9 +132,29 @@ main () {
     --output none
 
   # publish the function app
-  echo "Publishing function app $METRICS_COLLECT_APP_NAME"
+  ERR=0 # or some non zero error number you want
+  MAX_TRIES=6
+
+  echo "Publishing ${METRICS_COLLECT_APP_NAME} function app"
   pushd ../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH
-    func azure functionapp publish "$METRICS_COLLECT_APP_NAME" --dotnet
+    for (( i=1; i<=MAX_TRIES; i++ ))
+      do
+        ERR=0
+        echo "Waiting to publish function app"
+        sleep $(( i * 30 ))
+
+        echo "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" 
+        func azure functionapp publish "$METRICS_COLLECT_APP_NAME" --dotnet || ERR=1
+
+        if [ $ERR -eq 0 ];then
+          (( i = MAX_TRIES + 1))
+        fi
+
+      done
+    if [ $ERR -eq 1 ];then
+      echo "Too many non-sucessful tries"
+      exit $ERR
+    fi
   popd
 
   # Subscribe each dynamically created event blob topic to this function
@@ -228,9 +248,26 @@ main () {
   sleep 60
 
   # publish metrics function app
-  echo "Publishing function app $METRICS_API_APP_NAME"
+  echo "Publishing ${METRICS_API_APP_NAME} function app"
   pushd ../metrics/src/Piipan.Metrics/$API_APP_FILEPATH
-    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet
+    for (( i=1; i<=MAX_TRIES; i++ ))
+      do
+        ERR=0
+        echo "Waiting to publish function app"
+        sleep $(( i * 30 ))
+
+        echo "func azure functionapp publish ${METRICS_API_APP_NAME} --dotnet" 
+        func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet || ERR=1
+
+        if [ $ERR -eq 0 ];then
+          (( i = MAX_TRIES + 1))
+        fi
+
+      done
+    if [ $ERR -eq 1 ];then
+      echo "Too many non-sucessful tries"
+      exit $ERR
+    fi
   popd
 
   ## Dashboard stuff
