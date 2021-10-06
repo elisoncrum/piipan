@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
-using Dapper;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
     public class ParticipantDao : IParticipantDao
     {
-        private readonly IDbConnectionFactory _dbConnectionFactory;
+        private readonly IDbConnectionFactory<ParticipantsDb> _dbConnectionFactory;
         private readonly ILogger<ParticipantDao> _logger;
 
         public ParticipantDao(
-            IDbConnectionFactory dbConnectionFactory,
+            IDbConnectionFactory<ParticipantsDb> dbConnectionFactory,
             ILogger<ParticipantDao> logger)
         {
             _dbConnectionFactory = dbConnectionFactory;
