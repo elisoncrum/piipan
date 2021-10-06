@@ -321,7 +321,7 @@ main () {
   sleep 60
 
   echo "Publishing ${ORCHESTRATOR_FUNC_APP_NAME} function app"
-  pushd ../match/src/Piipan.Match.Orchestrator
+  pushd ../match/src/Piipan.Match/Piipan.Match.Func.Api
     func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet
   popd
 
