@@ -198,7 +198,7 @@ namespace Piipan.Match.Core.Tests.Serializers
             var converter = new JsonConverters.MonthEndArrayConverter();
 
             // Assert
-            Assert.True(converter.CanConvert(typeof(List<DateTime>)));
+            Assert.True(converter.CanConvert(typeof(IEnumerable<DateTime>)));
             Assert.False(converter.CanConvert(typeof(DateTime)));
             Assert.False(converter.CanConvert(typeof(int)));
             Assert.False(converter.CanConvert(typeof(string)));

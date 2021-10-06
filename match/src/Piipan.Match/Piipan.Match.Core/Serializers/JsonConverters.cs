@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -112,7 +113,7 @@ namespace Piipan.Match.Core.Serializers
             public override bool CanRead => false;
             public override bool CanWrite => true;
 
-            public override bool CanConvert(Type objectType) => objectType == typeof(List<DateTime>);
+            public override bool CanConvert(Type objectType) => objectType == typeof(IEnumerable<DateTime>);
 
             public override object ReadJson(
                 JsonReader reader,
@@ -128,11 +129,10 @@ namespace Piipan.Match.Core.Serializers
                 object value,
                 JsonSerializer serializer
             ){
-                var results = new List<string>();
-                var dateList = (List<DateTime>)value;
-                dateList.Sort((x, y) => y.CompareTo(x));
+                var dates = (IEnumerable<DateTime>)value;
+                dates.ToList().Sort((x, y) => y.CompareTo(x));
                 writer.WriteStartArray();
-                foreach (var date in dateList)
+                foreach (var date in dates)
                 {
                     writer.WriteValue(date.ToString("yyyy-MM"));
                 }

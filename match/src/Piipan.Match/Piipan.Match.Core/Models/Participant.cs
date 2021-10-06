@@ -41,7 +41,7 @@ namespace Piipan.Match.Core.Models
             CaseId = p.CaseId;
             ParticipantId = p.ParticipantId;
             BenefitsEndDate = p.BenefitsEndDate;
-            RecentBenefitMonths = p.RecentBenefitMonths.ToList();
+            RecentBenefitMonths = p.RecentBenefitMonths;
             ProtectLocation = p.ProtectLocation;
         }
 
