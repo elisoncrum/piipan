@@ -63,6 +63,10 @@ METRICS_API_APP_NAME=$PREFIX-func-$METRICS_API_APP_ID-$ENV
 METRICS_API_FUNCTION_NAME=GetParticipantUploads
 METRICS_API_FUNCTION_NAME_LASTUPLOAD=GetLastUpload
 
+# Core Database Resources
+CORE_DB_SERVER_NAME=$PREFIX-psql-core-$ENV
+COLLAB_DB_NAME=collaboration
+
 # Event Hub
 EVENT_HUB_NAME=$PREFIX-evh-monitoring-$ENV
 ### END Constants
