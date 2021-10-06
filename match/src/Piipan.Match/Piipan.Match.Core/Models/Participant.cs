@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Piipan.Match.Core.Serializers;
 using Piipan.Participants.Api.Models;
@@ -31,6 +32,18 @@ namespace Piipan.Match.Core.Models
 
         [JsonProperty("protect_location")]
         public bool? ProtectLocation { get; set; }
+
+        public Participant() {}
+
+        public Participant(IParticipant p) {
+            LdsHash = p.LdsHash;
+            State = p.State;
+            CaseId = p.CaseId;
+            ParticipantId = p.ParticipantId;
+            BenefitsEndDate = p.BenefitsEndDate;
+            RecentBenefitMonths = p.RecentBenefitMonths.ToList();
+            ProtectLocation = p.ProtectLocation;
+        }
 
         public string ToJson()
         {

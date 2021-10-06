@@ -142,6 +142,11 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Assert.Equal(record.BenefitsEndDate, person.Matches.First().BenefitsEndDate);
             Assert.Equal(record.RecentBenefitMonths, person.Matches.First().RecentBenefitMonths);
             Assert.Equal(record.ProtectLocation, person.Matches.First().ProtectLocation);
+            // serialization
+            var match = person.Matches.First();
+            var json = JsonConvert.SerializeObject(match);
+            Assert.Contains("participant_id", json);
+            Assert.Contains("recent_benefit_months", json);
         }
 
         [Fact]
