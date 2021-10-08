@@ -59,7 +59,7 @@ To (re)create the Azure resources that `piipan` uses:
         7. User: `blank`
         8. Click `Save` 
 
-7. Now you have to assign the necessary “application role” for the API. [A detail documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your enviroment you can run the following steps.
+7. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
 
     Use assign-app-role to assign your user account the necessary application role:
 
