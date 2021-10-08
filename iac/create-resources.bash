@@ -319,33 +319,9 @@ main () {
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
 
-  echo "Waiting to publish function app"
-  sleep 30
-
-  ERR=0 # or some non zero error number you want
-  MAX_TRIES=6
-
-  echo "Publishing ${ORCHESTRATOR_FUNC_APP_NAME} function app"
-  pushd ../match/src/Piipan.Match/Piipan.Match.Func.Api
-    for (( i=1; i<=MAX_TRIES; i++ ))
-      do
-        ERR=0
-        echo "Waiting to publish function app"
-        sleep $(( i * 30 ))
-
-        echo "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 
-        func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet || ERR=1
-
-        if [ $ERR -eq 0 ];then
-          (( i = MAX_TRIES + 1))
-        fi
-
-      done
-    if [ $ERR -eq 1 ];then
-      echo "Too many non-sucessful tries"
-      exit $ERR
-    fi
-  popd
+  #publish function app
+  source ./azfunc-publish.bash
+  azfunc_publish ${ORCHESTRATOR_FUNC_APP_NAME} "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
   # Resource ID required when vnet is in a separate resource group
   vnet_id=$(\
@@ -494,27 +470,7 @@ main () {
       --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
 
     # Create Function endpoint before setting up event subscription
-    echo "Publishing ${func_app} function app"
-    pushd ../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload
-      for (( i=1; i<=MAX_TRIES; i++ ))
-        do
-          ERR=0
-          echo "Waiting to publish function app"
-          sleep $(( i * 30 ))
-
-          echo "func azure functionapp publish ${func_app} --dotnet" 
-          func azure functionapp publish "$func_app" --dotnet || ERR=1
-
-          if [ $ERR -eq 0 ];then
-            (( i = MAX_TRIES + 1))
-          fi
-
-        done
-      if [ $ERR -eq 1 ];then
-        echo "Too many non-sucessful tries"
-        exit $ERR
-      fi
-    popd
+    azfunc_publish ${func_app} "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
     az eventgrid system-topic event-subscription create \
       --name "$sub_name" \
