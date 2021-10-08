@@ -514,8 +514,32 @@
       },
       "Newtonsoft.Json": {
         "type": "Transitive",
-        "resolved": "13.0.1",
-        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
+        "resolved": "9.0.1",
+        "contentHash": "U82mHQSKaIk+lpSVCbWYKNavmNH1i5xrExDEquU1i6I5pV6UMOqRnJRSlKO3cMPfcpp0RgDY+8jUXHdQ4IfXvw==",
+        "dependencies": {
+          "Microsoft.CSharp": "4.0.1",
+          "System.Collections": "4.0.11",
+          "System.Diagnostics.Debug": "4.0.11",
+          "System.Dynamic.Runtime": "4.0.11",
+          "System.Globalization": "4.0.11",
+          "System.IO": "4.1.0",
+          "System.Linq": "4.1.0",
+          "System.Linq.Expressions": "4.1.0",
+          "System.ObjectModel": "4.0.12",
+          "System.Reflection": "4.1.0",
+          "System.Reflection.Extensions": "4.0.1",
+          "System.Resources.ResourceManager": "4.0.1",
+          "System.Runtime": "4.1.0",
+          "System.Runtime.Extensions": "4.1.0",
+          "System.Runtime.Serialization.Primitives": "4.1.1",
+          "System.Text.Encoding": "4.0.11",
+          "System.Text.Encoding.Extensions": "4.0.11",
+          "System.Text.RegularExpressions": "4.1.0",
+          "System.Threading": "4.0.11",
+          "System.Threading.Tasks": "4.0.11",
+          "System.Xml.ReaderWriter": "4.0.11",
+          "System.Xml.XDocument": "4.0.11"
+        }
       },
       "Npgsql": {
         "type": "Transitive",
@@ -1713,22 +1737,11 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
-      "piipan.match.api": {
-        "type": "Project",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.1",
-          "Piipan.Participants.Api": "1.0.0"
-        }
-      },
-      "piipan.participants.api": {
-        "type": "Project"
-      },
       "piipan.querytool": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Logging.AzureAppServices": "3.1.19",
           "NEasyAuthMiddleware": "2.0.0",
-          "Piipan.Match.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "System.Text.Json": "5.0.2"
         }

@@ -440,11 +440,6 @@
           "System.Xml.XDocument": "4.3.0"
         }
       },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.1",
-        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
-      },
       "Npgsql": {
         "type": "Transitive",
         "resolved": "5.0.10",
@@ -1560,16 +1555,6 @@
           "System.Xml.ReaderWriter": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
         }
-      },
-      "piipan.match.api": {
-        "type": "Project",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.1",
-          "Piipan.Participants.Api": "1.0.0"
-        }
-      },
-      "piipan.participants.api": {
-        "type": "Project"
       },
       "piipan.shared": {
         "type": "Project",
