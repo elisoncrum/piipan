@@ -33,7 +33,7 @@ To (re)create the Azure resources that `piipan` uses:
     ./create-resources.bash tts/dev
 ```
 
-6. Create a subscription in the API Management service. At least for now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` script to test your environment.
+6. Create a subscription in the API Management service. At least for now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
 
     1. Go to the Azure Portal
     2. Go to Resource Groups
