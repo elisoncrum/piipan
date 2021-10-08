@@ -22,7 +22,7 @@ run_deploy () {
   for app in "${orch_function_apps[@]}"
   do
     echo "Publish ${app} to Azure Environment ${azure_env}"
-    pushd ./src/Piipan.Match.Orchestrator
+    pushd ./src/Piipan.Match/Piipan.Match.Func.Api
       func azure functionapp publish "$app" --dotnet
     popd
   done

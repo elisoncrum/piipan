@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9] - 2021-10-06
+
+### Added
+- Foundational components (e.g., database, class structures) for match events
+### Changed
+- `match` and `etl` subsystems were refactored to align with the [standard subsystem architecture](https://github.com/18F/piipan/blob/dev/docs/adr/0018-standardize-subsystem-software-architecture.md).
+- Enhanced normalization library and applied to inputs in the query tool
+- Minor enhancements to `create-apim.bash`
+### Removed
+- References to the previously planned plain text PII matching endpoint
+
 ## [0.8] - 2021-09-21
 
 ### Added
@@ -115,6 +126,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.9]: https://github.com/18F/piipan/releases/tag/v0.9
 [0.8]: https://github.com/18F/piipan/releases/tag/v0.8
 [0.7]: https://github.com/18F/piipan/releases/tag/v0.7
 [0.6]: https://github.com/18F/piipan/releases/tag/v0.6

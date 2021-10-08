@@ -7,7 +7,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
 {
     public interface IParticipantDao
     {
-        Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId);
+        Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId);
         Task AddParticipants(IEnumerable<ParticipantDbo> participants);
     }
 }

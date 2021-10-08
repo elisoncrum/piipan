@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.90" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.19" />
+    <PackageReference Include="Nanoid" Version="2.1.0" />
+    <PackageReference Include="Npgsql" Version="5.0.10" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
+    <PackageReference Include="FluentValidation" Version="10.3.3" />
+  </ItemGroup>
+
+</Project>

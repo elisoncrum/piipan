@@ -26,6 +26,9 @@
         "databaseConnectionString": {
             "type": "String"
         },
+        "collabDatabaseConnectionString": {
+            "type": "String"
+        },
         "cloudName": {
             "type": "String"
         },
@@ -128,6 +131,10 @@
                         {
                             "name": "DatabaseConnectionString",
                             "value": "[parameters('databaseConnectionString')]"
+                        },
+                        {
+                            "name": "CollaborationDatabaseConnectionString",
+                            "value": "[parameters('collabDatabaseConnectionString')]"
                         },
                         {
                             "name": "CloudName",

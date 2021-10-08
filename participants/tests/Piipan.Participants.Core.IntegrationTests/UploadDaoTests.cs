@@ -1,7 +1,9 @@
 using System;
-using Piipan.Participants.Core.DataAccessObjects;
 using Dapper;
+using Moq;
 using Npgsql;
+using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Shared.Database;
 using Xunit;
 
 namespace Piipan.Participants.Core.IntegrationTests
@@ -9,6 +11,22 @@ namespace Piipan.Participants.Core.IntegrationTests
     [Collection("Core.IntegrationTests")]
     public class UploadDaoTests : DbFixture
     {
+        private IDbConnectionFactory<ParticipantsDb> DbConnFactory()
+        {
+            var factory = new Mock<IDbConnectionFactory<ParticipantsDb>>();
+            factory
+                .Setup(m => m.Build(It.IsAny<string>()))
+                .ReturnsAsync(() =>
+                {
+                    var conn = Factory.CreateConnection();
+                    conn.ConnectionString = ConnectionString;
+                    conn.Open();
+                    return conn;
+                });
+
+            return factory.Object;
+        }
+
         [Fact]
         public async void GetLatestUpload()
         {
@@ -21,8 +39,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 InsertUpload();
 
                 var expected = GetLastUploadId();
-            
-                var dao = new UploadDao(conn);
+
+                var dao = new UploadDao(DbConnFactory());
 
                 // Act
                 var result = await dao.GetLatestUpload();
@@ -42,8 +60,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.Open();
 
                 ClearUploads();
-            
-                var dao = new UploadDao(conn);
+
+                var dao = new UploadDao(DbConnFactory());
 
                 // Act / Assert
                 await Assert.ThrowsAsync<InvalidOperationException>(() => dao.GetLatestUpload());
@@ -53,20 +71,14 @@ namespace Piipan.Participants.Core.IntegrationTests
         [Fact]
         public async void AddUpload()
         {
-            using (var conn = Factory.CreateConnection())
-            {
-                // Arrange
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-            
-                var dao = new UploadDao(conn);
+            // Arrange
+            var dao = new UploadDao(DbConnFactory());
 
-                // Act
-                var result = await dao.AddUpload();
+            // Act
+            var result = await dao.AddUpload();
 
-                // Assert
-                Assert.Equal(GetLastUploadId(), result.Id);
-            }
+            // Assert
+            Assert.Equal(GetLastUploadId(), result.Id);
         }
     }
 }

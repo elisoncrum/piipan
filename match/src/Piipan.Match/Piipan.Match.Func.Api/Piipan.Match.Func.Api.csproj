@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.90" />
+    <PackageReference Include="FluentValidation" Version="10.3.3" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
+    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.19" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
+    <PackageReference Include="Nanoid" Version="2.1.0" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
+    <PackageReference Include="Npgsql" Version="5.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="RunFunctions">
+    <Exec Command="func start" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
+    <ProjectReference Include="..\Piipan.Match.Core\Piipan.Match.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Core\Piipan.Participants.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

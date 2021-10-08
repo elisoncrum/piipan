@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using Piipan.Participants.Api.Models;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
-using Piipan.Participants.Core.Services;
-using Dapper;
-using Npgsql;
+using Piipan.Shared.Database;
 using Xunit;
 
 namespace Piipan.Participants.Core.IntegrationTests
@@ -42,13 +40,33 @@ namespace Piipan.Participants.Core.IntegrationTests
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
                     BenefitsEndDate = DateTime.UtcNow.Date,
-                    RecentBenefitMonths = new List<DateTime>(),
+                    RecentBenefitMonths = new List<DateTime>
+                    {
+                        new DateTime(2021, 4, 1),
+                        new DateTime(2021, 5, 1)
+                    },
                     ProtectLocation = (new Random()).Next(2) == 0,
                     UploadId = GetLastUploadId()
                 });
             }
 
             return result;
+        }
+
+        private IDbConnectionFactory<ParticipantsDb> DbConnFactory()
+        {
+            var factory = new Mock<IDbConnectionFactory<ParticipantsDb>>();
+            factory
+                .Setup(m => m.Build(It.IsAny<string>()))
+                .ReturnsAsync(() =>
+                {
+                    var conn = Factory.CreateConnection();
+                    conn.ConnectionString = ConnectionString;
+                    conn.Open();
+                    return conn;
+                });
+
+            return factory.Object;
         }
 
         [Theory]
@@ -65,7 +83,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.Open();
                 ClearParticipants();
 
-                var dao = new ParticipantDao(conn);
+                var logger = Mock.Of<ILogger<ParticipantDao>>();
+                var dao = new ParticipantDao(DbConnFactory(), logger);
                 var participants = RandomParticipants(nParticipants);
 
                 // Act
@@ -98,6 +117,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                     {
                         // make the hashes and upload id match for all of them
                         LdsHash = randoms.First().LdsHash,
+                        State = randoms.First().State,
                         CaseId = p.CaseId,
                         ParticipantId = p.ParticipantId,
                         BenefitsEndDate = p.BenefitsEndDate,
@@ -109,10 +129,11 @@ namespace Piipan.Participants.Core.IntegrationTests
 
                 participants.ToList().ForEach(p => Insert(p));
 
-                var dao = new ParticipantDao(conn);
+                var logger = Mock.Of<ILogger<ParticipantDao>>();
+                var dao = new ParticipantDao(DbConnFactory(), logger);
 
                 // Act
-                var matches = await dao.GetParticipants(randoms.First().LdsHash, randoms.First().UploadId);
+                var matches = await dao.GetParticipants("ea", randoms.First().LdsHash, randoms.First().UploadId);
 
                 // Assert
                 Assert.True(participants.OrderBy(p => p.CaseId).SequenceEqual(matches.OrderBy(p => p.CaseId)));

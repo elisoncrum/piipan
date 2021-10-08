@@ -8,9 +8,14 @@ Accepted
 
 ## Context
 
-We use Postgresql for our databases. Postgres has two ways of storing times and timestamps: `without time zone` (default) and `with time zone`. There's no right one to use, but they [convert timezones differently](https://www.postgresql.org/docs/11/datatype-datetime.html) to and from the database, and the fact that `without time zone` is the default suggests this is Postgres' general preference.
+We use Postgresql for our databases. Postgres has two ways of storing times and timestamps: `without time zone` (default) and `with time zone`. These types [convert time zones differently](https://www.postgresql.org/docs/11/datatype-datetime.html) to and from the database.
 
-Being consistent with how we store times throughout our databases should reduce complexity and cognitive overhead when working with times. Our users will be spread across all states and territories, so it's important to derive local timezones as easily and unambiguously as possible when displaying to users. So we should pick one data type or the other, but not use both.
+Being consistent with how we store times throughout our databases should reduce complexity and cognitive overhead when working with times. Our users will be spread across all states and territories, so it's important to derive local time zones as easily and unambiguously as possible when displaying to users. So we should pick one data type or the other, but not use both.
+
+One way to decide is going with what Postgres prefers, but what it prefers is unclear. While `timestamp` (without time zone) is the default data type, the `typeispreferred` setting for date and time data types is `timestampz` (with time zone), which means that time-related data conversions will default to this type unless specified otherwise. The Postgres "Don't Do This" [Wiki](https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timestamp_.28without_time_zone.29) states not to use `timestamp`, athough claims it's permittable in cases of simple app retrieval, which is our use case. The Wiki also states not to use `timestamp` to store UTC values as there are consequences when converting time zones within sql (details in our [Consequences](#consequences) section).
+
+In addition, Daylight Savings Time complicates the use of `timestampz`, as UTC offset can change depending on what time of year the data was stored.
+
 
 ### Converting to local time in Dotnet Apps
 
@@ -24,10 +29,21 @@ In Postgres, we will store `time` and `timestamp` values in the default manner `
 
 Over API's, all times will be in UTC.
 
-When it's converted to a local timezone, a timestamp should travel as little as possible through an application to avoid possible downstream reconversion. For web apps, this usually means keeping the timestamp in UTC and converting it to local time only when rendering it as html.
+When it's converted to a local time zone, a timestamp should travel as little as possible through an application to avoid possible downstream reconversion. For web apps, this usually means keeping the timestamp in UTC and converting it to local time only when rendering it as html.
 
 When creating new DateTime instances in Dotnet, specify the Kind property.
 
 ## Consequences
 
-- Being more explicit when creating DateTimes throughout the system
+While we've documented this convention, as this [Wiki](https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timestamp_.28without_time_zone.29_to_store_UTC_times) states, there's no way for the database to be aware of this convention.
+
+Also from the [Wiki](https://wiki.postgresql.org/wiki/Don't_Do_This#Don.27t_use_timestamp_.28without_time_zone.29_to_store_UTC_times), this adds an extra step whenever time zones are being converted in sql itself. For example, with `timestampz` one could do:
+```sql
+SELECT my_timestamptz AT TIME ZONE 'US/Hawaii';
+```
+But with `timestamp` one would need to convert to UTC before re-converting to the intended time zone:
+```sql
+SELECT my_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'US/Hawaii'
+```
+
+We don't anticipate ever having to perform a query like this, since we're deciding to hold off on time zone conversion until much later in the stack.

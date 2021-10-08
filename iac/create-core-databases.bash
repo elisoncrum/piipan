@@ -4,7 +4,6 @@
 source "$(dirname "$0")"/../tools/common.bash || exit
 
 set_constants () {
-  DB_SERVER_NAME=$PREFIX-psql-core-$ENV
   DB_ADMIN_NAME=piipanadmin
   SUPERUSER=$DB_ADMIN_NAME
 
@@ -51,7 +50,7 @@ main () {
     --template-file ./arm-templates/database-core.json \
     --parameters \
       administratorLogin=$DB_ADMIN_NAME \
-      serverName="$DB_SERVER_NAME" \
+      serverName="$CORE_DB_SERVER_NAME" \
       secretName="$PG_SECRET_NAME" \
       vaultName="$VAULT_NAME" \
       vnetName="$VNET_NAME" \
@@ -61,26 +60,35 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       eventHubName="$EVENT_HUB_NAME"
 
-  db_set_env "$RESOURCE_GROUP" "$DB_SERVER_NAME" "$DB_ADMIN_NAME" "$PG_SECRET"
+  db_set_env "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$DB_ADMIN_NAME" "$PG_SECRET"
 
-  # Create and configure metrics DB
+  echo "Creating $METRICS_DB_NAME database and applying DDL"
   db_init "$METRICS_DB_NAME" "$SUPERUSER"
-
-  echo "Create $METRICS_DB_NAME table"
   db_apply_ddl "$METRICS_DB_NAME" ../metrics/ddl/metrics.sql
 
-  db_config_aad "$RESOURCE_GROUP" "$DB_SERVER_NAME" "$PG_AAD_ADMIN"
-  db_use_aad "$DB_SERVER_NAME" "$PG_AAD_ADMIN"
+  echo "Creating $COLLAB_DB_NAME database and applying DDL"
+  db_init "$COLLAB_DB_NAME" "$SUPERUSER"
+  db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/match-record.sql
 
-  echo "Configuring database access for $METRICS_API_APP_NAME"
-  db_create_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
+  db_config_aad "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
+  db_use_aad "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
+
+  echo "Configuring $METRICS_DB_NAME access for $METRICS_API_APP_NAME"
+  db_create_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME" "$RESOURCE_GROUP"
   db_config_managed_role "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
   db_grant_read "$METRICS_DB_NAME" "$METRICS_API_APP_NAME"
 
-  echo "Configuring database access for $METRICS_COLLECT_APP_NAME"
-  db_create_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+  echo "Configuring $METRICS_DB_NAME access for $METRICS_COLLECT_APP_NAME"
+  db_create_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME" "$RESOURCE_GROUP"
   db_config_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
   db_grant_readwrite "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
+
+  local orchestrator
+  orchestrator=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
+  echo "Configuring $COLLAB_DB_NAME access for $orchestrator"
+  db_create_managed_role "$COLLAB_DB_NAME" "$orchestrator" "$MATCH_RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "$orchestrator"
+  db_grant_readwrite "$COLLAB_DB_NAME" "$orchestrator"
 
   db_leave_aad $PG_AAD_ADMIN
 
@@ -88,7 +96,7 @@ main () {
   ./remove-external-network.bash \
     "$azure_env" \
     "$RESOURCE_GROUP" \
-    "$DB_SERVER_NAME"
+    "$CORE_DB_SERVER_NAME"
 
   script_completed
 }

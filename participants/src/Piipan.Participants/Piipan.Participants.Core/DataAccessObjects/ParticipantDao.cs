@@ -1,41 +1,48 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Data;
-using Piipan.Participants.Core.Models;
 using Dapper;
+using Microsoft.Extensions.Logging;
+using Piipan.Participants.Core.Models;
+using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
     public class ParticipantDao : IParticipantDao
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly IDbConnectionFactory<ParticipantsDb> _dbConnectionFactory;
+        private readonly ILogger<ParticipantDao> _logger;
 
-        public ParticipantDao(IDbConnection dbConnection)
+        public ParticipantDao(
+            IDbConnectionFactory<ParticipantsDb> dbConnectionFactory,
+            ILogger<ParticipantDao> logger)
         {
-            _dbConnection = dbConnection;   
+            _dbConnectionFactory = dbConnectionFactory;
+            _logger = logger;
         }
 
-        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string ldsHash, Int64 uploadId)
+        public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId)
         {
-            return await _dbConnection.QueryAsync<ParticipantDbo>(@"
-                SELECT 
-                    lds_hash LdsHash,
-                    participant_id ParticipantId,
-                    case_id CaseId,
-                    benefits_end_date BenefitsEndDate,
-                    recent_benefit_months RecentBenefitMonths,
-                    protect_location ProtectLocation,
-                    upload_id UploadId
-                FROM participants
-                WHERE lds_hash=@ldsHash
-                    AND upload_id=@uploadId",
-                new
-                {
-                    ldsHash = ldsHash,
-                    uploadId = uploadId
-                }
-            );
+            var connection = await _dbConnectionFactory.Build(state);
+            return await connection
+                .QueryAsync<ParticipantDbo>(@"
+                    SELECT
+                        lds_hash LdsHash,
+                        participant_id ParticipantId,
+                        case_id CaseId,
+                        benefits_end_date BenefitsEndDate,
+                        recent_benefit_months RecentBenefitMonths,
+                        protect_location ProtectLocation,
+                        upload_id UploadId
+                    FROM participants
+                    WHERE lds_hash=@ldsHash
+                        AND upload_id=@uploadId",
+                    new
+                    {
+                        ldsHash = ldsHash,
+                        uploadId = uploadId
+                    }
+                );
         }
 
         public async Task AddParticipants(IEnumerable<ParticipantDbo> participants)
@@ -58,14 +65,18 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     @CaseId,
                     @ParticipantId,
                     @BenefitsEndDate,
-                    @RecentBenefitMonths,
+                    @RecentBenefitMonths::date[],
                     @ProtectLocation
                 )
             ";
 
+            var connection = await _dbConnectionFactory.Build();
             foreach (var participant in participants)
             {
-                await _dbConnection.ExecuteAsync(sql, participant);
+                _logger.LogDebug(
+                    $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
+
+                await connection.ExecuteAsync(sql, participant);
             }
         }
     }
