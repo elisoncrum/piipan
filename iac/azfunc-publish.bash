@@ -11,6 +11,8 @@
 #
 # usage:   source ./azfunc-publish.bash
 #          azfunc_publish <app_name> <directory>
+# example: azfunc_publish "${func_app}" "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
+#
 
 azfunc_publish () {
   app_name=$1
