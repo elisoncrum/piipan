@@ -77,7 +77,7 @@ To (re)create the Azure resources that `piipan` uses:
     ./tools/authorize-cli.bash <azure-env> <function-app-name>
     
     #Example
-    ./tools/assign-app-role.bash tts/dev tts-func-metricsapi-dev Metrics.Read
+    ./tools/authorize-cli.bash tts/dev tts-func-metricsapi-dev
     ```
 
 8. Time to test your infraestruture 
