@@ -321,7 +321,7 @@ main () {
 
   #publish function app
   source ./azfunc-publish.bash
-  azfunc_publish ${ORCHESTRATOR_FUNC_APP_NAME} "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+  azfunc_publish $ORCHESTRATOR_FUNC_APP_NAME "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
   # Resource ID required when vnet is in a separate resource group
   vnet_id=$(\
@@ -470,7 +470,7 @@ main () {
       --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
 
     # Create Function endpoint before setting up event subscription
-    azfunc_publish ${func_app} "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
+    azfunc_publish $func_app "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
     az eventgrid system-topic event-subscription create \
       --name "$sub_name" \
