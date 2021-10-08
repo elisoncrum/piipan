@@ -80,7 +80,7 @@ To (re)create the Azure resources that `piipan` uses:
     ./tools/authorize-cli.bash tts/dev tts-func-metricsapi-dev
     ```
 
-8. Time to test your infraestruture 
+8. Time to test your infrastructure 
     ```
     #Test ETL
     ./etl/tools/test-apim-upload-api.bash tts/dev
