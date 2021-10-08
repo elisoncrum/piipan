@@ -25,7 +25,7 @@ azfunc_publish () {
   MAX_TRIES=6
 
   echo "Publishing ${app_name} function app"
-  pushd "$directory"
+  pushd "$directory" || exit
     for (( i=1; i<=MAX_TRIES; i++ ))
       do
         ERR=0
@@ -44,6 +44,6 @@ azfunc_publish () {
       echo "Too many non-sucessful tries"
       exit $ERR
     fi
-  popd
+  popd || exit
 
 }
