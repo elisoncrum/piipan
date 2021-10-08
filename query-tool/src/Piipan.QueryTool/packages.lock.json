@@ -246,6 +246,16 @@
         "resolved": "3.1.19",
         "contentHash": "Htid3HfJu6W5KInQvN31ku2JHU9R0Oy4wlv22M7Paj9x1gjeEx3mhpPVgclnAm/2OCo+b9ZTqwUZD7Mx3lXuBQ=="
       },
+      "Microsoft.Extensions.Http": {
+        "type": "Transitive",
+        "resolved": "3.1.19",
+        "contentHash": "RVVCLCrHis7YEbmyoOGlV1bA3V3NkkcXw7SmWacHcSGaztlJWn+RzLvN2zHJ6JH63h0nUaITOFptG4SP1ge0dA==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.19",
+          "Microsoft.Extensions.Logging": "3.1.19",
+          "Microsoft.Extensions.Options": "3.1.19"
+        }
+      },
       "Microsoft.Extensions.Logging": {
         "type": "Transitive",
         "resolved": "3.1.19",
@@ -429,6 +439,11 @@
           "System.Xml.ReaderWriter": "4.3.0",
           "System.Xml.XDocument": "4.3.0"
         }
+      },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "13.0.1",
+        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
       "Npgsql": {
         "type": "Transitive",
@@ -1546,6 +1561,16 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "piipan.match.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1",
+          "Piipan.Participants.Api": "1.0.0"
+        }
+      },
+      "piipan.participants.api": {
+        "type": "Project"
+      },
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
@@ -1555,6 +1580,7 @@
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
+          "Microsoft.Extensions.Http": "3.1.19",
           "Microsoft.Extensions.Logging": "3.1.19",
           "Microsoft.Extensions.Options": "3.1.19",
           "Npgsql": "5.0.10"
