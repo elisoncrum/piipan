@@ -8,3 +8,15 @@
     position: static;
   }
 }
+
+.usa-header--extended .usa-navbar {
+  @include at-media('desktop') {
+    display: flex !important;
+  }
+}
+
+.usa-header--extended .usa-nav {
+  @include at-media('desktop') {
+    border-top: none;
+  }
+}
