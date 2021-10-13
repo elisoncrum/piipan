@@ -22,7 +22,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ThrowsOnIncorrectFormat(string ssn)
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _ssnNormalizer.Run(ssn));
-            Assert.Equal("social security number must have a 3-digit area number, a 2-digit group number, and a 4-digit serial number, in this order, all separated by a hyphen", exception.Message);
+            Assert.Contains("social security number must have a 3-digit area number, a 2-digit group number, and a 4-digit serial number, in this order, all separated by a hyphen", exception.Message.ToLower());
         }
 
         // Area numbers 000, 666, and 900-999 are invalid
@@ -35,7 +35,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ThrowsOnInvalidAreaNumbers(string ssn)
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _ssnNormalizer.Run(ssn));
-            Assert.Equal("SSN Area Number cannot be 000, 666, or between 900-999", exception.Message);
+            Assert.Contains("the first three numbers of ssn cannot be 000, 666, or between 900-999", exception.Message.ToLower());
         }
 
         // Group number 00 is invalid
@@ -43,7 +43,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ThrowsOnInvalidGroupNumber()
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _ssnNormalizer.Run("111-00-1111"));
-            Assert.Equal("SSN Group Number cannot be 00", exception.Message);
+            Assert.Contains("the middle two numbers of ssn cannot be 00", exception.Message.ToLower());
         }
 
         // Serial number 0000 is invalid
@@ -51,7 +51,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ThrowsOnInvalidSerialNumber()
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _ssnNormalizer.Run("111-11-0000"));
-            Assert.Equal("SSN Serial Number cannot be 0000", exception.Message);
+            Assert.Contains("the last four numbers of ssn cannot be 0000", exception.Message.ToLower());
         }
 
         [Theory]

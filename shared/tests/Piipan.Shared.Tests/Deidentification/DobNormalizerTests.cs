@@ -20,7 +20,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ThrowsOnNonISO8601Dates(string date)
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
-            Assert.Equal("dates must be in ISO 8601 format using a 4-digit year, a zero-padded month, and zero-padded day. Date must exist on Gregorian calendar.", exception.Message);
+            Assert.Contains("dates must be in iso 8601 format using a 4-digit year, a zero-padded month, and zero-padded day", exception.Message.ToLower());
         }
 
         [Theory]
@@ -29,7 +29,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ThrowsOnNonGregorianDates(string date)
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
-            Assert.Equal("dates must be in ISO 8601 format using a 4-digit year, a zero-padded month, and zero-padded day. Date must exist on Gregorian calendar.", exception.Message);
+            Assert.Contains("date must exist on gregorian calendar", exception.Message.ToLower());
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Piipan.Shared.Deidentification.Tests
         {
             string date = DateTime.Now.AddYears(-131).ToString("yyyy-MM-dd");
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _dobNormalizer.Run(date));
-            Assert.Equal($"date should be later than {DobNormalizer.MaxYearsAgo} years ago", exception.Message);
+            Assert.Contains($"date should be later than {DobNormalizer.MaxYearsAgo} years ago", exception.Message.ToLower());
         }
 
         [Theory]
