@@ -44,7 +44,7 @@ check_version () {
   # Delete any patch version
   minor="${minor%%.*}"
 
-  if [ "$major" -gt 4 ] || ([ "$major" -eq 4 ] && [ "$minor" -ge 1 ]); then
+  if [ "$major" -gt 4 ] || { [ "$major" -eq 4 ] && [ "$minor" -ge 1 ]; } then
     return 0
   fi
 
