@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Creates Piipan resource groups. Assumes an Azure user with at least
 # the Contributor role has signed in with the Azure CLI.

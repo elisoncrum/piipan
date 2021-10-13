@@ -8,8 +8,8 @@ All prerequisites are available in [Azure Cloud Shell](https://docs.microsoft.co
     -   There is an [error with versions 2.27.0, 2.27.1, 2.27.2, and 2.28.0](https://github.com/Azure/azure-cli/issues/19719#issuecomment-932617639)
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
-- `bash` shell, `/dev/urandom` – included in macOS, Linux, Git for Windows
-- `psql` client for PostgreSQL
+- `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
+- `psql` client for PostgreSQL – included in Azure Cloud Shell
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:

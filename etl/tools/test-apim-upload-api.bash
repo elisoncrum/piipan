@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Basic remote test tool for the APIM Bulk Upload API. Sends a curl request
 # with de-identified data to the API's upload endpoint for the configured

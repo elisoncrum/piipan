@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Basic remote test tool for the orchestrator match API. Sends a curl request
 # with de-identified data to the API's find_matches endpoint and writes result to

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Removes residual Lookup API resources from provided Azure environment.
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Add the Azure CLI as a "pre-authorized application" for the specified
 # application object. Used to allow users to obtain an access token via

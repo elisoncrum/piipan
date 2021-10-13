@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Assigns the current CLI user the specified application role of the
 # specified Azure Function. Used to enable the use of Azure CLI credentials

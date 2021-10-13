@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Grants the current user the ability to write a blob to the specified
 # storage account. Used in conjunction with upload.bash for ad-hoc testing.
