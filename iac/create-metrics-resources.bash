@@ -132,8 +132,7 @@ main () {
     --output none
 
   # publish the function app
-  source ./azfunc-publish.bash
-  azfunc_publish "${METRICS_COLLECT_APP_NAME}" "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
+  try_run "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
 
   # Subscribe each dynamically created event blob topic to this function
   METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
@@ -223,7 +222,7 @@ main () {
     ]'
 
   # publish metrics function app
-  azfunc_publish "${METRICS_API_APP_NAME}" "../metrics/src/Piipan.Metrics/$API_APP_FILEPATH"
+  try_run "func azure functionapp publish ${METRICS_API_APP_NAME} --dotnet" "../metrics/src/Piipan.Metrics/$API_APP_FILEPATH"
 
   ## Dashboard stuff
 

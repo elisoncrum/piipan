@@ -202,4 +202,49 @@ private_dns_zone () {
 
   echo $base
 }
+
+# try_command()
+#
+# The function help with the robusness of the IaC code. 
+# In ocassions the original when run a command it can fail, because any kind of error. 
+# The wrapper function will try run the command to a max_tries of times. 
+#
+# mycommand - command to be run
+# directory - path where tje mycommand should be run
+# max_tries - max number of try, default value 6
+#
+# usage:   try_command <mycommand> <directory> <max_tries>
+#
+try_run () {
+  mycommand=$1
+  directory="${2:-${"./"}}"
+  max_tries="${3:-6}" 
+
+  ERR=0 # or some non zero error number you want
+  mycommand+=" || ERR=1"
+
+  pushd "$directory" || exit
+    for (( i=1; i<=max_tries; i++ ))
+      do
+        ERR=0
+        echo "Running: ${mycommand}"  
+        eval "$mycommand"
+
+        if [ $ERR -eq 0 ];then
+          (( i = max_tries + 1))
+        else
+          echo "Waiting to retry..."
+          sleep $(( i * 30 ))
+        fi
+
+      done
+    if [ $ERR -eq 1 ];then
+      echo "Too many non-sucessful tries to run: ${mycommand}"
+      exit $ERR
+    fi
+  popd || exit
+
+}
+
+
 ### END Functions
