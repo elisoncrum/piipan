@@ -633,6 +633,16 @@
           "Microsoft.Extensions.Logging.Abstractions": "2.1.0"
         }
       },
+      "Microsoft.Extensions.Http": {
+        "type": "Transitive",
+        "resolved": "3.1.20",
+        "contentHash": "L2EJ4BqhNVlFyqkr9zplNc+jH4ENbYlmN1W0MJotAb/tYkp+P7QwnTTvsYqZwf70rhdOuFXdY4XdPRPWViN+WA==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.20",
+          "Microsoft.Extensions.Logging": "3.1.20",
+          "Microsoft.Extensions.Options": "3.1.20"
+        }
+      },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
         "resolved": "3.1.20",
@@ -2138,6 +2148,7 @@
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
+          "Microsoft.Extensions.Http": "3.1.20",
           "Microsoft.Extensions.Logging": "3.1.20",
           "Microsoft.Extensions.Options": "3.1.20",
           "Npgsql": "5.0.10"

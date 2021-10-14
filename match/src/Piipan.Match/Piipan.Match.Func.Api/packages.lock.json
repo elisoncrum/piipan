@@ -2203,6 +2203,7 @@
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
+          "Microsoft.Extensions.Http": "3.1.20",
           "Microsoft.Extensions.Logging": "3.1.20",
           "Microsoft.Extensions.Options": "3.1.20",
           "Npgsql": "5.0.10"
