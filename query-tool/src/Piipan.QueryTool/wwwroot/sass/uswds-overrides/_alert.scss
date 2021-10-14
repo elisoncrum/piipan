@@ -6,3 +6,7 @@
   margin: 3px 0 0;
   padding-left: 1rem;
 }
+
+.usa-alert--error p::first-letter {
+  text-transform: capitalize;
+}

@@ -1,22 +1,22 @@
 using System;
+using Dapper;
+using Moq;
+using Npgsql;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Shared.Database;
-using Dapper;
-using Npgsql;
 using Xunit;
-using Moq;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
     [Collection("Core.IntegrationTests")]
     public class UploadDaoTests : DbFixture
     {
-        private IDbConnectionFactory DbConnFactory()
+        private IDbConnectionFactory<ParticipantsDb> DbConnFactory()
         {
-            var factory = new Mock<IDbConnectionFactory>();
+            var factory = new Mock<IDbConnectionFactory<ParticipantsDb>>();
             factory
                 .Setup(m => m.Build(It.IsAny<string>()))
-                .ReturnsAsync(() => 
+                .ReturnsAsync(() =>
                 {
                     var conn = Factory.CreateConnection();
                     conn.ConnectionString = ConnectionString;
@@ -39,7 +39,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 InsertUpload();
 
                 var expected = GetLastUploadId();
-            
+
                 var dao = new UploadDao(DbConnFactory());
 
                 // Act
@@ -60,7 +60,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.Open();
 
                 ClearUploads();
-            
+
                 var dao = new UploadDao(DbConnFactory());
 
                 // Act / Assert

@@ -45,6 +45,8 @@ After installing the dependencies but before making any changes to the SCSS (in 
 
 Gulp will then watch for changes to the SCSS and compile them into the main CSS file.
 
+[Instructions for updating Node dependencies](../../docs/node.md)
+
 ## Deployment
 
 The app is deployed from [CircleCI](https://app.circleci.com/pipelines/github/18F/piipan) upon updates to `main`.

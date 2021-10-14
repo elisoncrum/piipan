@@ -20,7 +20,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void throwsExceptionOnNonAscii(string source)
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _nameNormalizer.Run(source));
-            Assert.Equal("name must contain only ascii characters", exception.Message);
+            Assert.Contains("name should only contain standard ascii characters", exception.Message.ToLower());
         }
 
         [Theory]
@@ -95,7 +95,7 @@ namespace Piipan.Shared.Deidentification.Tests
         public void Run_ValidatesAtleastOneAsciiChar(string source)
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _nameNormalizer.Run(source));
-            Assert.Equal("normalized name must be at least 1 character long", exception.Message);
+            Assert.Contains("normalized name must be at least 1 character long", exception.Message.ToLower());
         }
 
     }

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Uploads a file to a storage account, in the `upload` container. Used for
 # ad-hoc testing of the bulk import of participant records into a per-state

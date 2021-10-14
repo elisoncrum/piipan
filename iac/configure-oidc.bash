@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Sets the IDP_CLIENT_SECRET application setting for the web app with the 
 # given application name. Assumes an Azure user with the Global

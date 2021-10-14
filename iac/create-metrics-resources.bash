@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Provisions and configures the infrastructure components for all Piipan Metrics subsystems.
 # Assumes an Azure user with the Global Administrator role has signed in with the Azure CLI.

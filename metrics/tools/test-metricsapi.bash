@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Basic integration test tool for the Metrics API. Sends a curl request to the
 # API's GetParticipantUploads endpoint and writes result to stdout.

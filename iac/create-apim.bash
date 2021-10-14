@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Creates the API Management instance for managing the external-facing
 # duplicate participation API. Assumes an Azure user with the Global
@@ -67,7 +67,8 @@ grant_blob () {
   az role assignment create \
     --role "Storage Blob Data Contributor" \
     --assignee "$assignee" \
-    --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}"
+    --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}" \
+    --output none
 }
 
 get_state_abbrs () {
@@ -113,6 +114,7 @@ main () {
   local state_abbrs
   state_abbrs=$(get_state_abbrs)
 
+  echo "Creating APIM instance"
   apim_identity=$(\
     az deployment group create \
       --name apim-dev \
@@ -137,6 +139,7 @@ main () {
         eventHubName="$EVENT_HUB_NAME" \
         apimPolicyXml="$apim_policy_xml")
 
+  echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))
   for account in "${upload_accounts[@]}"
   do
@@ -146,6 +149,8 @@ main () {
   # Clear out default example resources
   # See: https://stackoverflow.com/a/64297708
   clean_defaults "$MATCH_RESOURCE_GROUP" "$APIM_NAME"
+
+  script_completed
 }
 
 main "$@"

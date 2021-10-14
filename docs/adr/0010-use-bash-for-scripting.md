@@ -4,7 +4,7 @@ Date: 2021-01-22
 
 ## Status
 
-Accepted
+Superceded by [21. Use recent bash version for scripting](0021-use-recent-bash-version-for-scripting.md)
 
 ## Context
 

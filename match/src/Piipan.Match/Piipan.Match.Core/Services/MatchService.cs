@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
+using Piipan.Match.Core.Models;
 using Piipan.Participants.Api;
 using FluentValidation;
 
@@ -65,8 +66,9 @@ namespace Piipan.Match.Core.Services
         {
             var states = await _participantApi.GetStates();
 
-            var matches = await states
-                .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash));
+            var matches = (await states
+                .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash)))
+                .Select(p => new Participant(p));
 
             return new OrchMatchResult
             {

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Validates a decomposed YAML OpenAPI spec and bundles it into a
 # single openapi.yaml file.

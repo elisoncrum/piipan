@@ -1,19 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using Microsoft.Extensions.Logging;
-using Piipan.Participants.Api.Models;
+using Moq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
-using Piipan.Participants.Core.Services;
-using Dapper;
-using Npgsql;
-using Xunit;
-using Moq;
 using Piipan.Shared.Database;
+using Xunit;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
@@ -58,12 +53,12 @@ namespace Piipan.Participants.Core.IntegrationTests
             return result;
         }
 
-        private IDbConnectionFactory DbConnFactory()
+        private IDbConnectionFactory<ParticipantsDb> DbConnFactory()
         {
-            var factory = new Mock<IDbConnectionFactory>();
+            var factory = new Mock<IDbConnectionFactory<ParticipantsDb>>();
             factory
                 .Setup(m => m.Build(It.IsAny<string>()))
-                .ReturnsAsync(() => 
+                .ReturnsAsync(() =>
                 {
                     var conn = Factory.CreateConnection();
                     conn.ConnectionString = ConnectionString;

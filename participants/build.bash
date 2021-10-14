@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Builds project with optional testing and app deployment
 # Relies on a solutions file (sln) in the subsystem root directory

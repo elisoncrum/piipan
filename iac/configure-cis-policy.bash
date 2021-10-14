@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Assigns the CIS Microsoft Azure Foundations Benchmark policy set
 # to the core and match resource groups. Assumes an Azure user with

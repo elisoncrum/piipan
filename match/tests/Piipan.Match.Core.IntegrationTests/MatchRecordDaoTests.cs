@@ -14,9 +14,9 @@ namespace Piipan.Match.Core.IntegrationTests
     [Collection("Core.IntegrationTests")]
     public class MatchRecordDaoTests : DbFixture
     {
-        private IDbConnectionFactory DbConnFactory()
+        private IDbConnectionFactory<CollaborationDb> DbConnFactory()
         {
-            var factory = new Mock<IDbConnectionFactory>();
+            var factory = new Mock<IDbConnectionFactory<CollaborationDb>>();
             factory
                 .Setup(m => m.Build(It.IsAny<string>()))
                 .ReturnsAsync(() =>

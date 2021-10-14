@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Npgsql;
+using Piipan.Etl.Func.BulkUpload;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
+using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Shared.Database;
 using Xunit;
 
@@ -27,11 +27,13 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var target = new Startup();
 
             // Act
+            Environment.SetEnvironmentVariable(Startup.DatabaseConnectionString,
+                "Server=server;Database=db;Port=5432;User Id=postgres;Password={password};");
             target.Configure(builder.Object);
             var provider = services.BuildServiceProvider();
 
             // Assert
-            Assert.NotNull(provider.GetService<IDbConnectionFactory>());
+            Assert.NotNull(provider.GetService<IDbConnectionFactory<ParticipantsDb>>());
             Assert.NotNull(provider.GetService<IParticipantApi>());
             Assert.NotNull(provider.GetService<IParticipantStreamParser>());
         }

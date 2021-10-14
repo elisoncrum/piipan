@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Delete all resources in the defined resource groups, leaving the resource
 # groups themselves in place.

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Provisions and configures the infrastructure components for all Piipan
 # subsystems. Assumes an Azure user with the Global Administrator role
@@ -301,6 +301,7 @@ main () {
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools.
   db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
+  collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
     --name orch-api \
     --resource-group "$MATCH_RESOURCE_GROUP" \
@@ -312,6 +313,7 @@ main () {
       appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
       storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
       databaseConnectionString="$db_conn_str" \
+      collabDatabaseConnectionString="$collab_db_conn_str" \
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
