@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,8 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
@@ -27,6 +30,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {
+        private const string InitiatingState = "ea";
+
         static Participant FullRecord()
         {
             return new Participant
@@ -73,7 +78,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
                 {
                     { "From", "a user" },
-                    { "Ocp-Apim-Subscription-Name", "sub-name" }
+                    { "Ocp-Apim-Subscription-Name", "sub-name" },
+                    { "X-Initiating-State", InitiatingState }
                 }));
 
             return mockRequest;
@@ -98,14 +104,21 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     Environment.GetEnvironmentVariable(Startup.DatabaseConnectionString));
             });
             services.RegisterParticipantsServices();
+            services.RegisterMatchServices();
 
-            services.AddTransient<IMatchApi, MatchService>();
+            services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<CollaborationDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
+            });
 
             var provider = services.BuildServiceProvider();
 
             var api = new MatchApi(
                 provider.GetService<IMatchApi>(),
-                provider.GetService<IStreamParser<OrchMatchRequest>>()
+                provider.GetService<IStreamParser<OrchMatchRequest>>(),
+                provider.GetService<IMatchEventService>()
             );
 
             return api;
@@ -222,6 +235,54 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             Assert.Equal(resultA.Matches.First().ParticipantId, recordA.ParticipantId);
             Assert.Equal(resultB.Matches.First().ParticipantId, recordB.ParticipantId);
+        }
+
+        [Fact]
+        public async void ApiCreatesMatchRecords()
+        {
+            // Arrange
+            var record = FullRecord();
+            var logger = Mock.Of<ILogger>();
+            var body = new object[] { record };
+            var mockRequest = MockRequest(JsonBody(body));
+            var api = Construct();
+            var state = Environment.GetEnvironmentVariable("States").Split(",");
+
+            ClearParticipants();
+            ClearMatchRecords();
+            Insert(record);
+
+            // Act
+            var response = await api.Find(mockRequest.Object, logger);
+
+            // Assert
+            Assert.Equal(1, CountMatchRecords());
+        }
+
+        [Fact]
+        public async void ApiCreatesMatchRecordsWithCorrectValues()
+        {
+            // Arrange
+            var record = FullRecord();
+            var logger = Mock.Of<ILogger>();
+            var body = new object[] { record };
+            var mockRequest = MockRequest(JsonBody(body));
+            var api = Construct();
+            var state = Environment.GetEnvironmentVariable("States").Split(",");
+
+            ClearParticipants();
+            ClearMatchRecords();
+            Insert(record);
+
+            // Act
+            var response = await api.Find(mockRequest.Object, logger);
+            var matchRecord = GetLastMatchRecord();
+
+            // Assert
+            Assert.Equal(InitiatingState, matchRecord.Initiator);
+            Assert.True(matchRecord.States.SequenceEqual(new string[] { InitiatingState, state[0] }));
+            Assert.Equal(record.LdsHash, matchRecord.Hash);
+            Assert.Equal("ldshash", matchRecord.HashType);
         }
     }
 }

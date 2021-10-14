@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <Content Include="..\..\..\ddl\per-state.sql" Link="per-state.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\ddl\match-record.sql" Link="match-record.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -75,6 +75,7 @@ jobs:
           name: Test Orchestrator Match integration
           environment:
             DatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
+            CollaborationDatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
             States: ea
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
