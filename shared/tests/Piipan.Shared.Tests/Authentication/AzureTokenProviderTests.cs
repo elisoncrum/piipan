@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Piipan.Shared.Authentication;
-using Moq;
-using Xunit;
 using Azure.Core;
 using Microsoft.Extensions.Options;
-using System.Threading;
+using Moq;
+using Piipan.Shared.Authentication;
+using Xunit;
 
 namespace Piipan.Shared.Tests.Authentication
 {
@@ -24,8 +24,8 @@ namespace Piipan.Shared.Tests.Authentication
             var options = new Mock<IOptions<AzureTokenProviderOptions<AzureTokenProviderTests>>>();
             options
                 .Setup(m => m.Value)
-                .Returns(new AzureTokenProviderOptions<AzureTokenProviderTests> 
-                { 
+                .Returns(new AzureTokenProviderOptions<AzureTokenProviderTests>
+                {
                     ResourceUri = "testUri"
                 });
 
