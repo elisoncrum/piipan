@@ -320,7 +320,7 @@ main () {
       eventHubName="$EVENT_HUB_NAME"
 
   #publish function app
-  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
   # Resource ID required when vnet is in a separate resource group
   vnet_id=$(\
@@ -469,7 +469,7 @@ main () {
       --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
 
     # Create Function endpoint before setting up event subscription
-    try_run "func azure functionapp publish ${func_app} --dotnet" "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
+    try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
     az eventgrid system-topic event-subscription create \
       --name "$sub_name" \

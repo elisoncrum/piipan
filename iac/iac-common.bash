@@ -210,15 +210,16 @@ private_dns_zone () {
 # The wrapper function will try run the command to a max_tries of times. 
 #
 # mycommand - command to be run
+# max_tries - max number of try, default value 3
 # directory - path where tje mycommand should be run
-# max_tries - max number of try, default value 6
 #
-# usage:   try_command <mycommand> <directory> <max_tries>
+# usage:   try_command <mycommand> <max_tries> <directory> 
 #
 try_run () {
   mycommand=$1
-  directory="${2:-${"./"}}"
-  max_tries="${3:-6}" 
+  max_tries="${2:-3}" 
+  directory="${3:-"./"}"
+
 
   ERR=0 # or some non zero error number you want
   mycommand+=" || ERR=1"

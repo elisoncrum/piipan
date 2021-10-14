@@ -132,7 +132,7 @@ main () {
     --output none
 
   # publish the function app
-  try_run "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
+  try_run "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" 7 "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
 
   # Subscribe each dynamically created event blob topic to this function
   METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
@@ -222,7 +222,7 @@ main () {
     ]'
 
   # publish metrics function app
-  try_run "func azure functionapp publish ${METRICS_API_APP_NAME} --dotnet" "../metrics/src/Piipan.Metrics/$API_APP_FILEPATH"
+  try_run "func azure functionapp publish ${METRICS_API_APP_NAME} --dotnet" 7 "../metrics/src/Piipan.Metrics/$API_APP_FILEPATH"
 
   ## Dashboard stuff
 
