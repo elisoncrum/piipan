@@ -15,10 +15,11 @@ namespace Piipan.Shared.Deidentification
         public string Run(string lname)
         {
             // Loud failure for non-ascii chars
-            Regex nonasciirgx = new Regex(@"[^\x00-\x7F]");
-            if (nonasciirgx.IsMatch(lname))
+            string nonasciirgx = @"[^\x00-\x7F]";
+            Match m = Regex.Match(lname, nonasciirgx, RegexOptions.IgnoreCase);
+            if (m.Success)
             {
-                throw new ArgumentException("name must contain only ascii characters");
+                throw new ArgumentException($"Change {m.Value} in {lname}. The Last name should only contain standard ASCII characters, including the letters A-Z, numbers 0-9, and some select characters including hyphens.");
             }
             // Convert to lower case
             string result = lname.ToLower();
@@ -36,7 +37,7 @@ namespace Piipan.Shared.Deidentification
             // Validate that the resulting value is at least one ASCII character in length
             if (result.Length < 1) // not at least one char
             {
-                throw new ArgumentException("normalized name must be at least 1 character long");
+                throw new ArgumentException("Normalized name must be at least 1 character long.");
             }
             return result;
         }

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Provisions and configures the infrastructure components for all Piipan
 # subsystems. Assumes an Azure user with the Global Administrator role

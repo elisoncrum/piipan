@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Supporting functionality for subsystem build scripts.
 # Purpose of build scripts is to have platform-agnostic scripts

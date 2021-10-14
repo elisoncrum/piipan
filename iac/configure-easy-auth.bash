@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Configures Easy Auth for internal API communication within Piipan.
 # Requires specific privileges on Azure Active Directory that the
 # subscription Global Administrator role has, but a subscription

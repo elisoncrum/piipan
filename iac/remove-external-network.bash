@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This script removes all firewall policies from database before
 # denying public access to database.
 # Once done, the only access to database would be through its private endpoint.

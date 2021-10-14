@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Enables Azure Defender at the subscription level for storage 
 # accounts. Assumes an Azure user with the Global Administrator
