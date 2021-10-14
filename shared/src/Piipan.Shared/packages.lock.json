@@ -80,13 +80,13 @@
       },
       "Microsoft.Extensions.Http": {
         "type": "Direct",
-        "requested": "[3.1.19, )",
-        "resolved": "3.1.19",
-        "contentHash": "RVVCLCrHis7YEbmyoOGlV1bA3V3NkkcXw7SmWacHcSGaztlJWn+RzLvN2zHJ6JH63h0nUaITOFptG4SP1ge0dA==",
+        "requested": "[3.1.20, )",
+        "resolved": "3.1.20",
+        "contentHash": "L2EJ4BqhNVlFyqkr9zplNc+jH4ENbYlmN1W0MJotAb/tYkp+P7QwnTTvsYqZwf70rhdOuFXdY4XdPRPWViN+WA==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.19",
-          "Microsoft.Extensions.Logging": "3.1.19",
-          "Microsoft.Extensions.Options": "3.1.19"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.20",
+          "Microsoft.Extensions.Logging": "3.1.20",
+          "Microsoft.Extensions.Options": "3.1.20"
         }
       },
       "Microsoft.Extensions.Logging": {
