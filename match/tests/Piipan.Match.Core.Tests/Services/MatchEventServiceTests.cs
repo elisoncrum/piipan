@@ -13,7 +13,7 @@ namespace Piipan.Match.Core.Tests.Services
 {
     public class MatchEventServiceTests
     {
-        private Mock<IActiveMatchRecordBuilder> BuilderMock()
+        private Mock<IActiveMatchRecordBuilder> BuilderMock(MatchRecordDbo record)
         {
             var recordBuilder = new Mock<IActiveMatchRecordBuilder>();
             recordBuilder
@@ -24,7 +24,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Returns(recordBuilder.Object);
             recordBuilder
                 .Setup(r => r.GetRecord())
-                .Returns(new MatchRecordDbo());
+                .Returns(record);
 
             return recordBuilder;
         }
@@ -42,7 +42,14 @@ namespace Piipan.Match.Core.Tests.Services
         public async void Resolve_AddsSingleRecord()
         {
             // Arrange
-            var recordBuilder = BuilderMock();
+            var record = new MatchRecordDbo
+            {
+                Hash = "foo",
+                HashType = "ldshash",
+                Initiator = "ea",
+                States = new string[] { "ea", "eb" }
+            };
+            var recordBuilder = BuilderMock(record);
             var recordApi = ApiMock();
 
             var request = new OrchMatchRequest();
@@ -65,7 +72,11 @@ namespace Piipan.Match.Core.Tests.Services
 
             // Assert
             recordApi.Verify(r => r.AddRecord(
-                It.IsAny<IMatchRecord>()),
+                It.Is<IMatchRecord>(r =>
+                    r.Hash == record.Hash &&
+                    r.HashType == record.HashType &&
+                    r.Initiator == record.Initiator &&
+                    r.States.SequenceEqual(record.States))),
                 Times.Once);
         }
 
@@ -73,7 +84,14 @@ namespace Piipan.Match.Core.Tests.Services
         public async void Resolve_AddsManyRecords()
         {
             // Arrange
-            var recordBuilder = BuilderMock();
+            var record = new MatchRecordDbo
+            {
+                Hash = "foo",
+                HashType = "ldshash",
+                Initiator = "ea",
+                States = new string[] { "ea", "eb" }
+            };
+            var recordBuilder = BuilderMock(record);
             var recordApi = ApiMock();
 
             var request = new OrchMatchRequest();
@@ -98,7 +116,11 @@ namespace Piipan.Match.Core.Tests.Services
 
             // Assert
             recordApi.Verify(r => r.AddRecord(
-                It.IsAny<IMatchRecord>()),
+                It.Is<IMatchRecord>(r =>
+                    r.Hash == record.Hash &&
+                    r.HashType == record.HashType &&
+                    r.Initiator == record.Initiator &&
+                    r.States.SequenceEqual(record.States))),
                 Times.Exactly(result.Matches.Count()));
         }
     }
