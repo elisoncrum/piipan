@@ -154,6 +154,32 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             return count;
         }
 
+        public MatchRecordDbo GetLastMatchRecord()
+        {
+            MatchRecordDbo record;
+
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = CollabConnectionString;
+                conn.Open();
+
+                record = conn.QuerySingle<MatchRecordDbo>(
+                    @"SELECT
+                        match_id,
+                        initiator,
+                        states,
+                        hash,
+                        hash_type::text,
+                        input::jsonb,
+                        data::jsonb
+                    FROM matches ORDER BY id LIMIT 1;");
+
+                conn.Close();
+            }
+
+            return record;
+        }
+
         public void Insert(Participant record)
         {
             var factory = NpgsqlFactory.Instance;

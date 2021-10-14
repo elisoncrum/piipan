@@ -16,9 +16,9 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Api.Models;
@@ -165,14 +165,12 @@ namespace Piipan.Match.Func.Api.Tests
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
-            var recordBuilder = new Mock<IActiveMatchRecordBuilder>();
-            var recordApi = new Mock<IMatchRecordApi>();
+            var matchEventService = new Mock<IMatchEventService>();
 
             var api = new MatchApi(
                 matchService.Object,
                 requestParser,
-                recordBuilder.Object,
-                recordApi.Object);
+                matchEventService.Object);
 
             return api;
         }
@@ -184,14 +182,12 @@ namespace Piipan.Match.Func.Api.Tests
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
-            var recordBuilder = new Mock<IActiveMatchRecordBuilder>();
-            var recordApi = new Mock<IMatchRecordApi>();
+            var matchEventService = new Mock<IMatchEventService>();
 
             var api = new MatchApi(
                 matchService.Object,
                 requestParser,
-                recordBuilder.Object,
-                recordApi.Object);
+                matchEventService.Object);
 
             return api;
         }
@@ -207,8 +203,7 @@ namespace Piipan.Match.Func.Api.Tests
             var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
-            var recordBuilder = Mock.Of<IActiveMatchRecordBuilder>();
-            var recordApi = Mock.Of<IMatchRecordApi>();
+            var matchEventService = Mock.Of<IMatchEventService>();
             var mockRequest = MockRequest("");
 
             requestParser
@@ -218,8 +213,7 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService,
                 requestParser.Object,
-                recordBuilder,
-                recordApi);
+                matchEventService);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -242,8 +236,7 @@ namespace Piipan.Match.Func.Api.Tests
             var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
-            var recordBuilder = Mock.Of<IActiveMatchRecordBuilder>();
-            var recordApi = Mock.Of<IMatchRecordApi>();
+            var matchEventService = Mock.Of<IMatchEventService>();
             var mockRequest = MockRequest("");
 
             requestParser
@@ -256,8 +249,7 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService,
                 requestParser.Object,
-                recordBuilder,
-                recordApi);
+                matchEventService);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -279,8 +271,7 @@ namespace Piipan.Match.Func.Api.Tests
             var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
-            var recordBuilder = Mock.Of<IActiveMatchRecordBuilder>();
-            var recordApi = Mock.Of<IMatchRecordApi>();
+            var matchEventService = Mock.Of<IMatchEventService>();
             var mockRequest = MockRequest("");
             mockRequest
                 .Setup(x => x.Headers)
@@ -289,8 +280,7 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService,
                 requestParser.Object,
-                recordBuilder,
-                recordApi);
+                matchEventService);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -400,15 +390,13 @@ namespace Piipan.Match.Func.Api.Tests
 
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
-            var recordBuilder = Mock.Of<IActiveMatchRecordBuilder>();
-            var recordApi = Mock.Of<IMatchRecordApi>();
+            var matchEventService = new Mock<IMatchEventService>();
             var mockRequest = MockRequest("");
 
             var api = new MatchApi(
                 matchService.Object,
                 requestParser.Object,
-                recordBuilder,
-                recordApi);
+                matchEventService.Object);
 
             // Act
             var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;

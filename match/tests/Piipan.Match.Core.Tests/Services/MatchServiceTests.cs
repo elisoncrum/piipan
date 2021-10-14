@@ -23,8 +23,7 @@ namespace Piipan.Match.Core.Tests.Services
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
             var requestPersonValidator = Mock.Of<IValidator<RequestPerson>>();
-            var matchEventService = Mock.Of<IMatchEventService>();
-            var service = new MatchService(participantApi, requestPersonValidator, matchEventService);
+            var service = new MatchService(participantApi, requestPersonValidator);
 
             var request = new OrchMatchRequest();
 
@@ -42,7 +41,6 @@ namespace Piipan.Match.Core.Tests.Services
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            var matchEventService = Mock.Of<IMatchEventService>();
 
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
@@ -52,7 +50,7 @@ namespace Piipan.Match.Core.Tests.Services
                     new ValidationFailure("property", "invalid value")
                 }));
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object, matchEventService);
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -78,14 +76,13 @@ namespace Piipan.Match.Core.Tests.Services
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            var matchEventService = Mock.Of<IMatchEventService>();
 
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object, matchEventService);
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -109,7 +106,6 @@ namespace Piipan.Match.Core.Tests.Services
         public async Task ReturnsAggregatedMatchesFromStates()
         {
             // Arrange
-            var matchEventService = Mock.Of<IMatchEventService>();
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.GetStates())
@@ -128,7 +124,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi.Object, requestPersonValidator.Object, matchEventService);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -154,57 +150,17 @@ namespace Piipan.Match.Core.Tests.Services
         }
 
         [Fact]
-        public async Task CallsMatchEventService()
-        {
-            // Arrange
-            var participantApi = Mock.Of<IParticipantApi>();
-            var matchEventService = new Mock<IMatchEventService>();
-            matchEventService
-                .Setup(m => m.ResolveMatchesAsync(
-                    It.IsAny<RequestPerson>(),
-                    It.IsAny<IEnumerable<IParticipant>>(),
-                    It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-
-            var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
-            requestPersonValidator
-                .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new ValidationResult());
-
-            var service = new MatchService(participantApi, requestPersonValidator.Object, matchEventService.Object);
-
-            var request = new OrchMatchRequest
-            {
-                Data = new List<RequestPerson>
-                {
-                    new RequestPerson { LdsHash = "" }
-                }
-            };
-
-            // Act
-            var response = await service.FindMatches(request, "ea");
-
-            // Assert
-            matchEventService.Verify(m => m.ResolveMatchesAsync(
-                It.IsAny<RequestPerson>(),
-                It.IsAny<IEnumerable<IParticipant>>(),
-                It.IsAny<string>()),
-                Times.Exactly(request.Data.Count));
-        }
-
-        [Fact]
         public async Task ThrowsWhenRequestPersonValidatorThrows()
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            var matchEventService = Mock.Of<IMatchEventService>();
 
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("validator failed"));
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object, matchEventService);
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {
@@ -222,7 +178,6 @@ namespace Piipan.Match.Core.Tests.Services
         public async Task ThrowsWhenParticipantApiThrows()
         {
             // Arrange
-            var matchEventService = Mock.Of<IMatchEventService>();
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.GetStates())
@@ -236,7 +191,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi.Object, requestPersonValidator.Object, matchEventService);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
 
             var request = new OrchMatchRequest
             {

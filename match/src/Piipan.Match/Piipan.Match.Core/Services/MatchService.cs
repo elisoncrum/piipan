@@ -16,19 +16,16 @@ namespace Piipan.Match.Core.Services
     {
         private readonly IParticipantApi _participantApi;
         private readonly IValidator<RequestPerson> _requestPersonValidator;
-        private readonly IMatchEventService _matchEventService;
 
         /// <summary>
         /// Initializes a new instance of MatchService
         /// </summary>
         public MatchService(
             IParticipantApi participantApi,
-            IValidator<RequestPerson> requestPersonValidator,
-            IMatchEventService matchEventService)
+            IValidator<RequestPerson> requestPersonValidator)
         {
             _participantApi = participantApi;
             _requestPersonValidator = requestPersonValidator;
-            _matchEventService = matchEventService;
         }
 
         /// <summary>
@@ -72,8 +69,6 @@ namespace Piipan.Match.Core.Services
             var matches = (await states
                 .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash)))
                 .Select(p => new Participant(p));
-
-            await _matchEventService.ResolveMatchesAsync(person, matches, initiatingState);
 
             return new OrchMatchResult
             {

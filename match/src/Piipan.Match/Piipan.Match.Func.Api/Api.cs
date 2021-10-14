@@ -13,6 +13,7 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Func.Api.Models;
 
@@ -25,19 +26,16 @@ namespace Piipan.Match.Func.Api
     {
         private readonly IMatchApi _matchApi;
         private readonly IStreamParser<OrchMatchRequest> _requestParser;
-        private readonly IActiveMatchRecordBuilder _recordBuilder;
-        private readonly IMatchRecordApi _recordApi;
+        private readonly IMatchEventService _matchEventService;
 
         public MatchApi(
             IMatchApi matchApi,
             IStreamParser<OrchMatchRequest> requestParser,
-            IActiveMatchRecordBuilder recordBuilder,
-            IMatchRecordApi recordApi)
+            IMatchEventService matchEventService)
         {
             _matchApi = matchApi;
             _requestParser = requestParser;
-            _recordBuilder = recordBuilder;
-            _recordApi = recordApi;
+            _matchEventService = matchEventService;
 
             SqlMapper.AddTypeHandler(new DateTimeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
@@ -65,6 +63,8 @@ namespace Piipan.Match.Func.Api
                 var initiatingState = InitiatingState(req);
                 var request = await _requestParser.Parse(req.Body);
                 var response = await _matchApi.FindMatches(request, initiatingState);
+
+                await _matchEventService.ResolveMatches(request, response, initiatingState);
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }

@@ -25,14 +25,25 @@ namespace Piipan.Match.Core.Services
         }
 
         /// <summary>
-        /// Creates a match record for each person-level match
+        /// Creates a match record for each match found by the match API
         /// </summary>
-        /// <param name="person">The matching RequestPerson instance from the match request</param>
-        /// <param name="matches">The collection of one or more matches returned by the match request</param>
+        /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
+        /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
         /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
-        public async Task ResolveMatchesAsync(RequestPerson person, IEnumerable<IParticipant> matches, string initiatingState)
+        public async Task ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
         {
-            var records = matches.Select(match =>
+
+            await Task.WhenAll(
+                matchResponse.Data.Results.Select(result =>
+                    ResolvePersonMatches(
+                        request.Data.ElementAt(result.Index),
+                        result,
+                        initiatingState)));
+        }
+
+        private async Task ResolvePersonMatches(RequestPerson person, OrchMatchResult result, string initiatingState)
+        {
+            var records = result.Matches.Select(match =>
                 _recordBuilder
                     .SetMatch(person, match)
                     .SetStates(initiatingState, match.State)
