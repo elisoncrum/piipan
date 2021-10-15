@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation;
+using FluentValidation.Results;
+using Moq;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
-using FluentValidation;
-using FluentValidation.Results;
-using Moq;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
@@ -28,7 +28,7 @@ namespace Piipan.Match.Core.Tests.Services
             var request = new OrchMatchRequest();
 
             // Act
-            var response = await service.FindMatches(request);
+            var response = await service.FindMatches(request, "ea");
 
             // Assert
             Assert.NotNull(response);
@@ -41,7 +41,7 @@ namespace Piipan.Match.Core.Tests.Services
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            
+
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
@@ -61,7 +61,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act
-            var response = await service.FindMatches(request);
+            var response = await service.FindMatches(request, "ea");
 
             // Assert
             Assert.NotNull(response);
@@ -76,7 +76,7 @@ namespace Piipan.Match.Core.Tests.Services
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            
+
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
@@ -93,7 +93,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act
-            var response = await service.FindMatches(request);
+            var response = await service.FindMatches(request, "ea");
 
             // Assert
             Assert.NotNull(response);
@@ -109,7 +109,7 @@ namespace Piipan.Match.Core.Tests.Services
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.GetStates())
-                .ReturnsAsync(new List<string>{ "ea", "eb" });
+                .ReturnsAsync(new List<string> { "ea", "eb" });
 
             participantApi
                 .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
@@ -118,7 +118,7 @@ namespace Piipan.Match.Core.Tests.Services
                     new Participant { ParticipantId = "p1" },
                     new Participant { ParticipantId = "p2" }
                 });
-            
+
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
@@ -135,7 +135,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act
-            var response = await service.FindMatches(request);
+            var response = await service.FindMatches(request, "ea");
 
             // Assert
             Assert.NotNull(response);
@@ -154,7 +154,7 @@ namespace Piipan.Match.Core.Tests.Services
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            
+
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
@@ -171,7 +171,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request));
+            await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request, "ea"));
         }
 
         [Fact]
@@ -181,7 +181,7 @@ namespace Piipan.Match.Core.Tests.Services
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.GetStates())
-                .ReturnsAsync(new List<string>{ "ea", "eb" });
+                .ReturnsAsync(new List<string> { "ea", "eb" });
             participantApi
                 .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception("participant API failed"));
@@ -202,7 +202,7 @@ namespace Piipan.Match.Core.Tests.Services
             };
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request));
+            await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request, "ea"));
         }
     }
 }

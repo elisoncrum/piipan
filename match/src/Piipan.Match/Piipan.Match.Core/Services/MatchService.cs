@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Models;
 using Piipan.Participants.Api;
-using FluentValidation;
 
 namespace Piipan.Match.Core.Services
 {
@@ -33,7 +33,7 @@ namespace Piipan.Match.Core.Services
         /// </summary>
         /// <param name="request">A collection of participants to attempt to find matches for</param>
         /// <returns>A collection of match results and inline errors for malformed participant requests</returns>
-        public async Task<OrchMatchResponse> FindMatches(OrchMatchRequest request)
+        public async Task<OrchMatchResponse> FindMatches(OrchMatchRequest request, string initiatingState)
         {
             var response = new OrchMatchResponse();
             for (int i = 0; i < request.Data.Count; i++)
@@ -42,7 +42,7 @@ namespace Piipan.Match.Core.Services
                 var personValidation = await _requestPersonValidator.ValidateAsync(person);
                 if (personValidation.IsValid)
                 {
-                    var result = await PersonMatch(request.Data[i], i);
+                    var result = await PersonMatch(request.Data[i], i, initiatingState);
                     response.Data.Results.Add(result);
                 }
                 else
@@ -62,7 +62,7 @@ namespace Piipan.Match.Core.Services
             return response;
         }
 
-        private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index)
+        private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index, string initiatingState)
         {
             var states = await _participantApi.GetStates();
 
