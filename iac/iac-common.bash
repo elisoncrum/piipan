@@ -203,7 +203,7 @@ private_dns_zone () {
   echo $base
 }
 
-# try_command()
+# try_run()
 #
 # The function help with the robusness of the IaC code. 
 # In ocassions the original when run a command it can fail, because any kind of error. 
