@@ -213,7 +213,7 @@ private_dns_zone () {
 # max_tries - max number of try, default value 3
 # directory - path where tje mycommand should be run
 #
-# usage:   try_command <mycommand> <max_tries> <directory> 
+# usage:   try_run <mycommand> <max_tries> <directory> 
 #
 try_run () {
   mycommand=$1
