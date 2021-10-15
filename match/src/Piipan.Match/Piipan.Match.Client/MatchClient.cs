@@ -14,7 +14,7 @@ namespace Piipan.Match.Client
             _apiClient = apiClient;
         }
 
-        public async Task<OrchMatchResponse> FindMatches(OrchMatchRequest request)
+        public async Task<OrchMatchResponse> FindMatches(OrchMatchRequest request, string initiatingState)
         {
             return await _apiClient.PostAsync<OrchMatchRequest, OrchMatchResponse>("find_matches", request);
         }
