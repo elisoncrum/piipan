@@ -132,10 +132,7 @@ main () {
     --output none
 
   # publish the function app
-  echo "Publishing function app $METRICS_COLLECT_APP_NAME"
-  pushd ../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH
-    func azure functionapp publish "$METRICS_COLLECT_APP_NAME" --dotnet
-  popd
+  try_run "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" 7 "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
 
   # Subscribe each dynamically created event blob topic to this function
   METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
@@ -224,14 +221,8 @@ main () {
       }
     ]'
 
-  echo "Waiting to publish function app"
-  sleep 60
-
   # publish metrics function app
-  echo "Publishing function app $METRICS_API_APP_NAME"
-  pushd ../metrics/src/Piipan.Metrics/$API_APP_FILEPATH
-    func azure functionapp publish "$METRICS_API_APP_NAME" --dotnet
-  popd
+  try_run "func azure functionapp publish ${METRICS_API_APP_NAME} --dotnet" 7 "../metrics/src/Piipan.Metrics/$API_APP_FILEPATH"
 
   ## Dashboard stuff
 
