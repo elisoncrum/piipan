@@ -42,7 +42,7 @@ namespace Piipan.Match.Client.Tests
             };
 
             // Act
-            var response = await client.FindMatches(request);
+            var response = await client.FindMatches(request, "ea");
 
             // Assert
             Assert.Equal(expectedResponse, response);

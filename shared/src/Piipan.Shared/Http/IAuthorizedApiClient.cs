@@ -9,14 +9,14 @@ namespace Piipan.Shared.Http
         /// <summary>
         /// Send an asynchronous POST request to an API endpoint
         /// </summary>
-        /// <param name="uri">URI of the API endpoint</param>
-        /// <param name="body">Request body</param>
+        /// <param name="path">path portion of the API endpoint</param>
+        /// <param name="body">object to be sent as request body</param>
         Task<TResponse> PostAsync<TRequest, TResponse>(string path, TRequest body);
 
         /// <summary>
         /// Send an asynchronous GET request to an API endpoint
         /// </summary>
-        /// <param name="uri">URI of the API endpoint</param>
+        /// <param name="path">path portion of the API endpoint</param>
         Task<TResponse> GetAsync<TResponse>(string path);
     }
 }
