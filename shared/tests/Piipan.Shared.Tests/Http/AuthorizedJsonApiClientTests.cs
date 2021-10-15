@@ -8,16 +8,29 @@ using Piipan.Shared.Http;
 using Moq;
 using Moq.Protected;
 using Xunit;
+using System.Text.Json;
 
 namespace Piipan.Shared.Tests.Http
 {
     public class AuthorizedJsonApiClientTests
     {
+        public class FakeRequestType
+        {
+            public string RequestMessage { get; set; }
+        }
+
+        public class FakeResponseType
+        {
+            public string ResponseMessage { get; set; }
+        }
+
         [Fact]
         public async Task PostAsync_SendsExpectedMessage()
         {
             // Arrange
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("response body") };
+            var httpResponseContent = new FakeResponseType() { ResponseMessage = "this is a response message" };
+            var json = JsonSerializer.Serialize(httpResponseContent);
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) };
 
             var expectedRequest = new HttpRequestMessage(HttpMethod.Post, "https://tts.test/path");
             var httpMessageHandler = new Mock<HttpMessageHandler>();
@@ -43,22 +56,27 @@ namespace Piipan.Shared.Tests.Http
                 clientFactory.Object,
                 tokenProvider.Object
             );
-            var body = new StringContent("this is the message body");
+
+            var body = new FakeRequestType
+            {
+                RequestMessage = "this is a request message"
+            };
             
             // Act
-            var response = await apiClient.PostAsync("/path", body);
+            var response = await apiClient.PostAsync<FakeRequestType, FakeResponseType>("/path", body);
 
             // Assert
-            var responseBody = await response.Content.ReadAsStringAsync();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("response body", responseBody);
+            Assert.IsType<FakeResponseType>(response);
+            Assert.Equal("this is a response message", response.ResponseMessage);
         }
 
         [Fact]
         public async Task GetAsync_SendsExpectedMessage()
         {
             // Arrange
-            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("response body") };
+            var httpResponseContent = new FakeResponseType() { ResponseMessage = "this is a response message" };
+            var json = JsonSerializer.Serialize(httpResponseContent);
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) };
 
             var expectedRequest = new HttpRequestMessage(HttpMethod.Get, "https://tts.test/path");
             var httpMessageHandler = new Mock<HttpMessageHandler>();
@@ -86,12 +104,11 @@ namespace Piipan.Shared.Tests.Http
             );
             
             // Act
-            var response = await apiClient.GetAsync("/path");
+            var response = await apiClient.GetAsync<FakeResponseType>("/path");
 
             // Assert
-            var responseBody = await response.Content.ReadAsStringAsync();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("response body", responseBody);
+            Assert.IsType<FakeResponseType>(response);
+            Assert.Equal("this is a response message", response.ResponseMessage);
         }
     }
 }

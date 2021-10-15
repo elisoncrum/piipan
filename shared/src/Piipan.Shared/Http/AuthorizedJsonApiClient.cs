@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Piipan.Shared.Authentication;
 
@@ -41,22 +42,32 @@ namespace Piipan.Shared.Http
             return httpRequestMessage;
         }
 
-        public async Task<HttpResponseMessage> PostAsync(string path, StringContent body)
+        public async Task<TResponse> PostAsync<TRequest, TResponse>(string path, TRequest body)
         {
             var requestMessage = await PrepareRequest(path, HttpMethod.Post);
-            requestMessage.Content = body;
+            
+            var json = JsonSerializer.Serialize(body);
+            requestMessage.Content = new StringContent(json);
 
             var response = await Client().SendAsync(requestMessage);
 
-            return response;
+            response.EnsureSuccessStatusCode();
+
+            var responseContentJson = await response.Content.ReadAsStringAsync();
+            
+            return JsonSerializer.Deserialize<TResponse>(responseContentJson);
         }
 
-        public async Task<HttpResponseMessage> GetAsync(string path)
+        public async Task<TResponse> GetAsync<TResponse>(string path)
         {
             var requestMessage = await PrepareRequest(path, HttpMethod.Get);
             var response = await Client().SendAsync(requestMessage);
 
-            return response;
+            response.EnsureSuccessStatusCode();
+
+            var responseContentJson = await response.Content.ReadAsStringAsync();
+
+            return JsonSerializer.Deserialize<TResponse>(responseContentJson);
         }
 
         private HttpClient Client()
