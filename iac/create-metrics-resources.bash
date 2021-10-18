@@ -17,14 +17,12 @@ source "$(dirname "$0")"/../tools/common.bash || exit
 set_constants () {
   DB_SERVER_NAME=$PREFIX-psql-core-$ENV
   DB_NAME=metrics
-  # Dashboard App Info
-  DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV
-  DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
-  DASHBOARD_WAF_NAME=wafdashboard${ENV}
+
   # Metrics Collection Info
   COLLECT_APP_FILEPATH=Piipan.Metrics.Func.Collect
   COLLECT_STORAGE_NAME=${PREFIX}st${METRICS_COLLECT_APP_ID}${ENV}
   COLLECT_FUNC=BulkUploadMetrics
+
   # Metrics API Info
   API_APP_FILEPATH=Piipan.Metrics.Func.Api
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
@@ -274,7 +272,7 @@ main () {
       frontDoorId="$front_door_id" \
       frontDoorUri="$front_door_uri"
 
-  ./configure-oidc.bash "$azure_env" "$DASHBOARD_APP_NAME"
+  create_oidc_secret "$DASHBOARD_APP_NAME"
 
   script_completed
 }
