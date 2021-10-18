@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
@@ -27,7 +28,9 @@ namespace Piipan.Match.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<MatchClient>>();
             apiClient
-                .Setup(m => m.PostAsync<OrchMatchRequest, OrchMatchResponse>("find_matches", It.IsAny<OrchMatchRequest>()))
+                .Setup(m => m.PostAsync<OrchMatchRequest, OrchMatchResponse>("find_matches",
+                    It.IsAny<OrchMatchRequest>(),
+                    It.IsAny<Func<IEnumerable<(string, string)>>>()))
                 .ReturnsAsync(expectedResponse);
 
             var client = new MatchClient(apiClient.Object);
