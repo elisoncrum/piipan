@@ -175,7 +175,7 @@
                                 "storageProfile": {
                                     "storageMB": 5120,
                                     "backupRetentionDays": 7,
-                                    "geoRedundantBackup": "Disabled",
+                                    "geoRedundantBackup": "Enabled",
                                     "storageAutoGrow": "Enabled"
                                 },
                                 "previewFeature": "",
