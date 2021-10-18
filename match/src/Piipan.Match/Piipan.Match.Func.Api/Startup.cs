@@ -25,8 +25,6 @@ namespace Piipan.Match.Func.Api
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var configuration = builder.GetContext().Configuration;
-
             builder.Services.AddLogging();
 
             builder.Services.AddTransient<IValidator<OrchMatchRequest>, OrchMatchRequestValidator>();
