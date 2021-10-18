@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.91] - 2021-10-14
+
+### Added
+- Match record persistence implementation
+### Changed
+- Enabled geo-redundancy for `core` and `participants` PostgreSQL databases
+- Updated Query Tool to only accept printable characters as input
+### Fixed
+- Match API participant serialization
+- IaC scripts to use updated path for Orchestrator app
+
 ## [0.9] - 2021-10-06
 
 ### Added
