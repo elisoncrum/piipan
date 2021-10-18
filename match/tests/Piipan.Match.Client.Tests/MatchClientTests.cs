@@ -31,6 +31,7 @@ namespace Piipan.Match.Client.Tests
                 .Setup(m => m.PostAsync<OrchMatchRequest, OrchMatchResponse>("find_matches",
                     It.IsAny<OrchMatchRequest>(),
                     It.IsAny<Func<IEnumerable<(string, string)>>>()))
+                .Callback((string path, OrchMatchRequest req, Func<IEnumerable<(string, string)>> fn) => fn())
                 .ReturnsAsync(expectedResponse);
 
             var client = new MatchClient(apiClient.Object);
