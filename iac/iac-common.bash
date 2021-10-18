@@ -69,6 +69,23 @@ COLLAB_DB_NAME=collaboration
 
 # Event Hub
 EVENT_HUB_NAME=$PREFIX-evh-monitoring-$ENV
+
+# Name of Key Vault
+VAULT_NAME=$PREFIX-kv-core-$ENV
+
+# Query Tool App Info
+QUERY_TOOL_APP_NAME=$PREFIX-app-querytool-$ENV
+QUERY_TOOL_FRONTDOOR_NAME=$PREFIX-fd-querytool-$ENV
+QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
+
+# Dashboard App Info
+DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV
+DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
+DASHBOARD_WAF_NAME=wafdashboard${ENV}
+
+# Names of apps authenticated by OIDC
+OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
+
 ### END Constants
 
 ### Functions
@@ -247,5 +264,74 @@ try_run () {
 
 }
 
+_get_oidc_secret_name () {
+  local app_name=$1
+  echo "${app_name}-oidc-secret"
+}
+
+# Given an App Service instance name, establish a placeholder secret
+# for OIDC in the core key vault, using a random value. See get_oidc_secret
+# for how this secret is used.
+# If the secret already exists, no action will be taken.
+create_oidc_secret () {
+  local app_name=$1
+
+  local secret_name
+  secret_name=$(_get_oidc_secret_name "$app_name")
+
+  local secret_id
+  secret_id=$(\
+    az keyvault secret list \
+      --vault-name "$VAULT_NAME" \
+      --query "[?name == '${secret_name}'].id" \
+      --output tsv)
+
+  if [ -z "$secret_id" ]; then
+    echo "creating $secret_name"
+
+    local value
+    value=$(random_password)
+    set_oidc_secret "$app_name" "$value"
+  else
+    echo "$secret_name already exists, no action taken"
+  fi
+}
+
+# Given an App Service instance name and a secret value, set the
+# corresponding secret in the core key vault. See get_oidc_secret
+# for how this secret is used.
+set_oidc_secret () {
+  local app_name=$1
+  local value=$2
+
+  local secret_name
+  secret_name=$(_get_oidc_secret_name "$app_name")
+
+  # use builtin and /dev/stdin so as to not expose secret in process listing
+  printf '%s' "$value" | az keyvault secret set \
+    --vault-name "$VAULT_NAME" \
+    --name "$secret_name" \
+    --file /dev/stdin \
+    --query id > /dev/null
+}
+
+# Given an App Service instance name, output the secret established for OIDC,
+# fetching it from the core key vault.
+#
+# This value is the client secret used when authenticating the OIDC Relying
+# Party (i.e., the web app)  to the configured OIDC Identity Provider (IdP)
+# under the Authorization Code Flow.
+get_oidc_secret () {
+  local app_name=$1
+
+  local secret_name
+  secret_name=$(_get_oidc_secret_name "$app_name")
+
+  az keyvault secret show \
+    --vault-name "$VAULT_NAME" \
+    --name "$secret_name" \
+    --query value \
+    --output tsv
+}
 
 ### END Functions
