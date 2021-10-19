@@ -13,4 +13,4 @@ The latest [product roadmap](https://github.com/18F/piipan/blob/dev/docs/roadmap
 MVP demo
 --------
 
-Here's a 3:30-minute video demo of the NAC MVP to give you a brief overview of the system. [ADD LINK TO YOUTUBE]
+Here's a 3:30-minute [video demo](https://github.com/18F/piipan/issues/1895#issue-1026756000) of the NAC MVP to give you a brief overview of the system. 
