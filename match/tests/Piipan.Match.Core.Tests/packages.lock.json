@@ -1682,6 +1682,7 @@
           "Microsoft.Extensions.Http": "3.1.20",
           "Microsoft.Extensions.Logging": "3.1.20",
           "Microsoft.Extensions.Options": "3.1.20",
+          "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10"
         }
       }

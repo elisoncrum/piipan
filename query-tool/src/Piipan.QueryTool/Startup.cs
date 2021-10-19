@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
+using Piipan.Match.Api;
+using Piipan.Match.Client.Extensions;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authentication;
 using Piipan.Shared.Authorization;
@@ -81,6 +84,8 @@ namespace Piipan.QueryTool
                     .GetSection(AuthorizationPolicyOptions.SectionName)
                     .Get<AuthorizationPolicyOptions>());
             });
+
+            services.RegisterMatchClientServices(_env);
 
             if (_env.IsDevelopment())
             {

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Piipan.Shared.Authentication;
 
 namespace Piipan.Shared.Http
@@ -15,9 +15,9 @@ namespace Piipan.Shared.Http
     /// </summary>
     public class AuthorizedJsonApiClient<T> : IAuthorizedApiClient<T>
     {
-        private IHttpClientFactory _clientFactory;
-        private ITokenProvider<T> _tokenProvider;
-        private string _accept = "application/json";
+        private readonly IHttpClientFactory _clientFactory;
+        private readonly ITokenProvider<T> _tokenProvider;
+        private const string _accept = "application/json";
 
         /// <summary>
         /// Creates a new instance of AuthorizedJsonApiClient
@@ -58,7 +58,8 @@ namespace Piipan.Shared.Http
             // add any additional headers using the supplied callback
             headerFactory.Invoke().ToList().ForEach(h => requestMessage.Headers.Add(h.Item1, h.Item2));
 
-            var json = JsonSerializer.Serialize(body);
+            var json = JsonConvert.SerializeObject(body);
+
             requestMessage.Content = new StringContent(json);
 
             var response = await Client().SendAsync(requestMessage);
@@ -67,7 +68,7 @@ namespace Piipan.Shared.Http
 
             var responseContentJson = await response.Content.ReadAsStringAsync();
             
-            return JsonSerializer.Deserialize<TResponse>(responseContentJson);
+            return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
         public async Task<TResponse> GetAsync<TResponse>(string path)
@@ -79,7 +80,7 @@ namespace Piipan.Shared.Http
 
             var responseContentJson = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<TResponse>(responseContentJson);
+            return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
         private HttpClient Client()

@@ -15,6 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj" />
+    <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Client\Piipan.Match.Client.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
   </ItemGroup>
 </Project>
