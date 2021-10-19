@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit

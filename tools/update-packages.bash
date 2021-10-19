@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Update package dependencies for C# projects (.csproj), recursively
 # from the indicated path.

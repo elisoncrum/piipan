@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Creates the named service principal (SP) with the Contributor role
 # for the specified deployment environment, setting a random password.
 #

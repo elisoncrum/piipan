@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Validates and bundles Open Api spec for duplicate participation API
 # into a single openapi markdown file to serve as API documentation.

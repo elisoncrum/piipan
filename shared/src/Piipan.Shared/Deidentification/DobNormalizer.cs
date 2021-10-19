@@ -24,11 +24,11 @@ namespace Piipan.Shared.Deidentification
             }
             catch (FormatException)
             {
-                throw new ArgumentException("dates must be in ISO 8601 format using a 4-digit year, a zero-padded month, and zero-padded day. Date must exist on Gregorian calendar.");
+                throw new ArgumentException("Dates must be in ISO 8601 format using a 4-digit year, a zero-padded month, and zero-padded day. Date must exist on Gregorian calendar.");
             }
             if (DateTime.Parse(dob).CompareTo(DateTime.Now.AddYears(-MaxYearsAgo)) < 0)
             {
-                throw new ArgumentException($"date should be later than {MaxYearsAgo} years ago");
+                throw new ArgumentException($"Date should be later than {MaxYearsAgo} years ago.");
             }
             return dob;
         }

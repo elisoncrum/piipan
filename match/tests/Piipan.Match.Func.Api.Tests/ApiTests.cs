@@ -11,16 +11,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Api.Models;
-using Moq;
-using Moq.Protected;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests
@@ -124,7 +125,8 @@ namespace Piipan.Match.Func.Api.Tests
 
             var headers = new HeaderDictionary(new Dictionary<String, StringValues>
             {
-                { "From", "foobar"}
+                { "From", "foobar"},
+                { "X-Initiating-State", "ea"}
             }) as IHeaderDictionary;
             mockRequest.Setup(x => x.Headers).Returns(headers);
 
@@ -163,8 +165,12 @@ namespace Piipan.Match.Func.Api.Tests
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
+            var matchEventService = new Mock<IMatchEventService>();
 
-            var api = new MatchApi(matchService.Object, requestParser);
+            var api = new MatchApi(
+                matchService.Object,
+                requestParser,
+                matchEventService.Object);
 
             return api;
         }
@@ -176,8 +182,12 @@ namespace Piipan.Match.Func.Api.Tests
                 new OrchMatchRequestValidator(),
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
+            var matchEventService = new Mock<IMatchEventService>();
 
-            var api = new MatchApi(matchService.Object, requestParser);
+            var api = new MatchApi(
+                matchService.Object,
+                requestParser,
+                matchEventService.Object);
 
             return api;
         }
@@ -193,13 +203,17 @@ namespace Piipan.Match.Func.Api.Tests
             var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
+            var matchEventService = Mock.Of<IMatchEventService>();
             var mockRequest = MockRequest("");
 
             requestParser
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
                 .ThrowsAsync(new StreamParserException("failed to parse"));
 
-            var api = new MatchApi(matchService, requestParser.Object);
+            var api = new MatchApi(
+                matchService,
+                requestParser.Object,
+                matchEventService);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -222,6 +236,7 @@ namespace Piipan.Match.Func.Api.Tests
             var matchService = Mock.Of<IMatchApi>();
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
+            var matchEventService = Mock.Of<IMatchEventService>();
             var mockRequest = MockRequest("");
 
             requestParser
@@ -231,7 +246,10 @@ namespace Piipan.Match.Func.Api.Tests
                     new ValidationFailure("property", "property missing")
                 }));
 
-            var api = new MatchApi(matchService, requestParser.Object);
+            var api = new MatchApi(
+                matchService,
+                requestParser.Object,
+                matchEventService);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -244,6 +262,35 @@ namespace Piipan.Match.Func.Api.Tests
             Assert.Equal(1, (int)errorResponse.Errors.Count);
             Assert.Equal("400", errorResponse.Errors[0].Status);
             Assert.Equal("property missing", errorResponse.Errors[0].Detail);
+        }
+
+        [Fact]
+        public async void MissingInitiatingStateHeaderResultsInBadRequest()
+        {
+            // Arrange
+            var matchService = Mock.Of<IMatchApi>();
+            var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
+            var logger = Mock.Of<ILogger>();
+            var matchEventService = Mock.Of<IMatchEventService>();
+            var mockRequest = MockRequest("");
+            mockRequest
+                .Setup(x => x.Headers)
+                .Returns(new HeaderDictionary(new Dictionary<string, StringValues> { }));
+
+            var api = new MatchApi(
+                matchService,
+                requestParser.Object,
+                matchEventService);
+
+            // Act
+            var response = await api.Find(mockRequest.Object, logger);
+
+            // Assert
+            var result = response as BadRequestObjectResult;
+            var errorResponse = result.Value as ApiErrorResponse;
+            Assert.Equal(400, result.StatusCode);
+            Assert.Equal("400", errorResponse.Errors[0].Status);
+            Assert.Contains("missing required header: X-Inititating-State", errorResponse.Errors[0].Detail);
         }
 
         // Whole thing blows up and returns a top-level error
@@ -338,14 +385,18 @@ namespace Piipan.Match.Func.Api.Tests
 
             var matchService = new Mock<IMatchApi>();
             matchService
-                .Setup(m => m.FindMatches(It.IsAny<OrchMatchRequest>()))
+                .Setup(m => m.FindMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<string>()))
                 .ReturnsAsync(response);
 
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
+            var matchEventService = new Mock<IMatchEventService>();
             var mockRequest = MockRequest("");
 
-            var api = new MatchApi(matchService.Object, requestParser.Object);
+            var api = new MatchApi(
+                matchService.Object,
+                requestParser.Object,
+                matchEventService.Object);
 
             // Act
             var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;

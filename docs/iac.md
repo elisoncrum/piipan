@@ -2,13 +2,12 @@
 
 ## Prerequisites
 
-All prerequisites are available in [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview).
-
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.23.0
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.23.0 but <= 2.26.1
+    - A [defect was introduced in Azure CLI version 2.27.0](https://github.com/Azure/azure-cli/issues/19719#issuecomment-932617639). As of October 2021, the latest release (2.29.0) continues to have this problem.
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
-- `bash` shell, `/dev/urandom` – included in macOS, Linux, Git for Windows
-- `psql` client for PostgreSQL
+- `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
+- `psql` client for PostgreSQL – included in Azure Cloud Shell
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:
@@ -26,11 +25,81 @@ To (re)create the Azure resources that `piipan` uses:
     az login
 ```
 
-5. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments).
+5. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments). Once this step is completed, all the infrastructure components will be provisioned.
 ```
     cd iac
     ./create-resources.bash tts/dev
 ```
+
+6. Configuring user account authentication for piipan's Query Tool and Dashboard web apps requires additional actions. These actions can be deferred, but until completed, users will not be able to access these web apps.
+
+    - Securely obtain the OpenID Connect (OIDC) client secrets for the identity provider (IdP) configured in the `iac/env` file for your environment.
+    - Run `store-oidc-secrets` and follow the prompts to store the client secrets in the system's core key vault.
+    - Run `configure-oidc-apps`, to configure the Query Tool and Dashboard App Service instances with the client secrets.
+```
+    ./store-oidc-secrets.bash tts/dev
+    ./configure-oidc-apps.bash tts/dev
+```
+
+7. Create a subscription in the API Management service. At least for now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
+
+    1. Go to the Azure Portal
+    2. Go to Resource Groups
+    3. Look for `rg-match-dev` resource group
+    4. Go to `tts-apim-duppartapi-dev`, an API Management service 
+    5. Go to `Subscriptions`, on the left menu
+    6. Click on `Add Subscription`
+        1. Name: `EA-DupPart`
+        2. Display Name: `EA-DupPart`
+        3. Allow tracing: `uncheck`
+        4. Scope: `API`
+        5. API: `Duplicate participation API`
+        6. Product: `blank`
+        7. User: `blank`
+        8. Click `Save`
+    7. Click on `Add Subscription`
+        1. Name: `EA-BulkUpload`
+        2. Display Name: `EA-BulkUpload`
+        3. Allow tracing: `uncheck`
+        4. Scope: `API`
+        5. API: `EA Bulk upload API`
+        6. Product: `blank`
+        7. User: `blank`
+        8. Click `Save` 
+
+8. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
+
+    Use assign-app-role to assign your user account the necessary application role:
+
+    ```
+    #Template
+    ./tools/assign-app-role.bash <azure-env> <function-app-name> <app-role-name>
+
+    #Example
+    ./tools/assign-app-role.bash tts/dev tts-func-metricsapi-dev Metrics.Read
+    ```
+
+    Use authorize-cli to add the Azure CLI as an authorized client application for the Function's application registration:
+    ```
+    #Template
+    ./tools/authorize-cli.bash <azure-env> <function-app-name>
+    
+    #Example
+    ./tools/authorize-cli.bash tts/dev tts-func-metricsapi-dev
+    ```
+
+9. Time to test your infrastructure
+    ```
+    #Test ETL
+    ./etl/tools/test-apim-upload-api.bash tts/dev
+    
+    #Test Match
+    ./match/tools/test-apim-match-api.bash tts/dev
+    
+    #Test Metrics
+    ./metrics/tools/test-metricsapi.bash tts/dev
+    ```
+
 
 ## Deployment environments
 

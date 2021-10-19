@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Creates participant records tables and their access controls for
 # each configured state. PGHOST, PGUSER, PGPASSWORD must be set.

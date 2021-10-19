@@ -47,6 +47,8 @@ After installing the dependencies but before making any changes to the SCSS (in 
 
 Gulp will then watch for changes to the SCSS and compile them into the main CSS file.
 
+[Instructions for updating Node dependencies](../../docs/node.md)
+
 ## Testing
 
 Tests will be run on the continuous integration server, but

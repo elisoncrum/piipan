@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Creates the API Management instance for managing the external-facing
 # duplicate participation API. Assumes an Azure user with the Global

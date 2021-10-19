@@ -55,10 +55,22 @@ namespace Piipan.QueryTool.Pages
                         QueryResult.Data.Results[0].Matches.Count == 0;
                     Title = "NAC Query Results";
                 }
+                catch (ArgumentException ex)
+                {
+                    _logger.LogError(ex, ex.Message);
+                    if (ex.Message.ToLower().Contains("gregorian"))
+                    {
+                        RequestError = "Date of birth must be a real date.";
+                    }
+                    else
+                    {
+                        RequestError = $"{ex.Message}";
+                    }
+                }
                 catch (Exception exception)
                 {
                     _logger.LogError(exception, exception.Message);
-                    RequestError = "There was an error running your search";
+                    RequestError = "There was an error running your search. Please try again.";
                 }
             }
 

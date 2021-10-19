@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Provisions and configures the infrastructure components for all Piipan
 # subsystems. Assumes an Azure user with the Global Administrator role
@@ -14,9 +14,6 @@
 source "$(dirname "$0")"/../tools/common.bash || exit
 
 set_constants () {
-  # Name of Key Vault
-  VAULT_NAME=$PREFIX-kv-core-$ENV
-
   # Name of secret used to store the PostgreSQL server admin password
   PG_SECRET_NAME=particpants-records-admin
 
@@ -28,11 +25,6 @@ set_constants () {
 
   # Name of PostgreSQL server
   PG_SERVER_NAME=$PREFIX-psql-participants-$ENV
-
-  # Base name of query tool app
-  QUERY_TOOL_APP_NAME=$PREFIX-app-querytool-$ENV
-  QUERY_TOOL_FRONTDOOR_NAME=$PREFIX-fd-querytool-$ENV
-  QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
 
   # Orchestrator Function app and its blob storage
   ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
@@ -319,13 +311,8 @@ main () {
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
 
-  echo "Waiting to publish function app"
-  sleep 60
-
-  echo "Publishing ${ORCHESTRATOR_FUNC_APP_NAME} function app"
-  pushd ../match/src/Piipan.Match/Piipan.Match.Func.Api
-    func azure functionapp publish "$ORCHESTRATOR_FUNC_APP_NAME" --dotnet
-  popd
+  #publish function app
+  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
   # Resource ID required when vnet is in a separate resource group
   vnet_id=$(\
@@ -474,9 +461,7 @@ main () {
       --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
 
     # Create Function endpoint before setting up event subscription
-    pushd ../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload
-    func azure functionapp publish "$func_app" --dotnet
-    popd
+    try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
     az eventgrid system-topic event-subscription create \
       --name "$sub_name" \
@@ -539,8 +524,8 @@ main () {
       frontDoorId="$front_door_id" \
       frontDoorUri="$front_door_uri"
 
-  # Sets the OIDC client secrets for web applications
-  ./configure-oidc.bash "$azure_env" "$QUERY_TOOL_APP_NAME"
+  # Create a placeholder OIDC IdP secret
+  create_oidc_secret "$QUERY_TOOL_APP_NAME"
 
   # Establish metrics sub-system
   ./create-metrics-resources.bash "$azure_env"

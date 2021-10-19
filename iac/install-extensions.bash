@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Installs Azure CLI extensions required for create-resources.bash.
 #

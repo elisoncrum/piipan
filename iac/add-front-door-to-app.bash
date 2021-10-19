@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This script creates an Azure Front Door with a WAF policy
 # and applies it to a single web app.
 #
