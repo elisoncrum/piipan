@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using Xunit;
 
@@ -43,6 +45,38 @@ namespace Piipan.Shared.Deidentification.Tests
                 string result = _ldsDeidentifier.Run("hopper", "1978-08-14", "425-46-5417");
                 string expectedDigest = "e733ee077eb82e13874a270bf170e3b999031c71eb5f0b47fc51c7cc677d0b8dd3b79615d79fa4ba2779c5fb9764b81aaa219dce20edb978a79903b647b5b714";
                 Assert.Equal(expectedDigest, result);
+            }
+
+            [Fact]
+            public void ReturnsExpectedExamples()
+            {
+                using(var reader = new StreamReader("plaintext-example.csv"))
+                {
+                    string headerLine = reader.ReadLine();
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        var values = line.Split(',');
+                        List<string> names = new List<string>() { values[0], values[3], values[4] };
+                        string result = _ldsDeidentifier.Run(values[0], values[3], values[4]);
+                    }
+                }
+
+                using (StreamReader pReader = new StreamReader("plaintext-example.csv"))
+                using (StreamReader reader = new StreamReader("example.csv")) {
+
+                    string pHeader = pReader.ReadLine();
+                    string header = reader.ReadLine();
+
+                    string pLine;
+                    while ((pLine = pReader.ReadLine()) != null)
+                    {
+                        var pValues = pLine.Split(',');
+                        string result = _ldsDeidentifier.Run(pValues[0], pValues[3], pValues[4]);
+                        string expected = reader.ReadLine().Split(',')[0];
+                        Assert.Equal(expected, result);
+                    }
+                }
             }
         }
     }

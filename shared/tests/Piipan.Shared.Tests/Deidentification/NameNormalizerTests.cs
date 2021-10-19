@@ -1,5 +1,5 @@
 using System;
-using System.Text.RegularExpressions;
+using System.IO;
 using Xunit;
 
 namespace Piipan.Shared.Deidentification.Tests
@@ -84,6 +84,7 @@ namespace Piipan.Shared.Deidentification.Tests
         [InlineData("foobar.", "foobar")]
         [InlineData("foobar,", "foobar")]
         [InlineData("foo'bar", "foobar")]
+        [InlineData("foobar`", "foobar")]
         public void Run_RemovesAsciiNotInRange(string source, string expected)
         {
             string result = _nameNormalizer.Run(source);
@@ -96,6 +97,21 @@ namespace Piipan.Shared.Deidentification.Tests
         {
             ArgumentException exception = Assert.Throws<ArgumentException>(() => _nameNormalizer.Run(source));
             Assert.Contains("normalized name must be at least 1 character long", exception.Message.ToLower());
+        }
+
+        [Fact]
+        public void Run_NormalizeSuccess()
+        {
+            using(var reader = new StreamReader("name_tests.csv"))
+            {
+                string headerLine = reader.ReadLine();
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var values = line.Split(',');
+                    Assert.Equal(values[1], _nameNormalizer.Run(values[0]));
+                }
+            }
         }
 
     }
