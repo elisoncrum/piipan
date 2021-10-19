@@ -137,6 +137,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.91]: https://github.com/18F/piipan/releases/tag/v0.91
 [0.9]: https://github.com/18F/piipan/releases/tag/v0.9
 [0.8]: https://github.com/18F/piipan/releases/tag/v0.8
 [0.7]: https://github.com/18F/piipan/releases/tag/v0.7
