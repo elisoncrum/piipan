@@ -5,6 +5,7 @@ The National Accuracy Clearinghouse (NAC) is a new congressionally mandated syst
 
 The [2018 Farm Bill](https://www.congress.gov/bill/115th-congress/house-bill/2/text) in Section 4011 tasked USDA Food and Nutrition Services (FNS) with implementing the NAC. In fiscal year 2021, FNS entered into an interagency agreement (IAA) with General Services Administration (GSA) digital design agency 18F to build the NAC system and provide assisted acquisition services for the procurement of a software development vendor to continue building and maintaining the NAC.
 
+
 2018 Farm Bill Requirements
 ---------------------------
 
@@ -43,6 +44,7 @@ Our approach to building the NAC  
 
 -   We also want to minimize the potential burden of the NAC on state workers by not having a large number of false positives they need to resolve.  
 
+
 How the NAC will work
 ---------------------
 
@@ -71,6 +73,7 @@ When a match is found, the relevant state agencies need to know if the matched p
 
 When states upload participant data to the NAC, they will need to flag vulnerable individuals. When a match is found, the NAC will inform states if the matching participant is a vulnerable individual and must have their location protected. State workers receiving the match notice must take extra precaution not to disclose the participant's location - for example, not sharing with the state where they now reside or any other location information with any member of the household in the matching state.
 
+
 NAC Pilot (and learnings)
 -------------------------
 
@@ -95,6 +98,7 @@ Here are some learnings, as summarized from the NAC Pilot final report [[PDF lin
 -   When states join the NAC, the initial matching process will identify many matches and states should dedicate staff to the effort of addressing an initial "big bang" number of matches.
 
 The NAC pilot solution is incompatible with the current solution being developed due to additional security requirements, so NAC pilot states will eventually need to migrate to the new FNS NAC system.
+
 
 PARIS report 
 -------------
