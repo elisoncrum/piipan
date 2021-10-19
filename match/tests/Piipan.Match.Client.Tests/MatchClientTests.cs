@@ -21,7 +21,7 @@ namespace Piipan.Match.Client.Tests
                 {
                     Results = new List<OrchMatchResult>
                     {
-                        new OrchMatchResult { Index = 0, Matches = new List<IParticipant> { Mock.Of<IParticipant>() }}
+                        new OrchMatchResult { Index = 0, Matches = new List<IParticipantMatch> { Mock.Of<IParticipantMatch>() }}
                     }
                 }
             };

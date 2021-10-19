@@ -63,8 +63,7 @@ namespace Piipan.Match.Func.Api
                 var initiatingState = InitiatingState(req);
                 var request = await _requestParser.Parse(req.Body);
                 var response = await _matchApi.FindMatches(request, initiatingState);
-
-                await _matchEventService.ResolveMatches(request, response, initiatingState);
+                response = await _matchEventService.ResolveMatches(request, response, initiatingState);
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }

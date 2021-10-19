@@ -28,9 +28,9 @@ namespace Piipan.Match.Func.Api.Tests
 {
     public class ApiTests
     {
-        static Participant FullRecord()
+        static ParticipantMatch FullRecord()
         {
-            return new Participant
+            return new ParticipantMatch
             {
                 CaseId = "CaseIdExample",
                 BenefitsEndDate = new DateTime(1970, 1, 31),
@@ -95,7 +95,7 @@ namespace Piipan.Match.Func.Api.Tests
             var stateResponse = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<Participant> { FullRecord() }
+                Matches = new List<IParticipantMatch> { FullRecord() }
             };
             return stateResponse;
         }
@@ -367,7 +367,7 @@ namespace Piipan.Match.Func.Api.Tests
                         new OrchMatchResult
                         {
                             Index = 0,
-                            Matches = new IParticipant[] { new Participant { LdsHash = "asdf" } }
+                            Matches = new IParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf" } }
                         }
                     },
                     Errors = new List<OrchMatchError>
@@ -391,6 +391,10 @@ namespace Piipan.Match.Func.Api.Tests
             var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
             var logger = Mock.Of<ILogger>();
             var matchEventService = new Mock<IMatchEventService>();
+            matchEventService
+                .Setup(r => r.ResolveMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<OrchMatchResponse>(), It.IsAny<string>()))
+                .ReturnsAsync(response);
+
             var mockRequest = MockRequest("");
 
             var api = new MatchApi(

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
+using Piipan.Match.Core.Models;
 using Piipan.Participants.Api.Models;
 
 namespace Piipan.Match.Core.Services
@@ -25,30 +26,54 @@ namespace Piipan.Match.Core.Services
         }
 
         /// <summary>
-        /// Creates a match record for each match found by the match API
+        /// Creates a match record for each match found by the match API.
+        /// Updates each match to include the resulting `match_id`.
         /// </summary>
         /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
         /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
         /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
-        public async Task ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
+        /// <returns>The updated `matchResponse` object with `match_id`s</returns>
+        public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
         {
 
-            await Task.WhenAll(
-                matchResponse.Data.Results.Select(result =>
-                    ResolvePersonMatches(
-                        request.Data.ElementAt(result.Index),
-                        result,
-                        initiatingState)));
+            matchResponse.Data.Results = (await Task.WhenAll(matchResponse.Data.Results.Select(result =>
+                ResolvePersonMatches(
+                    request.Data.ElementAt(result.Index),
+                    result,
+                    initiatingState))))
+                .OrderBy(result => result.Index)
+                .ToList();
+
+            return matchResponse;
         }
 
-        private async Task ResolvePersonMatches(RequestPerson person, OrchMatchResult result, string initiatingState)
+        private async Task<OrchMatchResult> ResolvePersonMatches(RequestPerson person, OrchMatchResult result, string initiatingState)
         {
-            var records = result.Matches.Select(match =>
-                _recordBuilder
-                    .SetMatch(person, match)
-                    .SetStates(initiatingState, match.State)
-                    .GetRecord());
-            await Task.WhenAll(records.Select(r => _recordApi.AddRecord(r)));
+            // Create a match <-> match record pairing
+            var pairs = result.Matches.Select(match =>
+                new
+                {
+                    match,
+                    record = _recordBuilder
+                                .SetMatch(person, match)
+                                .SetStates(initiatingState, match.State)
+                                .GetRecord()
+                });
+
+            result.Matches = (await Task.WhenAll(
+                pairs.Select(pair => ResolveSingleMatch(pair.match, pair.record))));
+
+            return result;
+        }
+
+        private async Task<ParticipantMatch> ResolveSingleMatch(IParticipant match, IMatchRecord record)
+        {
+            var matchId = await _recordApi.AddRecord(record);
+
+            return new ParticipantMatch(match)
+            {
+                MatchId = matchId
+            };
         }
     }
 }

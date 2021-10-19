@@ -113,10 +113,10 @@ namespace Piipan.Match.Core.Tests.Services
 
             participantApi
                 .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<IParticipant>
+                .ReturnsAsync(new List<IParticipantMatch>
                 {
-                    new Participant { ParticipantId = "p1" },
-                    new Participant { ParticipantId = "p2" }
+                    new ParticipantMatch { ParticipantId = "p1" },
+                    new ParticipantMatch { ParticipantId = "p2" }
                 });
 
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();

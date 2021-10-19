@@ -68,7 +68,7 @@ namespace Piipan.Match.Core.Services
 
             var matches = (await states
                 .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash)))
-                .Select(p => new Participant(p));
+                .Select(p => new ParticipantMatch(p));
 
             return new OrchMatchResult
             {

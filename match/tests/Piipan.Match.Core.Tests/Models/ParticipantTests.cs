@@ -1,5 +1,5 @@
-using Piipan.Match.Core.Models;
 using Newtonsoft.Json;
+using Piipan.Match.Core.Models;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Models
@@ -11,7 +11,7 @@ namespace Piipan.Match.Core.Tests.Models
         {
             // Arrange
             var json = @"{participant_id: 'baz', case_id: 'foo', benefits_end_month: '2020-01', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
-            var record = JsonConvert.DeserializeObject<Participant>(json);
+            var record = JsonConvert.DeserializeObject<ParticipantMatch>(json);
 
             string jsonRecord = record.ToJson();
 
