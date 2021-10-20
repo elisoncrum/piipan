@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
-using Piipan.Match.Core.Models;
+using Piipan.Match.Api.Models;
 using Xunit;
 
-namespace Piipan.Match.Core.Tests.Models
+namespace Piipan.Match.Api.Tests.Models
 {
     public class ParticipantTests
     {

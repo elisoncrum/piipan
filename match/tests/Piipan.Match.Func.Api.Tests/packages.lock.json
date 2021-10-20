@@ -2295,7 +2295,8 @@
         "type": "Project",
         "dependencies": {
           "Newtonsoft.Json": "13.0.1",
-          "Piipan.Participants.Api": "1.0.0"
+          "Piipan.Participants.Api": "1.0.0",
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.match.core": {

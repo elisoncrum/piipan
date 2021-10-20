@@ -16,12 +16,10 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Match.Func.Api.Models;
-using Piipan.Participants.Api.Models;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests
@@ -95,7 +93,7 @@ namespace Piipan.Match.Func.Api.Tests
             var stateResponse = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<IParticipantMatch> { FullRecord() }
+                Matches = new List<ParticipantMatch> { FullRecord() }
             };
             return stateResponse;
         }
@@ -367,7 +365,7 @@ namespace Piipan.Match.Func.Api.Tests
                         new OrchMatchResult
                         {
                             Index = 0,
-                            Matches = new IParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf" } }
+                            Matches = new ParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf" } }
                         }
                     },
                     Errors = new List<OrchMatchError>

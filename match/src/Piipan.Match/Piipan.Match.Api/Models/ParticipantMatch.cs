@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Serializers;
+using Piipan.Match.Api.Serializers;
 using Piipan.Participants.Api.Models;
 
-namespace Piipan.Match.Core.Models
+namespace Piipan.Match.Api.Models
 {
-    public class ParticipantMatch : IParticipantMatch
+    public class ParticipantMatch : IParticipant
     {
         [JsonProperty("match_id")]
         public string MatchId { get; set; }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
 using Piipan.Match.Api.Models;
-using Piipan.Participants.Api.Models;
 using Piipan.Shared.Http;
 using Xunit;
 
@@ -21,7 +20,7 @@ namespace Piipan.Match.Client.Tests
                 {
                     Results = new List<OrchMatchResult>
                     {
-                        new OrchMatchResult { Index = 0, Matches = new List<IParticipantMatch> { Mock.Of<IParticipantMatch>() }}
+                        new OrchMatchResult { Index = 0, Matches = new List<ParticipantMatch> { Mock.Of<ParticipantMatch>() }}
                     }
                 }
             };

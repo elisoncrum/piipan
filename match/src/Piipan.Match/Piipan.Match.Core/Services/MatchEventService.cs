@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
-using Piipan.Match.Core.Models;
 using Piipan.Participants.Api.Models;
 
 namespace Piipan.Match.Core.Services

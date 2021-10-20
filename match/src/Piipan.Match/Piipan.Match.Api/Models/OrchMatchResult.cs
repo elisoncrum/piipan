@@ -15,6 +15,6 @@ namespace Piipan.Match.Api.Models
         public int Index { get; set; }
 
         [JsonProperty("matches")]
-        public IEnumerable<IParticipantMatch> Matches { get; set; }
+        public IEnumerable<ParticipantMatch> Matches { get; set; }
     }
 }

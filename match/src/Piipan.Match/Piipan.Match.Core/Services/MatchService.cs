@@ -4,7 +4,6 @@ using FluentValidation;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
-using Piipan.Match.Core.Models;
 using Piipan.Participants.Api;
 
 namespace Piipan.Match.Core.Services

@@ -61,7 +61,7 @@ namespace Piipan.Match.Core.Tests.Services
             var result = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<IParticipantMatch>() { match }
+                Matches = new List<ParticipantMatch>() { match }
             };
             response.Data.Results.Add(result);
 
@@ -102,7 +102,7 @@ namespace Piipan.Match.Core.Tests.Services
             var result = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<IParticipantMatch>() {
+                Matches = new List<ParticipantMatch>() {
                     new ParticipantMatch { LdsHash = "foo", State= "eb" },
                     new ParticipantMatch { LdsHash = "foo", State = "ec" }
                 }
@@ -148,7 +148,7 @@ namespace Piipan.Match.Core.Tests.Services
             var result = new OrchMatchResult
             {
                 Index = 0,
-                Matches = new List<IParticipantMatch>() { match }
+                Matches = new List<ParticipantMatch>() { match }
             };
             response.Data.Results.Add(result);
 

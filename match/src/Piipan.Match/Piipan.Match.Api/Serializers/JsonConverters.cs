@@ -1,11 +1,11 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Piipan.Shared.Helpers;
 
-namespace Piipan.Match.Core.Serializers
+namespace Piipan.Match.Api.Serializers
 {
     public class JsonConverters
     {
@@ -45,7 +45,8 @@ namespace Piipan.Match.Core.Serializers
                 Type objectType,
                 object existingValue,
                 JsonSerializer serializer
-            ){
+            )
+            {
                 if (String.IsNullOrEmpty((string)reader.Value)) return null;
                 return MonthEndDateTime.Parse((string)reader.Value);
             }
@@ -54,7 +55,8 @@ namespace Piipan.Match.Core.Serializers
                 JsonWriter writer,
                 object value,
                 JsonSerializer serializer
-            ){
+            )
+            {
                 writer.WriteValue(((DateTime)value).ToString("yyyy-MM"));
             }
         }
@@ -85,7 +87,8 @@ namespace Piipan.Match.Core.Serializers
                 Type objectType,
                 object existingValue,
                 JsonSerializer serializer
-            ){
+            )
+            {
                 return String.IsNullOrWhiteSpace((string)reader.Value) ? null : (string)reader.Value;
             }
 
@@ -93,7 +96,8 @@ namespace Piipan.Match.Core.Serializers
                 JsonWriter writer,
                 object value,
                 JsonSerializer serializer
-            ){
+            )
+            {
                 throw new NotImplementedException();
             }
         }
@@ -108,7 +112,7 @@ namespace Piipan.Match.Core.Serializers
         /// <remarks>
         /// Applied to model properties as `[JsonConverter(typeof(MonthEndArrayConverter))]`
         /// </remarks>
-        public class MonthEndArrayConverter: JsonConverter
+        public class MonthEndArrayConverter : JsonConverter
         {
             public override bool CanRead => false;
             public override bool CanWrite => true;
@@ -120,7 +124,8 @@ namespace Piipan.Match.Core.Serializers
                 Type objectType,
                 object existingValue,
                 JsonSerializer serializer
-            ){
+            )
+            {
                 throw new NotImplementedException();
             }
 
@@ -128,7 +133,8 @@ namespace Piipan.Match.Core.Serializers
                 JsonWriter writer,
                 object value,
                 JsonSerializer serializer
-            ){
+            )
+            {
                 var dates = (IEnumerable<DateTime>)value;
                 dates.ToList().Sort((x, y) => y.CompareTo(x));
                 writer.WriteStartArray();
