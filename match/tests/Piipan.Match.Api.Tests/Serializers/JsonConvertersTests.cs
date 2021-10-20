@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Piipan.Match.Core.Serializers;
 using Moq;
-using Xunit;
 using Newtonsoft.Json;
+using Piipan.Match.Api.Serializers;
+using Xunit;
 
-namespace Piipan.Match.Core.Tests.Serializers
+namespace Piipan.Match.Api.Tests.Serializers
 {
     public class JsonConvertersTests
     {
@@ -163,7 +161,7 @@ namespace Piipan.Match.Core.Tests.Serializers
             var writer = Mock.Of<JsonWriter>();
 
             // Assert / Act
-            Assert.Throws<NotImplementedException>(() => 
+            Assert.Throws<NotImplementedException>(() =>
             {
                 converter.WriteJson(writer,
                     default(object),
@@ -216,9 +214,9 @@ namespace Piipan.Match.Core.Tests.Serializers
             // Act / Assert
             Assert.Throws<NotImplementedException>(() =>
             {
-                converter.ReadJson(reader, 
-                    default(Type), 
-                    default(object), 
+                converter.ReadJson(reader,
+                    default(Type),
+                    default(object),
                     default(JsonSerializer));
             });
         }

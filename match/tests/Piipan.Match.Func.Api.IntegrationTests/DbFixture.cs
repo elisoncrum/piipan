@@ -3,6 +3,7 @@ using System.Threading;
 using Dapper;
 using Npgsql;
 using Piipan.Match.Core.Models;
+using Piipan.Participants.Core.Models;
 
 namespace Piipan.Match.Func.Api.IntegrationTests
 {
@@ -154,7 +155,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             return count;
         }
 
-        public MatchRecordDbo GetLastMatchRecord()
+        public MatchRecordDbo GetMatchRecord(string matchId)
         {
             MatchRecordDbo record;
 
@@ -172,7 +173,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                         hash_type::text,
                         input::jsonb,
                         data::jsonb
-                    FROM matches ORDER BY id LIMIT 1;");
+                    FROM matches
+                    WHERE match_id=@matchId;",
+                    new { matchId = matchId });
 
                 conn.Close();
             }
@@ -180,7 +183,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             return record;
         }
 
-        public void Insert(Participant record)
+        public void Insert(ParticipantDbo record)
         {
             var factory = NpgsqlFactory.Instance;
 

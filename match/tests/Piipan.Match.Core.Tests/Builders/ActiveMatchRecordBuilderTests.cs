@@ -19,7 +19,7 @@ namespace Piipan.Match.Core.Tests.Builders
             {
                 LdsHash = hash
             };
-            var match = new Participant
+            var match = new ParticipantMatch
             {
                 LdsHash = hash
             };
