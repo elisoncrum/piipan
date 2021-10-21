@@ -50,23 +50,8 @@ namespace Piipan.QueryTool
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
 
-            services.AddSingleton<IAuthorizedApiClient>((s) =>
-            {
-                ITokenProvider tokenProvider;
-                if (_env.IsDevelopment())
-                {
-                    tokenProvider = new CliTokenProvider();
-                }
-                else
-                {
-                    tokenProvider = new EasyAuthTokenProvider();
-                }
-
-                return new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
-            });
-
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
-
+            
             services.AddSingleton<INameNormalizer, NameNormalizer>();
             services.AddSingleton<IDobNormalizer, DobNormalizer>();
             services.AddSingleton<ISsnNormalizer, SsnNormalizer>();

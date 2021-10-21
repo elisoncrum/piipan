@@ -47,7 +47,6 @@ namespace Piipan.QueryTool.Tests
         public void TestBeforeOnGet()
         {
             // arrange
-            var mockApiClient = Mock.Of<IAuthorizedApiClient>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var mockMatchApi = Mock.Of<IMatchApi>();
