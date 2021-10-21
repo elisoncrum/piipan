@@ -2,4 +2,6 @@
   "coverage-gutters.coverageFileNames": [
     "**/Piipan.QueryTool.Tests/**/coverage.info",
   ],
+  "omnisharp.enableImportCompletion": true,
+  "omnisharp.organizeImportsOnFormat": true,
 }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
-using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 
@@ -17,25 +14,18 @@ namespace Piipan.QueryTool.Pages
     public class IndexModel : BasePageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly IAuthorizedApiClient _apiClient;
-        private readonly OrchestratorApiRequest _apiRequest;
         private readonly ILdsDeidentifier _ldsDeidentifier;
         private readonly IMatchApi _matchApi;
 
         public IndexModel(ILogger<IndexModel> logger,
-                          IAuthorizedApiClient apiClient,
                           IClaimsProvider claimsProvider,
                           ILdsDeidentifier ldsDeidentifier,
                           IMatchApi matchApi)
                           : base(claimsProvider)
         {
             _logger = logger;
-            _apiClient = apiClient;
             _ldsDeidentifier = ldsDeidentifier;
             _matchApi = matchApi;
-
-            var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
-            _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
         }
 
         [BindProperty]
@@ -62,7 +52,7 @@ namespace Piipan.QueryTool.Pages
                     {
                         Data = new List<RequestPerson>
                         {
-                            new RequestPerson { LdsHash = digest }      
+                            new RequestPerson { LdsHash = digest }
                         }
                     };
 
