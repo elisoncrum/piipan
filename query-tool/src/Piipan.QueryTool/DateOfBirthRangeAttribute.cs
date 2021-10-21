@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace DataAnnotationInMVC.Common
+namespace Piipan.QueryTool
 {
     public class DateOfBirthRangeAttribute : RangeAttribute
     {

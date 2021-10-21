@@ -10,7 +10,7 @@ namespace Piipan.QueryTool.Extensions
     {
         public static string RecentBenefitMonthsDisplay(this IParticipant participant)
         {
-            return String.Join(", ", participant.RecentBenefitMonths);
+            return String.Join(", ", participant.RecentBenefitMonths.Select(dt => dt.ToString("yyyy-MM")));
         }
 
         public static string ProtectLocationDisplay(this IParticipant participant)
