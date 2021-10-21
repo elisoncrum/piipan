@@ -90,7 +90,11 @@ paths:
                                   - state
                                   - participant_id
                                   - case_id
+                                  - match_id
                                 properties:
+                                  match_id:
+                                    type: string
+                                    description: Unique identifier for the match
                                   state:
                                     type: string
                                     description: State/territory two-letter postal abbreviation
@@ -168,7 +172,8 @@ paths:
                       results:
                         - index: 0
                           matches:
-                            - state: ea
+                            - match_id: BCD2345
+                              state: ea
                               case_id: string
                               participant_id: string
                               benefits_end_month: 2021-01
@@ -193,7 +198,8 @@ paths:
                       results:
                         - index: 0
                           matches:
-                            - state: eb
+                            - match_id: XYZ9876
+                              state: eb
                               case_id: string
                               participant_id: string
                               benefits_end_month: 2021-01
@@ -202,7 +208,8 @@ paths:
                                 - 2021-04
                                 - 2021-03
                               protect_location: true
-                            - state: ec
+                            - match_id: 4567CDF
+                              state: ec
                               case_id: string
                               participant_id: string
                               benefits_end_month: null
@@ -218,7 +225,7 @@ paths:
                             - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
                         - index: 1
                           matches:
-                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
+                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Single%20match/value/data/results/0/matches/0'
                       errors: []
                 Multiple persons with one match:
                   description: A query for two persons returning no matches for one person and a match for the other

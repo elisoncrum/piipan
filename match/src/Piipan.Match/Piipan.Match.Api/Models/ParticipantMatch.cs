@@ -1,14 +1,16 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using Piipan.Match.Core.Serializers;
-using Piipan.Participants.Api.Models;
 using Newtonsoft.Json;
+using Piipan.Match.Api.Serializers;
+using Piipan.Participants.Api.Models;
 
-namespace Piipan.Match.Core.Models
+namespace Piipan.Match.Api.Models
 {
-    public class Participant : IParticipant
+    public class ParticipantMatch : IParticipant
     {
+        [JsonProperty("match_id")]
+        public string MatchId { get; set; }
+
         [JsonProperty("lds_hash",
             NullValueHandling = NullValueHandling.Ignore)]
         public string LdsHash { get; set; }
@@ -33,9 +35,10 @@ namespace Piipan.Match.Core.Models
         [JsonProperty("protect_location")]
         public bool? ProtectLocation { get; set; }
 
-        public Participant() {}
+        public ParticipantMatch() { }
 
-        public Participant(IParticipant p) {
+        public ParticipantMatch(IParticipant p)
+        {
             LdsHash = p.LdsHash;
             State = p.State;
             CaseId = p.CaseId;
