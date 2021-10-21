@@ -20,6 +20,7 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
+            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -37,6 +38,7 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Staging;
+            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -54,6 +56,7 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Production;
+            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -71,7 +74,6 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
-
             Environment.SetEnvironmentVariable("OrchApiUrl", "https://tts.test");
 
             // Act
