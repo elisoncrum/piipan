@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Piipan.Match.Api;
@@ -33,7 +34,6 @@ namespace Piipan.Match.Core.Services
         /// <returns>The updated `matchResponse` object with `match_id`s</returns>
         public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
         {
-
             matchResponse.Data.Results = (await Task.WhenAll(matchResponse.Data.Results.Select(result =>
                 ResolvePersonMatches(
                     request.Data.ElementAt(result.Index),
@@ -66,12 +66,38 @@ namespace Piipan.Match.Core.Services
 
         private async Task<ParticipantMatch> ResolveSingleMatch(IParticipant match, IMatchRecord record)
         {
-            var matchId = await _recordApi.AddRecord(record);
+            var existingRecords = await _recordApi.GetRecords(record);
 
+            if (existingRecords.Any())
+            {
+                return await Reconcile(match, record, existingRecords);
+            }
+
+            // No existing records
             return new ParticipantMatch(match)
             {
-                MatchId = matchId
+                MatchId = await _recordApi.AddRecord(record)
             };
+        }
+
+        private async Task<ParticipantMatch> Reconcile(IParticipant match, IMatchRecord pendingRecord, IEnumerable<IMatchRecord> existingRecords)
+        {
+            var latest = existingRecords.OrderBy(r => r.CreatedAt).Last();
+
+            if (latest.Status == MatchRecordStatus.Closed)
+            {
+                return new ParticipantMatch(match)
+                {
+                    MatchId = await _recordApi.AddRecord(pendingRecord)
+                };
+            }
+
+            // Latest record is open, return its match ID
+            return new ParticipantMatch(match)
+            {
+                MatchId = latest.MatchId
+            };
+
         }
     }
 }

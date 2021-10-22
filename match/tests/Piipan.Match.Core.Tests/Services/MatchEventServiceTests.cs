@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
@@ -159,6 +160,146 @@ namespace Piipan.Match.Core.Tests.Services
 
             // Assert
             Assert.Equal(mockMatchId, resolvedResponse.Data.Results.First().Matches.First().MatchId);
+        }
+
+        [Fact]
+        public async void Resolve_InsertsMostRecentMatchId()
+        {
+            // Arrange
+            var openMatchId = "BDC2345";
+            var closedMatchId = "CDB5432";
+            var record = new MatchRecordDbo
+            {
+                Hash = "foo",
+                HashType = "ldshash",
+                Initiator = "ea",
+                States = new string[] { "ea", "eb" }
+            };
+            var recordBuilder = BuilderMock(record);
+            var recordApi = ApiMock();
+            recordApi.Setup(r => r.GetRecords(It.IsAny<IMatchRecord>()))
+                .ReturnsAsync(new List<MatchRecordDbo> {
+                    new MatchRecordDbo {
+                        MatchId = openMatchId,
+                        Status = MatchRecordStatus.Open,
+                        CreatedAt = new DateTime(2020,01,02)
+                    },
+                    new MatchRecordDbo {
+                        MatchId = closedMatchId,
+                        Status = MatchRecordStatus.Open,
+                        CreatedAt = new DateTime(2020,01,01)
+                    }
+                });
+
+            var request = new OrchMatchRequest();
+            var person = new RequestPerson { LdsHash = "foo" };
+            request.Data.Add(person);
+
+            var response = new OrchMatchResponse();
+            var match = new ParticipantMatch { LdsHash = "foo", State = "eb" };
+            var result = new OrchMatchResult
+            {
+                Index = 0,
+                Matches = new List<ParticipantMatch>() { match }
+            };
+            response.Data.Results.Add(result);
+
+            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+
+            // Act
+            var resolvedResponse = await service.ResolveMatches(request, response, "ea");
+
+            // Assert
+            Assert.Equal(openMatchId, resolvedResponse.Data.Results.First().Matches.First().MatchId);
+        }
+
+        [Fact]
+        public async void Resolve_InsertsOpenMatchId()
+        {
+            // Arrange
+            var openMatchId = "BDC2345";
+            var record = new MatchRecordDbo
+            {
+                Hash = "foo",
+                HashType = "ldshash",
+                Initiator = "ea",
+                States = new string[] { "ea", "eb" }
+            };
+            var recordBuilder = BuilderMock(record);
+            var recordApi = ApiMock();
+            recordApi.Setup(r => r.GetRecords(It.IsAny<IMatchRecord>()))
+                .ReturnsAsync(new List<MatchRecordDbo> {
+                    new MatchRecordDbo {
+                        MatchId = openMatchId,
+                        Status = MatchRecordStatus.Open
+                    }
+                });
+
+            var request = new OrchMatchRequest();
+            var person = new RequestPerson { LdsHash = "foo" };
+            request.Data.Add(person);
+
+            var response = new OrchMatchResponse();
+            var match = new ParticipantMatch { LdsHash = "foo", State = "eb" };
+            var result = new OrchMatchResult
+            {
+                Index = 0,
+                Matches = new List<ParticipantMatch>() { match }
+            };
+            response.Data.Results.Add(result);
+
+            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+
+            // Act
+            var resolvedResponse = await service.ResolveMatches(request, response, "ea");
+
+            // Assert
+            Assert.Equal(openMatchId, resolvedResponse.Data.Results.First().Matches.First().MatchId);
+        }
+
+        [Fact]
+        public async void Resolve_InsertsNewMatchIdIfMostRecentRecordIsClosed()
+        {
+            // Arrange
+            var newId = "newId";
+            var record = new MatchRecordDbo
+            {
+                Hash = "foo",
+                HashType = "ldshash",
+                Initiator = "ea",
+                States = new string[] { "ea", "eb" }
+            };
+            var recordBuilder = BuilderMock(record);
+            var recordApi = ApiMock(newId);
+            recordApi.Setup(r => r.GetRecords(It.IsAny<IMatchRecord>()))
+                .ReturnsAsync(new List<MatchRecordDbo> {
+                    new MatchRecordDbo {
+                        MatchId = "closedId",
+                        Status = MatchRecordStatus.Closed,
+                        CreatedAt = new DateTime(2020,01,02)
+                    }
+                });
+
+            var request = new OrchMatchRequest();
+            var person = new RequestPerson { LdsHash = "foo" };
+            request.Data.Add(person);
+
+            var response = new OrchMatchResponse();
+            var match = new ParticipantMatch { LdsHash = "foo", State = "eb" };
+            var result = new OrchMatchResult
+            {
+                Index = 0,
+                Matches = new List<ParticipantMatch>() { match }
+            };
+            response.Data.Results.Add(result);
+
+            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+
+            // Act
+            var resolvedResponse = await service.ResolveMatches(request, response, "ea");
+
+            // Assert
+            Assert.Equal(newId, resolvedResponse.Data.Results.First().Matches.First().MatchId);
         }
     }
 }

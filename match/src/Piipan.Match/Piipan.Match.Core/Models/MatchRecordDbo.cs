@@ -21,7 +21,7 @@ namespace Piipan.Match.Core.Models
         [Column(TypeName = "jsonb")]
         public string Data { get; set; }
         public Boolean Invalid { get; set; } = false;
-        public string Status { get; set; } = "open";
+        public string Status { get; set; } = MatchRecordStatus.Open;
 
         public override bool Equals(Object obj)
         {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
@@ -78,6 +79,11 @@ namespace Piipan.Match.Core.Services
 
             throw new InvalidOperationException(
                 $"Match record table insert failed after {InsertRetries} retries.");
+        }
+
+        public async Task<IEnumerable<IMatchRecord>> GetRecords(IMatchRecord record)
+        {
+            return await _matchRecordDao.GetRecords((MatchRecordDbo)record);
         }
     }
 }
