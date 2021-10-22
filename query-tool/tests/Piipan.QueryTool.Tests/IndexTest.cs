@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -218,18 +219,23 @@ namespace Piipan.QueryTool.Tests
             var requestPii = new PiiRecord
             {
                 FirstName = "Theodore",
+                MiddleName = "Carri",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+            var mockMatchApi = new Mock<IMatchApi>();
+            mockMatchApi
+                .Setup(m => m.FindMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception("api broke"));
+
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
                 mockClaimsProvider,
                 mockLdsDeidentifier,
-                mockMatchApi
+                mockMatchApi.Object
             );
             pageModel.Query = requestPii;
             pageModel.PageContext.HttpContext = contextMock();
@@ -239,8 +245,48 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.NotNull(pageModel.RequestError);
+            Assert.Equal("There was an error running your search. Please try again.", pageModel.RequestError);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
+        }
+
+        [Theory]
+        [InlineData("something gregorian something", "Date of birth must be a real date.")]
+        [InlineData("something something something", "something something something")]
+        public async Task InvalidDateFormat(string exceptionMessage, string expectedErrorMessage)
+        {
+            // Arrange
+            var requestPii = new PiiRecord
+            {
+                FirstName = "Theodore",
+                MiddleName = "Carri",
+                LastName = "Farrington",
+                SocialSecurityNum = "000-00-0000",
+                DateOfBirth = new DateTime(2021, 1, 1)
+            };
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockLdsDeidentifier = new Mock<ILdsDeidentifier>();
+            mockLdsDeidentifier
+                .Setup(m => m.Run(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new ArgumentException(exceptionMessage));
+
+            var mockMatchApi = Mock.Of<IMatchApi>();
+
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockClaimsProvider,     
+                mockLdsDeidentifier.Object,
+                mockMatchApi
+            );
+            pageModel.Query = requestPii;
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // Act
+            await pageModel.OnPostAsync();
+
+            // Assert
+            Assert.NotNull(pageModel.RequestError);
+            Assert.Equal(expectedErrorMessage, pageModel.RequestError);
         }
     }
 }
