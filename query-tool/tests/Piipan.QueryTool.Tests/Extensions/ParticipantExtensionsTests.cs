@@ -1,16 +1,48 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Moq;
 using Piipan.Participants.Api.Models;
 using Piipan.QueryTool.Extensions;
 using Xunit;
 
+#nullable enable
+
 namespace Piipan.QueryTool.Tests.Extensions
 {
     public class ParticipantExtensionsTests
     {
+        [Fact]
+        public void BenefitsEndDateDisplay_Null()
+        {
+            // Arrange
+            var participant = new Mock<IParticipant>();
+            participant
+                .Setup(m => m.BenefitsEndDate)
+                .Returns<DateTime?>(null);
+
+            // Act
+            var result = participant.Object.BenefitsEndDateDisplay();
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void BenefitsEndDateDisplay()
+        {
+            // Arrange
+            var participant = new Mock<IParticipant>();
+            participant
+                .Setup(m => m.BenefitsEndDate)
+                .Returns(new DateTime(2021, 5, 31));
+
+            // Act
+            var result = participant.Object.BenefitsEndDateDisplay();
+
+            // Assert
+            Assert.Equal("2021-05", result);
+        }
+
         [Fact]
         public void RecentBenefitMonthsDisplay_Empty()
         {

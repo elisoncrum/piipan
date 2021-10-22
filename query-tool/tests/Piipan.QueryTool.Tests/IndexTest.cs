@@ -8,7 +8,6 @@ using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Pages;
-using Piipan.Shared.Authentication;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using Xunit;
