@@ -8,6 +8,7 @@
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
 - `psql` client for PostgreSQL – included in Azure Cloud Shell
+- [Node.js](https://nodejs.org/en/) and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during the build of ASP.NET Core web applications
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:

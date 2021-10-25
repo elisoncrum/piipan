@@ -62,6 +62,12 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install npm
+          command: |
+            apt-get update -y
+            apt-get install -y nodejs
+            apt-get install -y npm
+      - run:
           name: Setup Code Climate reporter
           command: |
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -129,10 +135,12 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install zip
+          name: Install environment deps
           command: |
             apt-get update -y
             apt-get install -y zip
+            apt-get install -y nodejs
+            apt-get install -y npm
       - run:
           working_directory: dashboard/src/Piipan.Dashboard
           name: Build Dashboard
