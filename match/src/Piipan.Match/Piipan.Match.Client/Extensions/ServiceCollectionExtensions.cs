@@ -13,6 +13,12 @@ namespace Piipan.Match.Client.Extensions
     {
         public static void RegisterMatchClientServices(this IServiceCollection serviceCollection, IHostEnvironment env)
         {
+            serviceCollection.Configure<AzureTokenProviderOptions<MatchClient>>(options =>
+            {
+                var uri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
+                options.ResourceUri = $"{uri.Scheme}://{uri.Host}";
+            });
+
             if (env.IsDevelopment())
             {
                 serviceCollection.AddTransient<TokenCredential, AzureCliCredential>();
@@ -24,7 +30,7 @@ namespace Piipan.Match.Client.Extensions
 
             serviceCollection.AddHttpClient<MatchClient>((c) =>
             {
-                c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("OrchApiUrl"));
+                c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
             });
             serviceCollection.AddTransient<ITokenProvider<MatchClient>, AzureTokenProvider<MatchClient>>();
             serviceCollection.AddTransient<IAuthorizedApiClient<MatchClient>, AuthorizedJsonApiClient<MatchClient>>();

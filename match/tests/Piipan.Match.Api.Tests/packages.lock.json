@@ -447,6 +447,14 @@
         "resolved": "13.0.1",
         "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
+      "Newtonsoft.Json.Schema": {
+        "type": "Transitive",
+        "resolved": "3.0.14",
+        "contentHash": "Qnu41yEFuMEJMuD1kJgslc4cF981K+hA7SmgXQ/N6pk6Zknvxt4g5Hx7KRykycP3oKyoz3aTFRV/TX+Vp6v7uQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "12.0.3"
+        }
+      },
       "NuGet.Frameworks": {
         "type": "Transitive",
         "resolved": "5.0.0",
@@ -1649,6 +1657,7 @@
           "Microsoft.Extensions.Http": "3.1.20",
           "Microsoft.Extensions.Logging": "3.1.20",
           "Microsoft.Extensions.Options": "3.1.20",
+          "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "5.0.10"
         }
       }
