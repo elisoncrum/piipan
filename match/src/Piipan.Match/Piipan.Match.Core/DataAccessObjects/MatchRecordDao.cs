@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Npgsql;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
@@ -44,6 +46,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                     match_id,
                     initiator,
                     states,
+                    status,
                     hash,
                     hash_type,
                     input,
@@ -55,6 +58,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                     @MatchId,
                     @Initiator,
                     @States,
+                    @Status::status,
                     @Hash,
                     @HashType::hash_type,
                     @Input::jsonb,
@@ -82,6 +86,31 @@ namespace Piipan.Match.Core.DataAccessObjects
 
                 throw ex;
             }
+        }
+
+        public async Task<IEnumerable<IMatchRecord>> GetRecords(MatchRecordDbo record)
+        {
+            const string sql = @"
+                SELECT
+                    match_id,
+                    created_at,
+                    initiator,
+                    states,
+                    hash,
+                    hash_type::text,
+                    input::jsonb,
+                    data::jsonb,
+                    status::text
+                FROM matches
+                WHERE
+                    hash=@Hash AND
+                    hash_type::text=@HashType AND
+                    states @> @States AND
+                    states <@ @States;";
+
+            var connection = await _dbConnectionFactory.Build();
+
+            return await connection.QueryAsync<MatchRecordDbo>(sql, record);
         }
     }
 }
