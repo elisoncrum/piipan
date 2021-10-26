@@ -25,8 +25,9 @@ namespace Piipan.Match.Core.Services
         }
 
         /// <summary>
-        /// Creates a match record for each match found by the match API.
-        /// Updates each match to include the resulting `match_id`.
+        /// Evaluates each new match in the incoming `matchRespone` against any existing matching records.
+        /// If an open match record for the match exists, it is reused. Else, a new match record is created.
+        /// Each match is subsequently updated to include the resulting `match_id`.
         /// </summary>
         /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
         /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
