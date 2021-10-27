@@ -226,7 +226,11 @@
                     "allowedExternalRedirectUrls": [
                         // Required for Easy Auth and Front Door to work together
                         "[parameters('frontDoorUri')]"
-                    ]
+                    ],
+                    "cookieExpiration": {
+                        "convention": "FixedTime",
+                        "timeToExpiration": "0.00:15:00"
+                    }
                 }
             }
         }
