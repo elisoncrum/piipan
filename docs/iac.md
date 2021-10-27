@@ -57,7 +57,7 @@ To (re)create the Azure resources that `piipan` uses:
         5. API: `Duplicate participation API`
         6. Product: `blank`
         7. User: `blank`
-        8. Click `Save`
+        8. Click `Create`
     7. Click on `Add Subscription`
         1. Name: `EA-BulkUpload`
         2. Display Name: `EA-BulkUpload`
@@ -66,7 +66,7 @@ To (re)create the Azure resources that `piipan` uses:
         5. API: `EA Bulk upload API`
         6. Product: `blank`
         7. User: `blank`
-        8. Click `Save` 
+        8. Click `Create` 
 
 8. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
 
