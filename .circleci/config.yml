@@ -117,6 +117,7 @@ jobs:
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.core.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Core.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.core.integration.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Client.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.client.json
+            ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Client.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.client.json
             ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.core.json
             ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Func.Api.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.func.api.json
             ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Func.Collect.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.func.collect.json
