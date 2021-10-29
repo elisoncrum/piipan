@@ -1,18 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Npgsql;
-using Piipan.Metrics.Func.Api.Builders;
 using Piipan.Metrics.Func.Api.Extensions;
-using Piipan.Metrics.Core.Services;
 using Piipan.Metrics.Api;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -20,19 +14,15 @@ namespace Piipan.Metrics.Func.Api
 {
     public class GetParticipantUploads
     {
-        private readonly IParticipantUploadApi _participantUploadApi;
-        private readonly IMetaBuilder _metaBuilder;
+        private readonly IParticipantUploadReaderApi _participantUploadApi;
 
-        public GetParticipantUploads(
-            IParticipantUploadApi participantUploadApi,
-            IMetaBuilder metaBuilder)
+        public GetParticipantUploads(IParticipantUploadReaderApi participantUploadApi)
         {
             _participantUploadApi = participantUploadApi;
-            _metaBuilder = metaBuilder;
         }
 
         [FunctionName("GetParticipantUploads")]
-        public IActionResult Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -40,24 +30,11 @@ namespace Piipan.Metrics.Func.Api
 
             try
             {
+                var state = req.Query.ParseString("state");
                 var perPage = req.Query.ParseInt("perPage", 50);
                 var page = req.Query.ParseInt("page", 1);
-                var state = req.Query.ParseString("state");
-                var offset = perPage * (page - 1);
 
-                var data = _participantUploadApi.GetUploads(state, perPage, offset);
-
-                var meta = _metaBuilder
-                    .SetPage(page)
-                    .SetPerPage(perPage)
-                    .SetState(state)
-                    .Build();
-
-                var response = new GetParticipantUploadsResponse
-                {
-                    Data = data,
-                    Meta = meta
-                };
+                var response = await _participantUploadApi.GetUploads(state, perPage, page);
 
                 return (ActionResult)new JsonResult(response);
             }

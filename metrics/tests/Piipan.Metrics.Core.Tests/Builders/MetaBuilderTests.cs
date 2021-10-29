@@ -1,7 +1,8 @@
 using Piipan.Metrics.Api;
-using Piipan.Metrics.Func.Api.Builders;
+using Piipan.Metrics.Core.Builders;
 using Xunit;
 using Moq;
+using System.Threading.Tasks;
 
 namespace Piipan.Metrics.Func.Api.Tests.Builders
 {
@@ -9,18 +10,18 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
     {
         [Theory]
         [InlineData(0, 0)]
-        public void Build_Default_Empty(int uploadCount, int expectedTotal)
+        public async Task Build_Default_Empty(int uploadCount, int expectedTotal)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(uploadCount);
+                .ReturnsAsync(uploadCount);
 
             var builder = new MetaBuilder(uploadApi.Object);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(expectedTotal, meta.Total);
@@ -32,18 +33,18 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
 
         [Theory]
         [InlineData(1, 1)]
-        public void Build_Default_NonEmpty(int uploadCount, int expectedTotal)
+        public async Task Build_Default_NonEmpty(int uploadCount, int expectedTotal)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(uploadCount);
+                .ReturnsAsync(uploadCount);
 
             var builder = new MetaBuilder(uploadApi.Object);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(expectedTotal, meta.Total);
@@ -56,19 +57,19 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         [Theory]
         [InlineData(0, 0)]
         [InlineData(1, 1)]
-        public void Build_FirstPage(int page, int expectedPage)
+        public async Task Build_FirstPage(int page, int expectedPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
+                .ReturnsAsync(5);
 
             var builder = new MetaBuilder(uploadApi.Object);
             builder.SetPage(page);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(5, meta.Total);
@@ -81,19 +82,19 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         [Theory]
         [InlineData(2, 2)]
         [InlineData(4, 4)]
-        public void Build_NotFirstPage(int page, int expectedPage)
+        public async Task Build_NotFirstPage(int page, int expectedPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
+                .ReturnsAsync(5);
 
             var builder = new MetaBuilder(uploadApi.Object);
             builder.SetPage(page);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(5, meta.Total);
@@ -106,7 +107,7 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         [Theory]
         [InlineData(2, 2, 4, 2, 2, 4)]
         [InlineData(4, 4, 15, 4, 4, 15)]
-        public void Build_LastPage(
+        public async Task Build_LastPage(
             int page, 
             int perPage, 
             int uploadCount, 
@@ -115,17 +116,17 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             int expectedTotal)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(uploadCount);
+                .ReturnsAsync(uploadCount);
 
             var builder = new MetaBuilder(uploadApi.Object);
             builder.SetPage(page);
             builder.SetPerPage(perPage);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(expectedTotal, meta.Total);
@@ -140,19 +141,19 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         [InlineData(0, 0)]
         [InlineData(1, 1)]
         [InlineData(4, 4)]
-        public void Build_WithPerPage(int perPage, int expectedPerPage)
+        public async Task Build_WithPerPage(int perPage, int expectedPerPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
+                .ReturnsAsync(5);
 
             var builder = new MetaBuilder(uploadApi.Object);
             builder.SetPerPage(perPage);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(5, meta.Total);
@@ -166,20 +167,20 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         [InlineData("ea", "ea")]
         [InlineData("eb", "eb")]
         [InlineData("somethinglonger", "somethinglonger")]
-        public void Build_WithState(string state, string expectedState)
+        public async Task Build_WithState(string state, string expectedState)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
                 .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
+                .ReturnsAsync(5);
 
             var builder = new MetaBuilder(uploadApi.Object);
             builder.SetPage(2);
             builder.SetState(state);
 
             // Act
-            var meta = builder.Build();
+            var meta = await builder.Build();
 
             // Assert
             Assert.Equal(5, meta.Total);

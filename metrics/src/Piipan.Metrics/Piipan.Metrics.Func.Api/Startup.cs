@@ -2,7 +2,6 @@ using System;
 using System.Data;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Metrics.Func.Api.Builders;
 using Piipan.Metrics.Core.Extensions;
 using Piipan.Shared.Authentication;
 using Npgsql;
@@ -59,8 +58,6 @@ namespace Piipan.Metrics.Func.Api
             });
 
             builder.Services.RegisterCoreServices();
-
-            builder.Services.AddTransient<IMetaBuilder, MetaBuilder>();
         }
     }
 }

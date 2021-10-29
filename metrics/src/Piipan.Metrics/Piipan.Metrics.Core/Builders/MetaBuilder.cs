@@ -1,25 +1,26 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Piipan.Metrics.Api;
 
 #nullable enable
 
-namespace Piipan.Metrics.Func.Api.Builders
+namespace Piipan.Metrics.Core.Builders
 {
     public class MetaBuilder : IMetaBuilder
     {
         private Meta _meta = new Meta();
         private string? _state;
-        private readonly IParticipantUploadApi _participantUploadApi;
+        private readonly IParticipantUploadReaderApi _participantUploadReaderApi;
 
-        public MetaBuilder(IParticipantUploadApi participantUploadApi)
+        public MetaBuilder(IParticipantUploadReaderApi participantUploadReaderApi)
         {
-            _participantUploadApi = participantUploadApi;
+            _participantUploadReaderApi = participantUploadReaderApi;
         }
 
-        public Meta Build()
+        public async Task<Meta> Build()
         {
-            _meta.Total = _participantUploadApi.GetUploadCount(_state);
+            _meta.Total = await _participantUploadReaderApi.GetUploadCount(_state);
             SetPrevPage(_state);
             SetNextPage(_state);
             return _meta;

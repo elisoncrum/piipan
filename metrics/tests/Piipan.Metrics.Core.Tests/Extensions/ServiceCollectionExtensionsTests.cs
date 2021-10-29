@@ -24,7 +24,7 @@ namespace Piipan.Metrics.Core.Tests.Extensions
 
             // Assert
             Assert.NotNull(provider.GetService<IParticipantUploadDao>());
-            Assert.NotNull(provider.GetService<IParticipantUploadApi>());
+            Assert.NotNull(provider.GetService<IParticipantUploadReaderApi>());
         }
     }
 }

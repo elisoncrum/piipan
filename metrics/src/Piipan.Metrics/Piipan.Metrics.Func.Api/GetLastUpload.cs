@@ -1,11 +1,11 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Piipan.Metrics.Api;
-using Piipan.Metrics.Func.Api.Builders;
 
 #nullable enable
 
@@ -16,22 +16,18 @@ namespace Piipan.Metrics.Func.Api
     /// </summary>
     public class GetLastUpload
     {
-        private readonly IParticipantUploadApi _participantUploadApi;
-        private readonly IMetaBuilder _metaBuilder;
+        private readonly IParticipantUploadReaderApi _participantUploadApi;
 
-        public GetLastUpload(
-            IParticipantUploadApi participantUploadApi,
-            IMetaBuilder metaBuilder)
+        public GetLastUpload(IParticipantUploadReaderApi participantUploadApi)
         {
             _participantUploadApi = participantUploadApi;
-            _metaBuilder = metaBuilder;
         }
 
         /// <summary>
         /// Azure Function implementing getting latest upload from each state.
         /// </summary>
         [FunctionName("GetLastUpload")]
-        public IActionResult Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -39,14 +35,7 @@ namespace Piipan.Metrics.Func.Api
 
             try
             {
-                var data = _participantUploadApi.GetLatestUploadsByState();
-                var meta = _metaBuilder.Build();
-
-                var response = new GetParticipantUploadsResponse
-                {
-                    Data = data,
-                    Meta = meta
-                };
+                var response = await _participantUploadApi.GetLatestUploadsByState();
 
                 return (ActionResult)new JsonResult(response);
             }
