@@ -31,7 +31,7 @@ namespace Piipan.Metrics.Core.Services
             return new GetParticipantUploadsResponse()
             {
                 Data = uploads,
-                Meta = await _metaBuilder.Build()
+                Meta = _metaBuilder.Build()
             };
         }
 
@@ -45,11 +45,13 @@ namespace Piipan.Metrics.Core.Services
             var limit = perPage;
             var offset = perPage * (page - 1);
             var uploads = _participantUploadDao.GetUploads(state, limit, offset);
+            var total = _participantUploadDao.GetUploadCount(state);
 
-            var meta = await _metaBuilder
+            var meta = _metaBuilder
                 .SetPage(page)
                 .SetPerPage(perPage)
                 .SetState(state)
+                .SetTotal(total)
                 .Build();
 
             return new GetParticipantUploadsResponse()

@@ -47,9 +47,13 @@ namespace Piipan.Metrics.Core.Tests.Services
                         UploadedAt = uploadedAt,
                     }
                 });
-            var metaBuilder = Mock.Of<IMetaBuilder>();
+            var metaBuilder = new Mock<IMetaBuilder>();
+            metaBuilder.Setup(m => m.SetPage(It.IsAny<int>())).Returns(metaBuilder.Object);
+            metaBuilder.Setup(m => m.SetPerPage(It.IsAny<int>())).Returns(metaBuilder.Object);
+            metaBuilder.Setup(m => m.SetState(It.IsAny<string>())).Returns(metaBuilder.Object);
+            metaBuilder.Setup(m => m.SetTotal(It.IsAny<long>())).Returns(metaBuilder.Object);
 
-            var service = new ParticipantUploadService(uploadDao.Object, metaBuilder);
+            var service = new ParticipantUploadService(uploadDao.Object, metaBuilder.Object);
 
             // Act
             var response = await service.GetUploads("somestate", 1, 1);
