@@ -19,11 +19,6 @@ namespace Piipan.Metrics.Core.Services
             _metaBuilder = metaBuilder;
         }
 
-        public async Task<Int64> GetUploadCount(string? state)
-        {
-            return _participantUploadDao.GetUploadCount(state);
-        }
-
         public async Task<GetParticipantUploadsResponse> GetLatestUploadsByState()
         {
             var uploads = _participantUploadDao.GetLatestUploadsByState();

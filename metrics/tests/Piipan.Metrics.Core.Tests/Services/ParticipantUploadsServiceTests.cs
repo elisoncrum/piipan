@@ -13,25 +13,6 @@ namespace Piipan.Metrics.Core.Tests.Services
     public class ParticipantUploadServiceTests
     {
         [Fact]
-        public async Task GetUploadCount()
-        {
-            // Arrange
-            var uploadDao = new Mock<IParticipantUploadDao>();
-            uploadDao
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(99);
-            var metaBuilder = Mock.Of<IMetaBuilder>();
-            
-            var service = new ParticipantUploadService(uploadDao.Object, metaBuilder);
-            
-            // Act
-            var count = await service.GetUploadCount("somestate");
-
-            // Assert
-            Assert.Equal(99, count);
-        }
-
-        [Fact]
         public async Task GetUploads()
         {
             // Arrange

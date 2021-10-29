@@ -72,11 +72,6 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_NotFirstPage(int page, int expectedPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadReaderApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .ReturnsAsync(5);
-
             var builder = new MetaBuilder();
             builder.SetPage(page);
             builder.SetTotal(5);
