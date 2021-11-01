@@ -158,14 +158,25 @@ main () {
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       func_stor_name=${PREFIX}st${abbr}upload${ENV}
       echo "Creating storage for $name ($func_stor_name)"
-      az deployment group create \
-      --name "$func_stor_name" \
-      --resource-group "$RESOURCE_GROUP" \
-      --template-file ./arm-templates/blob-storage.json \
+
+
+      try_run "az deployment group create --name \""${func_stor_name}"\" \
+      --resource-group \""${RESOURCE_GROUP}"\" \
+      --template-file \"./arm-templates/blob-storage.json\" \
       --parameters \
-        storageAccountName="$func_stor_name" \
-        resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        storageAccountName=\""${func_stor_name}"\" \
+        resourceTags="\'"${RESOURCE_TAGS}"\'" \
+        location=\""${LOCATION2}"\"" 4
+
+
+      # az deployment group create \
+      # --name "$func_stor_name" \
+      # --resource-group "$RESOURCE_GROUP" \
+      # --template-file ./arm-templates/blob-storage.json \
+      # --parameters \
+      #   storageAccountName="$func_stor_name" \
+      #   resourceTags="$RESOURCE_TAGS" \
+      #   location="$LOCATION2"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -384,7 +395,7 @@ main () {
       --parameters \
         uniqueStorageName="$func_stor" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION2"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it

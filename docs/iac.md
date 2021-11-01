@@ -21,14 +21,21 @@ To (re)create the Azure resources that `piipan` uses:
     az cloud set --name AzureCloud
 ```
 4. Sign in with the Azure CLI `login` command. An account with at least the Contributor role on the subscription is required.
-```
+```console
     az login
+
+    #if running docker
+    docker run piipan
+    docker start {CONTAINER_ID}
 ```
 
 5. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments). Once this step is completed, all the infrastructure components will be provisioned.
-```
+```console
     cd iac
     ./create-resources.bash tts/dev
+
+    #if running docker
+    docker exec -w /home/piipan/iac {CONTAINER_ID} ./create-resources.bash tts/dev
 ```
 
 6. Configuring user account authentication for piipan's Query Tool and Dashboard web apps requires additional actions. These actions can be deferred, but until completed, users will not be able to access these web apps.

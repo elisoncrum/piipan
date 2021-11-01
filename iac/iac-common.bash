@@ -241,6 +241,11 @@ try_run () {
   ERR=0 # or some non zero error number you want
   mycommand+=" || ERR=1"
 
+  echo "Directory: ${directory}"  
+  echo "Running: ${mycommand}"
+  echo "max_tries: ${max_tries}" 
+
+
   pushd "$directory" || exit
     for (( i=1; i<=max_tries; i++ ))
       do

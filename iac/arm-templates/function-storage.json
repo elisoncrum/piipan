@@ -37,4 +37,5 @@
             "value": "[reference(variables('uniqueStorageName')).primaryEndpoints]"
         }
     }
+    
 }
