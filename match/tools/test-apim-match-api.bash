@@ -15,10 +15,10 @@ source "$(dirname "$0")"/../../tools/common.bash || exit
 SUBSCRIPTION_NAME="EA-DupPart"
 MATCH_API_PATH="/match/v2/find_matches"
 
-# Hash digest for farrington,10/13/31,000-12-3456
+# Hash digest for farrington,10/13/31,425-46-5417
 JSON='{
     "data": [{
-      "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
+      "lds_hash": "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec"
     }]
 }'
 
