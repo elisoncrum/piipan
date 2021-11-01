@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Primitives;
 using Moq;
-using Piipan.Dashboard.Api;
 using Piipan.Dashboard.Pages;
+using Piipan.Metrics.Api;
 using Piipan.Shared.Claims;
 using Xunit;
 
@@ -22,14 +20,13 @@ namespace Piipan.Dashboard.Tests
         [Fact]
         public void BeforeOnGetAsync_TitleIsCorrect()
         {
-            var mockApi = new Mock<IParticipantUploadRequest>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
-                mockApi.Object,
+                Mock.Of<IParticipantUploadReaderApi>(),
                 new NullLogger<ParticipantUploadsModel>(),
                 mockClaimsProvider
             );
-            pageModel.PageContext.HttpContext = contextMock();
+            pageModel.PageContext.HttpContext = contextMock().Object;
 
             Assert.Equal("Most recent upload from each state", pageModel.Title);
             Assert.Equal("noreply@tts.test", pageModel.Email);
@@ -43,37 +40,11 @@ namespace Piipan.Dashboard.Tests
         }
 
         [Fact]
-        public void BeforeOnGetAsync_ApiUrlKeyIsCorrect()
+        public void BeforeOnGetAsync_InitializesParticipantUploadResults()
         {
-            Assert.IsType<String>(ParticipantUploadsModel.ApiUrlKey);
-        }
-
-        [Fact]
-        public void BeforeOnGetAsync_BaseUrlIsCorrect()
-        {
-            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
-            var mockApi = new Mock<IParticipantUploadRequest>();
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
-                mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
-            );
-            pageModel.PageContext.HttpContext = contextMock();
-
-            Assert.Matches("http://example.com", pageModel.MetricsApiBaseUrl);
-            Assert.Equal("noreply@tts.test", pageModel.Email);
-            Assert.Equal("https://tts.test", pageModel.BaseUrl);
-            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
-        }
-
-        [Fact]
-        public void BeforeOnGetAsync_initializesParticipantUploadResults()
-        {
-            var mockApi = new Mock<IParticipantUploadRequest>();
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new ParticipantUploadsModel(
-                mockApi.Object,
+                Mock.Of<IParticipantUploadReaderApi>(),
                 new NullLogger<ParticipantUploadsModel>(),
                 mockClaimsProvider
             );
@@ -82,114 +53,159 @@ namespace Piipan.Dashboard.Tests
 
         // sets participant uploads after Get request
         [Fact]
-        public async void AfterOnGetAsync_setsParticipantUploadResults()
+        public async void AfterOnGetAsync_SetsParticipantUploadResults()
         {
-            // setup env
-            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
-            // setup mocks
-            var participantUpload = new ParticipantUpload("eb", new DateTime());
-            var data = new List<ParticipantUpload>();
-            data.Add(participantUpload);
-            var meta = new ParticipantUploadResponseMeta();
-            var mockApi = mockApiWithResponse(data, meta);
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Scheme = "https";
-            httpContext.Request.Host = new HostString("tts.test");
-            var pageContext = MockPageContext(httpContext);
-            // setup page model with mocks
-            var pageModel = new ParticipantUploadsModel(
-                mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
-            )
+            // Arrange
+            var response = new GetParticipantUploadsResponse
             {
-                PageContext = pageContext
+                Data = new List<ParticipantUpload>
+                {
+                    new ParticipantUpload { State = "ea", UploadedAt = DateTime.Now }
+                },
+                Meta = new Meta()
             };
+            var participantApi = new Mock<IParticipantUploadReaderApi>();
+            participantApi
+                .Setup(m => m.GetLatestUploadsByState())
+                .ReturnsAsync(response);
 
-            // run
+            var pageModel = new ParticipantUploadsModel(
+                participantApi.Object,
+                new NullLogger<ParticipantUploadsModel>(),
+                claimsProviderMock("noreply@tts.test")
+            );
+
+            var httpContext = contextMock().Object;
+            pageModel.PageContext.HttpContext = httpContext;
+
+            // Act
             await pageModel.OnGetAsync();
 
             // assert
-            Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
+            Assert.Equal(response.Data.First(), pageModel.ParticipantUploadResults[0]);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
+        }
 
-            // teardown
-            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
+        [Fact]
+        public async Task AfterOnGetAsync_ApiThrows()
+        {
+            // Arrange
+            var participantApi = new Mock<IParticipantUploadReaderApi>();
+            participantApi
+                .Setup(m => m.GetLatestUploadsByState())
+                .ThrowsAsync(new Exception("api broke"));
+
+            var logger = new Mock<ILogger<ParticipantUploadsModel>>();
+
+            var pageModel = new ParticipantUploadsModel(
+                participantApi.Object,
+                logger.Object,
+                claimsProviderMock("noreply@tts.test")
+            );
+
+            // Act
+            await pageModel.OnGetAsync();
+
+            // Assert
+            logger.Verify(x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("api broke")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+            ));
         }
 
         // sets participant uploads after Post request
         [Fact]
         public async void AfterOnPostAsync_setsParticipantUploadResults()
         {
-            // setup env
-            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, "http://example.com");
-            // setup mock api response
-            var participantUpload = new ParticipantUpload("eb", new DateTime());
-            var data = new List<ParticipantUpload>();
-            data.Add(participantUpload);
-            var meta = new ParticipantUploadResponseMeta();
-            var mockApi = mockApiWithResponse(data, meta);
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            // setup mock page context with form data
-            var httpContext = new DefaultHttpContext();
-            var form = new FormCollection(new Dictionary<string,
-            Microsoft.Extensions.Primitives.StringValues>
+            // Arrange
+            var response = new GetParticipantUploadsResponse
             {
-                { "state", "foo" }
-            });
-            httpContext.Request.Form = form;
-            httpContext.Request.Scheme = "https";
-            httpContext.Request.Host = new HostString("tts.test");
-            var pageContext = MockPageContext(httpContext);
-            // setup page model with mocks
-            var pageModel = new ParticipantUploadsModel(
-                mockApi.Object,
-                new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
-            )
-            {
-                PageContext = pageContext
+                Data = new List<ParticipantUpload>
+                {
+                    new ParticipantUpload { State = "eb", UploadedAt = DateTime.Now }
+                },
+                Meta = new Meta()
             };
+            var participantApi = new Mock<IParticipantUploadReaderApi>();
+            participantApi
+                .Setup(m => m.GetUploads("eb", ParticipantUploadsModel.PerPageDefault, 1))
+                .ReturnsAsync(response);
 
-            // run
+            var pageModel = new ParticipantUploadsModel(
+                participantApi.Object,
+                new NullLogger<ParticipantUploadsModel>(),
+                claimsProviderMock("noreply@tts.test")
+            );
+
+            var request = requestMock();
+            request
+                .Setup(m => m.Form)
+                .Returns(new FormCollection(new Dictionary<string, StringValues>
+                {
+                    { "state", "eb" }
+                }));
+
+            var httpContext = contextMock();
+            httpContext
+                .Setup(m => m.Request)
+                .Returns(request.Object);
+            pageModel.PageContext.HttpContext = httpContext.Object;
+
+            // Act
             await pageModel.OnPostAsync();
 
-            // assert
-            Assert.Equal(participantUpload, pageModel.ParticipantUploadResults[0]);
+            // Assert
+            Assert.Equal(response.Data.First(), pageModel.ParticipantUploadResults[0]);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
-
-            // teardown
-            Environment.SetEnvironmentVariable(ParticipantUploadsModel.ApiUrlKey, null);
         }
 
-        private Mock<IParticipantUploadRequest> mockApiWithResponse(
-            List<ParticipantUpload> data,
-            ParticipantUploadResponseMeta meta
-        )
+        [Fact]
+        public async Task AfterOnPostAsync_ApiThrows()
         {
-            var mockResponse = new ParticipantUploadResponse();
-            mockResponse.meta = new ParticipantUploadResponseMeta();
-            mockResponse.data = data;
-            var mockApi = new Mock<IParticipantUploadRequest>();
-            mockApi.Setup(x => x.Get(It.IsAny<string>())).Returns(Task.FromResult(mockResponse));
-            return mockApi;
-        }
-        // setup mock httpcontext for page model,
-        // which provides the Route object to the model
-        private PageContext MockPageContext(DefaultHttpContext httpContext)
-        {
-            var modelState = new ModelStateDictionary();
-            var actionContext = new ActionContext(httpContext, new RouteData(), new PageActionDescriptor(), modelState);
-            var modelMetadataProvider = new EmptyModelMetadataProvider();
-            var viewData = new ViewDataDictionary(modelMetadataProvider, modelState);
-            var pageContext = new PageContext(actionContext)
-            {
-                ViewData = viewData
-            };
-            return pageContext;
+            // Arrange
+            var participantApi = new Mock<IParticipantUploadReaderApi>();
+            participantApi
+                .Setup(m => m.GetUploads("eb", ParticipantUploadsModel.PerPageDefault, 1))
+                .ThrowsAsync(new Exception("api broke"));
+
+            var logger = new Mock<ILogger<ParticipantUploadsModel>>();
+
+            var pageModel = new ParticipantUploadsModel(
+                participantApi.Object,
+                logger.Object,
+                claimsProviderMock("noreply@tts.test")
+            );
+
+            var request = requestMock();
+            request
+                .Setup(m => m.Form)
+                .Returns(new FormCollection(new Dictionary<string, StringValues>
+                {
+                    { "state", "eb" }
+                }));
+
+            var httpContext = contextMock();
+            httpContext
+                .Setup(m => m.Request)
+                .Returns(request.Object);
+            pageModel.PageContext.HttpContext = httpContext.Object;
+
+            // Act
+            await pageModel.OnPostAsync();
+
+            // Assert
+            logger.Verify(x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("api broke")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+            ));
         }
 
         private IClaimsProvider claimsProviderMock(string email)
@@ -201,7 +217,7 @@ namespace Piipan.Dashboard.Tests
             return claimsProviderMock.Object;
         }
 
-        public static HttpContext contextMock()
+        public static Mock<HttpRequest> requestMock()
         {
             var request = new Mock<HttpRequest>();
 
@@ -213,10 +229,17 @@ namespace Piipan.Dashboard.Tests
                 .Setup(m => m.Host)
                 .Returns(new HostString("tts.test"));
 
+            return request;
+        }
+
+        public static Mock<HttpContext> contextMock()
+        {
+            var request = requestMock();
+
             var context = new Mock<HttpContext>();
             context.Setup(m => m.Request).Returns(request.Object);
 
-            return context.Object;
+            return context;
         }
     }
 }
