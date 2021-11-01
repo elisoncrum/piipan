@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  iac:
+    build:
+      context: ./
+      dockerfile: ./iac/Dockerfile
+    volumes:
+      - type: bind
+        source: ./
+        target: /home/piipan/app
