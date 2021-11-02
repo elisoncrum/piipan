@@ -11,7 +11,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Func.Api.DataTypeHandlers;
@@ -63,8 +62,7 @@ namespace Piipan.Match.Func.Api
                 var initiatingState = InitiatingState(req);
                 var request = await _requestParser.Parse(req.Body);
                 var response = await _matchApi.FindMatches(request, initiatingState);
-
-                await _matchEventService.ResolveMatches(request, response, initiatingState);
+                response = await _matchEventService.ResolveMatches(request, response, initiatingState);
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }

@@ -7,10 +7,8 @@ using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Participants.Api;
-using Piipan.Participants.Api.Models;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
@@ -113,10 +111,10 @@ namespace Piipan.Match.Core.Tests.Services
 
             participantApi
                 .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<IParticipant>
+                .ReturnsAsync(new List<ParticipantMatch>
                 {
-                    new Participant { ParticipantId = "p1" },
-                    new Participant { ParticipantId = "p2" }
+                    new ParticipantMatch { ParticipantId = "p1" },
+                    new ParticipantMatch { ParticipantId = "p2" }
                 });
 
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Piipan.Shared.Authentication;
+using Piipan.Match.Api;
+using Piipan.Match.Api.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 
@@ -11,27 +14,23 @@ namespace Piipan.QueryTool.Pages
     public class IndexModel : BasePageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly IAuthorizedApiClient _apiClient;
-        private readonly OrchestratorApiRequest _apiRequest;
         private readonly ILdsDeidentifier _ldsDeidentifier;
+        private readonly IMatchApi _matchApi;
 
         public IndexModel(ILogger<IndexModel> logger,
-                          IAuthorizedApiClient apiClient,
                           IClaimsProvider claimsProvider,
-                          ILdsDeidentifier ldsDeidentifier)
+                          ILdsDeidentifier ldsDeidentifier,
+                          IMatchApi matchApi)
                           : base(claimsProvider)
         {
             _logger = logger;
-            _apiClient = apiClient;
             _ldsDeidentifier = ldsDeidentifier;
-
-            var apiBaseUri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
-            _apiRequest = new OrchestratorApiRequest(_apiClient, apiBaseUri, _logger);
+            _matchApi = matchApi;
         }
 
         [BindProperty]
         public PiiRecord Query { get; set; }
-        public MatchResponse QueryResult { get; private set; }
+        public OrchMatchResponse QueryResult { get; private set; }
         public String RequestError { get; private set; }
         public bool NoResults = false;
 
@@ -48,11 +47,21 @@ namespace Piipan.QueryTool.Pages
                         Query.DateOfBirth.Value.ToString("yyyy-MM-dd"),
                         Query.SocialSecurityNum
                     );
-                    MatchRequestRecord requestRecord = new MatchRequestRecord() { LdsHash = digest };
-                    MatchResponse result = await _apiRequest.Match(requestRecord);
-                    QueryResult = result;
+
+                    var request = new OrchMatchRequest
+                    {
+                        Data = new List<RequestPerson>
+                        {
+                            new RequestPerson { LdsHash = digest }
+                        }
+                    };
+
+                    var response = await _matchApi.FindMatches(request, "ea");
+
+                    QueryResult = response;
                     NoResults = QueryResult.Data.Results.Count == 0 ||
-                        QueryResult.Data.Results[0].Matches.Count == 0;
+                        QueryResult.Data.Results[0].Matches.Count() == 0;
+
                     Title = "NAC Query Results";
                 }
                 catch (ArgumentException ex)

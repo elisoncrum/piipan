@@ -1,7 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Npgsql;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
@@ -50,7 +54,7 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = "open",
+                    Status = MatchRecordStatus.Open,
                     Invalid = false,
                     Data = "{}"
                 };
@@ -83,7 +87,7 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = "open",
+                    Status = MatchRecordStatus.Open,
                     Invalid = false,
                     Data = "{}"
                 };
@@ -120,7 +124,7 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = "open",
+                    Status = MatchRecordStatus.Open,
                     Invalid = false,
                     Data = "{{"
                 };
@@ -150,7 +154,7 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = "open",
+                    Status = MatchRecordStatus.Open,
                     Invalid = false,
                     Data = "{}"
                 };
@@ -160,6 +164,54 @@ namespace Piipan.Match.Core.IntegrationTests
 
                 // Assert
                 Assert.True(result == record.MatchId);
+            }
+        }
+
+        [Fact]
+        public async Task GetRecord_ReturnsMatchingRecords()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchRecordDao>>();
+                var dao = new MatchRecordDao(DbConnFactory(), logger);
+                var idService = new MatchIdService();
+                var records = new List<MatchRecordDbo>() {
+                    new MatchRecordDbo
+                    {
+                        MatchId = idService.GenerateId(),
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Status = MatchRecordStatus.Open,
+                        Invalid = false,
+                        Data = "{}"
+                    },
+                    new MatchRecordDbo
+                    {
+                        MatchId = idService.GenerateId(),
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Status = MatchRecordStatus.Closed,
+                        Invalid = false,
+                        Data = "{}"
+                    }
+                };
+
+                ClearMatchRecords();
+                records.ForEach(r => Insert(r));
+
+                // Act
+                var results = (await dao.GetRecords(records.First())).ToList();
+
+                // Assert
+                Assert.True(results.OrderBy(r => r.Status).SequenceEqual(records.OrderBy(r => r.Status)));
             }
         }
     }

@@ -73,6 +73,7 @@ Searches all state databases for any participant records that are an exact match
         "index": 0,
         "matches": [
           {
+            "match_id": "BCD2345",
             "state": "ea",
             "case_id": "string",
             "participant_id": "string",
@@ -118,6 +119,7 @@ Searches all state databases for any participant records that are an exact match
         "index": 0,
         "matches": [
           {
+            "match_id": "XYZ9876",
             "state": "eb",
             "case_id": "string",
             "participant_id": "string",
@@ -130,6 +132,7 @@ Searches all state databases for any participant records that are an exact match
             "protect_location": true
           },
           {
+            "match_id": "4567CDF",
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
@@ -154,6 +157,7 @@ Searches all state databases for any participant records that are an exact match
         "index": 0,
         "matches": [
           {
+            "match_id": "4567CDF",
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
@@ -166,11 +170,17 @@ Searches all state databases for any participant records that are an exact match
         "index": 1,
         "matches": [
           {
-            "state": "ec",
+            "match_id": "BCD2345",
+            "state": "ea",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": null,
-            "protect_location": null
+            "benefits_end_month": "2021-01",
+            "recent_benefit_months": [
+              "2021-05",
+              "2021-04",
+              "2021-03"
+            ],
+            "protect_location": true
           }
         ]
       }
@@ -194,6 +204,7 @@ Searches all state databases for any participant records that are an exact match
         "index": 1,
         "matches": [
           {
+            "match_id": "4567CDF",
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
@@ -218,6 +229,7 @@ Searches all state databases for any participant records that are an exact match
         "index": 1,
         "matches": [
           {
+            "match_id": "4567CDF",
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
@@ -273,6 +285,7 @@ Status Code **200**
 |»» results|[object]|true|none|Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» matches|[object]|true|none|none|
+|»»»» match_id|string|true|none|Unique identifier for the match|
 |»»»» state|string|true|none|State/territory two-letter postal abbreviation|
 |»»»» case_id|string|true|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
 |»»»» participant_id|string|true|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|

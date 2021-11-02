@@ -169,6 +169,16 @@ gulp.task(
   )
 );
 
+gulp.task(
+  "build",
+  gulp.series(
+    "copy-uswds-fonts",
+    "copy-uswds-images",
+    "copy-uswds-js",
+    "build-sass"
+  )
+)
+
 gulp.task("watch-sass", function() {
   gulp.watch(`${PROJECT_SASS_SRC}/**/*.scss`, gulp.series("build-sass"));
 });

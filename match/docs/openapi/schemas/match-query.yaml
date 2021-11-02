@@ -162,7 +162,7 @@ MatchResponseExamples:
               - $ref: './participant-record.yaml#/ParticipantRecordExamples/Required'
           - index: 1
             matches:
-              - $ref: './participant-record.yaml#/ParticipantRecordExamples/Required'
+              - $ref: './participant-record.yaml#/ParticipantRecordExamples/All'
         errors: []
   MultipleRecordsOneMatch:
     description: "A query for two persons returning no matches for one person and a match for the other"
@@ -247,6 +247,7 @@ components:
       schema:
         type: string
       description: "Two-letter postal abbreviation for the caller's state role"
+      required: true
   responses:
     '200':
       description: "Successful response. Returns match response items."

@@ -226,7 +226,17 @@
                     "allowedExternalRedirectUrls": [
                         // Required for Easy Auth and Front Door to work together
                         "[parameters('frontDoorUri')]"
-                    ]
+                    ],
+                    "cookieExpiration": {
+                        "convention": "FixedTime",
+                        // the string format for timeToExpiration is not well documented. Official Microsoft
+                        // documentation describes the value for this field as simply "string", with no formatting details [1].
+                        // Unofficial documentation [2] suggests that this field is of type <timespan>, and provides an example
+                        // of the proper string formatting. Our own testing verifies that this format behaves as expected.
+                        // [1] https://docs.microsoft.com/en-us/azure/templates/microsoft.web/sites/config-authsettingsv2?tabs=bicep#cookieexpiration
+                        // [2] https://stackoverflow.com/questions/50156326/json-format-for-a-timespan-that-can-be-bound-using-microsoft-extensions-configur/50157340#50157340
+                        "timeToExpiration": "0.00:15:00"
+                    }
                 }
             }
         }

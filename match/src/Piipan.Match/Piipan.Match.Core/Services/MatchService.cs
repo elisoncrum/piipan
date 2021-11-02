@@ -4,7 +4,6 @@ using FluentValidation;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
-using Piipan.Match.Core.Models;
 using Piipan.Participants.Api;
 
 namespace Piipan.Match.Core.Services
@@ -68,7 +67,7 @@ namespace Piipan.Match.Core.Services
 
             var matches = (await states
                 .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash)))
-                .Select(p => new Participant(p));
+                .Select(p => new ParticipantMatch(p));
 
             return new OrchMatchResult
             {

@@ -5,7 +5,11 @@ ParticipantRecord:
     - state
     - participant_id
     - case_id
+    - match_id
   properties:
+    match_id:
+      type: string
+      description: "Unique identifier for the match"
     state:
       type: string
       description: "State/territory two-letter postal abbreviation"
@@ -37,6 +41,7 @@ ParticipantRecord:
 
 ParticipantRecordExamples:
   All:
+    match_id: "BCD2345"
     state: "ea"
     case_id: "string"
     participant_id: "string"
@@ -47,6 +52,7 @@ ParticipantRecordExamples:
       - "2021-03"
     protect_location: true
   AllEB:
+    match_id: "XYZ9876"
     state: "eb"
     case_id: "string"
     participant_id: "string"
@@ -57,6 +63,7 @@ ParticipantRecordExamples:
       - "2021-03"
     protect_location: true
   Required:
+    match_id: "4567CDF"
     state: "ec"
     case_id: "string"
     participant_id: "string"
