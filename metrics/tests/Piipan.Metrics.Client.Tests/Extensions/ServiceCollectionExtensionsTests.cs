@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,6 +65,26 @@ namespace Piipan.Metrics.Client.Tests.Extensions
             // Assert
             Assert.NotNull(provider.GetService<IParticipantUploadReaderApi>());
             Assert.IsType<ManagedIdentityCredential>(provider.GetService<TokenCredential>());
+        }
+
+        [Fact]
+        public void RegisterMetricsClientServices_HttpClientBaseAddressSet()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            var env = Mock.Of<IHostEnvironment>();
+            env.EnvironmentName = Environments.Development;
+            Environment.SetEnvironmentVariable("MetricsApiUri", "https://tts.test");
+
+            // Act
+            services.RegisterMetricsClientServices(env);
+            var provider = services.BuildServiceProvider();
+
+            var clientFactory = provider.GetService<IHttpClientFactory>();
+            var client = clientFactory.CreateClient("ParticipantUploadClient");
+
+            // Assert
+            Assert.Equal("https://tts.test/", client.BaseAddress.ToString());
         }
     }
 }
