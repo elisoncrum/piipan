@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.92] - 2021-11-02
+
+### Added
+- `match_id` field in Duplicate Participation match responses
+- Explicit session timeout for dashboard and query tool apps
+- Front-end dependencies build process for query tool and dashboard apps
+### Changed
+- Refactored `query-tool` subsystem to align with the [standard subsystem architecture](https://github.com/18F/piipan/blob/dev/docs/adr/0018-standardize-subsystem-software-architecture.md)
+- Made `uswds` the only production dependency for dashboard and query tool apps
+### Fixed
+- `test-apim-match-api.bash` to use a secure hash from `example.csv`
+
 ## [0.91] - 2021-10-14
 
 ### Added
@@ -137,6 +149,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[0.92]: https://github.com/18F/piipan/releases/tag/v0.92
 [0.91]: https://github.com/18F/piipan/releases/tag/v0.91
 [0.9]: https://github.com/18F/piipan/releases/tag/v0.9
 [0.8]: https://github.com/18F/piipan/releases/tag/v0.8
