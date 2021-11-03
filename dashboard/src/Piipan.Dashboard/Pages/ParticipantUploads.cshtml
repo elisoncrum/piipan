@@ -44,7 +44,11 @@
         </table>
 
     }
-    @if (!Model.ParticipantUploadResults.Any())
+    @if (!String.IsNullOrEmpty(Model.RequestError))
+    {
+        <h3>@Model.RequestError</h3>
+    }
+    @if (String.IsNullOrEmpty(Model.RequestError) && !Model.ParticipantUploadResults.Any())
     {
         <h3>There were no results for your search</h3>
     }

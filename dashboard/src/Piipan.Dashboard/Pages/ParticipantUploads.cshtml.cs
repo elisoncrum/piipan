@@ -36,6 +36,7 @@ namespace Piipan.Dashboard.Pages
         public string? MetricsApiBaseUrl = Environment.GetEnvironmentVariable(ApiUrlKey);
         public string MetricsApiSearchPath = "/getparticipantuploads";
         public string MetricsApiLastUploadPath = "/getlastupload";
+        public string? RequestError { get; private set; }
 
         private HttpClient httpClient = new HttpClient();
 
@@ -44,6 +45,7 @@ namespace Piipan.Dashboard.Pages
             try
             {
                 _logger.LogInformation("Loading initial results");
+                RequestError = null;
                 if (MetricsApiBaseUrl == null)
                 {
                     throw new Exception("MetricsApiBaseUrl is null.");
@@ -53,9 +55,15 @@ namespace Piipan.Dashboard.Pages
                 ParticipantUploadResults = response.data;
                 SetPageLinks(response.meta);
             }
+            catch (HttpRequestException exception)
+            {
+                _logger.LogError(exception, exception.Message);
+                RequestError = "There was an error running your search. Please try again.";
+            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
+                RequestError = "Internal Server Error. Please contact support.";
             }
         }
 
