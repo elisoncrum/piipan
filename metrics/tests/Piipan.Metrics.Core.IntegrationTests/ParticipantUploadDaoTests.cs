@@ -157,7 +157,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
         {
             // Arrange
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
-            var uploadedAt = DateTime.Now;
+            var uploadedAt = new DateTime(2021, 1, 1, 5, 10, 0);
 
             // Act
             await dao.AddUpload("ea", uploadedAt);
