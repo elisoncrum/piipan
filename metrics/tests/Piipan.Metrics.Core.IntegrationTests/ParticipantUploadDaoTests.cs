@@ -59,6 +59,33 @@ namespace Piipan.Metrics.Core.IntegrationTests
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(50)]
+        public async Task GetUploadCountByState_ReturnsExpected(long expectedCount)
+        {
+            // Arrange
+            for (var i = 0; i < expectedCount; i++)
+            {
+                Insert("ea", DateTime.Now);
+                Insert("eb", DateTime.Now);
+                Insert("ec", DateTime.Now);
+            }
+
+            var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
+
+            // Act
+            var eaCount = await dao.GetUploadCount("ea");
+            var ebCount = await dao.GetUploadCount("eb");
+            var ecCount = await dao.GetUploadCount("ec");
+
+            // Assert
+            Assert.Equal(expectedCount, eaCount);
+            Assert.Equal(expectedCount, ebCount);
+            Assert.Equal(expectedCount, ecCount);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(50)]
         public async Task GetUploads_ReturnsCorrectCount(long count)
         {
             // Arrange
