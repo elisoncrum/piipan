@@ -8,6 +8,15 @@
         "resolved": "3.1.0",
         "contentHash": "YzYqSRrjoP5lULBhTDcTOjuM4IDPPi6PhFsl4w8EI4WdZhE6llt7E38Tg4CHyrS+QKwyu1+9OwkdDgluOdoBTw=="
       },
+      "Dapper": {
+        "type": "Direct",
+        "requested": "[2.0.90, )",
+        "resolved": "2.0.90",
+        "contentHash": "e4YjOLJptnpwHIbP8HxjaYf7So9lhUC43rvvGMEkH4Q4CiVlm4rOxYDo0HyuHlMQKj0U5Ob/nCMm52TUhTaZQg==",
+        "dependencies": {
+          "System.Reflection.Emit.Lightweight": "4.7.0"
+        }
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[16.11.0, )",
@@ -26,6 +35,15 @@
         "dependencies": {
           "Castle.Core": "4.4.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
+        }
+      },
+      "Npgsql": {
+        "type": "Direct",
+        "requested": "[5.0.10, )",
+        "resolved": "5.0.10",
+        "contentHash": "3TB9le3lfu5Hc+LSHqMCVLcA+qUPg1enyM4+u0pMUBmNNGwc0sVPrnfnys2TVZIdkF8Aww/AZlnJHDsnEGqD0g==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
       },
       "xunit": {
@@ -99,14 +117,6 @@
           "System.Reflection.Emit": "4.3.0",
           "System.Reflection.TypeExtensions": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
-        }
-      },
-      "Dapper": {
-        "type": "Transitive",
-        "resolved": "2.0.90",
-        "contentHash": "e4YjOLJptnpwHIbP8HxjaYf7So9lhUC43rvvGMEkH4Q4CiVlm4rOxYDo0HyuHlMQKj0U5Ob/nCMm52TUhTaZQg==",
-        "dependencies": {
-          "System.Reflection.Emit.Lightweight": "4.7.0"
         }
       },
       "Microsoft.AspNet.WebApi.Client": {
@@ -317,31 +327,10 @@
           "System.Text.Encodings.Web": "4.5.0"
         }
       },
-      "Microsoft.Azure.EventGrid": {
-        "type": "Transitive",
-        "resolved": "1.3.0",
-        "contentHash": "LjrB8bknpLAe8x56tPeqKyKE945Y/wNTUqb/yScxqqdX/n0q+RsfUIf0P1V0pD3YoOkiAfqj2bxB0dYaT7zBvA==",
-        "dependencies": {
-          "Microsoft.Rest.ClientRuntime": "[2.3.11, 3.0.0)",
-          "Microsoft.Rest.ClientRuntime.Azure": "[3.3.12, 4.0.0)",
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1",
-          "System.Net.Http": "4.3.0"
-        }
-      },
       "Microsoft.Azure.Functions.Analyzers": {
         "type": "Transitive",
         "resolved": "1.0.0",
         "contentHash": "8nQq/IlK9BMBchRw3lfChSKaFNjMUOxXcPcDC3rkMd5PeWRm54nz2Owr6fZjPHMYJ36XX/9PGOfjn4jyiRojjw=="
-      },
-      "Microsoft.Azure.Functions.Extensions": {
-        "type": "Transitive",
-        "resolved": "1.1.0",
-        "contentHash": "zYKtQQoS1fdzufxFApuMFiFtoi9QAGH6McXxntpylwLKgKjmCMWdgUd1dcekzTKNR9DPSDPRLiulvukqXnpWrQ==",
-        "dependencies": {
-          "Microsoft.Azure.WebJobs": "3.0.18",
-          "Microsoft.Extensions.DependencyInjection": "2.1.0"
-        }
       },
       "Microsoft.Azure.Services.AppAuthentication": {
         "type": "Transitive",
@@ -387,15 +376,6 @@
           "Microsoft.Azure.WebJobs": "3.0.14",
           "Microsoft.Azure.WebJobs.Host.Storage": "3.0.14",
           "ncrontab.signed": "3.3.0"
-        }
-      },
-      "Microsoft.Azure.WebJobs.Extensions.EventGrid": {
-        "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "fU5mA523E2f9UpBHP77y7ZfZ1UpRKnRIpYMXUEz0wuanmpZgy/OshoS8x6fgTqpLp1vKXLBIbpfy5uiYK3w0Sg==",
-        "dependencies": {
-          "Microsoft.Azure.EventGrid": "1.3.0",
-          "Microsoft.Azure.WebJobs": "3.0.0"
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.Http": {
@@ -710,25 +690,6 @@
         "resolved": "1.1.3",
         "contentHash": "3Wrmi0kJDzClwAC+iBdUBpEKmEle8FQNsCs77fkiOIw/9oYA07bL1EZNX0kQ2OMN3xpwvl0vAtOCYY3ndDNlhQ=="
       },
-      "Microsoft.Rest.ClientRuntime": {
-        "type": "Transitive",
-        "resolved": "2.3.11",
-        "contentHash": "0WOjf6O3H7XPrjBxK5H1kHqyO+PLvzwJ5Zc1pXkimQ1FrroLuhRYtG5XW70qbq0AFFoS/3vsua0h19GLLXomTg==",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1"
-        }
-      },
-      "Microsoft.Rest.ClientRuntime.Azure": {
-        "type": "Transitive",
-        "resolved": "3.3.12",
-        "contentHash": "dJP3X+kO1pspVnZwaXQOclfxx/7Js1TakyooMESwBK8DgdfDBbdr3BMT3fKN3s6iH2ffz/DaCs8Pqn3fnS9ZqQ==",
-        "dependencies": {
-          "Microsoft.Rest.ClientRuntime": "[2.3.10, 3.0.0)",
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1"
-        }
-      },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
         "resolved": "16.11.0",
@@ -856,14 +817,6 @@
         "contentHash": "Qnu41yEFuMEJMuD1kJgslc4cF981K+hA7SmgXQ/N6pk6Zknvxt4g5Hx7KRykycP3oKyoz3aTFRV/TX+Vp6v7uQ==",
         "dependencies": {
           "Newtonsoft.Json": "12.0.3"
-        }
-      },
-      "Npgsql": {
-        "type": "Transitive",
-        "resolved": "5.0.10",
-        "contentHash": "3TB9le3lfu5Hc+LSHqMCVLcA+qUPg1enyM4+u0pMUBmNNGwc0sVPrnfnys2TVZIdkF8Aww/AZlnJHDsnEGqD0g==",
-        "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
       },
       "NuGet.Frameworks": {
@@ -2085,20 +2038,6 @@
           "Microsoft.Extensions.DependencyInjection": "3.1.20",
           "Microsoft.Extensions.Logging": "3.1.20",
           "Piipan.Metrics.Api": "1.0.0"
-        }
-      },
-      "piipan.metrics.func.collect": {
-        "type": "Project",
-        "dependencies": {
-          "Azure.Identity": "1.5.0",
-          "Azure.Security.KeyVault.Secrets": "4.2.0",
-          "Microsoft.Azure.Functions.Extensions": "1.1.0",
-          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
-          "Microsoft.Extensions.DependencyInjection": "3.1.20",
-          "Microsoft.NET.Sdk.Functions": "3.0.13",
-          "Npgsql": "5.0.10",
-          "Piipan.Metrics.Core": "1.0.0",
-          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.shared": {

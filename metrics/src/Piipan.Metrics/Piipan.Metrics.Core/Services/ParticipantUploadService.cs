@@ -21,7 +21,7 @@ namespace Piipan.Metrics.Core.Services
 
         public async Task<GetParticipantUploadsResponse> GetLatestUploadsByState()
         {
-            var uploads = _participantUploadDao.GetLatestUploadsByState();
+            var uploads = await _participantUploadDao.GetLatestUploadsByState();
 
             return new GetParticipantUploadsResponse()
             {
@@ -32,15 +32,15 @@ namespace Piipan.Metrics.Core.Services
 
         public async Task<int> AddUpload(string state, DateTime uploadedAt)
         {
-            return _participantUploadDao.AddUpload(state, uploadedAt);
+            return await _participantUploadDao.AddUpload(state, uploadedAt);
         }
 
         public async Task<GetParticipantUploadsResponse> GetUploads(string? state, int perPage, int page = 0)
         {
             var limit = perPage;
             var offset = perPage * (page - 1);
-            var uploads = _participantUploadDao.GetUploads(state, limit, offset);
-            var total = _participantUploadDao.GetUploadCount(state);
+            var uploads = await _participantUploadDao.GetUploads(state, limit, offset);
+            var total = await _participantUploadDao.GetUploadCount(state);
 
             var meta = _metaBuilder
                 .SetPage(page)

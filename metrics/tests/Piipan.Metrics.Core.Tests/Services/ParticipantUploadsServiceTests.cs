@@ -20,7 +20,7 @@ namespace Piipan.Metrics.Core.Tests.Services
             var uploadDao = new Mock<IParticipantUploadDao>();
             uploadDao
                 .Setup(m => m.GetUploads(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(new List<ParticipantUpload>()
+                .ReturnsAsync(new List<ParticipantUpload>()
                 {
                     new ParticipantUpload
                     {
@@ -53,7 +53,7 @@ namespace Piipan.Metrics.Core.Tests.Services
             var uploadDao = new Mock<IParticipantUploadDao>();
             uploadDao
                 .Setup(m => m.GetLatestUploadsByState())
-                .Returns(new List<ParticipantUpload>()
+                .ReturnsAsync(new List<ParticipantUpload>()
                 {
                     new ParticipantUpload
                     {
@@ -82,7 +82,7 @@ namespace Piipan.Metrics.Core.Tests.Services
             var uploadDao = new Mock<IParticipantUploadDao>();
             uploadDao
                 .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
-                .Returns(1);
+                .ReturnsAsync(1);
             var metaBuilder = Mock.Of<IMetaBuilder>();
 
             var service = new ParticipantUploadService(uploadDao.Object, metaBuilder);
