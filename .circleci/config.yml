@@ -105,7 +105,7 @@ jobs:
             CollaborationDatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
-          working_directory: match/tests/Piipan.Metrics.Core.IntegrationTests
+          working_directory: metrics/tests/Piipan.Metrics.Core.IntegrationTests
           name: Test Metrics Core integration
           environment:
             DatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
