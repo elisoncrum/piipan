@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Script used by docker to start the provisioning of resources 
 # as part of the infraestruture as code process
