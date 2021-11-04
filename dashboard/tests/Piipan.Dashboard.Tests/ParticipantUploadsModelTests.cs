@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -117,6 +118,37 @@ namespace Piipan.Dashboard.Tests
             ));
         }
 
+        [Fact]
+        public async Task AfterOnGetAsync_ApiThrowsHttpRequestExecption()
+        {
+            // Arrange
+            var participantApi = new Mock<IParticipantUploadReaderApi>();
+            participantApi
+                .Setup(m => m.GetLatestUploadsByState())
+                .ThrowsAsync(new HttpRequestException("api broke"));
+
+            var logger = new Mock<ILogger<ParticipantUploadsModel>>();
+
+            var pageModel = new ParticipantUploadsModel(
+                participantApi.Object,
+                logger.Object,
+                claimsProviderMock("noreply@tts.test")
+            );
+
+            // Act
+            await pageModel.OnGetAsync();
+
+            // Assert
+            Assert.Contains("You may be able to try again", pageModel.RequestError);
+            logger.Verify(x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("api broke")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+            ));
+        }
+
         // sets participant uploads after Post request
         [Fact]
         public async void AfterOnPostAsync_setsParticipantUploadResults()
@@ -199,6 +231,51 @@ namespace Piipan.Dashboard.Tests
             await pageModel.OnPostAsync();
 
             // Assert
+            logger.Verify(x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("api broke")),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+            ));
+        }
+
+        [Fact]
+        public async Task AfterOnPostAsync_ApiThrowsHttpRequestException()
+        {
+            // Arrange
+            var participantApi = new Mock<IParticipantUploadReaderApi>();
+            participantApi
+                .Setup(m => m.GetUploads("eb", ParticipantUploadsModel.PerPageDefault, 1))
+                .ThrowsAsync(new HttpRequestException("api broke"));
+
+            var logger = new Mock<ILogger<ParticipantUploadsModel>>();
+
+            var pageModel = new ParticipantUploadsModel(
+                participantApi.Object,
+                logger.Object,
+                claimsProviderMock("noreply@tts.test")
+            );
+
+            var request = requestMock();
+            request
+                .Setup(m => m.Form)
+                .Returns(new FormCollection(new Dictionary<string, StringValues>
+                {
+                    { "state", "eb" }
+                }));
+
+            var httpContext = contextMock();
+            httpContext
+                .Setup(m => m.Request)
+                .Returns(request.Object);
+            pageModel.PageContext.HttpContext = httpContext.Object;
+
+            // Act
+            await pageModel.OnPostAsync();
+
+            // Assert
+            Assert.Contains("You may be able to try again", pageModel.RequestError);
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Error),
                 It.IsAny<EventId>(),

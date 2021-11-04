@@ -33,27 +33,17 @@ namespace Piipan.Dashboard.Pages
         public static int PerPageDefault = 10;
         public string? RequestError { get; private set; }
 
-        private HttpClient httpClient = new HttpClient();
-
         public async Task OnGetAsync()
         {
             try
             {
                 _logger.LogInformation("Loading initial results");
 
+                RequestError = null;
+
                 var response = await _participantUploadApi.GetLatestUploadsByState();
                 ParticipantUploadResults = response.Data.ToList();
                 SetPageLinks(response.Meta);
-
-                // RequestError = null;
-                // if (MetricsApiBaseUrl == null)
-                // {
-                //     throw new Exception("MetricsApiBaseUrl is null.");
-                // }
-                // var url = MetricsApiBaseUrl + MetricsApiLastUploadPath;
-                // var response = await _participantUploadRequest.Get(url);
-                // ParticipantUploadResults = response.data;
-                // SetPageLinks(response.meta);
             }
             catch (HttpRequestException exception)
             {
@@ -92,7 +82,7 @@ namespace Piipan.Dashboard.Pages
             return Page();
         }
 
-        private void SetPageLinks(Piipan.Metrics.Api.Meta meta)
+        private void SetPageLinks(Meta meta)
         {
             NextPageParams = meta.NextPage;
             PrevPageParams = meta.PrevPage;
