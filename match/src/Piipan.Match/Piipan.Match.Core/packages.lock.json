@@ -4,9 +4,9 @@
     ".NETCoreApp,Version=v3.1": {
       "Dapper": {
         "type": "Direct",
-        "requested": "[2.0.90, )",
-        "resolved": "2.0.90",
-        "contentHash": "e4YjOLJptnpwHIbP8HxjaYf7So9lhUC43rvvGMEkH4Q4CiVlm4rOxYDo0HyuHlMQKj0U5Ob/nCMm52TUhTaZQg==",
+        "requested": "[2.0.123, )",
+        "resolved": "2.0.123",
+        "contentHash": "RDFF4rBLLmbpi6pwkY7q/M6UXHRJEOerplDGE5jwEkP/JGJnBauAClYavNKJPW1yOTWRPIyfj4is3EaJxQXILQ==",
         "dependencies": {
           "System.Reflection.Emit.Lightweight": "4.7.0"
         }
