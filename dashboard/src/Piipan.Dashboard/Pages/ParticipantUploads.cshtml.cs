@@ -36,6 +36,7 @@ namespace Piipan.Dashboard.Pages
         public string? MetricsApiBaseUrl = Environment.GetEnvironmentVariable(ApiUrlKey);
         public string MetricsApiSearchPath = "/getparticipantuploads";
         public string MetricsApiLastUploadPath = "/getlastupload";
+        public string? RequestError { get; private set; }
 
         private HttpClient httpClient = new HttpClient();
 
@@ -44,6 +45,7 @@ namespace Piipan.Dashboard.Pages
             try
             {
                 _logger.LogInformation("Loading initial results");
+                RequestError = null;
                 if (MetricsApiBaseUrl == null)
                 {
                     throw new Exception("MetricsApiBaseUrl is null.");
@@ -53,9 +55,15 @@ namespace Piipan.Dashboard.Pages
                 ParticipantUploadResults = response.data;
                 SetPageLinks(response.meta);
             }
+            catch (HttpRequestException exception)
+            {
+                _logger.LogError(exception, exception.Message);
+                RequestError = "There was an error loading data. You may be able to try again. If the problem persists, please contact system maintainers.";
+            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
+                RequestError = "Internal Server Error. Please contact system maintainers.";
             }
         }
 
@@ -64,12 +72,11 @@ namespace Piipan.Dashboard.Pages
             try
             {
                 _logger.LogInformation("Querying uploads via search form");
-
+                RequestError = null;
                 if (MetricsApiBaseUrl == null)
                 {
                     throw new Exception("MetricsApiBaseUrl is null.");
                 }
-
                 StateQuery = Request.Form["state"];
                 var url = QueryHelpers.AddQueryString(MetricsApiBaseUrl + MetricsApiSearchPath, "state", StateQuery);
                 url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
@@ -77,9 +84,15 @@ namespace Piipan.Dashboard.Pages
                 ParticipantUploadResults = response.data;
                 SetPageLinks(response.meta);
             }
+            catch (HttpRequestException exception)
+            {
+                _logger.LogError(exception, exception.Message);
+                RequestError = "There was an error running your search. You may be able to try again. If the problem persists, please contact system maintainers.";
+            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
+                RequestError = "Internal Server Error. Please contact system maintainers.";
             }
             return Page();
         }
