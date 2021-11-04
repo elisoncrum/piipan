@@ -101,8 +101,8 @@
       },
       "Dapper": {
         "type": "Transitive",
-        "resolved": "2.0.90",
-        "contentHash": "e4YjOLJptnpwHIbP8HxjaYf7So9lhUC43rvvGMEkH4Q4CiVlm4rOxYDo0HyuHlMQKj0U5Ob/nCMm52TUhTaZQg==",
+        "resolved": "2.0.123",
+        "contentHash": "RDFF4rBLLmbpi6pwkY7q/M6UXHRJEOerplDGE5jwEkP/JGJnBauAClYavNKJPW1yOTWRPIyfj4is3EaJxQXILQ==",
         "dependencies": {
           "System.Reflection.Emit.Lightweight": "4.7.0"
         }
@@ -1657,7 +1657,7 @@
       "piipan.match.core": {
         "type": "Project",
         "dependencies": {
-          "Dapper": "2.0.90",
+          "Dapper": "2.0.123",
           "FluentValidation": "10.3.4",
           "Microsoft.Extensions.Logging": "3.1.20",
           "Nanoid": "2.1.0",
