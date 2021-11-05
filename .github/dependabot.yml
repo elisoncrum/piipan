@@ -130,3 +130,23 @@ updates:
   schedule:
     interval: daily
     time: "09:00"
+- package-ecosystem: nuget
+  directory: "/participants/src/Piipan.Participants/Piipan.Participants.Api"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/participants/src/Piipan.Participants/Piipan.Participants.Core"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/participants/tests/Piipan.Participants.Core.IntegrationTests"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/participants/tests/Piipan.Participants.Core.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
