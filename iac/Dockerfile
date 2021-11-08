@@ -11,7 +11,7 @@ RUN ./iac/install-azure-core-tool.bash
 RUN ./iac/install-psql.bash
 RUN ./iac/install-extensions.bash
 # Configure az cli
-# RUN az config set extension.use_dynamic_install=yes_without_prompt
+RUN az config set extension.use_dynamic_install=yes_without_prompt
 RUN az cloud set --name AzureCloud
 #Copy piipan and set the permision to execute the code
 COPY . ./piipan
