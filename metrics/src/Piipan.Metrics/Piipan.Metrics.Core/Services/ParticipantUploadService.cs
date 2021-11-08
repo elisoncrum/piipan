@@ -1,39 +1,59 @@
 using System;
-using System.Collections.Generic;
 using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
+using System.Threading.Tasks;
+using Piipan.Metrics.Core.Builders;
 
 #nullable enable
 
 namespace Piipan.Metrics.Core.Services
 {
-    public class ParticipantUploadService : IParticipantUploadApi
+    public class ParticipantUploadService : IParticipantUploadReaderApi, IParticipantUploadWriterApi
     {
         private readonly IParticipantUploadDao _participantUploadDao;
+        private readonly IMetaBuilder _metaBuilder;
 
-        public ParticipantUploadService(IParticipantUploadDao participantUploadDao)
+        public ParticipantUploadService(IParticipantUploadDao participantUploadDao, IMetaBuilder metaBuilder)
         {
             _participantUploadDao = participantUploadDao;
+            _metaBuilder = metaBuilder;
         }
 
-        public Int64 GetUploadCount(string? state)
+        public async Task<GetParticipantUploadsResponse> GetLatestUploadsByState()
         {
-            return _participantUploadDao.GetUploadCount(state);
+            var uploads = await _participantUploadDao.GetLatestUploadsByState();
+
+            return new GetParticipantUploadsResponse()
+            {
+                Data = uploads,
+                Meta = _metaBuilder.Build()
+            };
         }
 
-        public IEnumerable<ParticipantUpload> GetUploads(string? state, int limit, int offset = 0)
+        public async Task<int> AddUpload(string state, DateTime uploadedAt)
         {
-            return _participantUploadDao.GetUploads(state, limit, offset);
+            return await _participantUploadDao.AddUpload(state, uploadedAt);
         }
 
-        public IEnumerable<ParticipantUpload> GetLatestUploadsByState()
+        public async Task<GetParticipantUploadsResponse> GetUploads(string? state, int perPage, int page = 0)
         {
-            return _participantUploadDao.GetLatestUploadsByState();
-        }
+            var limit = perPage;
+            var offset = perPage * (page - 1);
+            var uploads = await _participantUploadDao.GetUploads(state, limit, offset);
+            var total = await _participantUploadDao.GetUploadCount(state);
 
-        public int AddUpload(string state, DateTime uploadedAt)
-        {
-            return _participantUploadDao.AddUpload(state, uploadedAt);
+            var meta = _metaBuilder
+                .SetPage(page)
+                .SetPerPage(perPage)
+                .SetState(state)
+                .SetTotal(total)
+                .Build();
+
+            return new GetParticipantUploadsResponse()
+            {
+                Data = uploads,
+                Meta = meta
+            };
         }
     }
 }

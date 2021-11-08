@@ -39,6 +39,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\..\..\metrics\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
+    <ProjectReference Include="..\..\..\metrics\src\Piipan.Metrics\Piipan.Metrics.Client\Piipan.Metrics.Client.csproj" />
   </ItemGroup>
 
 </Project>

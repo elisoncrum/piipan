@@ -1,9 +1,10 @@
 using System.Data;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Piipan.Metrics.Api;
 using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Core.Extensions;
-using Moq;
+using Piipan.Shared.Database;
 using Xunit;
 
 namespace Piipan.Metrics.Core.Tests.Extensions
@@ -16,7 +17,7 @@ namespace Piipan.Metrics.Core.Tests.Extensions
             // Arrange
             var services = new ServiceCollection();
             services.AddLogging();
-            services.AddTransient<IDbConnection>(c => Mock.Of<IDbConnection>());
+            services.AddTransient<IDbConnectionFactory<MetricsDb>>(c => Mock.Of<IDbConnectionFactory<MetricsDb>>());
 
             // Act
             services.RegisterCoreServices();
@@ -24,7 +25,7 @@ namespace Piipan.Metrics.Core.Tests.Extensions
 
             // Assert
             Assert.NotNull(provider.GetService<IParticipantUploadDao>());
-            Assert.NotNull(provider.GetService<IParticipantUploadApi>());
+            Assert.NotNull(provider.GetService<IParticipantUploadReaderApi>());
         }
     }
 }

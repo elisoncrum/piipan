@@ -4,22 +4,19 @@ using Piipan.Metrics.Api;
 
 #nullable enable
 
-namespace Piipan.Metrics.Func.Api.Builders
+namespace Piipan.Metrics.Core.Builders
 {
     public class MetaBuilder : IMetaBuilder
     {
         private Meta _meta = new Meta();
         private string? _state;
-        private readonly IParticipantUploadApi _participantUploadApi;
 
-        public MetaBuilder(IParticipantUploadApi participantUploadApi)
+        public MetaBuilder()
         {
-            _participantUploadApi = participantUploadApi;
         }
 
         public Meta Build()
         {
-            _meta.Total = _participantUploadApi.GetUploadCount(_state);
             SetPrevPage(_state);
             SetNextPage(_state);
             return _meta;
@@ -40,6 +37,12 @@ namespace Piipan.Metrics.Func.Api.Builders
         public IMetaBuilder SetState(string? state)
         {
             _state = state;
+            return this;
+        }
+
+        public IMetaBuilder SetTotal(long total)
+        {
+            _meta.Total = total;
             return this;
         }
 

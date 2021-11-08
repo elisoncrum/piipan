@@ -5,6 +5,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Piipan.Metrics.Api;
 using System;
+using System.Threading.Tasks;
 
 namespace Piipan.Metrics.Func.Collect.Tests
 {
@@ -19,21 +20,21 @@ namespace Piipan.Metrics.Func.Collect.Tests
         }
 
         [Fact]
-        public void Run_Success()
+        public async Task Run_Success()
         {
             // Arrange
             var now = DateTime.Now;
             var logger = new Mock<ILogger>();
 
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadWriterApi>();
             uploadApi
                 .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
-                .Returns(1);
+                .ReturnsAsync(1);
 
             var function = new BulkUploadMetrics(uploadApi.Object);
 
             // Act
-            function.Run(MockEvent("https://somethingeaupload", now), logger.Object);
+            await function.Run(MockEvent("https://somethingeaupload", now), logger.Object);
 
             // Assert
             uploadApi.Verify(m => m.AddUpload("ea", now), Times.Once);
@@ -49,21 +50,21 @@ namespace Piipan.Metrics.Func.Collect.Tests
         [Theory]
         [InlineData("badurl", "State not found")] // malformed url, can't parse the state
         [InlineData("https://eupload", "State not found")] // state is only one character
-        public void Run_BadUrl(string url, string expectedLogMessage)
+        public async Task Run_BadUrl(string url, string expectedLogMessage)
         {
             // Arrange
             var now = DateTime.Now;
             var logger = new Mock<ILogger>();
 
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadWriterApi>();
             uploadApi
                 .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
-                .Returns(1);
+                .ReturnsAsync(1);
 
             var function = new BulkUploadMetrics(uploadApi.Object);
 
             // Act
-            Assert.Throws<FormatException>(() => function.Run(MockEvent(url, now), logger.Object));
+            await Assert.ThrowsAsync<FormatException>(() => function.Run(MockEvent(url, now), logger.Object));
 
             // Assert
             uploadApi.Verify(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()), Times.Never);
@@ -77,21 +78,21 @@ namespace Piipan.Metrics.Func.Collect.Tests
         }
 
         [Fact]
-        public void Run_UploadApiThrows()
+        public async Task Run_UploadApiThrows()
         {
             // Arrange
             var now = DateTime.Now;
             var logger = new Mock<ILogger>();
 
-            var uploadApi = new Mock<IParticipantUploadApi>();
+            var uploadApi = new Mock<IParticipantUploadWriterApi>();
             uploadApi
                 .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
-                .Throws(new Exception("upload api broke"));
+                .ThrowsAsync(new Exception("upload api broke"));
 
             var function = new BulkUploadMetrics(uploadApi.Object);
 
             // Act
-            Assert.Throws<Exception>(() => function.Run(MockEvent("https://somethingeaupload", now), logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run(MockEvent("https://somethingeaupload", now), logger.Object));
 
             // Assert
             uploadApi.Verify(m => m.AddUpload("ea", now), Times.Once);

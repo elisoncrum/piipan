@@ -5,83 +5,85 @@ using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using Piipan.Match.Api;
-using Piipan.Match.Client.Extensions;
+using Piipan.Metrics.Api;
+using Piipan.Metrics.Client.Extensions;
 using Xunit;
 
-namespace Piipan.Match.Client.Tests.Extensions
+namespace Piipan.Metrics.Client.Tests.Extensions
 {
     public class ServiceCollectionExtensionsTests
     {
         [Fact]
-        public void RegisterMatchClientServices_DevelopmentServicesResolve()
+        public void RegisterMetricsClientServices_DevelopmentServicesResolve()
         {
             // Arrange
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
-            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
+            Environment.SetEnvironmentVariable("MetricsApiUri", "https://tts.test");
 
             // Act
-            services.RegisterMatchClientServices(env);
+            services.RegisterMetricsClientServices(env);
             var provider = services.BuildServiceProvider();
 
             // Assert
-            Assert.NotNull(provider.GetService<IMatchApi>());
+            Assert.NotNull(provider.GetService<IParticipantUploadReaderApi>());
             Assert.IsType<AzureCliCredential>(provider.GetService<TokenCredential>());
         }
 
         [Fact]
-        public void RegisterMatchClientServices_StagingServicesResolve()
+        public void RegisterMetricsClientServices_StagingServicesResolve()
         {
             // Arrange
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Staging;
-            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
+            Environment.SetEnvironmentVariable("MetricsApiUri", "https://tts.test");
 
             // Act
-            services.RegisterMatchClientServices(env);
+            services.RegisterMetricsClientServices(env);
             var provider = services.BuildServiceProvider();
 
             // Assert
-            Assert.NotNull(provider.GetService<IMatchApi>());
+            Assert.NotNull(provider.GetService<IParticipantUploadReaderApi>());
             Assert.IsType<ManagedIdentityCredential>(provider.GetService<TokenCredential>());
         }
 
         [Fact]
-        public void RegisterMatchClientServices_ProductionServicesResolve()
+        public void RegisterMetricsClientServices_ProductionServicesResolve()
         {
             // Arrange
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Production;
-            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
+            Environment.SetEnvironmentVariable("MetricsApiUri", "https://tts.test");
 
             // Act
-            services.RegisterMatchClientServices(env);
+            services.RegisterMetricsClientServices(env);
             var provider = services.BuildServiceProvider();
 
             // Assert
-            Assert.NotNull(provider.GetService<IMatchApi>());
+            Assert.NotNull(provider.GetService<IParticipantUploadReaderApi>());
             Assert.IsType<ManagedIdentityCredential>(provider.GetService<TokenCredential>());
         }
 
         [Fact]
-        public void RegisterMatchClientServices_HttpClientBaseAddressSet()
+        public void RegisterMetricsClientServices_HttpClientBaseAddressSet()
         {
             // Arrange
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
-            Environment.SetEnvironmentVariable("OrchApiUrl", "https://tts.test");
+            Environment.SetEnvironmentVariable("MetricsApiUri", "https://tts.test");
 
             // Act
-            services.RegisterMatchClientServices(env);
+            services.RegisterMetricsClientServices(env);
             var provider = services.BuildServiceProvider();
 
             var clientFactory = provider.GetService<IHttpClientFactory>();
-            var client = clientFactory.CreateClient("MatchClient");
+            var client = clientFactory.CreateClient("ParticipantUploadClient");
+
+            // Assert
             Assert.Equal("https://tts.test/", client.BaseAddress.ToString());
         }
     }

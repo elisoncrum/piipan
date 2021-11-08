@@ -1,5 +1,5 @@
 using Piipan.Metrics.Api;
-using Piipan.Metrics.Func.Api.Builders;
+using Piipan.Metrics.Core.Builders;
 using Xunit;
 using Moq;
 
@@ -12,12 +12,8 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_Default_Empty(int uploadCount, int expectedTotal)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(uploadCount);
-
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
+            builder.SetTotal(uploadCount);
 
             // Act
             var meta = builder.Build();
@@ -35,12 +31,8 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_Default_NonEmpty(int uploadCount, int expectedTotal)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(uploadCount);
-
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
+            builder.SetTotal(uploadCount);
 
             // Act
             var meta = builder.Build();
@@ -59,13 +51,9 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_FirstPage(int page, int expectedPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
-
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
             builder.SetPage(page);
+            builder.SetTotal(5);
 
             // Act
             var meta = builder.Build();
@@ -84,13 +72,9 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_NotFirstPage(int page, int expectedPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
-
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
             builder.SetPage(page);
+            builder.SetTotal(5);
 
             // Act
             var meta = builder.Build();
@@ -115,14 +99,10 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             int expectedTotal)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(uploadCount);
-
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
             builder.SetPage(page);
             builder.SetPerPage(perPage);
+            builder.SetTotal(uploadCount);
 
             // Act
             var meta = builder.Build();
@@ -143,13 +123,9 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_WithPerPage(int perPage, int expectedPerPage)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
-
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
             builder.SetPerPage(perPage);
+            builder.SetTotal(5);
 
             // Act
             var meta = builder.Build();
@@ -169,14 +145,11 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
         public void Build_WithState(string state, string expectedState)
         {
             // Arrange
-            var uploadApi = new Mock<IParticipantUploadApi>();
-            uploadApi
-                .Setup(m => m.GetUploadCount(It.IsAny<string>()))
-                .Returns(5);
 
-            var builder = new MetaBuilder(uploadApi.Object);
+            var builder = new MetaBuilder();
             builder.SetPage(2);
             builder.SetState(state);
+            builder.SetTotal(5);
 
             // Act
             var meta = builder.Build();
