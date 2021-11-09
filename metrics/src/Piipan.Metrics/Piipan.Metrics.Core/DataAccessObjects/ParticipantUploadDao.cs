@@ -40,14 +40,14 @@ namespace Piipan.Metrics.Core.DataAccessObjects
         public async Task<IEnumerable<ParticipantUpload>> GetUploads(string? state, int limit, int offset = 0)
         {
             var sql = @"
-                SELECT 
+                SELECT
                     state State,
                     uploaded_at UploadedAt
                 FROM participant_uploads";
 
             if (!String.IsNullOrEmpty(state))
             {
-                sql += $" WHERE lower(state) LIKE @state";
+                sql += $" WHERE lower(state) LIKE lower(@state)";
             }
 
             sql += " ORDER BY uploaded_at DESC";
