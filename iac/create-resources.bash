@@ -93,7 +93,8 @@ main () {
         vnetName="$VNET_NAME" \
         peParticipantsSubnetName="$DB_SUBNET_NAME" \
         peCoreSubnetName="$DB_2_SUBNET_NAME" \
-        appServicePlanSubnetName="$FUNC_SUBNET_NAME"
+        appServicePlanSubnetName="$FUNC_SUBNET_NAME" \
+        appServicePlanNsgName="$FUNC_NSG_NAME"
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
@@ -406,6 +407,10 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --subnet "$FUNC_SUBNET_NAME" \
       --vnet "$VNET_NAME"
+    az webapp config set \
+      --name "$func_app" \
+      --resource-group "$RESOURCE_GROUP" \
+      --vnet-route-all-enabled true
 
     # Stream logs to Event Hub
     func_id=$(\

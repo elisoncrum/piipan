@@ -2,8 +2,7 @@
 
 ## Prerequisites
 
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.23.0 but <= 2.26.1
-    - A [defect was introduced in Azure CLI version 2.27.0](https://github.com/Azure/azure-cli/issues/19719#issuecomment-932617639). As of October 2021, the latest release (2.29.0) continues to have this problem.
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.30.0
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
