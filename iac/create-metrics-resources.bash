@@ -250,7 +250,7 @@ main () {
     -g "$RESOURCE_GROUP" \
     --query "defaultHostName" \
     --output tsv)
-  metrics_api_uri="https://${metrics_api_hostname}/api"
+  metrics_api_uri="https://${metrics_api_hostname}/api/"
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
