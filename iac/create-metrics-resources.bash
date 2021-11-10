@@ -69,6 +69,10 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
+  az webapp config set \
+    --name "$METRICS_COLLECT_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-route-all-enabled true
 
   # Allow only incoming traffic from Event Grid
   # Only set rule if it does not exist, to avoid error
@@ -183,6 +187,10 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
+  az webapp config set \
+    --name "$METRICS_API_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-route-all-enabled true
 
   db_conn_str=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "${METRICS_API_APP_NAME//-/_}")
   az functionapp config appsettings set \

@@ -52,6 +52,7 @@ VNET_NAME=vnet-core-$ENV
 DB_SUBNET_NAME=snet-participants-$ENV # Subnet that participants database private endpoint uses
 DB_2_SUBNET_NAME=snet-core-$ENV # Subnet that core database private endpoint uses
 FUNC_SUBNET_NAME=snet-apps1-$ENV # Subnet function apps use
+FUNC_NSG_NAME=nsg-apps1-$ENV # Network security groups for function apps subnet
 PRIVATE_ENDPOINT_NAME=pe-participants-$ENV
 CORE_DB_PRIVATE_ENDPOINT_NAME=pe-core-$ENV
 
