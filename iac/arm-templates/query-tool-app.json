@@ -80,7 +80,8 @@
                     "name": "ASPNETCORE_ENVIRONMENT",
                     "value": "[parameters('aspNetCoreEnvironment')]"
                 }
-            ]
+            ],
+            "vnetRouteAllEnabled": true
         },
         "systemTypeTag": {
             "SysType": "QueryApp"

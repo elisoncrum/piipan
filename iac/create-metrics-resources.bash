@@ -280,6 +280,19 @@ main () {
       frontDoorId="$front_door_id" \
       frontDoorUri="$front_door_uri"
 
+  echo "Integrating ${DASHBOARD_APP_NAME} into virtual network"
+  vnet_id=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  az functionapp vnet-integration add \
+    --name "$DASHBOARD_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --subnet "$WEBAPP_SUBNET_NAME" \
+    --vnet "$vnet_id"
+
   create_oidc_secret "$DASHBOARD_APP_NAME"
 
   script_completed
