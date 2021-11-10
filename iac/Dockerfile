@@ -18,4 +18,4 @@ RUN az cloud set --name AzureCloud
 COPY . ./piipan
 RUN chmod -R ug+rwx /piipan
 #Start the deployment with the set enviroment "tts/dev"
-CMD ["/piipan/iac/docker/start.bash", "tts/eth2"]
+CMD ["/piipan/iac/docker/start.bash", "tts/dev"]
