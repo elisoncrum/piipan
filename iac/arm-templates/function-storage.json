@@ -27,7 +27,10 @@
             },
             "kind": "StorageV2",
             "properties": {
-                "supportsHttpsTrafficOnly": true
+                "supportsHttpsTrafficOnly": true,
+                "networkAcls": {
+                    "defaultAction": "Deny"
+                }
             }
         }
     ],
