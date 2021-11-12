@@ -64,7 +64,8 @@ create_aad_app_reg () {
     --name "$app" \
     --query defaultHostName \
     --output tsv)
-  app_uri="https://${app_uri}"
+    app_uri="api://${app_uri}"
+  # app_uri="https://${app_uri}"
 
   # Running `az ad app create` with the `--app-roles` parameter will throw
   # an error if the app already exists and the app role is enabled
@@ -172,7 +173,8 @@ enable_easy_auth () {
     --name "$app" \
     --query defaultHostName \
     --output tsv)
-  app_uri="https://${app_uri}"
+    app_uri="api://${app_uri}"
+  # app_uri="https://${app_uri}"
 
   app_aad_client=$(\
     az ad app list \

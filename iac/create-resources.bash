@@ -146,7 +146,7 @@ main () {
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
     --name activity-log-diagnostics \
-    --location "$LOCATION" \
+    --location "westus" \
     --template-file ./arm-templates/activity-log.json \
     --parameters \
       eventHubName="$EVENT_HUB_NAME" \

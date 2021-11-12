@@ -43,33 +43,6 @@ main () {
     --file /dev/stdin \
     --query id
 
-  echo "Creating core database server"
-  az deployment group create \
-    --name core-db \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/database-core.json \
-    --parameters \
-      administratorLogin=$DB_ADMIN_NAME \
-      serverName="$CORE_DB_SERVER_NAME" \
-      secretName="$PG_SECRET_NAME" \
-      vaultName="$VAULT_NAME" \
-      vnetName="$VNET_NAME" \
-      subnetName="$DB_2_SUBNET_NAME" \
-      privateEndpointName="$CORE_DB_PRIVATE_ENDPOINT_NAME" \
-      privateDnsZoneName="$PRIVATE_DNS_ZONE" \
-      resourceTags="$RESOURCE_TAGS" \
-      eventHubName="$EVENT_HUB_NAME"
-
-  db_set_env "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$DB_ADMIN_NAME" "$PG_SECRET"
-
-  echo "Creating $METRICS_DB_NAME database and applying DDL"
-  db_init "$METRICS_DB_NAME" "$SUPERUSER"
-  db_apply_ddl "$METRICS_DB_NAME" ../metrics/ddl/metrics.sql
-
-  echo "Creating $COLLAB_DB_NAME database and applying DDL"
-  db_init "$COLLAB_DB_NAME" "$SUPERUSER"
-  db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/match-record.sql
-
   db_config_aad "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
   db_use_aad "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
 
