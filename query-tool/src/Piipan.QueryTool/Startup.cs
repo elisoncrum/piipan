@@ -116,6 +116,12 @@ namespace Piipan.QueryTool
             {
                 endpoints.MapRazorPages();
             });
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "DENY");
+                await next();
+            });
         }
     }
 }

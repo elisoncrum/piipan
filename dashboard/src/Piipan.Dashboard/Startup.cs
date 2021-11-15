@@ -104,6 +104,12 @@ namespace Piipan.Dashboard
             {
                 endpoints.MapRazorPages();
             });
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "DENY");
+                await next();
+            });
         }
     }
 }
