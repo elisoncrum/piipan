@@ -387,7 +387,9 @@ main () {
       --parameters \
         uniqueStorageName="$func_stor" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        vnet="$vnet_id" \
+        subnet="$FUNC_SUBNET_NAME"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
@@ -565,6 +567,8 @@ main () {
     "$azure_env" \
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
+
+  ./configure-storage-firewalls.bash "$azure_env"
 
   # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
   ./configure-cis-policy.bash "$azure_env"
