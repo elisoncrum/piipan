@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.93] - 2021-11-16
+
+### Added
+- Network egress protections for Function apps and App Service apps
+### Changed
+- Updated PPRL guidance to include explicit list of suffixes for removal
+- Refactored Dashboard subsystem to align with the [standard subsystem architecture](https://github.com/18F/piipan/blob/dev/docs/adr/0018-standardize-subsystem-software-architecture.md)
+- Configuration options for containerized IaC environment
+- Modified web app dependencies to drop requirement for PhantomJS
+### Fixed
+- Dashboard configuration to use correct metrics API URI
+- Dashboard to display error message when API calls fail
+
 ## [0.92] - 2021-11-02
 
 ### Added
