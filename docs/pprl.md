@@ -23,7 +23,10 @@ Finally, in order for exact matching against de-identified PII to be effective, 
 Participant's Last name must be normalized and validated in accordance with these **ordered** rules. These transformations assume ASCII-encoded input.
 
 1. Convert to lower case
-1. Remove any suffixes (e.g.; `junior`, `jnr`, `jr`, `jr.`, `iii`, etc.)
+1. Remove suffixes:
+    1. Roman numerals i-ix
+    1. Variations of junior: junior, jr, jr., jnr
+    1. Variations of senior: senior, sr, sr., snr
 1. Replace hyphens with a space
 1. Remove any character that is not an ASCII space (`0x20`) or in the range `[a-z]` (`0x61`-`0x70`)
 1. Replace multiple spaces with one space

@@ -1,27 +1,24 @@
 // Default URL for triggering event grid function in the local environment.
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Npgsql;
 using Piipan.Metrics.Api;
-using Piipan.Shared.Authentication;
 
 namespace Piipan.Metrics.Func.Collect
 {
     public class BulkUploadMetrics
     {
-        private readonly IParticipantUploadApi _participantUploadApi;
+        private readonly IParticipantUploadWriterApi _participantUploadWriterApi;
 
-        public BulkUploadMetrics(IParticipantUploadApi participantUploadApi)
+        public BulkUploadMetrics(IParticipantUploadWriterApi participantUploadWriterApi)
         {
-            _participantUploadApi = participantUploadApi;
+            _participantUploadWriterApi = participantUploadWriterApi;
         }
 
         /// <summary>
@@ -32,7 +29,7 @@ namespace Piipan.Metrics.Func.Collect
         /// <param name="log">handle to the function log</param>
 
         [FunctionName("BulkUploadMetrics")]
-        public void Run(
+        public async Task Run(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             ILogger log)
         {
@@ -42,7 +39,7 @@ namespace Piipan.Metrics.Func.Collect
                 string state = ParseState(eventGridEvent);
                 DateTime uploadedAt = eventGridEvent.EventTime;
 
-                int nRows = _participantUploadApi.AddUpload(state, uploadedAt);
+                int nRows = await _participantUploadWriterApi.AddUpload(state, uploadedAt);
 
                 log.LogInformation(String.Format("Number of rows inserted={0}", nRows));
             }

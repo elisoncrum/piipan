@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
-using Piipan.Metrics.Core.Extensions;
 using Piipan.Metrics.Api;
+using Piipan.Shared.Database;
 
 #nullable enable
 
@@ -11,146 +13,91 @@ namespace Piipan.Metrics.Core.DataAccessObjects
 {
     public class ParticipantUploadDao : IParticipantUploadDao
     {
-        private readonly IDbConnection _dbConnection;
+        private readonly IDbConnectionFactory<MetricsDb> _dbConnectionFactory;
         private readonly ILogger<ParticipantUploadDao> _logger;
 
         public ParticipantUploadDao(
-            IDbConnection dbConnection, 
+            IDbConnectionFactory<MetricsDb> dbConnectionFactory,
             ILogger<ParticipantUploadDao> logger)
         {
-            _dbConnection = dbConnection;
+            _dbConnectionFactory = dbConnectionFactory;
             _logger = logger;
         }
 
-        public Int64 GetUploadCount(string? state)
+        public async Task<Int64> GetUploadCount(string? state)
         {
-            var cmd = ParticipantUploadCountQueryCommand(state);
-
-            return (Int64)cmd.ExecuteScalar();
-        }
-
-        public IEnumerable<ParticipantUpload> GetUploads(string? state, int limit, int offset = 0)
-        {
-            var results = new List<ParticipantUpload>();
-            var cmd = ParticipantUploadQueryCommand(state, limit, offset);
-
-            var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                var record = new ParticipantUpload
-                {
-                    State = reader[0].ToString(),
-                    UploadedAt = Convert.ToDateTime(reader[1])
-                };
-                results.Add(record);
-            }
-
-            return results;
-        }
-
-        public IEnumerable<ParticipantUpload> GetLatestUploadsByState()
-        {
-            var results = new List<ParticipantUpload>();
-            var cmd = LatestParticipantUploadByStateQueryCommand();
-
-            var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                var record = new ParticipantUpload
-                {
-                    State = reader[0].ToString(),
-                    UploadedAt = Convert.ToDateTime(reader[1])
-                };
-                results.Add(record);
-            }
-
-            return results;
-        }
-
-        public int AddUpload(string state, DateTime uploadedAt)
-        {
-            var tx = _dbConnection.BeginTransaction();
-            var cmd = AddUploadCommand(state, uploadedAt);
-            int nRows = cmd.ExecuteNonQuery();
-            tx.Commit();
-            return nRows;
-        }
-
-        private IDbCommand ParticipantUploadCountQueryCommand(string? state)
-        {
-            var cmd = _dbConnection.CreateCommand();
-            cmd.CommandType = CommandType.Text;
-
-            var statement = "SELECT COUNT(*) from participant_uploads";
+            var sql = "SELECT COUNT(*) from participant_uploads";
             if (!String.IsNullOrEmpty(state))
             {
-                statement += $" WHERE lower(state) LIKE @state";
+                sql += $" WHERE lower(state) LIKE @state";
             }
 
-            cmd.CommandText = statement;
-            if (!String.IsNullOrEmpty(state))
-            {
-                cmd.AddParameter(DbType.String, "state", state);
-            }
+            var connection = await _dbConnectionFactory.Build();
 
-            return cmd;
+            return await connection.ExecuteScalarAsync<Int64>(sql, new { state = state });
         }
 
-        private IDbCommand ParticipantUploadQueryCommand(string? state, int limit, int offset)
+        public async Task<IEnumerable<ParticipantUpload>> GetUploads(string? state, int limit, int offset = 0)
         {
-            var cmd = _dbConnection.CreateCommand();
-            cmd.CommandType = CommandType.Text;
-
-            var statement = "SELECT state, uploaded_at FROM participant_uploads";
-            if (!String.IsNullOrEmpty(state))
-                statement += $" WHERE lower(state) LIKE @state";
-            statement += " ORDER BY uploaded_at DESC";
-            statement += $" LIMIT @limit";
-            statement += $" OFFSET @offset";
-            
-            cmd.CommandText = statement;
+            var sql = @"
+                SELECT
+                    state State,
+                    uploaded_at UploadedAt
+                FROM participant_uploads";
 
             if (!String.IsNullOrEmpty(state))
             {
-                cmd.AddParameter(DbType.String, "state", state.ToLower());
+                sql += $" WHERE lower(state) LIKE lower(@state)";
             }
 
-            cmd.AddParameter(DbType.Int64, "limit", limit);
-            cmd.AddParameter(DbType.Int64, "offset", offset);
+            sql += " ORDER BY uploaded_at DESC";
+            sql += $" LIMIT @limit";
+            sql += $" OFFSET @offset";
 
-            return cmd;
+            var connection = await _dbConnectionFactory.Build();
+
+            return await connection
+                .QueryAsync<ParticipantUpload>(sql, new { state = state, limit = limit, offset = offset });
         }
 
-        private IDbCommand LatestParticipantUploadByStateQueryCommand()
+        public async Task<IEnumerable<ParticipantUpload>> GetLatestUploadsByState()
         {
-            var cmd = _dbConnection.CreateCommand();
-            cmd.CommandType = CommandType.Text;
+            var connection = await _dbConnectionFactory.Build();
 
-            var statement = @"
-                SELECT state, max(uploaded_at) as uploaded_at
+            return (await connection.QueryAsync(@"
+                SELECT 
+                    state, 
+                    max(uploaded_at) as uploaded_at
                 FROM participant_uploads
                 GROUP BY state
                 ORDER BY uploaded_at ASC
-            ;";
-            
-            cmd.CommandText = statement;
-
-            return cmd;
+            ;")).Select(o => new ParticipantUpload
+            {
+                State = o.state,
+                UploadedAt = o.uploaded_at
+            });
         }
 
-        private IDbCommand AddUploadCommand(string state, DateTime uploadedAt)
+        public async Task<int> AddUpload(string state, DateTime uploadedAt)
         {
-            var cmd = _dbConnection.CreateCommand();
-            cmd.CommandType = CommandType.Text;
-            cmd.CommandText = @"
-                INSERT INTO participant_uploads (state, uploaded_at) 
-                VALUES (@state, @uploaded_at)
-            ;";
+            var connection = await _dbConnectionFactory.Build();
 
-            cmd.AddParameter(DbType.String, "state", state);
-            cmd.AddParameter(DbType.DateTime, "uploaded_at", uploadedAt);
-
-            return cmd;
+            return await connection.ExecuteAsync(@"
+                INSERT INTO participant_uploads 
+                (
+                    state, 
+                    uploaded_at
+                ) 
+                VALUES
+                (
+                    @state, 
+                    @uploaded_at
+                );",
+                new
+                {
+                    state = state,
+                    uploaded_at = uploadedAt
+                });
         }
     }
 }

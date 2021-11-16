@@ -154,12 +154,12 @@ NAC user roles, pain points, and needs
 
     -   States are sending sensitive PII via email to resolve potential duplicate participation
 
--   SNAP applicants and participants
-    Note: We have not conducted primary research with SNAP applicants and participants. Below are the pain points surfaced in conversations with state workers.
+-   **SNAP applicants and participants**  
+*Note: We have not conducted primary research with SNAP applicants and participants. Below are the pain points surfaced in conversations with state workers.*
 
     -   When duplicate participation is not identified in a timely manner, participants can be confronted with the unexpected need to repay incorrectly issued benefits 
 
-    -   Different states have different processes for applying for and managing SNAP benefits
+    -   Different states have different processes for applying for and managing SNAP benefits, which can make it difficult for SNAP participants to understand what is required of them. 
 
 Overview of user research activities & findings to date
 -------------------------------------------------------
@@ -168,25 +168,25 @@ Overview of user research activities & findings to date
 
     -   Format: 1 hour [contextual inquiries](https://methods.18f.gov/discover/contextual-inquiry/) / [interviews](https://methods.18f.gov/discover/stakeholder-and-user-interviews/) with state workers
 
-    -   Questions
+    -   Questions:
 
         -   What is the workflow that an eligibility worker goes through to process a SNAP application?
 
         -   How are existing required data matches conducted?
 
-        -   How is duplicate enrollment handled currently?
+        -   How is duplicate enrollment discovered and handled currently?
 
-    -   High-level learnings
+    -   High-level learnings:
 
-        -   Although workflows are similar across states, there's not a consistent way that states connect to existing required data match interfaces
+        -   Although workflows are similar across states, there's not a consistent way that states connect to existing required data match interfaces.
 
-        -   All states currently rely on workers to screen via application and interview questions about prior receipt of out-of-state benefits
+        -   All states currently rely on workers to screen via application and interview questions about prior receipt of out-of-state benefits.
 
-        -   PARIS matches, which are generally processed by a specialized team, are considered unreliable and labor-intensive
+        -   PARIS matches, which are generally processed by a specialized team, are considered unreliable and labor-intensive.
 
         -   The most commonly cited pain point was the often cumbersome and time-consuming process of communicating between states.
 
-        -   States are enthusiastic about the NAC, but they primarily see the value if it's verified upon receipt, which would allow them to resolve matches using only the information provided by the NAC without verifying the details with the other state. As a federal system of records used for data matching, the NAC is subject to the provisions of the Privacy Act, which provides specific protections to individuals whose information has been used in a match.  Protections include the need for states to verify the information and notify the matched individual and provide them an opportunity to contest before any adverse action can be taken on the case as a result of the match.  In addition, the NAC is not considered a primary data source because it aggregates data from other sources, specifically the states that provide information to populate it. Therefore, information received from the NAC cannot be considered verified upon receipt.
+        -   States are enthusiastic about the NAC, but they primarily see the value if it's verified upon receipt, which would allow them to resolve matches using only the information provided by the NAC without verifying the details with the other state. As a federal system of records used for data matching, the NAC is subject to the provisions of the Privacy Act, which provides specific protections to individuals whose information has been used in a match.  Protections include the need for states to verify the information and notify the matched individual and provide them an opportunity to contest before any adverse action can be taken on the case as a result of the match. In addition, the NAC is not considered a primary data source because it aggregates data from other sources, specifically the states that provide information to populate it. Therefore, information received from the NAC cannot be considered verified upon receipt.
 
 -   **Technical inquiry with 14 states** (January 2021)
 
@@ -270,7 +270,7 @@ Overview of user research activities & findings to date
 
     -   Format: 1 hour interview with members of the FNS QC team
 
-    -   Questions 
+    -   Questions: 
 
         -   What are the responsibilities of FNS Quality Control (QC)?
 
@@ -280,7 +280,7 @@ Overview of user research activities & findings to date
 
         -   What information would QC need, when would they need it, and where does most of their work take place today?
 
-    -   High-level learnings
+    -   High-level learnings:
 
         -   QC is responsible for assessing adherence to SNAP policy, but is not responsible for monitoring systems or correcting mistakes.
 
@@ -308,7 +308,7 @@ Overview of user research activities & findings to date
 
         -   What ideas do state workers have about how to make this easy?
 
-    -   High-level learnings
+    -   High-level learnings:
 
         -   State workers are used to using PII in correspondence with other states by email and phone; they will likely continue to do so
 

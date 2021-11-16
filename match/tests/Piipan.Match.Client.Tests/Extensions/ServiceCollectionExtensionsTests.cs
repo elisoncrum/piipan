@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Piipan.Match.Client.Tests.Extensions
 {
-    public class ServiceCollectionExtensionsTets
+    public class ServiceCollectionExtensionsTests
     {
         [Fact]
         public void RegisterMatchClientServices_DevelopmentServicesResolve()

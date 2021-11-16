@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +78,10 @@ namespace Piipan.QueryTool
                 var mockFile = $"{_env.ContentRootPath}/mock_user.json";
                 services.UseJsonFileToMockEasyAuth(mockFile);
             }
+
+            services.AddAntiforgery(options => {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,6 +115,12 @@ namespace Piipan.QueryTool
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+            });
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "DENY");
+                await next();
             });
         }
     }

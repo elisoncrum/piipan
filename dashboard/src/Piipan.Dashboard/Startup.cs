@@ -1,16 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 using NEasyAuthMiddleware;
-using Piipan.Dashboard.Api;
-using Piipan.Shared.Authentication;
+using Piipan.Metrics.Client.Extensions;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
@@ -34,42 +31,26 @@ namespace Piipan.Dashboard
         {
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
-            services.Configure<ForwardedHeadersOptions>(options => {
-                options.ForwardedHeaders = 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
             });
 
-            services.AddRazorPages(options => {
+            services.AddRazorPages(options =>
+            {
                 options.Conventions.AuthorizeFolder("/");
                 options.Conventions.AllowAnonymousToPage("/SignedOut");
-            });
-            
-            services.AddSingleton<IParticipantUploadRequest>((s) =>
-            {
-                ITokenProvider tokenProvider;
-                IAuthorizedApiClient apiClient;
-
-                if (_env.IsDevelopment())
-                {
-                    tokenProvider = new CliTokenProvider();
-                }
-                else
-                {
-                    tokenProvider = new EasyAuthTokenProvider();
-                }
-
-                apiClient = new AuthorizedJsonApiClient(new HttpClient(), tokenProvider);
-
-                return new ParticipantUploadRequest(apiClient);
             });
 
             services.AddHttpContextAccessor();
             services.AddEasyAuth();
-            
+
             services.AddDistributedMemoryCache();
             services.AddSession();
 
-            services.AddAuthorizationCore(options => {
+            services.AddAuthorizationCore(options =>
+            {
                 options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
                     .GetSection(AuthorizationPolicyOptions.SectionName)
                     .Get<AuthorizationPolicyOptions>());
@@ -77,11 +58,17 @@ namespace Piipan.Dashboard
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
+            services.RegisterMetricsClientServices(_env);
+
             if (_env.IsDevelopment())
             {
                 var mockFile = $"{_env.ContentRootPath}/mock_user.json";
                 services.UseJsonFileToMockEasyAuth(mockFile);
             }
+
+            services.AddAntiforgery(options => {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -116,6 +103,12 @@ namespace Piipan.Dashboard
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+            });
+
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("X-Frame-Options", "DENY");
+                await next();
             });
         }
     }

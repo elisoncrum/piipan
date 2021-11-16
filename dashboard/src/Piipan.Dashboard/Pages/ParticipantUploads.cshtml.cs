@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Piipan.Dashboard.Api;
+using Piipan.Metrics.Api;
 using Piipan.Shared.Claims;
 
 #nullable enable
@@ -15,15 +14,15 @@ namespace Piipan.Dashboard.Pages
 {
     public class ParticipantUploadsModel : BasePageModel
     {
-        private readonly IParticipantUploadRequest _participantUploadRequest;
+        private readonly IParticipantUploadReaderApi _participantUploadApi;
         private readonly ILogger<ParticipantUploadsModel> _logger;
 
-        public ParticipantUploadsModel(IParticipantUploadRequest participantUploadRequest,
+        public ParticipantUploadsModel(IParticipantUploadReaderApi participantUploadApi,
             ILogger<ParticipantUploadsModel> logger,
             IClaimsProvider claimsProvider)
             : base(claimsProvider)
         {
-            _participantUploadRequest = participantUploadRequest;
+            _participantUploadApi = participantUploadApi;
             _logger = logger;
         }
         public string Title = "Most recent upload from each state";
@@ -32,30 +31,29 @@ namespace Piipan.Dashboard.Pages
         public string? PrevPageParams { get; private set; }
         public string? StateQuery { get; private set; }
         public static int PerPageDefault = 10;
-        public static string ApiUrlKey = "MetricsApiUri";
-        public string? MetricsApiBaseUrl = Environment.GetEnvironmentVariable(ApiUrlKey);
-        public string MetricsApiSearchPath = "/getparticipantuploads";
-        public string MetricsApiLastUploadPath = "/getlastupload";
-
-        private HttpClient httpClient = new HttpClient();
+        public string? RequestError { get; private set; }
 
         public async Task OnGetAsync()
         {
             try
             {
                 _logger.LogInformation("Loading initial results");
-                if (MetricsApiBaseUrl == null)
-                {
-                    throw new Exception("MetricsApiBaseUrl is null.");
-                }
-                var url = MetricsApiBaseUrl + MetricsApiLastUploadPath;
-                var response = await _participantUploadRequest.Get(url);
-                ParticipantUploadResults = response.data;
-                SetPageLinks(response.meta);
+
+                RequestError = null;
+
+                var response = await _participantUploadApi.GetLatestUploadsByState();
+                ParticipantUploadResults = response.Data.ToList();
+                SetPageLinks(response.Meta);
+            }
+            catch (HttpRequestException exception)
+            {
+                _logger.LogError(exception, exception.Message);
+                RequestError = "There was an error loading data. You may be able to try again. If the problem persists, please contact system maintainers.";
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
+                RequestError = "Internal Server Error. Please contact system maintainers.";
             }
         }
 
@@ -64,44 +62,30 @@ namespace Piipan.Dashboard.Pages
             try
             {
                 _logger.LogInformation("Querying uploads via search form");
-
-                if (MetricsApiBaseUrl == null)
-                {
-                    throw new Exception("MetricsApiBaseUrl is null.");
-                }
+                RequestError = null;
 
                 StateQuery = Request.Form["state"];
-                var url = QueryHelpers.AddQueryString(MetricsApiBaseUrl + MetricsApiSearchPath, "state", StateQuery);
-                url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
-                var response = await _participantUploadRequest.Get(url);
-                ParticipantUploadResults = response.data;
-                SetPageLinks(response.meta);
+                var response = await _participantUploadApi.GetUploads(StateQuery, PerPageDefault, 1);
+                ParticipantUploadResults = response.Data.ToList();
+                SetPageLinks(response.Meta);
+            }
+            catch (HttpRequestException exception)
+            {
+                _logger.LogError(exception, exception.Message);
+                RequestError = "There was an error running your search. You may be able to try again. If the problem persists, please contact system maintainers.";
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception, exception.Message);
+                RequestError = "Internal Server Error. Please contact system maintainers.";
             }
             return Page();
         }
 
-        // adds default pagination to the api url if none is present from request params
-        private string FormatUrl()
+        private void SetPageLinks(Meta meta)
         {
-            if (MetricsApiBaseUrl == null)
-            {
-                throw new Exception("MetricsApiBaseUrl is null.");
-            }
-            var url = MetricsApiBaseUrl + Request.QueryString;
-            StateQuery = Request.Query["state"];
-            if (String.IsNullOrEmpty(Request.Query["perPage"]))
-                url = QueryHelpers.AddQueryString(url, "perPage", PerPageDefault.ToString());
-            return url;
-        }
-
-        private void SetPageLinks(ParticipantUploadResponseMeta meta)
-        {
-            NextPageParams = meta.nextPage;
-            PrevPageParams = meta.prevPage;
+            NextPageParams = meta.NextPage;
+            PrevPageParams = meta.PrevPage;
         }
     }
 }

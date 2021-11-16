@@ -69,6 +69,10 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
+  az webapp config set \
+    --name "$METRICS_COLLECT_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-route-all-enabled true
 
   # Allow only incoming traffic from Event Grid
   # Only set rule if it does not exist, to avoid error
@@ -183,6 +187,10 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_NAME"
+  az webapp config set \
+    --name "$METRICS_API_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-route-all-enabled true
 
   db_conn_str=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "${METRICS_API_APP_NAME//-/_}")
   az functionapp config appsettings set \
@@ -250,7 +258,7 @@ main () {
     -g "$RESOURCE_GROUP" \
     --query "defaultHostName" \
     --output tsv)
-  metrics_api_uri="https://${metrics_api_hostname}/api"
+  metrics_api_uri="https://${metrics_api_hostname}/api/"
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
@@ -271,6 +279,19 @@ main () {
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
       frontDoorUri="$front_door_uri"
+
+  echo "Integrating ${DASHBOARD_APP_NAME} into virtual network"
+  vnet_id=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  az functionapp vnet-integration add \
+    --name "$DASHBOARD_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --subnet "$WEBAPP_SUBNET_NAME" \
+    --vnet "$vnet_id"
 
   create_oidc_secret "$DASHBOARD_APP_NAME"
 

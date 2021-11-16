@@ -93,7 +93,10 @@ main () {
         vnetName="$VNET_NAME" \
         peParticipantsSubnetName="$DB_SUBNET_NAME" \
         peCoreSubnetName="$DB_2_SUBNET_NAME" \
-        appServicePlanSubnetName="$FUNC_SUBNET_NAME"
+        funcAppServicePlanSubnetName="$FUNC_SUBNET_NAME" \
+        funcAppServicePlanNsgName="$FUNC_NSG_NAME" \
+        webAppServicePlanSubnetName="$WEBAPP_SUBNET_NAME" \
+        webAppServicePlanNsgName="$WEBAPP_NSG_NAME"
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
@@ -406,6 +409,10 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --subnet "$FUNC_SUBNET_NAME" \
       --vnet "$VNET_NAME"
+    az webapp config set \
+      --name "$func_app" \
+      --resource-group "$RESOURCE_GROUP" \
+      --vnet-route-all-enabled true
 
     # Stream logs to Event Hub
     func_id=$(\
@@ -506,6 +513,7 @@ main () {
       -o tsv)
   orch_api_uri="https://${orch_api_uri}/api/v1/"
 
+  echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
@@ -523,6 +531,13 @@ main () {
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
       frontDoorUri="$front_door_uri"
+
+  echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$QUERY_TOOL_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --subnet "$WEBAPP_SUBNET_NAME" \
+    --vnet "$vnet_id"
 
   # Create a placeholder OIDC IdP secret
   create_oidc_secret "$QUERY_TOOL_APP_NAME"

@@ -18,6 +18,47 @@ Tier 3 (or higher) is defined as any user issue that requires a developer to mak
 
 The Help Desk vendor will be responsible for detailed documentation of reported Tier 3 issues within the FNS trouble ticketing system so the software development team can triage and resolve.
 
+Current FNS Help Desk Process
+-------------------------------
+
+### Ticketing Process
+
+The below is an example of the help desk ticketing process that is currently following in FNS.
+
+1.  User submits an issue/inquiry through email or a phone call. 
+
+2.  Tier 1 processes the issue upon receipt. 
+
+    a.  Tier 1 performs ticket analysis to determine the response or action necessary. If appropriate, Tier 1 will determine the root cause. 
+
+    b.  Tier 1 creates a Jira ticket using e-Jira to keep track of the issue. 
+
+    c.  Tier 1 will assign the Jira tickets - immediate ownership and responsibility is established and facilitates follow up if needed. 
+
+3.  When Tier 1 requires additional research involving technical analysis, the Jira ticket will be escalated to Tier 2. 
+
+    a.  Tier 2 performs technical analysis. 
+
+    b.  Tier 2 utilizes the information shared from Tier 1 along with their expertise to recommend a resolution. 
+
+    c.  Tier 2 determines if a Change Request (CR) will be needed to resolve the issue. 
+
+4.  Tier 1 monitors the ticket from beginning to end (Open to Close), to ensure timely responses and resolutions. 
+
+Notes from the team's analysis will be recorded with the Jira item for tracking and future reference.  
+
+### Priority guidelines  
+
+There are priority guidelines defined for the tickets that are reported by users and the corresponding response time from Helpdesk support. 
+
+    Priority 1 (P1) -- 0-2h response time 
+
+    Priority 2 (P2) -- 0-4h response time 
+
+    Priority 3 (P3) -- 0-24h response time 
+
+    Priority 4 (P4) --24-48h response time (can be delayed if needed for additional 48h)
+
 **Number of State Users**
 ---------------------
 

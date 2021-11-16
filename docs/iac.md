@@ -2,8 +2,7 @@
 
 ## Prerequisites
 
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.23.0 but <= 2.26.1
-    - A [defect was introduced in Azure CLI version 2.27.0](https://github.com/Azure/azure-cli/issues/19719#issuecomment-932617639). As of October 2021, the latest release (2.29.0) continues to have this problem.
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.30.0
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
@@ -12,6 +11,12 @@
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:
+
+NOTE: If you are using docker you can skip step 1 to 5 running the following command:
+```
+    docker-compose up --build
+```
+
 1. Run `install-extensions` to install Azure CLI extensions required by the `az` commands used by our IaC:
 ```
     ./iac/install-extensions.bash
@@ -165,3 +170,4 @@ az resource list  --tag SysType=PerStateMatchApi --query "[? resourceGroup == 'r
 - .NET 5 with Azure Functions v3 is [not (yet) supported by Microsoft](https://github.com/Azure/azure-functions-host/issues/6674).
 - `iac/.azure` contains local Azure CLI configuration that is used by `create-resources`
 - In order for IaC to automatically configure the OIDC client secrets for the Dashboard and Query Tool applications, the secrets need to be present in a key vault with a particular naming format. See `configure-oidc.bash` for details.
+- The iac docker container in the `iac` folder has all pre-requisite for running the IAC code, with tested software versions. If you only need to deploy the infrastructure, you can run the docker container to skip installing pre-requisite software.
