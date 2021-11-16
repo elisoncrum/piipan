@@ -60,7 +60,6 @@ jobs:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:3.1
       - image: postgres:11-alpine
-      - image: mcr.microsoft.com/playwright:focal
         environment:
           POSTGRES_PASSWORD: securepass
           POSTGRES_DB: ea
@@ -82,12 +81,17 @@ jobs:
           name: Install Playwright CLI Globally
           command: |
             dotnet tool install --global Microsoft.Playwright.CLI
-            export PATH="$PATH:/root/.dotnet/tools"
+      - run:
+          name: Install Playwright deps
+          command: |
+            apt-get install -y libgobject-2.0.so.0 libglib-2.0.so.0 libnss3.so libnssutil3.so libsmime3.so libnspr4.so libatk-1.0.so.0 libatk-bridge-2.0.so.0 libcups.so.2 libgio-2.0.so.0 libdrm.so.2 libdbus-1.so.3 libxcb.so.1 libxkbcommon.so.0 libX11.so.6 libXcomposite.so.1 libXdamage.so.1 libXext.so.6 libXfixes.so.3 libXrandr.so.2 libgbm.so.1 libpango-1.0.so.0 libcairo.so.2 libasound.so.2 libatspi.so.0
       - run:
           name: Install Playwright in Query Tool Tests
           working_directory: query-tool/tests/Piipan.QueryTool.Tests
           command: |
             dotnet build
+            export PATH="$PATH:/root/.dotnet/tools"
+            echo $PATH
             playwright install
       - run:
           name: Run All Unit Tests
