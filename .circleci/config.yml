@@ -78,6 +78,11 @@ jobs:
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
       - run:
+          name: Install Playwright
+          command: |
+            dotnet tool install --global Microsoft.Playwright.CLI
+            playwright install
+      - run:
           name: Run All Unit Tests
           command: ./build.bash test -c
       - run:
