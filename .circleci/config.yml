@@ -60,6 +60,7 @@ jobs:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:3.1
       - image: postgres:11-alpine
+      - image: mcr.microsoft.com/playwright:focal
         environment:
           POSTGRES_PASSWORD: securepass
           POSTGRES_DB: ea
@@ -78,9 +79,15 @@ jobs:
             chmod +x ./cc-test-reporter
             ./cc-test-reporter before-build
       - run:
-          name: Install Playwright
+          name: Install Playwright CLI Globally
           command: |
             dotnet tool install --global Microsoft.Playwright.CLI
+            export PATH="$PATH:/root/.dotnet/tools"
+      - run:
+          name: Install Playwright in Query Tool Tests
+          working_directory: query-tool/tests/Piipan.QueryTool.Tests
+          command: |
+            dotnet build
             playwright install
       - run:
           name: Run All Unit Tests
