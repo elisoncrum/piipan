@@ -84,7 +84,7 @@ jobs:
       - run:
           name: Install Playwright deps
           command: |
-            apt-get install -y libgobject-2.0.so.0 libglib-2.0.so.0 libnss3.so libnssutil3.so libsmime3.so libnspr4.so libatk-1.0.so.0 libatk-bridge-2.0.so.0 libcups.so.2 libgio-2.0.so.0 libdrm.so.2 libdbus-1.so.3 libxcb.so.1 libxkbcommon.so.0 libX11.so.6 libXcomposite.so.1 libXdamage.so.1 libXext.so.6 libXfixes.so.3 libXrandr.so.2 libgbm.so.1 libpango-1.0.so.0 libcairo.so.2 libasound.so.2 libatspi.so.0
+            apt-get install -y libgobject-2.0 libglib-2.0 libnss3 libnssutil3 libsmime3 libnspr4 libatk-1.0 libatk-bridge-2.0 libcups libgio-2.0 libdrm libdbus-1 libxcb libxkbcommon libX11 libXcomposite libXdamage libXext libXfixes libXrandr libgbm libpango-1.0 libcairo libasound libatspi
       - run:
           name: Install Playwright in Query Tool Tests
           working_directory: query-tool/tests/Piipan.QueryTool.Tests
