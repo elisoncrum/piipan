@@ -10,6 +10,12 @@
         },
         "storageAccountName": {
             "type": "string"
+        },
+        "vnet": {
+            "type": "string"
+        },
+        "subnet": {
+            "type": "string"
         }
     },
     "variables": {
@@ -33,7 +39,13 @@
             "properties": {
                 "supportsHttpsTrafficOnly": true,
                 "networkAcls": {
-                    "defaultAction": "Deny"
+                    "defaultAction": "Deny",
+                    "virtualNetworkRules": [
+                        {
+                            "id": "[concat(parameters('vnet'),  '/subnets/', parameters('subnet'))]",
+                            "action": "Allow"
+                        }
+                    ]
                 }
             },
             "resources": [

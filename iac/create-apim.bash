@@ -92,7 +92,6 @@ main () {
   APIM_NAME=${PREFIX}-apim-duppartapi-${ENV}
   PUBLISHER_NAME='API Administrator'
   publisher_email=$2
-
   orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
   orch_base_url=$(\
     az functionapp show \
@@ -139,11 +138,27 @@ main () {
         eventHubName="$EVENT_HUB_NAME" \
         apimPolicyXml="$apim_policy_xml")
 
+  apim_id=$(\
+    az apim show \
+      --name "$APIM_NAME" \
+      --resource-group "$MATCH_RESOURCE_GROUP" \
+      --query id \
+      --output tsv)
+
   echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))
+
+  tenant_id=$(az account show --query homeTenantId -o tsv)
   for account in "${upload_accounts[@]}"
   do
-    grant_blob "$apim_identity" "$account"
+    grant_blob "$apim_identity" "$apim_id" "$account"
+
+    echo "Allowing APIM to access $account"
+    az storage account network-rule add \
+      --account-name "$account" \
+      --resource-group "$RESOURCE_GROUP" \
+      --resource-id "$apim_id" \
+      --tenant-id "$tenant_id"
   done
 
   # Clear out default example resources

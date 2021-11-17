@@ -102,6 +102,15 @@ main () {
   # for our default resource group
   DEFAULT_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
 
+  # Several CLI commands use the vnet resource ID
+  # Resource ID required when vnet is in a separate resource group
+  VNET_ID=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+
   # Create a key vault which will store credentials for use in other templates
   az deployment group create \
     --name "$VAULT_NAME" \
@@ -168,7 +177,9 @@ main () {
       --parameters \
         storageAccountName="$func_stor_name" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        vnet="$VNET_ID" \
+        subnet="$FUNC_SUBNET_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -317,19 +328,12 @@ main () {
   #publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
-  # Resource ID required when vnet is in a separate resource group
-  vnet_id=$(\
-    az network vnet show \
-      -n "$VNET_NAME" \
-      -g "$RESOURCE_GROUP" \
-      --query id \
-      -o tsv)
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
     --name "$ORCHESTRATOR_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
-    --vnet "$vnet_id"
+    --vnet "$VNET_ID"
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
@@ -388,7 +392,7 @@ main () {
         uniqueStorageName="$func_stor" \
         resourceTags="$RESOURCE_TAGS" \
         location="$LOCATION" \
-        vnet="$vnet_id" \
+        vnet="$VNET_ID" \
         subnet="$FUNC_SUBNET_NAME"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
@@ -539,7 +543,7 @@ main () {
     --name "$QUERY_TOOL_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$WEBAPP_SUBNET_NAME" \
-    --vnet "$vnet_id"
+    --vnet "$VNET_ID"
 
   # Create a placeholder OIDC IdP secret
   create_oidc_secret "$QUERY_TOOL_APP_NAME"
@@ -567,8 +571,6 @@ main () {
     "$azure_env" \
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
-
-  ./configure-storage-firewalls.bash "$azure_env"
 
   # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
   ./configure-cis-policy.bash "$azure_env"
