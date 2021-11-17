@@ -151,7 +151,7 @@ main () {
   tenant_id=$(az account show --query homeTenantId -o tsv)
   for account in "${upload_accounts[@]}"
   do
-    grant_blob "$apim_identity" "$apim_id" "$account"
+    grant_blob "$apim_identity" "$account"
 
     echo "Allowing APIM to access $account"
     az storage account network-rule add \
