@@ -47,8 +47,16 @@ main () {
     --name "$COLLECT_STORAGE_NAME" \
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
+    --default-action "Deny" \
     --sku Standard_LRS \
     --tags Project=$PROJECT_TAG
+
+  echo "Allowing $VNET_NAME to access $COLLECT_STORAGE_NAME"
+  az storage account network-rule add \
+    --account-name "$COLLECT_STORAGE_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-name "$VNET_NAME" \
+    --subnet "$FUNC_SUBNET_NAME"
 
   # Create the function app in Azure
   echo "Creating function app $METRICS_COLLECT_APP_NAME in Azure"
@@ -165,8 +173,16 @@ main () {
     --name "$API_APP_STORAGE_NAME" \
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
+    --default-action "Deny" \
     --sku Standard_LRS \
     --tags Project=$PROJECT_TAG
+
+  echo "Allowing $VNET_NAME to access $API_APP_STORAGE_NAME"
+  az storage account network-rule add \
+    --account-name "$API_APP_STORAGE_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-name "$VNET_NAME" \
+    --subnet "$FUNC_SUBNET_NAME"
 
   # Create the function app in Azure
   echo "Creating function app $METRICS_API_APP_NAME"
