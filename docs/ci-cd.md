@@ -41,3 +41,6 @@ Dependabot is configured via [.github/dependabot.yml](../.github/dependabot.yml)
 ## Code Coverage
 
 [Code Climate](https://codeclimate.com/) is enabled on this repository to report test coverage results from automated testing in CircleCI. The Code Climate test reporter ID is stored in CircleCI using the `CC_TEST_REPORTER_ID` environment variable, allowing CircleCI to automatically upload coverage reports. The test reporter ID can be found in the Repo Settings section of Code Climate's [web console](https://codeclimate.com/github/18F/piipan).
+
+## Notes
+- An intermittent failure we've encountered that should be noted is that Node tasks may stall intermittently during MSBuilds in jobs related to frontend testing of the Dashboard and Query Tool. This causes the web server to never spin up, which in turn causes downstream test failures. This happens inconsistently, but causes nightly Pa11y jobs to fail from time to time. A theory is that it's due to CircleCI caching, but this hasn't been verified.
