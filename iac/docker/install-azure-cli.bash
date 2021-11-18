@@ -21,4 +21,8 @@ echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO 
 # Update the repository information and install the azure-cli package.
 apt-get update
 apt-get install python
-apt-get install azure-cli="$AZURE_CLI_VERSION"~focal -V
+if [ "$AZURE_CLI_VERSION" = 0 ]; then
+    apt-get install azure-cli
+else
+    apt-get install azure-cli="$AZURE_CLI_VERSION"~focal -V
+fi
