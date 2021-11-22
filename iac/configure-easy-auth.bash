@@ -181,6 +181,11 @@ enable_easy_auth () {
       --query "[0].objectId" \
       --output tsv)
 
+  aad_endpoint=$(\
+    az cloud show \
+      --query endpoints.activeDirectory \
+      --output tsv)
+
   sp_filter="displayName eq '${app}' and servicePrincipalType eq 'Application'"
   app_aad_sp=$(\
     az ad sp list \
@@ -195,7 +200,7 @@ enable_easy_auth () {
     --name "$app" \
     --aad-allowed-token-audiences "$app_uri" \
     --aad-client-id "$app_aad_client" \
-    --aad-token-issuer-url "https://sts.windows.net/${TENANT_ID}/" \
+    --aad-token-issuer-url "${aad_endpoint}/${TENANT_ID}/" \
     --enabled true \
     --action LoginWithAzureActiveDirectory
 
