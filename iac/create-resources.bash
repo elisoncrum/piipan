@@ -335,6 +335,12 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
 
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --available-to-other-tenants false
+
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
   if [ "$exists" = "true" ]; then
@@ -518,6 +524,12 @@ main () {
       --query defaultHostName \
       -o tsv)
   orch_api_uri="https://${orch_api_uri}/api/v1/"
+  orch_api_app_id=$(\
+    az ad app list \
+      --display-name "${ORCHESTRATOR_FUNC_APP_NAME}" \
+      --filter "displayName eq '${ORCHESTRATOR_FUNC_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
 
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
@@ -530,6 +542,7 @@ main () {
       appName="$QUERY_TOOL_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
+      OrchApiAppId="$orch_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \

@@ -195,6 +195,11 @@ main () {
     --storage-account "$API_APP_STORAGE_NAME" \
     --assign-identity "[system]" \
     --tags Project=$PROJECT_TAG
+  
+  # Create an Active Directory app registration associated with the app.
+  az ad app create \
+    --display-name "$METRICS_API_APP_NAME" \
+    --available-to-other-tenants false
 
   # Integrate function app into Virtual Network
   echo "Integrating $METRICS_API_APP_NAME into virtual network"
@@ -275,6 +280,12 @@ main () {
     --query "defaultHostName" \
     --output tsv)
   metrics_api_uri="https://${metrics_api_hostname}/api/"
+  metrics_api_app_id=$(\
+    az ad app list \
+      --display-name "${METRICS_API_APP_NAME}" \
+      --filter "displayName eq '${METRICS_API_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
@@ -288,6 +299,7 @@ main () {
       appName="$DASHBOARD_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       metricsApiUri="$metrics_api_uri" \
+      metricsApiAppId="$metrics_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$DASHBOARD_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$DASHBOARD_APP_IDP_OIDC_SCOPES" \
