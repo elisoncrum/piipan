@@ -41,7 +41,7 @@ main () {
       ruleName="rateLimitRule" \
       rulePriority="1" \
       ruleRateLimitDurationInMinutes="1" \
-      ruleRateLimitThreshold="1000" \
+      ruleRateLimitThreshold="100" \
       ruleMatchValue="querytool" \
       prefix="$PREFIX" \
       env="$ENV"
