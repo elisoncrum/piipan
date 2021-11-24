@@ -34,6 +34,12 @@
         },
         "states": {
             "type": "String"
+        },
+        "vnet": {
+            "type": "string"
+        },
+        "subnet": {
+            "type": "string"
         }
     },
     "variables": {
@@ -59,7 +65,19 @@
             "sku": {
                 "name": "[variables('storageAccountType')]"
             },
-            "kind": "Storage"
+            "kind": "StorageV2",
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "networkAcls": {
+                    "defaultAction": "Deny",
+                    "virtualNetworkRules": [
+                        {
+                            "id": "[concat(parameters('vnet'),  '/subnets/', parameters('subnet'))]",
+                            "action": "Allow"
+                        }
+                    ]
+                }
+            }
         },
         {
             "type": "Microsoft.Web/sites",
@@ -144,6 +162,10 @@
                         {
                             "name": "States",
                             "value": "[parameters('states')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTOVERVNET",
+                            "value": "1"
                         }
                     ]
                 }
