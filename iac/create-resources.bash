@@ -325,15 +325,38 @@ main () {
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
 
-  #publish function app
-  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
-
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
     --name "$ORCHESTRATOR_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
+
+  az storage account update \
+    --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --default-action Allow
+
+  #publish function app
+  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+
+  az storage account update \
+      --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+      --resource-group "$MATCH_RESOURCE_GROUP" \
+      --default-action Deny
+
+  func_subnet_id=$(\
+    az network vnet subnet show \
+      --resource-group rg-core-dev \
+      --vnet-name vnet-core-dev \
+      --name snet-apps1-dev \
+      --query id \
+      --output tsv)
+
+  az storage account network-rule add \
+    --account-name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$func_subnet_id"
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
