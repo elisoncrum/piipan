@@ -15,8 +15,8 @@ namespace Piipan.Match.Client.Extensions
         {
             serviceCollection.Configure<AzureTokenProviderOptions<MatchClient>>(options =>
             {
-                var uri = new Uri(Environment.GetEnvironmentVariable("OrchApiUri"));
-                options.ResourceUri = $"{uri.Scheme}://{uri.Host}";
+                var appId = Environment.GetEnvironmentVariable("OrchApiAppId");
+                options.ResourceUri = $"api://{appId}";
             });
 
             if (env.IsDevelopment())

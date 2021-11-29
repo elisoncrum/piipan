@@ -51,23 +51,38 @@ app_role_manifest () {
   echo "$json"
 }
 
-# Create an Active Directory app registration with an application
+# Generate the application ID URI for a given app, using the default
+# format: https://docs.microsoft.com/en-us/azure/active-directory/develop/security-best-practices-for-app-registration#appid-uri-configuration
+app_id_uri () {
+  app=$1
+
+  app_aad_client=$(\
+    az ad app list \
+      --display-name "${app}" \
+      --filter "displayName eq '${app}'" \
+      --query "[0].appId" \
+      --output tsv)
+
+  echo "api://${app_aad_client}"
+}
+
+# Update an Active Directory app registration with an application
 # role for a given application.
-create_aad_app_reg () {
+configure_aad_app_reg () {
   app=$1
   role=$2
   group=$3
 
-  app_uri=$(\
-    az functionapp show \
-    --resource-group "$group" \
-    --name "$app" \
-    --query defaultHostName \
-    --output tsv)
-  app_uri="https://${app_uri}"
+  object_id=$(\
+    az ad app list \
+      --display-name "${app}" \
+      --filter "displayName eq '${app}'" \
+      --query "[0].objectId" \
+      --output tsv)
 
-  # Running `az ad app create` with the `--app-roles` parameter will throw
-  # an error if the app already exists and the app role is enabled
+  # First configure the app registration with the application role
+  # Running `az ad app update` with the `--app-roles` parameter will throw
+  # an error if the app already exists and the app role is enabled.
   exists=$(\
     az ad app list \
     --display-name "${app}" \
@@ -76,26 +91,20 @@ create_aad_app_reg () {
     --output tsv)
   if [ -z "$exists" ]; then
     app_role=$(app_role_manifest "$role")
-    app_id=$(\
-      az ad app create \
-        --display-name "$app" \
-        --app-roles "${app_role}" \
-        --available-to-other-tenants false \
-        --homepage "$app_uri" \
-        --identifier-uris "$app_uri" \
-        --reply-urls "${app_uri}/.auth/login/aad/callback" \
-        --query objectId \
-        --output tsv)
-  else
-    app_id=$(\
-      az ad app list \
-        --display-name "${app}" \
-        --filter "displayName eq '${app}'" \
-        --query "[0].objectId" \
-        --output tsv)
+    az ad app update \
+      --id "$object_id" \
+      --display-name "$app" \
+      --app-roles "${app_role}"
   fi
 
-  echo "$app_id"
+  # Set the application ID URI and limit app to the current tenant
+  app_uri=$(app_id_uri "$app")
+  az ad app update \
+    --id "$object_id" \
+    --available-to-other-tenants false \
+    --identifier-uris "$app_uri"
+
+  echo "$object_id"
 }
 
 # Create a service principal associated with a given AAD
@@ -166,20 +175,14 @@ enable_easy_auth () {
   app=$1
   group=$2
 
-  app_uri=$(\
-    az functionapp show \
-    --resource-group "$group" \
-    --name "$app" \
-    --query defaultHostName \
-    --output tsv)
-  app_uri="https://${app_uri}"
-
   app_aad_client=$(\
     az ad app list \
       --display-name "${app}" \
       --filter "displayName eq '${app}'" \
       --query "[0].objectId" \
       --output tsv)
+
+  app_uri=$(app_id_uri "$app")
 
   aad_endpoint=$(\
     az cloud show \
@@ -232,7 +235,7 @@ configure_easy_auth_pair () {
   local client_identity=$4
 
   local func_app_reg_id
-  func_app_reg_id=$(create_aad_app_reg "$func" "$role" "$group")
+  func_app_reg_id=$(configure_aad_app_reg "$func" "$role" "$group")
 
   # Wait a bit to prevent "service principal being created must in the local tenant" error
   sleep 60
