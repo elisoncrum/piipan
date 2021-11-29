@@ -102,6 +102,15 @@ main () {
   # for our default resource group
   DEFAULT_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
 
+  # Several CLI commands use the vnet resource ID
+  # Resource ID required when vnet is in a separate resource group
+  VNET_ID=$(\
+    az network vnet show \
+      -n "$VNET_NAME" \
+      -g "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+
   # Create a key vault which will store credentials for use in other templates
   az deployment group create \
     --name "$VAULT_NAME" \
@@ -168,7 +177,9 @@ main () {
       --parameters \
         storageAccountName="$func_stor_name" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        vnet="$VNET_ID" \
+        subnet="$FUNC_SUBNET_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -312,24 +323,25 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
+      eventHubName="$EVENT_HUB_NAME" \
+      vnet="$VNET_ID" \
+      subnet="$FUNC_SUBNET_NAME"
 
   #publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
-  # Resource ID required when vnet is in a separate resource group
-  vnet_id=$(\
-    az network vnet show \
-      -n "$VNET_NAME" \
-      -g "$RESOURCE_GROUP" \
-      --query id \
-      -o tsv)
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
     --name "$ORCHESTRATOR_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
-    --vnet "$vnet_id"
+    --vnet "$VNET_ID"
+
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --available-to-other-tenants false
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
@@ -387,7 +399,9 @@ main () {
       --parameters \
         uniqueStorageName="$func_stor" \
         resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION"
+        location="$LOCATION" \
+        vnet="$VNET_ID" \
+        subnet="$FUNC_SUBNET_NAME"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
@@ -512,6 +526,12 @@ main () {
       --query defaultHostName \
       -o tsv)
   orch_api_uri="https://${orch_api_uri}/api/v1/"
+  orch_api_app_id=$(\
+    az ad app list \
+      --display-name "${ORCHESTRATOR_FUNC_APP_NAME}" \
+      --filter "displayName eq '${ORCHESTRATOR_FUNC_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
 
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
@@ -524,6 +544,7 @@ main () {
       appName="$QUERY_TOOL_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
+      OrchApiAppId="$orch_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
@@ -537,7 +558,7 @@ main () {
     --name "$QUERY_TOOL_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$WEBAPP_SUBNET_NAME" \
-    --vnet "$vnet_id"
+    --vnet "$VNET_ID"
 
   # Create a placeholder OIDC IdP secret
   create_oidc_secret "$QUERY_TOOL_APP_NAME"

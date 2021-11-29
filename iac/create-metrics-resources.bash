@@ -47,8 +47,16 @@ main () {
     --name "$COLLECT_STORAGE_NAME" \
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
+    --default-action "Deny" \
     --sku Standard_LRS \
     --tags Project=$PROJECT_TAG
+
+  echo "Allowing $VNET_NAME to access $COLLECT_STORAGE_NAME"
+  az storage account network-rule add \
+    --account-name "$COLLECT_STORAGE_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-name "$VNET_NAME" \
+    --subnet "$FUNC_SUBNET_NAME"
 
   # Create the function app in Azure
   echo "Creating function app $METRICS_COLLECT_APP_NAME in Azure"
@@ -165,8 +173,16 @@ main () {
     --name "$API_APP_STORAGE_NAME" \
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
+    --default-action "Deny" \
     --sku Standard_LRS \
     --tags Project=$PROJECT_TAG
+
+  echo "Allowing $VNET_NAME to access $API_APP_STORAGE_NAME"
+  az storage account network-rule add \
+    --account-name "$API_APP_STORAGE_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --vnet-name "$VNET_NAME" \
+    --subnet "$FUNC_SUBNET_NAME"
 
   # Create the function app in Azure
   echo "Creating function app $METRICS_API_APP_NAME"
@@ -179,6 +195,11 @@ main () {
     --storage-account "$API_APP_STORAGE_NAME" \
     --assign-identity "[system]" \
     --tags Project=$PROJECT_TAG
+  
+  # Create an Active Directory app registration associated with the app.
+  az ad app create \
+    --display-name "$METRICS_API_APP_NAME" \
+    --available-to-other-tenants false
 
   # Integrate function app into Virtual Network
   echo "Integrating $METRICS_API_APP_NAME into virtual network"
@@ -259,6 +280,12 @@ main () {
     --query "defaultHostName" \
     --output tsv)
   metrics_api_uri="https://${metrics_api_hostname}/api/"
+  metrics_api_app_id=$(\
+    az ad app list \
+      --display-name "${METRICS_API_APP_NAME}" \
+      --filter "displayName eq '${METRICS_API_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
 
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
@@ -272,6 +299,7 @@ main () {
       appName="$DASHBOARD_APP_NAME" \
       servicePlan="$APP_SERVICE_PLAN" \
       metricsApiUri="$metrics_api_uri" \
+      metricsApiAppId="$metrics_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$DASHBOARD_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$DASHBOARD_APP_IDP_OIDC_SCOPES" \

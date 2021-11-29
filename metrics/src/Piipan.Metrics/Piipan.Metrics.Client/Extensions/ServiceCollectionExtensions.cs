@@ -15,13 +15,13 @@ namespace Piipan.Metrics.Client.Extensions
         {
             serviceCollection.Configure<AzureTokenProviderOptions<ParticipantUploadClient>>(options =>
             {
-                var uri = new Uri(Environment.GetEnvironmentVariable("MetricsApiUri"));
-                options.ResourceUri = $"{uri.Scheme}://{uri.Host}"; 
+                var appId = Environment.GetEnvironmentVariable("MetricsApiAppId");
+                options.ResourceUri = $"api://{appId}";
             });
 
             if (env.IsDevelopment())
             {
-                 serviceCollection.AddTransient<TokenCredential, AzureCliCredential>();
+                serviceCollection.AddTransient<TokenCredential, AzureCliCredential>();
             }
             else
             {

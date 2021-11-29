@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.94] - 2021-11-29
+
+### Changed
+- Update approach to App ID URI usage for App Service Authentication based on recent Microsoft changes
+- Denied default access to Orchestrator function storage account and storage containers in IAC script
+- Use cloud-specific AAD endpoint when configuring App Service Auth
+
 ## [0.93] - 2021-11-16
 
 ### Added
@@ -99,7 +106,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [0.5] - 2021-08-10
 ### Added
-- OpenID Connect (OIDC) authentication to dashboard and query tool 
+- OpenID Connect (OIDC) authentication to dashboard and query tool
 - managed identity to metrics Function Apps and database access
 - IaC for streaming logs to an external SIEM via Event Hub
 - system account and initiating user to audit logs for API calls
@@ -112,7 +119,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - query tool to remove lookup API feature and accomodate query API changes
 - Front Door to use a designated public file in dashboard and query tool for health check
 - duplicate participation Function Apps so they do not hibernate
-- Orchestrator Function App so that network egress is through a VNet 
+- Orchestrator Function App so that network egress is through a VNet
 ### Removed
 - Lookup API call; it's been obsoleted by PPRL model
 - `METRICS_RESOURCE_GROUP`; folded resources into `RESOURCE_GROUP`

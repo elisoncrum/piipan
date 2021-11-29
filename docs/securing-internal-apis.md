@@ -47,7 +47,7 @@ When an Azure resource is created it is effectively unknown to Azure AD. For the
 Once an API server is deployed in the form of an Azure Function, the following steps are taken to create and configure the necessary Azure AD resources to perform authentication and authorization:
 
 1. An [application object](#application-object) is created to function as the server's representative in Azure AD. By convention, the application object shares the same name as the server's Azure Function. The application object defines certain properties of the server for the purposes of authentication:
-    - *[Application ID URI](#application-id-uri)*: used by clients to request access tokens. By convention, the URI value is set to the base URL of the server's Azure Function *without a trailing slash*. E.g., `https://<azure-function-name>.azurewebsites.net`.
+    - *[Application ID URI](#application-id-uri)*: used by clients to request access tokens. The URI value is set to the [Azure AD default schema](https://docs.microsoft.com/en-us/azure/active-directory/develop/security-best-practices-for-app-registration#appid-uri-configuration) of `api://<app-id>`.
     - *[Application role](#application-roles)*: an application-specific role (e.g., `StateApi.Query` or `OrchestratorApi.Query`) that is assigned to authorized clients.
     - *Supported account types*: a setting which determines whether or not the server will accept clients originating from Azure AD tenants external to Piipan's. This setting is set to only allow clients originating within Piipan's tenant.
 1. A [service principal](#service-principal--in-the-context-of-an-application-object) is created to serve as the *local instance* of the application object in Piipan's Azure AD tenant (see the [application object definition](#application-object) for more detail on the distinction between global and local). The service principal inherits the application object's configuration/definitions (including name), and is configured with one additional detail:
@@ -55,7 +55,7 @@ Once an API server is deployed in the form of an Azure Function, the following s
 1. The Azure Function's [App Service Authentication](#app-service-authentication) functionality is enabled and configured with the following details:
     - The authentication method is set to use Azure AD
     - The Azure Function's Azure AD representative is set to the application object created above
-    - The "token issuer URL" is set to the standard issuer URL for the Azure environment. E.g., `https://sts.windows.net/{azure-ad-tennant-id}/` for Azure global.
+    - The "token issuer URL" is set to the standard issuer URL for the Azure environment. E.g., `https://login.microsoftonline.com/{azure-ad-tennant-id}/` for Azure Commercial (using `az cloud show --query endpoints.activeDirectory` to discover the endpoint for the current cloud environment).
 
 At this point, authentication is fully configured and implemented on the server side. Specifically, the server will use Azure AD to authenticate clients. Access tokens will be issued to clients that are members of the server's tenant *and* are assigned at least one of the application roles defined in the server's representative application object. Any requests from clients that do not conform to that policy will result in `401 unauthorized` responses.
 
@@ -145,7 +145,7 @@ All configuration is done through the associated Azure and Azure AD resources (e
 
 ### Application ID URI
 
-A valid URI string defined on an [application object](#application-object). This URI is used for specifying the resource from which the client should request an [access token]() for authenticating with the server. The URI can be set to any value unique to the tenant, but by convention it is set to the base URL of the server *without a trailing slash*. For example, if a server's API can be called from `https://functionfoo.azurewebsites.net/api/endpoint`, the application ID URI is set to `https://functionfoo.azurewebsites.net`.
+A valid URI string defined on an [application object](#application-object). This URI is used for specifying the resource from which the client should request an [access token](#access-token) for authenticating with the server. The URI can be set to any value unique to the tenant, but [Azure AD specifies a default value](https://docs.microsoft.com/en-us/azure/active-directory/develop/security-best-practices-for-app-registration#appid-uri-configuration) of `api://<app-id>` where `<app-id>` is the application object's application (aka "client") ID.
 
 **Managing the application ID URI**
 - *Portal*: Azure Active Directory > App registration > All applications > {your application object} > Application ID URI

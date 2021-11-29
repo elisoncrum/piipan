@@ -4,7 +4,8 @@ COPY ./iac/docker/* ./iac/
 COPY ./iac/install-extensions.bash ./iac/
 COPY ./tools/common.bash ./tools/
 #Set to an working Azure CLI version
-ENV AZURE_CLI_VERSION=2.25.0-1
+#If you want lastest version set the set the AZURE_CLI_VERSION to 0
+ENV AZURE_CLI_VERSION=0
 #Run IAC scripts to prepare the deployment enviroment
 RUN ./iac/install-azure-cli.bash
 RUN ./iac/install-azure-core-tool.bash
