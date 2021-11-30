@@ -505,15 +505,15 @@ main () {
     --name rateLimitRuleName \
     --priority 1 \
     --action Block \
-    --resource-group $RESOURCE_GROUP \
-    --policy-name $QUERY_TOOL_WAF_NAME \
+    --resource-group "$RESOURCE_GROUP" \
+    --policy-name "$QUERY_TOOL_WAF_NAME" \
     --rule-type ratelimitrule \
     --rate-limit-duration 5 \
     --rate-limit-threshold 10000 --defer
 
   az network front-door waf-policy rule match-condition add \
-    --resource-group $RESOURCE_GROUP \
-    --policy-name $QUERY_TOOL_WAF_NAME \
+    --resource-group "$RESOURCE_GROUP" \
+    --policy-name "$QUERY_TOOL_WAF_NAME" \
     --name rateLimitRuleName \
     --match-variable RequestUri \
     --operator Contains \
