@@ -36,11 +36,7 @@
                 </return-response>
             </otherwise>
         </choose>
-        <rate-limit-by-key  calls="100"
-              renewal-period="60"
-              increment-condition="@(context.Response.StatusCode == 200)"
-              counter-key="@(context.Request.IpAddress)"
-              remaining-calls-variable-name="remainingCallsPerIP"/>
+        <rate-limit calls="100" renewal-period="60" remaining-calls-variable-name="remainingCallsPerSubscription"/>
     </inbound>
     <backend>
         <base />
