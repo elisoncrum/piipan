@@ -38,11 +38,6 @@ main () {
       resourceGroupName="$resource_group" \
       resourceTags="$RESOURCE_TAGS" \
       wafPolicyName="$waf_name" \
-      ruleName="rateLimitRule" \
-      rulePriority="1" \
-      ruleRateLimitDurationInMinutes="1" \
-      ruleRateLimitThreshold="100" \
-      ruleMatchValue="querytool" \
       prefix="$PREFIX" \
       env="$ENV"
 

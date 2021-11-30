@@ -501,6 +501,24 @@ main () {
     "$QUERY_TOOL_WAF_NAME" \
     "$query_tool_host"
 
+  az network front-door waf-policy rule create \
+    --name rateLimitRuleName \
+    --priority 1 \
+    --action Block \
+    --resource-group $RESOURCE_GROUP \
+    --policy-name $QUERY_TOOL_WAF_NAME \
+    --rule-type ratelimitrule \
+    --rate-limit-duration 5 \
+    --rate-limit-threshold 10000 --defer
+
+  az network front-door waf-policy rule match-condition add \
+    --resource-group $RESOURCE_GROUP \
+    --policy-name $QUERY_TOOL_WAF_NAME \
+    --name rateLimitRuleName \
+    --match-variable RequestUri \
+    --operator Contains \
+    --values querytool 
+
   front_door_id=$(\
   az network front-door show \
     --name "$QUERY_TOOL_FRONTDOOR_NAME" \

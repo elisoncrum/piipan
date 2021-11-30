@@ -60,39 +60,6 @@
             "metadata": {
                 "description": "Development environment indicator"
             }
-        },
-        "ruleName": {
-            "type": "string",
-            "metadata": {
-                "description": "Rule name"
-            }
-        },
-        "rulePriority": {
-            "type": "int",
-            "defaultValue": 100,
-            "metadata": {
-                "description": "Rule priority"
-            }
-        },
-        "ruleRateLimitDurationInMinutes": {
-            "type": "int",
-            "defaultValue": 1,
-            "metadata": {
-                "description": "Rule rate  limit duration in minutes"
-            }
-        },
-        "ruleRateLimitThreshold": {
-            "type": "int",
-            "defaultValue": 100,
-            "metadata": {
-                "description": "Rule rate  limit threshold"
-            }
-        },
-        "ruleMatchValue": {
-            "type": "string",
-            "metadata": {
-                "description": "String match"
-            }
         }
     },
     "variables": {
@@ -113,30 +80,7 @@
                     "enabledState": "Enabled"
                 },
                 "customRules": {
-                    "rules": [
-                        {
-                            "name": "[parameters('ruleName')]",
-                            "enabledState": "Enabled",
-                            "priority": "[parameters('rulePriority')]",
-                            "ruleType": "RateLimitRule",
-                            "rateLimitDurationInMinutes": "[parameters('ruleRateLimitDurationInMinutes')]",
-                            "rateLimitThreshold": "[parameters('ruleRateLimitThreshold')]",
-                            "matchConditions": [
-                                {
-                                    "matchVariable": "RequestUri",
-                                    "operator": "Contains",
-                                    "negateCondition": false,
-                                    "matchValue": [
-                                        "[parameters('ruleMatchValue')]"
-                                    ],
-                                    "transforms": [
-                                        "Lowercase"
-                                    ]
-                                }
-                            ],
-                            "action": "Block"
-                        }
-                    ]
+                    "rules": []
                 },
                 "managedRules": {
                     "managedRuleSets": [
