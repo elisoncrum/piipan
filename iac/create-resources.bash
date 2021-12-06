@@ -517,7 +517,7 @@ main () {
     --name rateLimitRuleName \
     --match-variable RequestUri \
     --operator Contains \
-    --values $QUERY_TOOL_FRONTDOOR_NAME 
+    --values "$QUERY_TOOL_FRONTDOOR_NAME"
 
   front_door_id=$(\
   az network front-door show \
