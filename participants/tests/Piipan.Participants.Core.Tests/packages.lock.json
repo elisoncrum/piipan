@@ -30,9 +30,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[5.0.10, )",
-        "resolved": "5.0.10",
-        "contentHash": "3TB9le3lfu5Hc+LSHqMCVLcA+qUPg1enyM4+u0pMUBmNNGwc0sVPrnfnys2TVZIdkF8Aww/AZlnJHDsnEGqD0g==",
+        "requested": "[5.0.11, )",
+        "resolved": "5.0.11",
+        "contentHash": "tCc36FSYqdYN/JQUaR2KkQj54suYPg5Jl6LXOGZ6MiiqnwDHDXkEKwxhsqR6+Ovh3MZ4yZltkKYJu9JG3WZZ9g==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
@@ -1662,7 +1662,7 @@
           "Microsoft.Extensions.Logging": "3.1.21",
           "Microsoft.Extensions.Options": "3.1.21",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "5.0.10"
+          "Npgsql": "5.0.11"
         }
       }
     }
