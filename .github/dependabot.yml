@@ -19,18 +19,18 @@ updates:
     time: "09:00"
   open-pull-requests-limit: 10
 - package-ecosystem: nuget
-  directory: "/etl/src/Piipan.Etl"
+  directory: "/etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
   schedule:
     interval: daily
     time: "09:00"
   open-pull-requests-limit: 10
 - package-ecosystem: nuget
-  directory: "/etl/tests/Piipan.Etl.Tests"
+  directory: "/etl/tests/Piipan.Etl.Func.BulkUpload.Tests"
   schedule:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
-  directory: "/etl/tests/Piipan.Etl.TestsIntegrationTests"
+  directory: "/etl/tests/Piipan.Etl.Func.BulkUpload.IntegrationTests"
   schedule:
     interval: daily
     time: "09:00"
