@@ -120,7 +120,8 @@ main () {
       name="$VAULT_NAME" \
       location="$LOCATION" \
       objectId="$CURRENT_USER_OBJID" \
-      resourceTags="$RESOURCE_TAGS"
+      resourceTags="$RESOURCE_TAGS" \
+      eventHubName="$EVENT_HUB_NAME"
 
   # Create an Event Hub namespace and hub where resource logs will be streamed,
   # as well as an application registration that can be used to read logs
