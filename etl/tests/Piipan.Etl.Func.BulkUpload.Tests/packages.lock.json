@@ -10,11 +10,11 @@
       },
       "CsvHelper": {
         "type": "Direct",
-        "requested": "[27.1.1, )",
-        "resolved": "27.1.1",
-        "contentHash": "lo5yypClBORR2XiWPRxQApaA4C2R4GVCIPVRt9HfaLxLmVQtg/KZiOYsd4luLgyOxkUatF9R0QdFQYk7Y2l0cw==",
+        "requested": "[27.2.1, )",
+        "resolved": "27.2.1",
+        "contentHash": "uS5ix5hL9gL5taiAG//CScyJa8Fn1ZOh3FDhDvf4laboESFs84mCNropfp7PIt8xCkyQofljFpqu1B5UnSXjyA==",
         "dependencies": {
-          "Microsoft.CSharp": "[4.7.0]"
+          "Microsoft.CSharp": "4.3.0"
         }
       },
       "Microsoft.NET.Test.Sdk": {
@@ -39,9 +39,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[5.0.10, )",
-        "resolved": "5.0.10",
-        "contentHash": "3TB9le3lfu5Hc+LSHqMCVLcA+qUPg1enyM4+u0pMUBmNNGwc0sVPrnfnys2TVZIdkF8Aww/AZlnJHDsnEGqD0g==",
+        "requested": "[5.0.11, )",
+        "resolved": "5.0.11",
+        "contentHash": "tCc36FSYqdYN/JQUaR2KkQj54suYPg5Jl6LXOGZ6MiiqnwDHDXkEKwxhsqR6+Ovh3MZ4yZltkKYJu9JG3WZZ9g==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.6.0"
         }
@@ -528,8 +528,8 @@
       },
       "Microsoft.CSharp": {
         "type": "Transitive",
-        "resolved": "4.7.0",
-        "contentHash": "pTj+D3uJWyN3My70i2Hqo+OXixq3Os2D1nJ2x92FFo6sk8fYS1m1WLNTs0Dc1uPaViH0YvEEwvzddQ7y4rhXmA=="
+        "resolved": "4.5.0",
+        "contentHash": "kaj6Wb4qoMuH3HySFJhxwQfe8R/sJsNJnANrvv8WdFPMoNbKY5htfNscv+LHCu5ipz+49m2e+WQXpLXr9XYemQ=="
       },
       "Microsoft.DotNet.PlatformAbstractions": {
         "type": "Transitive",
@@ -2268,7 +2268,7 @@
       "piipan.etl.func.bulkupload": {
         "type": "Project",
         "dependencies": {
-          "CsvHelper": "27.1.1",
+          "CsvHelper": "27.2.1",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
@@ -2276,7 +2276,7 @@
           "Microsoft.Extensions.DependencyInjection": "3.1.21",
           "Microsoft.Extensions.Logging": "3.1.21",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
-          "Npgsql": "5.0.10",
+          "Npgsql": "5.0.11",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Participants.Core": "1.0.0",
           "Piipan.Shared": "1.0.0"
@@ -2308,7 +2308,7 @@
           "Microsoft.Extensions.Logging": "3.1.21",
           "Microsoft.Extensions.Options": "3.1.21",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "5.0.10"
+          "Npgsql": "5.0.11"
         }
       }
     }
