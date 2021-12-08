@@ -475,12 +475,15 @@ main () {
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
 
-    az eventgrid system-topic create \
-      --location "$LOCATION" \
-      --name "$topic_name" \
-      --topic-type Microsoft.Storage.storageAccounts \
-      --resource-group "$RESOURCE_GROUP" \
-      --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
+    event_grid_system_topic_id=$(\
+      az eventgrid system-topic create \
+        --location "$LOCATION" \
+        --name "$topic_name" \
+        --topic-type Microsoft.Storage.storageAccounts \
+        --resource-group "$RESOURCE_GROUP" \
+        --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}" \
+        -o tsv \
+        --query id)
 
     # Create Function endpoint before setting up event subscription
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
@@ -493,6 +496,19 @@ main () {
       --endpoint-type azurefunction \
       --included-event-types Microsoft.Storage.BlobCreated \
       --subject-begins-with /blobServices/default/containers/upload/blobs/
+
+    # Stream event topic logs to Event Hub
+    az monitor diagnostic-settings create \
+      --name "stream-logs-to-event-hub" \
+      --resource "$event_grid_system_topic_id" \
+      --event-hub "logs" \
+      --event-hub-rule "$eh_rule_id" \
+      --logs '[
+        {
+          "category": "DeliveryFailures",
+          "enabled": true
+        }
+      ]'
   done < states.csv
 
   # Create App Service resources for query tool app.
