@@ -180,7 +180,12 @@
                                             ],
                                             "networkSecurityGroup": {
                                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('funcAppServicePlanNsgName'))]"
-                                            }
+                                            },
+                                            "serviceEndpoints": [
+                                                {
+                                                    "service": "Microsoft.Storage"
+                                                }
+                                            ]
                                         }
                                     },
                                     {
