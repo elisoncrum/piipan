@@ -48,3 +48,4 @@ To address these Dependabot PRs, a developer can:
 - follow the [steps to update dependencies](./update-deps.md) using a a new PR
 
 The Dependabot PRs should close automatically after the new PR is merged.
+
