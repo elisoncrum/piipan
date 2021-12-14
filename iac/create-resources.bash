@@ -111,17 +111,7 @@ main () {
       --query id \
       -o tsv)
 
-  # Create a key vault which will store credentials for use in other templates
-  az deployment group create \
-    --name "$VAULT_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/key-vault.json \
-    --parameters \
-      name="$VAULT_NAME" \
-      location="$LOCATION" \
-      objectId="$CURRENT_USER_OBJID" \
-      resourceTags="$RESOURCE_TAGS" \
-      eventHubName="$EVENT_HUB_NAME"
+
 
   # Create an Event Hub namespace and hub where resource logs will be streamed,
   # as well as an application registration that can be used to read logs
@@ -164,6 +154,18 @@ main () {
     --parameters \
       eventHubName="$EVENT_HUB_NAME" \
       coreResourceGroup="$RESOURCE_GROUP"
+
+  # Create a key vault which will store credentials for use in other templates
+  az deployment group create \
+    --name "$VAULT_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file ./arm-templates/key-vault.json \
+    --parameters \
+      name="$VAULT_NAME" \
+      location="$LOCATION" \
+      objectId="$CURRENT_USER_OBJID" \
+      resourceTags="$RESOURCE_TAGS" \
+      eventHubName="$EVENT_HUB_NAME"
 
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
