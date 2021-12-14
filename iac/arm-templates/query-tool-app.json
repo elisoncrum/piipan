@@ -17,6 +17,9 @@
         "OrchApiUri": {
             "type": "string"
         },
+        "OrchApiAppId": {
+            "type": "string"
+        },
         "eventHubName": {
             "type": "String"
         },
@@ -75,6 +78,10 @@
                 {
                     "name": "OrchApiUri",
                     "value": "[parameters('OrchApiUri')]"
+                },
+                {
+                    "name": "OrchApiAppId",
+                    "value": "[parameters('OrchApiAppId')]"
                 },
                 {
                     "name": "ASPNETCORE_ENVIRONMENT",

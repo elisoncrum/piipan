@@ -92,18 +92,22 @@ main () {
   APIM_NAME=${PREFIX}-apim-duppartapi-${ENV}
   PUBLISHER_NAME='API Administrator'
   publisher_email=$2
-
   orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
-  orch_base_url=$(\
+  orch_hostname=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
       -n "$orch_name" \
       --query defaultHostName \
       --output tsv)
-  orch_base_url="https://${orch_base_url}"
-  orch_api_url="${orch_base_url}/api/v1"
+  orch_api_url="https://${orch_hostname}/api/v1"
+  orch_aad_client_id=$(\
+    az ad app list \
+      --display-name "${orch_name}" \
+      --filter "displayName eq '${orch_name}'" \
+      --query "[0].appId" \
+      --output tsv)
 
-  duppart_policy_xml=$(generate_policy apim-duppart-policy.xml "${orch_base_url}")
+  duppart_policy_xml=$(generate_policy apim-duppart-policy.xml "api://${orch_aad_client_id}")
 
   upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
   upload_policy_xml=$(< "$upload_policy_path")
@@ -139,11 +143,27 @@ main () {
         eventHubName="$EVENT_HUB_NAME" \
         apimPolicyXml="$apim_policy_xml")
 
+  apim_id=$(\
+    az apim show \
+      --name "$APIM_NAME" \
+      --resource-group "$MATCH_RESOURCE_GROUP" \
+      --query id \
+      --output tsv)
+
   echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))
+
+  tenant_id=$(az account show --query homeTenantId -o tsv)
   for account in "${upload_accounts[@]}"
   do
     grant_blob "$apim_identity" "$account"
+
+    echo "Allowing APIM to access $account"
+    az storage account network-rule add \
+      --account-name "$account" \
+      --resource-group "$RESOURCE_GROUP" \
+      --resource-id "$apim_id" \
+      --tenant-id "$tenant_id"
   done
 
   # Clear out default example resources

@@ -10,7 +10,7 @@ The convention for each release tag is `v<version-number>`; e.g., `v0.1`, `v0.2`
 
 ## Tagging the release
 
-Note: before tagging the release, it is easiest to update the CHANGELOG first.
+Note: before tagging the release, it is easiest to update the CHANGELOG first. This can be done with a commit to `dev` (which requires an approval before merging) before creating the release branch, or as a commit directly to the release branch prior to tagging. The latter requires an additional step of merging the release branch back into `dev` to keep the CHANGELOG up to date.
 
 Tagging process:
 

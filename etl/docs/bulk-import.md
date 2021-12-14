@@ -4,21 +4,26 @@ CSV files are used as a data exchange format for the bulk import of program part
 
 UTF-8 encoding is required for all fields.
 
-## Cleaning participant records
-
-The `lds_hash` csv column represents the hashed value of the various identity data necessary for matching participants. Refer to [our Privacy-Preserving Record Linkage approach](../../docs/pprl.md) for how to validate, normalize, concatenate, and hash this data. [Csv-level validation](#validating-files) will only validate that the column data is a hexadecimal digest as specified in the PPRL documententation.
-
 ## Participant records to exclude
 
-Exclude participant records that meet any of the following criteria from your uploads to Piipan:
+Exclude records from the CSV files that you upload to Piipan for individuals who:
 
-- Participants who are missing any of these required data:
-  - First name
+- Are missing any of these required data:
   - Last name
   - Social Security number
   - Date of birth
-- Participants who have not yet been certified for benefits.
-- Participants who are no longer receiving benefits.  These records should be included through the last day of the participant's final benefit month and excluded from subsequent uploads.
+- Do not meet the definition of `active participants`
+
+### Definition of active participants
+> An active participant is an individual who is certified to receive SNAP benefits for the current monthly benefit cycle on the day when the bulk upload file is being generated.
+
+Note that the following groups of individuals are not considered active participants and as a result should be **excluded** from daily uploads:
+- Applicants who have not yet been certified for benefits.
+- Participants who are no longer receiving benefits.  These records should only be included through the last day of the participant's final benefit month and excluded from subsequent uploads.
+
+## Cleaning participant records
+
+The `lds_hash` csv column represents the hashed value of the various identity data necessary for matching participants. Refer to [our Privacy-Preserving Record Linkage approach](../../docs/pprl.md) for how to validate, normalize, concatenate, and hash this data. [Csv-level validation](#validating-files) will only validate that the column data is a hexadecimal digest as specified in the PPRL documententation.
 
 ## Validating files
 

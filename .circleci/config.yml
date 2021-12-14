@@ -29,13 +29,17 @@ commands:
           working_directory: << parameters.directory >>
           command: dotnet dev-certs https
       - run:
+          name: Build app
+          working_directory: << parameters.directory >>
+          command: dotnet build -v diag
+      - run:
           name: Run dev version of app for testing
           working_directory: << parameters.directory >>
-          command: dotnet run
+          command: dotnet run --no-build
           background: true
       - run:
           name: wait for app to spin up
-          command: sleep 60s
+          command: sleep 10s
       - run:
           name: run pa11y
           working_directory: << parameters.directory >>

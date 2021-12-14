@@ -10,6 +10,12 @@
         },
         "location": {
             "type": "string"
+        },
+        "vnet": {
+            "type": "string"
+        },
+        "subnet": {
+            "type": "string"
         }
     },
     "variables": {
@@ -27,7 +33,16 @@
             },
             "kind": "StorageV2",
             "properties": {
-                "supportsHttpsTrafficOnly": true
+                "supportsHttpsTrafficOnly": true,
+                "networkAcls": {
+                    "defaultAction": "Deny",
+                    "virtualNetworkRules": [
+                        {
+                            "id": "[concat(parameters('vnet'),  '/subnets/', parameters('subnet'))]",
+                            "action": "Allow"
+                        }
+                    ]
+                }
             }
         }
     ],
