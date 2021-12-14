@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.95] - 2021-12-14
+
+### Added
+- Add APIM rate limiting policy Duplicate Participation API
+- Stream diagnostic settings for key vault and event grid topics to event hub
+### Fixed
+- Add Microsoft.Storage service endpoint to function apps subnet to prevent deployment failures
+- Fix resource deployment sequencing bug causing deployment failures
+
 ## [0.94] - 2021-11-29
 
 ### Changed
