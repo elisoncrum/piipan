@@ -6,6 +6,7 @@ This is a place to jot down our decisions around engineering team workflow. It's
 - [Git Workflow](#git-workflow)
 - [Pull Requests and Code Reviews](#pull-requests-and-code-reviews)
 - [Definition of Done](#definition-of-done)
+- [Sprints and Releases](#sprints-and-releases)
 - [Dependabot PRs](#dependabot-prs)
 
 ## Git Workflow
@@ -36,6 +37,10 @@ The usual suspects, plus some variants:
 - If a PR changes the IaC, the IaC should be manually applied to tts/dev as our CI/CD pipeline does not run IaC automatically
 - As warranted, add the `changelog` tag to the PR and leave text to add to CHANGELOG at the end of the sprint – this is particularly important for any external API changes (e.g.; [#1374](https://github.com/18F/piipan/pull/1374))
 - For any deployment steps that require manual intervention, add them to the `Deployment notes` section of the draft release notes
+
+## Sprints and Releases
+
+We work in 2 week sprint cycles, starting on Tuesdays and ending on Mondays. A [release](./releases.md) is cut at the end of each sprint and the release notes are used as an outline for sprint demo. To avoid last minute rushes to include items in a release, we adhere to a cutoff of COB the day before demo. Any work that meets the [definition of done](#definition-of-done) and is merged into `dev` at that time is included in the release. Any in progress work is moved in the following sprint and prioritized during sprint planning.
 
 ## Dependabot PRs
 
