@@ -43,8 +43,16 @@ func azure functionapp publish <function-app-name> --dotnet
 
 ## Ad-hoc testing
 
-In a development environment, the `test-apim-upload-api.bash` tool can be used to upload test CSV files to a storage account. The state, APIM subscription, and CSV file information can be controlled by adjusting the variables at the top of the script. Usage:
+In a development environment, the `test-storage-upload.bash` tool can be used to upload test CSV files to a storage account.
 
+For example, if you are targeting the `tts/dev` environment and the `ttssteauploaddev` storage account:
 ```
-./tools/test-apim-upload-api.bash tts/dev
+./tools/test-storage-upload.bash tts/dev ./docs/csv/example.csv ttssteauploaddev
 ```
+
+`test-storage-upload.bash` uses the credentials of the signed in Azure administrator to access the storage accounts. Privileges to perform that operation have to be explicitly granted on each storage account:
+```
+./tools/grant-blob.bash tts/dev ttssteauploaddev
+``` 
+
+While `grant-blob.bash` may return within a few seconds, it take can up to several minutes for Azure to replicate the privileges across its internal infrastructure; e.g., if `test-storage-upload.bash` fails right after `grant-blob.bash` has been run, try it again in a couple of minutes.

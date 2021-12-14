@@ -14,15 +14,15 @@
   "license": "ISC",
   "devDependencies": {
     "autoprefixer": "^10.4.0",
-    "cypress": "^9.1.0",
+    "cypress": "^8.7.0",
     "gulp": "^4.0.2",
     "gulp-postcss": "^9.0.1",
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^5.0.0",
     "gulp-sourcemaps": "^3.0.0",
-    "postcss": "^8.4.4",
+    "postcss": "^8.3.11",
     "postcss-csso": "^5.0.1",
-    "sass": "^1.43.5",
+    "sass": "^1.43.4",
     "uswds-gulp": "github:uswds/uswds-gulp"
   },
   "dependencies": {

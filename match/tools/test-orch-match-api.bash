@@ -15,10 +15,10 @@ source "$(dirname "$0")"/../../tools/common.bash || exit
 
 MATCH_API_FUNC_NAME="find_matches"
 
-# Hash digest for farrington,10/13/31,425-46-5417
+# Hash digest for farrington,10/13/31,000-12-3456
 JSON='{
     "data": [{
-      "lds_hash": "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec"
+      "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
     }]
 }'
 
@@ -33,17 +33,18 @@ main () {
 
   name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
 
-  aad_app_id=$(\
-    az ad app list \
-      --display-name "${name}" \
-      --filter "displayName eq '${name}'" \
-      --query "[0].appId" \
-      --output tsv)
+  resource_uri=$(\
+    az functionapp show \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$name" \
+      --query defaultHostName \
+      -o tsv)
+  resource_uri="https://${resource_uri}"
 
-  echo "Retrieving access token from ${name}"
+  echo "Retrieving access token from ${resource_uri}"
   token=$(\
     az account get-access-token \
-      --resource "api://${aad_app_id}" \
+      --resource "${resource_uri}" \
       --query accessToken \
       -o tsv
   )
@@ -62,7 +63,6 @@ main () {
     --header "Authorization: Bearer ${token}" \
     --header 'Accept: application/json' \
     --header 'Content-Type: application/json' \
-    --header 'X-Initiating-State: ea' \
     --data-raw "$JSON" \
     --include
 

@@ -20,13 +20,8 @@ main () {
   source "$(dirname "$0")"/../../iac/iac-common.bash
   verify_cloud
 
-  app_id=$(\
-    az ad app list \
-      --display-name "${METRICS_API_APP_NAME}" \
-      --filter "displayName eq '${METRICS_API_APP_NAME}'" \
-      --query "[0].appId" \
-      --output tsv)
-  token=$(az account get-access-token --resource "api://${app_id}" --query accessToken -o tsv)
+  domain=$(web_app_host_suffix)
+  token=$(az account get-access-token --resource "https://${METRICS_API_APP_NAME}${domain}" --query accessToken -o tsv)
 
   # grab url for metrics api
   function_uri=$(az functionapp function show \

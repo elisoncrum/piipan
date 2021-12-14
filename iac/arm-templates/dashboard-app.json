@@ -17,9 +17,6 @@
         "metricsApiUri": {
             "type": "string"
         },
-        "metricsApiAppId": {
-            "type": "string"
-        },
         "eventHubName": {
             "type": "String"
         },
@@ -78,10 +75,6 @@
                 {
                     "name": "MetricsApiUri",
                     "value": "[parameters('metricsApiUri')]"
-                },
-                {
-                    "name": "MetricsApiAppId",
-                    "value": "[parameters('metricsApiAppId')]"
                 },
                 {
                     "name": "ASPNETCORE_ENVIRONMENT",
