@@ -111,17 +111,6 @@ main () {
       --query id \
       -o tsv)
 
-  # Create a key vault which will store credentials for use in other templates
-  az deployment group create \
-    --name "$VAULT_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/key-vault.json \
-    --parameters \
-      name="$VAULT_NAME" \
-      location="$LOCATION" \
-      objectId="$CURRENT_USER_OBJID" \
-      resourceTags="$RESOURCE_TAGS"
-
   # Create an Event Hub namespace and hub where resource logs will be streamed,
   # as well as an application registration that can be used to read logs
   siem_app_id=$(\
@@ -154,6 +143,18 @@ main () {
       env="$ENV" \
       prefix="$PREFIX" \
       receiverId="$siem_app_id"
+
+  # Create a key vault which will store credentials for use in other templates
+  az deployment group create \
+    --name "$VAULT_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file ./arm-templates/key-vault.json \
+    --parameters \
+      name="$VAULT_NAME" \
+      location="$LOCATION" \
+      objectId="$CURRENT_USER_OBJID" \
+      resourceTags="$RESOURCE_TAGS" \
+      eventHubName="$EVENT_HUB_NAME"
 
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
@@ -474,12 +475,15 @@ main () {
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
 
-    az eventgrid system-topic create \
-      --location "$LOCATION" \
-      --name "$topic_name" \
-      --topic-type Microsoft.Storage.storageAccounts \
-      --resource-group "$RESOURCE_GROUP" \
-      --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}"
+    event_grid_system_topic_id=$(\
+      az eventgrid system-topic create \
+        --location "$LOCATION" \
+        --name "$topic_name" \
+        --topic-type Microsoft.Storage.storageAccounts \
+        --resource-group "$RESOURCE_GROUP" \
+        --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}" \
+        -o tsv \
+        --query id)
 
     # Create Function endpoint before setting up event subscription
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
@@ -492,6 +496,19 @@ main () {
       --endpoint-type azurefunction \
       --included-event-types Microsoft.Storage.BlobCreated \
       --subject-begins-with /blobServices/default/containers/upload/blobs/
+
+    # Stream event topic logs to Event Hub
+    az monitor diagnostic-settings create \
+      --name "stream-logs-to-event-hub" \
+      --resource "$event_grid_system_topic_id" \
+      --event-hub "logs" \
+      --event-hub-rule "$eh_rule_id" \
+      --logs '[
+        {
+          "category": "DeliveryFailures",
+          "enabled": true
+        }
+      ]'
   done < states.csv
 
   # Create App Service resources for query tool app.
