@@ -41,11 +41,10 @@ The usual suspects, plus some variants:
 
 Dependabot does not support package lock files with .NET and so the automated PRs that it generates will fail in CI.
 
-In addition, since we have avoided requiring Node to build the web applications, as a consequence Dependabot PRs that update Node packages do not correctly rebuild our web apps.
-
 To address these Dependabot PRs, a developer can:
 - assign the PRs to themselves (typically in bulk via the Asignee function)
 - follow the [steps to update dependencies](./update-deps.md) using a a new PR
 
 The Dependabot PRs should close automatically after the new PR is merged.
 
+See also [guidance for addressing Dependabot PRs that update Node packages](./node.md).
