@@ -34,12 +34,6 @@
         },
         "states": {
             "type": "String"
-        },
-        "vnet": {
-            "type": "string"
-        },
-        "subnet": {
-            "type": "string"
         }
     },
     "variables": {
@@ -64,19 +58,6 @@
             "location": "[parameters('location')]",
             "sku": {
                 "name": "[variables('storageAccountType')]"
-            },
-            "kind": "StorageV2",
-            "properties": {
-                "supportsHttpsTrafficOnly": true,
-                "networkAcls": {
-                    "defaultAction": "Deny",
-                    "virtualNetworkRules": [
-                        {
-                            "id": "[concat(parameters('vnet'),  '/subnets/', parameters('subnet'))]",
-                            "action": "Allow"
-                        }
-                    ]
-                }
             }
         },
         {
@@ -127,14 +108,14 @@
 
                             See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#windows)
                         */
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(variables('functionAppName'))]"
-                        },
+                        // {
+                        //     "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                        //     "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                        // },
+                        // {
+                        //     "name": "WEBSITE_CONTENTSHARE",
+                        //     "value": "[toLower(variables('functionAppName'))]"
+                        // },
                         // Required when using the zip deployment method (i.e., the method
                         // used by `func azure functionapp publish`)
                         {
@@ -162,10 +143,6 @@
                         {
                             "name": "States",
                             "value": "[parameters('states')]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTOVERVNET",
-                            "value": "1"
                         }
                     ]
                 }

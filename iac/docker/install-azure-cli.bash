@@ -22,7 +22,7 @@ echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO 
 apt-get update
 apt-get install python
 if [ "$AZURE_CLI_VERSION" = 0 ]; then
-    apt-get install azure-cli
+    apt-get install azure-cli~focal -V
 else
     apt-get install azure-cli="$AZURE_CLI_VERSION"~focal -V
 fi

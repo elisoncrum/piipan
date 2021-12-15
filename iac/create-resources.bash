@@ -165,23 +165,23 @@ main () {
       eventHubName="$EVENT_HUB_NAME" \
       coreResourceGroup="$RESOURCE_GROUP"
 
-  # For each participating state, create a separate storage account.
-  # Each account has a blob storage container named `upload`.
-  while IFS=, read -r abbr name ; do
-      abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
-      func_stor_name=${PREFIX}st${abbr}upload${ENV}
-      echo "Creating storage for $name ($func_stor_name)"
-      az deployment group create \
-      --name "$func_stor_name" \
-      --resource-group "$RESOURCE_GROUP" \
-      --template-file ./arm-templates/blob-storage.json \
-      --parameters \
-        storageAccountName="$func_stor_name" \
-        resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION" \
-        vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME"
-  done < states.csv
+  # # For each participating state, create a separate storage account.
+  # # Each account has a blob storage container named `upload`.
+  # while IFS=, read -r abbr name ; do
+  #     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
+  #     func_stor_name=${PREFIX}st${abbr}upload${ENV}
+  #     echo "Creating storage for $name ($func_stor_name)"
+  #     az deployment group create \
+  #     --name "$func_stor_name" \
+  #     --resource-group "$RESOURCE_GROUP" \
+  #     --template-file ./arm-templates/blob-storage.json \
+  #     --parameters \
+  #       storageAccountName="$func_stor_name" \
+  #       resourceTags="$RESOURCE_TAGS" \
+  #       location="$LOCATION" \
+  #       vnet="$VNET_ID" \
+  #       subnet="$FUNC_SUBNET_NAME"
+  # done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
   # or storing it in a temp file that may be read, or appearing in a CI/CD log.
@@ -196,83 +196,83 @@ main () {
     --file /dev/stdin \
     --query id
 
-  echo "Creating PostgreSQL server"
-  az deployment group create \
-    --name participant-records \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/participant-records.json \
-    --parameters \
-      administratorLogin=$PG_SUPERUSER \
-      serverName="$PG_SERVER_NAME" \
-      secretName="$PG_SECRET_NAME" \
-      vaultName="$VAULT_NAME" \
-      resourceTags="$RESOURCE_TAGS" \
-      vnetName="$VNET_NAME" \
-      subnetName="$DB_SUBNET_NAME" \
-      privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
-      privateDnsZoneName="$PRIVATE_DNS_ZONE" \
-      eventHubName="$EVENT_HUB_NAME"
+  # echo "Creating PostgreSQL server"
+  # az deployment group create \
+  #   --name participant-records \
+  #   --resource-group "$RESOURCE_GROUP" \
+  #   --template-file ./arm-templates/participant-records.json \
+  #   --parameters \
+  #     administratorLogin=$PG_SUPERUSER \
+  #     serverName="$PG_SERVER_NAME" \
+  #     secretName="$PG_SECRET_NAME" \
+  #     vaultName="$VAULT_NAME" \
+  #     resourceTags="$RESOURCE_TAGS" \
+  #     vnetName="$VNET_NAME" \
+  #     subnetName="$DB_SUBNET_NAME" \
+  #     privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
+  #     privateDnsZoneName="$PRIVATE_DNS_ZONE" \
+  #     eventHubName="$EVENT_HUB_NAME"
 
 
-  # The AD admin can't be specified in the PostgreSQL ARM template,
-  # unlike in Azure SQL
-  az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
-  PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
-  az postgres server ad-admin create \
-    --resource-group "$RESOURCE_GROUP" \
-    --server "$PG_SERVER_NAME" \
-    --display-name "$PG_AAD_ADMIN" \
-    --object-id "$PG_AAD_ADMIN_OBJID"
+  # # The AD admin can't be specified in the PostgreSQL ARM template,
+  # # unlike in Azure SQL
+  # az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
+  # PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
+  # az postgres server ad-admin create \
+  #   --resource-group "$RESOURCE_GROUP" \
+  #   --server "$PG_SERVER_NAME" \
+  #   --display-name "$PG_AAD_ADMIN" \
+  #   --object-id "$PG_AAD_ADMIN_OBJID"
 
-  # Create managed identities to admin each state's database
-  while IFS=, read -r abbr name ; do
-      echo "Creating managed identity for $name ($abbr)"
-      abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
-      identity=$(state_managed_id_name "$abbr" "$ENV")
-      az identity create -g "$RESOURCE_GROUP" -n "$identity"
-  done < states.csv
+  # # Create managed identities to admin each state's database
+  # while IFS=, read -r abbr name ; do
+  #     echo "Creating managed identity for $name ($abbr)"
+  #     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
+  #     identity=$(state_managed_id_name "$abbr" "$ENV")
+  #     az identity create -g "$RESOURCE_GROUP" -n "$identity"
+  # done < states.csv
 
-  exists=$(az ad group member check \
-    --group "$PG_AAD_ADMIN" \
-    --member-id "$CURRENT_USER_OBJID" \
-    --query value -o tsv)
+  # exists=$(az ad group member check \
+  #   --group "$PG_AAD_ADMIN" \
+  #   --member-id "$CURRENT_USER_OBJID" \
+  #   --query value -o tsv)
 
-  if [ "$exists" = "true" ]; then
-    echo "$CURRENT_USER_OBJID is already a member of $PG_AAD_ADMIN"
-  else
-    # Temporarily add current user as a PostgreSQL AD admin
-    # to allow provisioning of managed identity roles
-    az ad group member add \
-      --group "$PG_AAD_ADMIN" \
-      --member-id "$CURRENT_USER_OBJID"
-  fi
+  # if [ "$exists" = "true" ]; then
+  #   echo "$CURRENT_USER_OBJID is already a member of $PG_AAD_ADMIN"
+  # else
+  #   # Temporarily add current user as a PostgreSQL AD admin
+  #   # to allow provisioning of managed identity roles
+  #   az ad group member add \
+  #     --group "$PG_AAD_ADMIN" \
+  #     --member-id "$CURRENT_USER_OBJID"
+  # fi
 
-  PGPASSWORD=$PG_SECRET
-  export PGPASSWORD
-  PGUSER=${PG_SUPERUSER}@${PG_SERVER_NAME}
-  export PGUSER
-  PGHOST=$(az resource show \
-    --resource-group "$RESOURCE_GROUP" \
-    --name "$PG_SERVER_NAME" \
-    --resource-type "Microsoft.DbForPostgreSQL/servers" \
-    --query properties.fullyQualifiedDomainName -o tsv)
-  export PGHOST
-  export ENV
-  export PREFIX
-  # Multiple PostgreSQL databases cannot be created with an ARM template;
-  # detailed database/schema/role configuration can't be done with an ARM
-  # template either. Instead, we access the PostgreSQL server from a trusted
-  # network (as established by its ARM template firewall variable), and apply
-  # various Data Definition (DDL) scripts for each state.
-  ./create-databases.bash "$RESOURCE_GROUP"
+  # PGPASSWORD=$PG_SECRET
+  # export PGPASSWORD
+  # PGUSER=${PG_SUPERUSER}@${PG_SERVER_NAME}
+  # export PGUSER
+  # PGHOST=$(az resource show \
+  #   --resource-group "$RESOURCE_GROUP" \
+  #   --name "$PG_SERVER_NAME" \
+  #   --resource-type "Microsoft.DbForPostgreSQL/servers" \
+  #   --query properties.fullyQualifiedDomainName -o tsv)
+  # export PGHOST
+  # export ENV
+  # export PREFIX
+  # # Multiple PostgreSQL databases cannot be created with an ARM template;
+  # # detailed database/schema/role configuration can't be done with an ARM
+  # # template either. Instead, we access the PostgreSQL server from a trusted
+  # # network (as established by its ARM template firewall variable), and apply
+  # # various Data Definition (DDL) scripts for each state.
+  # ./create-databases.bash "$RESOURCE_GROUP"
 
-  # Apply DDL shared between the ETL and match API subsystems.
-  # XXX This should be moved out of IaC, which is not run in CI/CD,
-  #     to a continuously deployable workflow that accomodates schema
-  #     changes over time.
-  pushd ../ddl
-  ./apply-ddl.bash
-  popd
+  # # Apply DDL shared between the ETL and match API subsystems.
+  # # XXX This should be moved out of IaC, which is not run in CI/CD,
+  # #     to a continuously deployable workflow that accomodates schema
+  # #     changes over time.
+  # pushd ../ddl
+  # ./apply-ddl.bash
+  # popd
 
   # This is a subscription-level resource provider
   az provider register --wait --namespace Microsoft.EventGrid
@@ -324,12 +324,10 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME" \
-      vnet="$VNET_ID" \
-      subnet="$FUNC_SUBNET_NAME"
+      eventHubName="$EVENT_HUB_NAME" 
 
   #publish function app
-  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+  try_run "CLI_DEBUG=1 func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --build local --csharp" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api" 
 
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \

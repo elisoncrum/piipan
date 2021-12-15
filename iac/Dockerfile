@@ -5,7 +5,7 @@ COPY ./iac/install-extensions.bash ./iac/
 COPY ./tools/common.bash ./tools/
 #Set to an working Azure CLI version
 #If you want lastest version set the set the AZURE_CLI_VERSION to 0
-ENV AZURE_CLI_VERSION=0
+ENV AZURE_CLI_VERSION=2.30.0-1
 #Run IAC scripts to prepare the deployment enviroment
 RUN ./iac/install-azure-cli.bash
 RUN ./iac/install-azure-core-tool.bash
@@ -18,4 +18,5 @@ RUN az cloud set --name AzureCloud
 COPY . ./piipan
 RUN chmod -R ug+rwx /piipan
 #Start the deployment with the set enviroment "tts/dev"
-CMD ["/piipan/iac/docker/start.bash", "tts/dev"]
+# CMD ["/piipan/iac/docker/start.bash", "tts/dev"]
+CMD ["/piipan/iac/docker/start.bash", "tts/eth"]
