@@ -34,12 +34,6 @@
         },
         "states": {
             "type": "String"
-        },
-        "vnet": {
-            "type": "string"
-        },
-        "subnet": {
-            "type": "string"
         }
     },
     "variables": {
@@ -67,16 +61,7 @@
             },
             "kind": "StorageV2",
             "properties": {
-                "supportsHttpsTrafficOnly": true,
-                "networkAcls": {
-                    "defaultAction": "Deny",
-                    "virtualNetworkRules": [
-                        {
-                            "id": "[concat(parameters('vnet'),  '/subnets/', parameters('subnet'))]",
-                            "action": "Allow"
-                        }
-                    ]
-                }
+                "supportsHttpsTrafficOnly": true
             }
         },
         {
@@ -95,7 +80,6 @@
             "properties": {
                 "serverFarmId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "httpsOnly": true,
-                "vnetRouteAllEnabled": true,
                 "siteConfig": {
                     "ftpsState": "Disabled",
                     "alwaysOn": true,
@@ -162,10 +146,6 @@
                         {
                             "name": "States",
                             "value": "[parameters('states')]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTOVERVNET",
-                            "value": "1"
                         }
                     ]
                 }
