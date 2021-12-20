@@ -94,7 +94,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 conn.Execute("DROP TABLE IF EXISTS participants");
                 conn.Execute("DROP TABLE IF EXISTS uploads");
                 conn.Execute(perstateSql);
-                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now(), current_user)");
+                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now() at time zone 'utc', current_user)");
 
                 conn.Close();
             }

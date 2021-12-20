@@ -54,7 +54,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                 )
                 VALUES
                 (
-                    now(),
+                    now() at time zone 'utc',
                     @MatchId,
                     @Initiator,
                     @States,
