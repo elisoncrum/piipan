@@ -80,7 +80,7 @@ main () {
 
   set_constants
 
-  # ./create-resource-groups.bash "$azure_env"
+  ./create-resource-groups.bash "$azure_env"
 
   # Virtual network is used to secure connections between
   # participant records database and all apps that communicate with it.
