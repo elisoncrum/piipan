@@ -15,12 +15,15 @@ commands:
       - checkout
       - run:
           name: Install Dependencies
-          description: "Installs Nodejs, supporting libs for the puppeteer dependency in pa11y, and supporting libs for cypress"
+          description: "Installs latest stable Nodejs, supporting libs for the puppeteer dependency in pa11y, and supporting libs for cypress"
           # https://medium.com/@ssmak/how-to-fix-puppetteer-error-while-loading-shared-libraries-libx11-xcb-so-1-c1918b75acc3
           # https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies
           command : |
             curl -sL https://deb.nodesource.com/setup_10.x |  bash -
             apt-get install -y nodejs
+            npm install -g n
+            n stable
+            PATH="$PATH"
             apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget libgbm-dev libnotify-dev xauth xvfb
             npm install -g pa11y-ci --unsafe-perm=true --allow-root
             npm install cypress
@@ -70,11 +73,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install npm
+          name: Install npm and get latest stable version of Node
           command: |
             apt-get update -y
             apt-get install -y nodejs
             apt-get install -y npm
+            npm install -g n
+            n stable
+            PATH="$PATH"
       - run:
           name: Setup Code Climate reporter
           command: |
@@ -151,12 +157,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install environment deps
+          name: Install environment deps and get latest stable node version
           command: |
             apt-get update -y
             apt-get install -y zip
             apt-get install -y nodejs
             apt-get install -y npm
+            npm install -g n
+            n stable
+            PATH="$PATH"
       - run:
           working_directory: dashboard/src/Piipan.Dashboard
           name: Build Dashboard

@@ -33,7 +33,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
             await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher)
-                VALUES (now(), current_user)");
+                VALUES (now() at time zone 'utc', current_user)");
 
             var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher

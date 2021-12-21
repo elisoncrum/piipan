@@ -736,10 +736,11 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "5.0.11",
-        "contentHash": "tCc36FSYqdYN/JQUaR2KkQj54suYPg5Jl6LXOGZ6MiiqnwDHDXkEKwxhsqR6+Ovh3MZ4yZltkKYJu9JG3WZZ9g==",
+        "resolved": "6.0.2",
+        "contentHash": "j/BJY/1lqtu5ssfGEi9D+qJ/3OMrK8ZdicsW4SldV49CahRVXVHldj636ucVcEqJPNDI0h+/PWJD7oHsQ/cFAQ==",
         "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "4.6.0"
+          "System.Diagnostics.DiagnosticSource": "6.0.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
       },
       "NuGet.Frameworks": {
@@ -990,8 +991,12 @@
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "4.6.0",
-        "contentHash": "mbBgoR0rRfl2uimsZ2avZY8g7Xnh1Mza0rJZLPcxqiMWlkGukjmRkuMJ/er+AhQuiRIh80CR/Hpeztr80seV5g=="
+        "resolved": "6.0.0",
+        "contentHash": "frQDfv0rl209cKm1lnwTgFPzNigy2EKk1BS3uAvHvlBVKe5cymGyHO+Sj+NLv5VF/AhHsqPIUUwya5oV4CHMUw==",
+        "dependencies": {
+          "System.Memory": "4.5.4",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
       },
       "System.Diagnostics.Process": {
         "type": "Transitive",
@@ -1453,8 +1458,8 @@
       },
       "System.Runtime.CompilerServices.Unsafe": {
         "type": "Transitive",
-        "resolved": "4.6.0",
-        "contentHash": "HxozeSlipUK7dAroTYwIcGwKDeOVpQnJlpVaOkBz7CM4TsE5b/tKlQBZecTjh6FzcSbxndYaxxpsBMz+wMJeyw=="
+        "resolved": "6.0.0",
+        "contentHash": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg=="
       },
       "System.Runtime.Extensions": {
         "type": "Transitive",
@@ -1944,7 +1949,7 @@
           "Microsoft.Extensions.Logging": "3.1.22",
           "Microsoft.Extensions.Options": "3.1.22",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "5.0.11"
+          "Npgsql": "6.0.2"
         }
       }
     }

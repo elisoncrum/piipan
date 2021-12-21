@@ -309,7 +309,9 @@ main () {
   state_abbrs=${state_abbrs:1}
 
   # Create orchestrator-level Function app using ARM template and
-  # deploy project code using functions core tools.
+  # deploy project code using functions core tools. Networking
+  # restrictions for the function app and storage account are added
+  # in a separate step to avoid deployment and publishing issues.
   db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
@@ -327,12 +329,28 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME" \
-      vnet="$VNET_ID" \
-      subnet="$FUNC_SUBNET_NAME"
+      eventHubName="$EVENT_HUB_NAME"
 
-  #publish function app
+  # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+
+  echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
+  # Subnet ID is needed when vnet and storage are in different resource groups
+  func_subnet_id=$(\
+    az network vnet subnet show \
+      --vnet-name "$VNET_NAME" \
+      --name "$FUNC_SUBNET_NAME" \
+      --resource-group "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  az storage account network-rule add \
+    --account-name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$func_subnet_id"
+  az storage account update \
+    --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --default-action Deny
 
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -340,6 +358,12 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
+  az functionapp config appsettings set \
+    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --settings \
+      WEBSITE_CONTENTOVERVNET=1 \
+      WEBSITE_VNET_ROUTE_ALL=1
 
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth

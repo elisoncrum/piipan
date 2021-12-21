@@ -82,7 +82,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.Execute("DROP TABLE IF EXISTS participants");
                 conn.Execute("DROP TABLE IF EXISTS uploads");
                 conn.Execute(sqltext);
-                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now(), current_user)");
+                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now() at time zone 'utc', current_user)");
 
                 conn.Close();
             }
@@ -159,7 +159,7 @@ namespace Piipan.Participants.Core.IntegrationTests
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now(), current_user)");
+                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now() at time zone 'utc', current_user)");
                 conn.Close();
             }
         }
