@@ -539,7 +539,7 @@ main () {
 
   front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
 
-
+  # Create WAF Policy on the front door
   echo "az network front-door waf-policy rule create "
   az network front-door waf-policy rule create \
     --name $WAF_CUSTOM_RULE_NAME \
@@ -553,11 +553,13 @@ main () {
 
   echo "az network front-door waf-policy rule show"
 
+  # Show if there is any rule on the WAF policy
   az network front-door waf-policy rule show \
     --resource-group "$RESOURCE_GROUP" \
     --policy-name "$QUERY_TOOL_WAF_NAME"  \
     --name $WAF_CUSTOM_RULE_NAME
 
+  #Create the custom rule on the WAF Polity that match with any POST request method
   echo "az network front-door waf-policy rule match-condition add" 
   az network front-door waf-policy rule match-condition add \
     --resource-group "$RESOURCE_GROUP" \
