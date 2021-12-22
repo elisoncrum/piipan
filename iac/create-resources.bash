@@ -577,12 +577,6 @@ main () {
 
   echo "az network front-door waf-policy rule show"
 
-  # Show if there is any rule on the WAF policy
-  az network front-door waf-policy rule show \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME"  \
-    --name $WAF_CUSTOM_RULE_NAME
-
   #Create the custom rule on the WAF Polity that match with any POST request method
   echo "az network front-door waf-policy rule match-condition add" 
   az network front-door waf-policy rule match-condition add \
