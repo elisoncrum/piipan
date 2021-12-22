@@ -158,7 +158,7 @@ main () {
 
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
-    --name activity-log-diagnostics \
+    --name activity-log-diagnostics-$LOCATION \
     --location "$LOCATION" \
     --template-file ./arm-templates/activity-log.json \
     --parameters \
