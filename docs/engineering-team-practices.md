@@ -17,6 +17,19 @@ This is a place to jot down our decisions around engineering team workflow. It's
 
 - Avoid adjusting git history once a PR is submitted for review.
 
+### Git Commits
+
+We use this commit message template:
+
+```
+# Short phrase that explains change in active voice
+
+# - If necessary, additional information
+# - If necessary, more additional information
+
+# Reference to issue or task in Github, Jira, etc
+```
+
 ## Pull Requests and Code Reviews
 
 - We strive to keep pull requests as small as possible, but realize this can be hard with greenfield projects. Small pull requests are easier to review and lead to more frequent merges.
