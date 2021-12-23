@@ -16,6 +16,9 @@
         },
         "subnet": {
             "type": "string"
+        },
+        "sku": {
+            "type": "string"
         }
     },
     "variables": {
@@ -29,7 +32,8 @@
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
             "sku": {
-                "name": "Standard_ZRS"
+                "name": "[parameters('sku')]"
+                // "Standard_ZRS"
             },
             "kind": "StorageV2",
             "properties": {
