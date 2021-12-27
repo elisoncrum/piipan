@@ -75,6 +75,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
             using (var connection = await _dbConnectionFactory.Build() as DbConnection)
             {
+                // A performance optimization. Dapper will open/close around invidual
+                // calls if it is passed a closed connection. 
                 await connection.OpenAsync();
                 foreach (var participant in participants)
                 {
