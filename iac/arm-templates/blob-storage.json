@@ -16,6 +16,9 @@
         },
         "subnet": {
             "type": "string"
+        },
+        "sku": {
+            "type": "string"
         }
     },
     "variables": {
@@ -33,7 +36,7 @@
             "location": "[parameters('location')]",
             "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "sku": {
-                "name": "Standard_LRS"
+                "name": "[parameters('sku')]"
             },
             "kind": "StorageV2",
             "properties": {
