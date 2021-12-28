@@ -34,6 +34,6 @@ QUERY_TOOL_APP_IDP_CLIENT_ID=a8e3c164-77a9-45fd-9950-cc9862aa774a
 # SIEM tool app registration name
 SIEM_RECEIVER=$PREFIX-siem-tool-$ENV
 
-# Azure Storage SKU
+# Azure Storage SKU for per-state storage accounts and storage accounts backing function apps
 STORAGE_SKU="Standard_ZRS" # Standard Zone Redundant Storage
-# STORAGE_SKU="Standard_ZRS" # Standard Locally Redundant Storage (Use this when ZRS is not avilable in the region)
+# STORAGE_SKU="Standard_LRS" # Standard Locally Redundant Storage (Use this when ZRS is not available in the region)

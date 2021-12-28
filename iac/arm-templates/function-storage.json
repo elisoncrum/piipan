@@ -33,7 +33,6 @@
             "tags": "[parameters('resourceTags')]",
             "sku": {
                 "name": "[parameters('sku')]"
-                // "Standard_ZRS"
             },
             "kind": "StorageV2",
             "properties": {
