@@ -121,7 +121,7 @@ pg_connection_string () {
     base=${base/.postgres.database.azure.com/.postgres.database.usgovcloudapi.net}
   fi
 
-  echo "${base}Ssl Mode=Require;"
+  echo "${base}Ssl Mode=VerifyFull;"
 }
 
 # Verify that the expected Azure environment is the active cloud

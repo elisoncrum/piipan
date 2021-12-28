@@ -6,6 +6,7 @@ This is a place to jot down our decisions around engineering team workflow. It's
 - [Git Workflow](#git-workflow)
 - [Pull Requests and Code Reviews](#pull-requests-and-code-reviews)
 - [Definition of Done](#definition-of-done)
+- [Sprints and Releases](#sprints-and-releases)
 - [Dependabot PRs](#dependabot-prs)
 
 ## Git Workflow
@@ -15,6 +16,19 @@ This is a place to jot down our decisions around engineering team workflow. It's
 - Rebasing should be done off of the dev branch.
 
 - Avoid adjusting git history once a PR is submitted for review.
+
+### Git Commits
+
+We use this commit message template:
+
+```
+# Short phrase that explains change in active voice
+
+# - If necessary, additional information
+# - If necessary, more additional information
+
+# Reference to issue or task in Github, Jira, etc
+```
 
 ## Pull Requests and Code Reviews
 
@@ -37,11 +51,13 @@ The usual suspects, plus some variants:
 - As warranted, add the `changelog` tag to the PR and leave text to add to CHANGELOG at the end of the sprint – this is particularly important for any external API changes (e.g.; [#1374](https://github.com/18F/piipan/pull/1374))
 - For any deployment steps that require manual intervention, add them to the `Deployment notes` section of the draft release notes
 
+## Sprints and Releases
+
+We work in 2 week sprint cycles, starting on Tuesdays and ending on Mondays. A [release](./releases.md) is cut at the end of each sprint and the release notes are used as an outline for sprint demo. To avoid last minute rushes to include items in a release, we adhere to a cutoff of COB the day before demo. Any work that meets the [definition of done](#definition-of-done) and is merged into `dev` at that time is included in the release. Any in progress work is moved in the following sprint and prioritized during sprint planning.
+
 ## Dependabot PRs
 
 Dependabot does not support package lock files with .NET and so the automated PRs that it generates will fail in CI.
-
-In addition, since we have avoided requiring Node to build the web applications, as a consequence Dependabot PRs that update Node packages do not correctly rebuild our web apps.
 
 To address these Dependabot PRs, a developer can:
 - assign the PRs to themselves (typically in bulk via the Asignee function)
@@ -49,3 +65,4 @@ To address these Dependabot PRs, a developer can:
 
 The Dependabot PRs should close automatically after the new PR is merged.
 
+See also [guidance for addressing Dependabot PRs that update Node packages](./node.md).

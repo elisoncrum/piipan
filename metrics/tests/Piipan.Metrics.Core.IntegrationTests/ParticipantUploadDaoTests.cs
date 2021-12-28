@@ -188,9 +188,11 @@ namespace Piipan.Metrics.Core.IntegrationTests
 
             // Act
             await dao.AddUpload("ea", uploadedAt);
+            var latest = await dao.GetLatestUploadsByState();
 
             // Assert
             Assert.True(Has("ea", uploadedAt));
+            Assert.Equal(uploadedAt, latest.ToList()[0].UploadedAt);
         }
     }
 }

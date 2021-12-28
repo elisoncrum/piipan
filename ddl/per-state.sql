@@ -7,7 +7,7 @@ SET search_path=piipan,public;
 
 CREATE TABLE IF NOT EXISTS uploads(
 	id serial PRIMARY KEY,
-	created_at timestamp NOT NULL,
+	created_at timestamptz NOT NULL,
 	publisher text NOT NULL
 );
 

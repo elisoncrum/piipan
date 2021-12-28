@@ -17,7 +17,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS matches(
     id serial PRIMARY KEY,
     match_id text UNIQUE NOT NULL,
-    created_at timestamp NOT NULL,
+    created_at timestamptz NOT NULL,
     initiator text NOT NULL,
     states text[2] NOT NULL,
     hash text NOT NULL,

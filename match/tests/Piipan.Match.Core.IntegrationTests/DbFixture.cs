@@ -127,7 +127,7 @@ namespace Piipan.Match.Core.IntegrationTests
                     )
                     VALUES
                     (
-                        now(),
+                        now() at time zone 'utc',
                         @MatchId,
                         @Initiator,
                         @States,

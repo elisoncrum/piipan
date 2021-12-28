@@ -67,6 +67,48 @@
                     }
                 }
             ]
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/providers/diagnosticSettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(variables('namespace'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('namespace'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', variables('namespace'), '/authorizationrules/RootManageSharedAccessKey')]",
+                "eventHubName": "logs",
+                "logs": [
+                    {
+                        "category": "ArchiveLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "OperationalLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AutoScaleLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "KafkaCoordinatorLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "KafkaUserErrorLogs",
+                        "enabled": true
+                    },
+                    {
+                        "category": "EventHubVNetConnectionEvent",
+                        "enabled": true
+                    },
+                    {
+                        "category": "CustomerManagedKeyUserLogs",
+                        "enabled": true
+                    }
+                ]
+            }
         }
     ]
 }

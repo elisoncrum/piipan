@@ -31,6 +31,9 @@ set_constants () {
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
+
+  # Query rool cWAF custom rule
+  WAF_CUSTOM_RULE_NAME=rateLimitRuleByRequestMethod
 }
 
 # Generate the storage account connection string for the corresponding
@@ -158,7 +161,7 @@ main () {
 
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
-    --name activity-log-diagnostics \
+    --name activity-log-diagnostics-$LOCATION \
     --location "$LOCATION" \
     --template-file ./arm-templates/activity-log.json \
     --parameters \
@@ -180,7 +183,8 @@ main () {
         resourceTags="$RESOURCE_TAGS" \
         location="$LOCATION" \
         vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME"
+        subnet="$FUNC_SUBNET_NAME" \
+        sku="$STORAGE_SKU"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -306,7 +310,9 @@ main () {
   state_abbrs=${state_abbrs:1}
 
   # Create orchestrator-level Function app using ARM template and
-  # deploy project code using functions core tools.
+  # deploy project code using functions core tools. Networking
+  # restrictions for the function app and storage account are added
+  # in a separate step to avoid deployment and publishing issues.
   db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
@@ -324,12 +330,28 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME" \
-      vnet="$VNET_ID" \
-      subnet="$FUNC_SUBNET_NAME"
+      eventHubName="$EVENT_HUB_NAME"
 
-  #publish function app
+  # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+
+  echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
+  # Subnet ID is needed when vnet and storage are in different resource groups
+  func_subnet_id=$(\
+    az network vnet subnet show \
+      --vnet-name "$VNET_NAME" \
+      --name "$FUNC_SUBNET_NAME" \
+      --resource-group "$RESOURCE_GROUP" \
+      --query id \
+      -o tsv)
+  az storage account network-rule add \
+    --account-name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$func_subnet_id"
+  az storage account update \
+    --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --default-action Deny
 
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -337,6 +359,12 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
+  az functionapp config appsettings set \
+    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --settings \
+      WEBSITE_CONTENTOVERVNET=1 \
+      WEBSITE_VNET_ROUTE_ALL=1
 
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
@@ -402,7 +430,8 @@ main () {
         resourceTags="$RESOURCE_TAGS" \
         location="$LOCATION" \
         vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME"
+        subnet="$FUNC_SUBNET_NAME" \
+        sku="$STORAGE_SKU"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
@@ -535,6 +564,30 @@ main () {
   echo "Front Door iD: ${front_door_id}"
 
   front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
+
+  # Create WAF Policy on the front door
+  echo "az network front-door waf-policy rule create "
+  az network front-door waf-policy rule create \
+    --name $WAF_CUSTOM_RULE_NAME \
+    --priority 1 \
+    --action Block \
+    --resource-group "$RESOURCE_GROUP" \
+    --policy-name "$QUERY_TOOL_WAF_NAME" \
+    --rule-type ratelimitrule \
+    --rate-limit-duration 5 \
+    --rate-limit-threshold 10000 --defer
+
+  echo "az network front-door waf-policy rule show"
+
+  #Create the custom rule on the WAF Polity that match with any POST request method
+  echo "az network front-door waf-policy rule match-condition add" 
+  az network front-door waf-policy rule match-condition add \
+    --resource-group "$RESOURCE_GROUP" \
+    --policy-name "$QUERY_TOOL_WAF_NAME" \
+    --name $WAF_CUSTOM_RULE_NAME \
+    --match-variable RequestMethod \
+    --operator Equal \
+    --values POST
 
   orch_api_uri=$(\
     az functionapp show \
