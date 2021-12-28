@@ -48,7 +48,7 @@ main () {
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
     --default-action "Deny" \
-    --sku $STORAGE_SKU \
+    --sku "$STORAGE_SKU" \
     --tags Project=$PROJECT_TAG
 
   echo "Allowing $VNET_NAME to access $COLLECT_STORAGE_NAME"
