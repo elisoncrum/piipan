@@ -47,31 +47,12 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./configure-oidc-apps.bash tts/dev
 ```
 
-7. Create a subscription in the API Management service. At least for now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
+7. Create a subscription in the API Management service. For now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
 
-    1. Go to the Azure Portal
-    2. Go to Resource Groups
-    3. Look for `rg-match-dev` resource group
-    4. Go to `tts-apim-duppartapi-dev`, an API Management service 
-    5. Go to `Subscriptions`, on the left menu
-    6. Click on `Add Subscription`
-        1. Name: `EA-DupPart`
-        2. Display Name: `EA-DupPart`
-        3. Allow tracing: `uncheck`
-        4. Scope: `API`
-        5. API: `Duplicate participation API`
-        6. Product: `blank`
-        7. User: `blank`
-        8. Click `Create`
-    7. Click on `Add Subscription`
-        1. Name: `EA-BulkUpload`
-        2. Display Name: `EA-BulkUpload`
-        3. Allow tracing: `uncheck`
-        4. Scope: `API`
-        5. API: `EA Bulk upload API`
-        6. Product: `blank`
-        7. User: `blank`
-        8. Click `Create` 
+```
+    ./match/tools/create-apim-match-subscription.bash tts/dev ea
+    ./etl/tools/create-apim-bulk-subscription.bash tts/dev ea
+```
 
 8. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
 
