@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - [.NET Core SDK](https://dotnet.microsoft.com/download)
-- [npm](https://npmjs.com)
+- [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during build
 
 ## Local development
 To run the app locally:
