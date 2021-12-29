@@ -4,7 +4,7 @@
 ENV=$(basename "${BASH_SOURCE%.*}")
 
 # Default location
-LOCATION=westus
+LOCATION=westus2
 
 # Default resource group
 RESOURCE_GROUP=rg-core-$ENV
@@ -33,3 +33,6 @@ QUERY_TOOL_APP_IDP_CLIENT_ID=71286b1e-5f5a-4757-ab5f-714802f33277
 
 # SIEM tool app registration name
 SIEM_RECEIVER=$PREFIX-siem-tool-$ENV
+
+# Azure Storage SKU for per-state storage accounts and storage accounts backing function apps
+STORAGE_SKU="Standard_ZRS"
