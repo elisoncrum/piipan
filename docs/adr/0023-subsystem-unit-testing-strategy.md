@@ -14,7 +14,7 @@ Piipan is made up of six primary subsystems (`dashboard`, `etl`, `match`, `metri
 
 Each project within a subsystem (with the exception of `*.Api`, if present) will have a corresponding `xUnit` test project located in the top-level `tests` directory (the `tests` directory structure should match that of `src`).
 
-Each source file (with the exception of `interfaces` and `POCOs`) will have have corresponding test file. A given test file (e.g. `ParticipantServiceTests.cs`) should strive to fully test the executable code of the target file (e.g. `ParticipantService.cs`), while minimizing the execution of executable code that lives outside the target file. This is best achieved through a combination of dependency injection and mocking.
+Each source file (with the exception of `interfaces` and `POCOs`) will have a corresponding test file. A given test file (e.g. `ParticipantServiceTests.cs`) should strive to fully test the executable code of the target file (e.g. `ParticipantService.cs`), while minimizing the execution of executable code that lives outside the target file. This is best achieved through a combination of dependency injection and mocking.
 
 There will be special cases where mocking all external functionality is not possible. This most commonly occurs when there are dependencies on extension methods and/or third-party or system classes which contain non-virtual methods (in both cases, these components cannot be mocked because they are non-overridable).
 
