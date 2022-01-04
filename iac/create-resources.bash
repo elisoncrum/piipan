@@ -184,7 +184,8 @@ main () {
         location="$LOCATION" \
         vnet="$VNET_ID" \
         subnet="$FUNC_SUBNET_NAME" \
-        sku="$STORAGE_SKU"
+        sku="$STORAGE_SKU" \
+        eventHubNamespace="$EVENT_HUB_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
