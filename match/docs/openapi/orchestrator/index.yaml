@@ -11,6 +11,8 @@ servers:
 paths:
   /find_matches:
     $ref: './find.yaml'
+  /matches/{match_id}:
+    $ref: './show.yaml'
 security:
   - BearerAuth: []
 components:

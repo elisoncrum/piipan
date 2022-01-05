@@ -22,6 +22,18 @@ paths:
           $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/200'
         '400':
           $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/400'
+  /matches/{match_id}:
+    get:
+      operationId: "Get match record"
+      tags:
+        - "Match"
+      summary: "Get a specific match record based on Match ID"
+      description: "Retrieves a specific match record based on Match ID, if exists"
+      responses:
+        '200':
+          $ref: '../../match/docs/openapi/schemas/match-record.yaml#/components/responses/200'
+        '404':
+          $ref: '../../match/docs/openapi/schemas/match-record.yaml#/components/responses/404'
 
 security:
   - ApiKeyAuth: []

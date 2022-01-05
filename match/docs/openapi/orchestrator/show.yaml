@@ -1,0 +1,17 @@
+get:
+  operationId: "Get a match record"
+  tags:
+    - "Match"
+  summary: "Get a specific match record based on Match ID"
+  description: "Searches matches database to retrieve a specific match record based on Match ID, if exists"
+  parameters:
+    match_id:
+      in: "path"
+      required: true
+      description: "the Match ID provided in the results of a previous match query"
+  responses:
+    '200':
+      $ref: '../schemas/match-record.yaml#/components/responses/200'
+    '404':
+      $ref: '../schemas/match-record.yaml#/components/responses/404'
+

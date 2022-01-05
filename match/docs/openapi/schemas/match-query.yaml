@@ -82,33 +82,30 @@ MatchRequestExamples:
 
 #/components/schemas/MatchResponse
 MatchResponse:
-  title: Match response
-  type: object
-  properties:
-    data:
-      type: object
-      nullable: true
-      description: The response payload. Either an errors or data property will be present in the response, but not both.
-      required:
-        - results
-        - errors
-      properties:
-        results:
-          type: array
-          description: "Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array."
-          items:
-            $ref: '#/Result'
-        errors:
-          type: array
-          description: "Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items."
-          items:
-            $ref: '#/DataError'
-    errors:
-      type: array
-      nullable: true
-      description: "Holds HTTP and other top-level errors. Either an errors or data property will be present in the response, but not both."
-      items:
-        $ref: '#/ResponseError'
+  Success:
+    title: Match response Success
+    type: object
+    properties:
+      data:
+        type: object
+        nullable: true
+        description: The response payload.
+        required:
+          - results
+          - errors
+        properties:
+          results:
+            type: array
+            description: "Array of query results. For every person provided in the request, a result is returned, even if no matches are found. If a query fails, the failure data will be in the errors array."
+            items:
+              $ref: '#/Result'
+          errors:
+            type: array
+            description: "Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items."
+            items:
+              $ref: '#/DataError'
+  Failure:
+    $ref: './errors.yaml#/HttpErrors'
 
 Result:
   type: object
@@ -215,24 +212,6 @@ DataError:
       type: string
       description: "The human-readable explanation specific to this occurrence of the error"
 
-ResponseError:
-  type: object
-  required:
-    - status
-  properties:
-    status:
-      type: string
-      description: "The HTTP status code"
-    code:
-      type: string
-      description: "The application-specific error code"
-    title:
-      type: string
-      description: "The short, human-readable summary of the error, consistent across all occurrences of the error"
-    detail:
-      type: string
-      description: "The human-readable explanation specific to this occurrence of the error"
-
 components:
   parameters:
     From:
@@ -254,7 +233,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '../schemas/match-query.yaml#/MatchResponse'
+            $ref: '../schemas/match-query.yaml#/MatchResponse/Success'
           examples:
             Single match:
               $ref: '../schemas/match-query.yaml#/MatchResponseExamples/Single'
@@ -272,3 +251,7 @@ components:
               $ref: '../schemas/match-query.yaml#/MatchResponseExamples/TopLevelError'
     '400':
       description: "Bad request. Request body does not match the required format."
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/match-query.yaml#/MatchResponse/Failure'
