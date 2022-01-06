@@ -1,0 +1,113 @@
+MatchRecordResponses:
+  Success:
+    title: "Match Record response - success"
+    type: object
+    properties:
+      data:
+        type: object
+        description: "The response payload representing a match record. Either an errors or data property will be present in the response, but not both."
+        required:
+          - created_at
+          - match_id
+          - initiator
+          - states
+          - hash
+          - hash_type
+          - output
+          - invalid
+          - status
+        properties:
+          created_at:
+            type: string
+            format: date-time
+            example: "2021-04-12T23:20:50.52Z"
+            description: "Match record's creation date/time"
+          match_id:
+            type: string
+            description: "Match record's human-readable unique identifier"
+          initiator:
+            type: string
+            description: "Match record's initiating state or territory"
+          states:
+            type: array
+            description: "List of states/territories involved in match"
+            items:
+              type: string
+          hash:
+            type: string
+            description: "Value of hash used to identify match. See docs/pprl.md for details"
+          hash_type:
+            enum:
+              - "ldshash"
+            description: "Type of hash used to identify match"
+          input:
+            description: "Original request data from real-time match request"
+            $ref: '../../../../match/docs/openapi/schemas/match-query.yaml#/Person'
+          output:
+            description: "Original response data from real-time match request"
+            $ref: '../../../../match/docs/openapi/schemas/participant-record.yaml#/ParticipantRecord'
+          invalid:
+            type: boolean
+            description: "Indicator used for designating match as invalid"
+          status:
+            enum:
+              - "open"
+              - "closed"
+            description: "Match record's status"
+
+MatchRecordResponseExamples:
+  Success:
+    description: "A match record is returned"
+    value:
+      data:
+        created_at: "2021-04-12T23:20:50.52Z"
+        match_id: "ABC1234"
+        initiator: "eb"
+        states:
+          - "ea"
+          - "eb"
+        hash: "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec"
+        hash_type: "ldshash"
+        input:
+          lds_hash: "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec"
+        output:
+          $ref: "../../../../match/docs/openapi/schemas/participant-record.yaml#/ParticipantRecordExamples/All"
+        invalid: false
+        status: "open"
+  NotFound:
+    description: "A match record is not found"
+    value:
+      errors:
+        - status: "404"
+          code: "XYZ"
+          title: "Not Found"
+          detail: "Match record not found"
+
+components:
+  parameters:
+    MatchId:
+      in: path
+      name: match_id
+      required: true
+      description: "the Match ID provided in the results of a previous match query"
+      schema:
+        type: string
+  responses:
+    '200':
+      description: "Success"
+      content:
+        application/json:
+          schema:
+            $ref: '#/MatchRecordResponses/Success'
+          examples:
+            success:
+              $ref: '#/MatchRecordResponseExamples/Success'
+    '404':
+      description: "Match not found"
+      content:
+        application/json:
+          schema:
+            $ref: './errors.yaml#/HttpErrors'
+          examples:
+            not_found:
+              $ref: '#/MatchRecordResponseExamples/NotFound'

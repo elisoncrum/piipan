@@ -1,0 +1,20 @@
+# Collaboration API base spec
+openapi: 3.0.0
+info:
+  title: "Match Collaboration API"
+  version: 1.0.0
+  description: "Internal API for resolving matching participant records"
+tags:
+  - name: "Collaboration"
+servers:
+  - url: "/v1"
+paths:
+  /matches/{match_id}:
+    $ref: './show.yaml'
+security:
+  - BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

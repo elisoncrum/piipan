@@ -1,0 +1,14 @@
+get:
+  operationId: "Get a match record"
+  tags:
+    - "Collaboration"
+  summary: "Get a specific match record based on Match ID"
+  description: "Searches matches database to retrieve a specific match record based on Match ID, if exists"
+  parameters:
+    - $ref: '../schemas/match-record.yaml#/components/parameters/MatchId'
+  responses:
+    '200':
+      $ref: '../schemas/match-record.yaml#/components/responses/200'
+    '404':
+      $ref: '../schemas/match-record.yaml#/components/responses/404'
+
