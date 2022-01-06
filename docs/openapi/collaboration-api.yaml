@@ -1,0 +1,30 @@
+# Orchestrator API base spec
+openapi: 3.0.0
+info:
+  title: "Match Collaboration API"
+  version: 1.0.0
+  description: "Internal API for resolving matching participant records"
+tags:
+  - name: "Collaboration"
+servers:
+  - url: "/v1"
+paths:
+  /matches/{match_id}:
+    get:
+      operationId: "Get match record"
+      tags:
+        - "Collaboration"
+      summary: "Get a specific match record based on Match ID"
+      description: "Retrieves a specific match record based on Match ID, if exists"
+      responses:
+        '200':
+          $ref: '../../match/docs/openapi/schemas/match-record.yaml#/components/responses/200'
+        '404':
+          $ref: '../../match/docs/openapi/schemas/match-record.yaml#/components/responses/404'
+security:
+  - BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

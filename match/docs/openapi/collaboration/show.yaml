@@ -1,7 +1,7 @@
 get:
   operationId: "Get a match record"
   tags:
-    - "Match"
+    - "Collaboration"
   summary: "Get a specific match record based on Match ID"
   description: "Searches matches database to retrieve a specific match record based on Match ID, if exists"
   parameters:

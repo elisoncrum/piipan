@@ -151,7 +151,16 @@ paths:
                       results:
                         - index: 0
                           matches:
-                            - $ref: '#/paths/~1matches~1%7Bmatch_id%7D/get/responses/200/content/application~1json/examples/success/value/data/output'
+                            - match_id: BCD2345
+                              state: ea
+                              case_id: string
+                              participant_id: string
+                              benefits_end_month: 2021-01
+                              recent_benefit_months:
+                                - 2021-05
+                                - 2021-04
+                                - 2021-03
+                              protect_location: true
                       errors: []
                 No matches:
                   description: A query for a single person returning no matches
@@ -195,7 +204,7 @@ paths:
                             - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Multiple%20matches/value/data/results/0/matches/1'
                         - index: 1
                           matches:
-                            - $ref: '#/paths/~1matches~1%7Bmatch_id%7D/get/responses/200/content/application~1json/examples/success/value/data/output'
+                            - $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/examples/Single%20match/value/data/results/0/matches/0'
                       errors: []
                 Multiple persons with one match:
                   description: A query for two persons returning no matches for one person and a match for the other
@@ -234,107 +243,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/paths/~1matches~1%7Bmatch_id%7D/get/responses/404/content/application~1json/schema'
-  '/matches/{match_id}':
-    get:
-      operationId: Get match record
-      tags:
-        - Match
-      summary: Get a specific match record based on Match ID
-      description: 'Retrieves a specific match record based on Match ID, if exists'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                title: Match Record response - success
-                type: object
-                properties:
-                  data:
-                    type: object
-                    description: 'The response payload representing a match record. Either an errors or data property will be present in the response, but not both.'
-                    required:
-                      - created_at
-                      - match_id
-                      - initiator
-                      - states
-                      - hash
-                      - hash_type
-                      - output
-                      - invalid
-                      - status
-                    properties:
-                      created_at:
-                        type: string
-                        format: date-time
-                        example: '2021-04-12T23:20:50.52Z'
-                        description: Match record's creation date/time
-                      match_id:
-                        type: string
-                        description: Match record's human-readable unique identifier
-                      initiator:
-                        type: string
-                        description: Match record's initiating state or territory
-                      states:
-                        type: array
-                        description: List of states/territories involved in match
-                        items:
-                          type: string
-                      hash:
-                        type: string
-                        description: Value of hash used to identify match. See docs/pprl.md for details
-                      hash_type:
-                        enum:
-                          - ldshash
-                        description: Type of hash used to identify match
-                      input:
-                        description: Original request data from real-time match request
-                        $ref: '#/paths/~1find_matches/post/requestBody/content/application~1json/schema/properties/data/items'
-                      output:
-                        description: Original response data from real-time match request
-                        $ref: '#/paths/~1find_matches/post/responses/200/content/application~1json/schema/properties/data/properties/results/items/properties/matches/items'
-                      invalid:
-                        type: boolean
-                        description: Indicator used for designating match as invalid
-                      status:
-                        enum:
-                          - open
-                          - closed
-                        description: Match record's status
-              examples:
-                success:
-                  description: A match record is returned
-                  value:
-                    data:
-                      created_at: '2021-04-12T23:20:50.52Z'
-                      match_id: ABC1234
-                      initiator: eb
-                      states:
-                        - ea
-                        - eb
-                      hash: a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec
-                      hash_type: ldshash
-                      input:
-                        lds_hash: a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec
-                      output:
-                        match_id: BCD2345
-                        state: ea
-                        case_id: string
-                        participant_id: string
-                        benefits_end_month: 2021-01
-                        recent_benefit_months:
-                          - 2021-05
-                          - 2021-04
-                          - 2021-03
-                        protect_location: true
-                      invalid: false
-                      status: open
-        '404':
-          description: Match not found
-          content:
-            application/json:
-              schema:
                 title: Http Errors
                 type: object
                 properties:
@@ -358,15 +266,6 @@ paths:
                         detail:
                           type: string
                           description: The human-readable explanation specific to this occurrence of the error
-              examples:
-                not_found:
-                  description: A match record is not found
-                  value:
-                    errors:
-                      - status: '404'
-                        code: XYZ
-                        title: Not Found
-                        detail: Match record not found
 security:
   - ApiKeyAuth: []
 components:
