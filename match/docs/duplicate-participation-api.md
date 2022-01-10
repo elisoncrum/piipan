@@ -8,7 +8,7 @@ The API includes the following endpoints:
 
 | Endpoint | Backend | Function |
 |---|---|---|
-| `/query` | [Orchestrator Function App](orchestrator-match.md) | `Query` |
+| `/find_matches` | [Orchestrator Function App](orchestrator-match.md) | `Find` |
 
 For a general overview of APIM, refer to [Microsoft's documentation](https://docs.microsoft.com/en-us/azure/api-management/). Piipan makes use of the following concepts:
 
@@ -36,7 +36,7 @@ An operation's endpoint is constructed using the following components, all provi
 | The APIM instance's base gateway URL | `https://<apim-name>.azure-api.net` | `https://<apim-name>.azure-api.net` |
 | The API's optional `path` property | `path` | `https://<apim-name>.azure-api.net/path` |
 | The API's optional version identifier | `v1` | `https://<apim-name>.azure-api.net/path/v1` |
-| The operation's `urlTemplate` property | `/query` | `https://<apim-name>.azure-api.net/path/v1/query` |
+| The operation's `urlTemplate` property | `/find_matches` | `https://<apim-name>.azure-api.net/path/v1/find_matches` |
 
 Operations are frontend layers for backend services. A client's request is received by an operation and forwarded to a backend server for processing. The operation receives the resulting response from the backend server and completes the loop by forwarding it to the client.
 
