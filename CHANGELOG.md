@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.96] - 2021-12-28
+
+### Changed
+- Storage accounts to use zone redundancy
+- Target region for `tts` deployments to support zone redundancy change
+- `timestamp` fields to `timestamptz`
+- DB connection strings to use `VerifyFull` SSL mode
+- Duplicate Participation API documentation to clarify `Content-Length` header
+### Added
+- Updates to engineering practices doc
+- Rate limiting on Query Tool search form
+- ADR for per-state databases decision
+- Logging for Event Hub
+### Fixed
+- `DbConnection` handling to allow for connection pooling
+- Orchestrator IaC configuration to properly sequence adding network protections
+
 ## [0.95] - 2021-12-14
 
 ### Added

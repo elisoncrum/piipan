@@ -1,4 +1,3 @@
-<!-- Generator: Widdershins v4.0.1 -->
 
 <h1 id="bulk-api">Bulk API v2.0.0</h1>
 

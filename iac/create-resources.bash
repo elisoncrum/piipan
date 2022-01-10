@@ -161,7 +161,7 @@ main () {
 
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
-    --name activity-log-diagnostics \
+    --name activity-log-diagnostics-$LOCATION \
     --location "$LOCATION" \
     --template-file ./arm-templates/activity-log.json \
     --parameters \
@@ -183,7 +183,9 @@ main () {
         resourceTags="$RESOURCE_TAGS" \
         location="$LOCATION" \
         vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME"
+        subnet="$FUNC_SUBNET_NAME" \
+        sku="$STORAGE_SKU" \
+        eventHubNamespace="$EVENT_HUB_NAME"
   done < states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -429,7 +431,8 @@ main () {
         resourceTags="$RESOURCE_TAGS" \
         location="$LOCATION" \
         vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME"
+        subnet="$FUNC_SUBNET_NAME" \
+        sku="$STORAGE_SKU"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it

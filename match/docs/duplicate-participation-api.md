@@ -44,23 +44,29 @@ The connection between an operation and a backend server is made by specifying t
 
 ## Managing API keys
 
-API keys are managed as [subscriptions](https://docs.microsoft.com/en-us/azure/api-management/api-management-subscriptions) in APIM. Currently, keys are created and managed ad-hoc by system developers via the Portal (Portal > {APIM instance} > Subscriptions).
+API keys are managed as [subscriptions](https://docs.microsoft.com/en-us/azure/api-management/api-management-subscriptions) in APIM. Currently, keys are managed ad-hoc by system developers via the Azure Portal (Portal > {APIM instance} > Subscriptions).
 
-When creating subscriptions during the onboarding process for states use the following process:
+When creating subscriptions during the onboarding process for states add two new subscriptions: one for the Duplicate Participation API and one for the Bulk Upload API. Subscriptions can be created using provided scripts:
 
-- Add one new subscription per-API
-- Use the following details:
-    - If creating a subscription for the Duplicate Participation API:
-        - Name: `{state-abbreviation}-DupPart`; e.g., `EA-DupPart`
-        - Display name: `{state-abbreviation}-DupPart`; e.g., `EA-DupPart`
-        - Scope: API
-        - API: (Current version of the Duplicate Participation API)
-        - User: leave blank
-    - If creating a subscription for the Bulk Upload API:
-        - Name: `{state-abbreviation}-BulkUpload`; e.g., `EA-BulkUpload`
-        - Display name: `{state-abbreviation}-BulkUpload`; e.g., `EA-BulkUpload`
-        - Scope: API
-        - API: (Current version of the state-specific Bulk Upload API)
-        - User: leave blank
+```
+    # For example state Echo Alpha (ea) in the tts/dev environment
+    ./match/tools/create-apim-match-subscription.bash tts/dev ea
+    ./etl/tools/create-apim-bulk-subscription.bash tts/dev ea
+```
+
+Subscriptions can also be created manually using the Azure Portal:
+
+- If creating a subscription for the Duplicate Participation API:
+    - Name: `{state-abbreviation}-DupPart`; e.g., `EA-DupPart`
+    - Display name: `{state-abbreviation}-DupPart`; e.g., `EA-DupPart`
+    - Scope: API
+    - API: (Current version of the Duplicate Participation API)
+    - User: leave blank
+- If creating a subscription for the Bulk Upload API:
+    - Name: `{state-abbreviation}-BulkUpload`; e.g., `EA-BulkUpload`
+    - Display name: `{state-abbreviation}-BulkUpload`; e.g., `EA-BulkUpload`
+    - Scope: API
+    - API: (Current version of the state-specific Bulk Upload API)
+    - User: leave blank
 
 *Note:* The APIM instance relies on a consistent naming format to dynamically derive a state's two-letter postal abbreviation from incoming requests.
