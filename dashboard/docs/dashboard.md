@@ -13,7 +13,7 @@ To run the app locally:
 
 2. Set the `MetricsApiUri` environment variable to a local or remote instance of `Piipan.Metrics.Api`:
 ```
-export MetricsApiUri=https://tts-func-metricsapi-dev.azurewebsites.net/api/getparticipantuploads
+export MetricsApiUri=https://tts-func-metricsapi-dev.azurewebsites.net/api/
 ```
 
 3. If using a remote metrics API URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `Metrics.Read` role for the remote metrics API Function App and authorize the Azure CLI.
