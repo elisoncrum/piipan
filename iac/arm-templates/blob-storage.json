@@ -52,10 +52,6 @@
                             "action": "Allow"
                         }
                     ]
-                },
-                "shareDeleteRetentionPolicy": {
-                    "enabled": true,
-                    "days": 1
                 }
             },
             "resources": [
