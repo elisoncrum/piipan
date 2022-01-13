@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.97] - 2022-01-13
+
+### Changed
+- Documentation to reference specific Node.js version requirement
+### Added
+- ADRs for async/await, subsystem testing strategy, Windows app service plan decision
+- Log streaming for blob storage
+- Automated script for creating APIM subscriptions
+- Various documentation clean up
+- Custom widdershins templates for documentation generation
+### Fixed
+- CSV schema to show `lds_hash` as a required field
+
 ## [0.96] - 2021-12-28
 
 ### Changed
